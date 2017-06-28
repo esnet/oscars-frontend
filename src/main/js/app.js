@@ -4,6 +4,7 @@ const Router = require('react-router').Router;
 const Route = require('react-router').Route;
 const browserHistory = require('react-router').browserHistory;
 import FixtureApp from './components/FixtureApp'
+import MapApp from './components/MapApp'
 
 import combinedReducers from './reducers'
 
