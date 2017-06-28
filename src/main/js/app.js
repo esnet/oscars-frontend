@@ -13,11 +13,13 @@ import { Provider } from 'react-redux';
 
 let store = createStore(combinedReducers);
 
+// TODO: remove 'frontend' route
+
 ReactDOM.render(
     <Provider store={store}>
       <Router history={browserHistory}>
-        <Route path="/" component={FixtureApp}> </Route>
-        <Route path="/map" component={MapApp}> </Route>
+        <Route path="/frontend/" component={FixtureApp}> </Route>
+        <Route path="/frontend/map" component={MapApp}> </Route>
       </Router>
     </Provider>
     ,document.getElementById('react') );
