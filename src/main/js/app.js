@@ -16,6 +16,7 @@ ReactDOM.render(
     <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={FixtureApp}> </Route>
+        <Route path="/map" component={MapApp}> </Route>
       </Router>
     </Provider>
     ,document.getElementById('react') );
