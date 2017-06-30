@@ -26,7 +26,7 @@ class MyXHRClient {
                     xhr.setRequestHeader(key, opts.headers[key]);
                 });
             }
-            xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
             let params = opts.params;
             if (params) {
                 if (typeof params === 'object') {

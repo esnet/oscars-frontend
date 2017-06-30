@@ -5,12 +5,11 @@ import {Modal, Button, Form, FormGroup, FormControl, ControlLabel, Checkbox, Gri
 
 @inject('sandboxStore')
 @observer
-export default class FixtureParamsModal extends Component {
+export default class AddPortModal extends Component {
     constructor(props) {
         super(props);
         this.closeModal = this.closeModal.bind(this);
-        this.deleteFixture = this.deleteFixture.bind(this);
-        this.updateFixture = this.updateFixture.bind(this);
+        this.addFixture = this.addFixture.bind(this);
         this.toggleSymmetrical = this.toggleSymmetrical.bind(this);
         this.onIngressBwChange = this.onIngressBwChange.bind(this);
     }
@@ -20,17 +19,17 @@ export default class FixtureParamsModal extends Component {
     };
 
     closeModal() {
-        this.props.sandboxStore.closeModal('fixture');
-    }
-    
-    updateFixture() {
-        console.log('udating')
+        this.props.sandboxStore.closeModal('port');
     }
 
-    deleteFixture() {
-        this.props.sandboxStore.deleteFixture(this.props.sandboxStore.selection.fixture);
+    addFixture() {
+        const port = this.props.sandboxStore.selection.port;
+        const device = this.props.sandboxStore.selection.device;
+        let id = this.props.sandboxStore.addFixture(port, device);
+        this.props.sandboxStore.selectFixture(id, false);
         this.closeModal();
     }
+
 
     toggleSymmetrical() {
         this.setState({
@@ -45,14 +44,16 @@ export default class FixtureParamsModal extends Component {
     }
 
     render() {
-        let fixture = this.props.sandboxStore.selection.fixture;
-        let showModal = this.props.sandboxStore.modals.get('fixture');
+        let port = this.props.sandboxStore.selection.port;
+        let device = this.props.sandboxStore.selection.device;
+        let showModal = this.props.sandboxStore.modals.get('port');
+
 
         return (
             <div>
                 <Modal show={showModal} onHide={this.closeModal}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{fixture}</Modal.Title>
+                        <Modal.Title>{port} ({device})</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <form>
@@ -89,8 +90,7 @@ export default class FixtureParamsModal extends Component {
                                     </Col>
                                 </Row>
                             </Grid>
-                            <Button onClick={this.updateFixture}>Update</Button>
-                            <Button onClick={this.deleteFixture}>Delete</Button>
+                            <Button onClick={this.addFixture}>Accept</Button>
                         </form>
                     </Modal.Body>
                     <Modal.Footer>

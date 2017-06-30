@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import {observable, action} from 'mobx';
 
 class SandboxStore {
     @observable sandbox = {
@@ -8,89 +8,154 @@ class SandboxStore {
     };
 
     @observable selection = {
-        device: "",
-        fixture: "",
+        device: '',
+        port: '',
+        fixture: '',
     };
 
-    @observable connState = "INITIAL";
+    @observable connState = 'INITIAL';
 
-    @observable modals = {
-        "fixture": false,
-        "device": false
-    };
+    @observable modals = observable.map({
+        'connection': false,
+        'port': false,
+        'fixture': false,
+        'device': false
+    });
 
 
-    @action addFixture(urn) {
-        this.sandbox.fixtures.push(urn);
+    @action addFixture(port, device) {
+        let idx = 0;
+        let id = port + '-' + idx;
+        let idMightBeTaken = true;
+        while (idMightBeTaken) {
+            let idIsTaken = false;
+            this.sandbox.fixtures.map((e) => {
+                if (e.id === id) {
+                    idIsTaken = true;
+                }
+            });
+            if (!idIsTaken) {
+                idMightBeTaken = false;
+            } else {
+                idx += 1;
+                id = port +'-'+ idx;
+            }
+        }
+
+        this.sandbox.fixtures.push(
+            {
+                'id': id,
+                'port': port,
+                'device': device
+            });
+        return id;
     }
 
-    @action deleteFixture(urn) {
-        const index = this.sandbox.fixtures.indexOf(urn);
-        if (index > -1) {
-            this.sandbox.fixtures.splice(index, 1);
+    @action deleteFixture(id) {
+        let idxToRemove = -1;
+        this.sandbox.fixtures.map((entry, index) => {
+            if (entry.id === id) {
+                idxToRemove = index;
+            }
+        });
+        if (idxToRemove > -1) {
+            this.sandbox.fixtures.splice(idxToRemove, 1);
         }
     }
 
     @action openModal(type) {
-        this.modals[type] = true;
-    }
-    @action closeModal(type) {
-        this.modals[type] = false;
+        this.modals.set(type, true);
     }
 
-    @action selectDevice(urn) {
-        this.selection.device = urn;
+    @action closeModal(type) {
+        this.modals.set(type, false);
+    }
+
+    @action closeModals() {
+        this.modals.forEach((value, key) => {
+            this.modals.set(key, false);
+        });
+    }
+
+    @action selectDevice(device) {
+        this.selection.device = device;
+        this.closeModals();
         this.openModal('device');
     }
 
-    @action selectFixture(urn) {
-        this.selection.fixture = urn;
-        this.closeModal('device');
-        this.openModal('fixture');
+    @action selectPort(urn, device) {
+        this.selection.port = urn;
+        this.selection.device = device;
+        this.closeModals();
+        this.openModal('port');
     }
 
-
+    @action selectFixture(id, openModal) {
+        this.selection.fixture = id;
+        this.closeModals();
+        if (openModal) {
+            this.openModal('fixture');
+        }
+    }
 
 
     @action reset() {
-        this.connState = "INITIAL";
+        this.connState = 'INITIAL';
+    }
+
+    @action validate() {
+        if (this.connState === 'INITIAL') {
+            this.connState = 'VALIDATING';
+        }
+    }
+
+    @action postValidate(ok) {
+        if (ok) {
+            this.connState = 'VALIDATE_OK';
+        } else {
+            this.connState = 'INITIAL';
+        }
     }
 
     @action check() {
-        if (this.connState === "INITIAL") {
-            this.connState = "CHECKING";
+        if (this.connState === 'INITIAL') {
+            this.connState = 'CHECKING';
         }
     }
 
     @action postCheck(ok) {
         if (ok) {
-            this.connState = "CHECK_OK";
+            this.connState = 'CHECK_OK';
         } else {
-            this.connState = "INITIAL";
+            this.connState = 'INITIAL';
         }
     }
+
     @action hold() {
-        if (this.connState === "CHECK_OK") {
-            this.connState = "HOLDING";
+        if (this.connState === 'CHECK_OK') {
+            this.connState = 'HOLDING';
         }
     }
+
     @action postHold(ok) {
         if (ok) {
-            this.connState = "HOLD_OK";
+            this.connState = 'HOLD_OK';
         } else {
-            this.connState = "INITIAL";
+            this.connState = 'INITIAL';
         }
     }
+
     @action commit() {
-        if (this.connState === "HOLD_OK") {
-            this.connState = "COMMITTING";
+        if (this.connState === 'HOLD_OK') {
+            this.connState = 'COMMITTING';
         }
     }
+
     @action postCommit(ok) {
         if (ok) {
-            this.connState = "COMMITTED";
+            this.connState = 'COMMITTED';
         } else {
-            this.connState = "INITIAL";
+            this.connState = 'INITIAL';
         }
     }
 

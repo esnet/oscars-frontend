@@ -2,10 +2,11 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {Grid, Row, Col} from 'react-bootstrap';
 
-import SelectFixtureFromText from '../components/selectFixtureFromText';
-import SelectFixtureFromMap from '../components/selectFixtureFromMap';
+import SelectPortFromText from '../components/selectPortFromText';
+import SelectPortFromMap from '../components/selectPortFromMap';
 import SandboxFixtures from '../components/sandboxFixtures';
 import SandboxControls from '../components/sandboxControls';
+import ConnectionParamsModal from '../components/connectionParamsModal';
 
 @inject('sandboxStore')
 @observer
@@ -18,10 +19,10 @@ export default class NewReservationApp extends Component {
                 <Grid>
                     <Row>
                         <Col md={10}>
-                            <SelectFixtureFromMap div_id="new_resv_map"/>
+                            <SelectPortFromMap div_id="new_resv_map"/>
                         </Col>
                         <Col md={2}>
-                            <SelectFixtureFromText  />
+                            <SelectPortFromText  />
                             <SandboxFixtures /></Col>
                     </Row>
                     <Row>
@@ -33,6 +34,7 @@ export default class NewReservationApp extends Component {
                         </Col>
                     </Row>
                 </Grid>
+                <ConnectionParamsModal />
             </div>
         );
     }

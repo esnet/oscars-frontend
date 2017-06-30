@@ -4,22 +4,23 @@ import {action} from 'mobx';
 import vis from 'vis';
 
 import myClient from '../agents/client';
-import FixtureParamsModal from "./fixtureParamsModal";
-import DeviceFixturesModal from "./deviceFixturesModal";
+import FixtureParamsModal from './fixtureParamsModal';
+import DevicePortsModal from './devicePortsModal';
+import AddPortModal from './addPortModal';
 
 @inject('sandboxStore', 'topologyStore')
-export default class SelectFixtureFromMap extends Component {
+export default class SelectPortFromMap extends Component {
     constructor(props) {
         super(props);
     }
 
     componentWillMount() {
-        this.props.topologyStore.loadPortsForFixtures();
+        this.props.topologyStore.loadAvailablePorts();
     }
 
 
     componentDidMount() {
-        myClient.loadJSON({method: "GET", url: "/viz/topology/multilayer"})
+        myClient.loadJSON({method: 'GET', url: '/viz/topology/multilayer'})
             .then(
                 action((response) => {
                         let topology = JSON.parse(response);
@@ -36,20 +37,43 @@ export default class SelectFixtureFromMap extends Component {
                             },
                             nodes: {
                                 shape: 'dot',
-                                color: {background: "white"}
+                                color: {background: 'white'}
                             }
                         };
+                        let nodeDataset = new vis.DataSet(topology.nodes);
+                        let edgeDataset = new vis.DataSet(topology.edges);
+                        let datasource = {
+                            nodes: nodeDataset,
+                            edges: edgeDataset
+                        };
 
-                        let network = new vis.Network(this.mapRef, topology, options);
-                        network.on("click", (params) => {
+
+                    let network = new vis.Network(this.mapRef, datasource, options);
+                        network.on('click', (params) => {
                             if (params.nodes.length > 0) {
                                 let nodeId = params.nodes[0];
                                 this.props.sandboxStore.selectDevice(nodeId);
                             }
                         });
+
+                        network.on('dragEnd', (params) => {
+                            if (params.nodes.length > 0) {
+                                let nodeId = params.nodes[0];
+                                nodeDataset.update({id: nodeId, fixed: {x: true, y: true}});
+                            }
+                        });
+
+                        network.on('dragStart', (params) => {
+                            if (params.nodes.length > 0) {
+                                let nodeId = params.nodes[0];
+                                nodeDataset.update({id: nodeId, fixed: {x: false, y: false}});
+                            }
+                        });
+
                     }
                 )
-            );
+            )
+        ;
 
     }
 
@@ -58,7 +82,8 @@ export default class SelectFixtureFromMap extends Component {
         return (
             <div>
                 <FixtureParamsModal />
-                <DeviceFixturesModal />
+                <DevicePortsModal />
+                <AddPortModal />
 
                 <div ref={(ref) => {
                     this.mapRef = ref;

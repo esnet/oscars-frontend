@@ -8,8 +8,10 @@ import {Button} from 'react-bootstrap';
 export default class SandboxControls extends Component {
     constructor(props) {
         super(props);
-        this.preCheck = this.preCheck.bind(this);
         this.isDisabled = this.isDisabled.bind(this);
+
+        this.validate = this.validate.bind(this);
+        this.preCheck = this.preCheck.bind(this);
         this.hold = this.hold.bind(this);
         this.commit = this.commit.bind(this);
         this.reset = this.reset.bind(this);
@@ -17,8 +19,11 @@ export default class SandboxControls extends Component {
 
     isDisabled(what) {
         let connState = this.props.sandboxStore.connState;
-        if (what === 'precheck') {
+        if (what === 'validate') {
             return connState !== 'INITIAL';
+        }
+        if (what === 'precheck') {
+            return connState !== 'VALIDATE_OK';
         }
         if (what === 'hold') {
             return connState !== 'CHECK_OK';
@@ -29,6 +34,12 @@ export default class SandboxControls extends Component {
         }
     }
 
+    validate() {
+        this.props.sandboxStore.validate();
+        setTimeout(() => {this.props.sandboxStore.postValidate(true)}, 1000)
+        return false;
+
+    }
     preCheck() {
         this.props.sandboxStore.check();
         setTimeout(() => {this.props.sandboxStore.postCheck(true)}, 1000)
@@ -57,7 +68,7 @@ export default class SandboxControls extends Component {
             <div>
                 <p>connectionId</p>
                 <p>date and time</p>
-
+                <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>
                 <Button disabled={this.isDisabled('precheck')} onClick={this.preCheck}>Precheck</Button>
                 <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>
                 <Button disabled={this.isDisabled('commit')}  onClick={this.commit}>Commit</Button>

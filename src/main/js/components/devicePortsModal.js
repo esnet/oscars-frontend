@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button} from 'react-bootstrap';
-import FixtureList from "./fixtures";
+import DevicePortList from './devicePorts';
 
 
 @inject('sandboxStore', 'topologyStore')
 @observer
-export default class FixtureParamsModal extends Component {
+export default class DevicePortsModal extends Component {
     constructor(props) {
         super(props);
         this.closeModal = this.closeModal.bind(this);
@@ -18,9 +18,20 @@ export default class FixtureParamsModal extends Component {
 
     render() {
         const device = this.props.sandboxStore.selection.device;
+        const devicePorts = this.props.topologyStore.availPortsByDevice;
 
-        const devicePorts = this.props.topologyStore.portsForFixtures[device];
-        let showModal = this.props.sandboxStore.modals['device'];
+        let ports = [];
+        if (typeof device !== 'undefined' && device !== '') {
+            devicePorts.get(device).map((port) => {
+                    ports.push({
+                        'port': port,
+                        'device': device
+                    })
+                }
+            );
+        }
+
+        let showModal = this.props.sandboxStore.modals.get('device');
 
         return (
             <div>
@@ -29,8 +40,7 @@ export default class FixtureParamsModal extends Component {
                         <Modal.Title>{device}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <FixtureList fixtures={devicePorts} onFixtureClick={() => {
-                        }}/>
+                        <DevicePortList ports={ports} />
 
                     </Modal.Body>
                     <Modal.Footer>
