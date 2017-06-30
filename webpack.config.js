@@ -1,5 +1,5 @@
-var path = require('path');
 var packageJSON = require('./package.json');
+var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
@@ -9,7 +9,7 @@ const PATHS = {
 };
 
 module.exports = {
-    entry: './src/main/js/app.js',
+    entry: './src/main/js/index.js',
     devtool: 'sourcemaps',
     cache: true,
     output: {
@@ -24,7 +24,8 @@ module.exports = {
                 loader: 'babel-loader',
                 query: {
                     cacheDirectory: true,
-                    presets: ['es2015', 'react']
+                    presets: ['es2015', 'react', 'stage-1'],
+                    plugins: ["transform-decorators-legacy"]
                 }
             }
         ]
@@ -42,6 +43,18 @@ module.exports = {
         },
         watchOptions: {
             poll: 1000
+        },
+        proxy: {
+            "/topology/*": {
+                secure: false,
+                changeOrigin: true,
+                target: "https://localhost:8001/"
+            },
+            "/viz/*": {
+                secure: false,
+                changeOrigin: true,
+                target: "https://localhost:8001/"
+            }
         }
     }
 };

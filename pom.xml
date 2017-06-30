@@ -31,7 +31,16 @@
                         </goals>
                         <configuration>
                             <nodeVersion>v6.11.0</nodeVersion>
-                            <npmVersion>5.0.4</npmVersion>
+                            <npmVersion>4.6.1</npmVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                     <execution>
