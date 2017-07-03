@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
-import {toJS} from 'mobx';
 
 @inject('topologyStore', 'sandboxStore')
 @observer
@@ -40,6 +39,7 @@ export default class SelectPortFromText extends Component {
         }
         return (
             <Typeahead
+                placeholder='type to add a fixture'
                 options={options}
                 maxVisible={2}
                 onInputChange={this.handleFixtureSelection}

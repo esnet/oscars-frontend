@@ -198,7 +198,7 @@ export default class BwSelect extends Component {
                 }
             </FormControl>;
 
-        let fixtureSelect = <FixtureSelect fixtures={otherFixtures} onChange={this.fixtureSelected}/>
+        let fixtureSelect = <FixtureSelect fixtures={otherFixtures} onChange={this.fixtureSelected}/>;
 
         let bwControl = null;
         if (this.state.bwSelectMode === 'sameAs') {

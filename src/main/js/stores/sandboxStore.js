@@ -12,6 +12,10 @@ class SandboxStore {
         port: '',
         fixture: '',
         vlan: '',
+        junction: '',
+        otherJunction: '',
+        azBw: 0,
+        zaBw: 0,
         ingress: 0,
         egress: 0
     };
@@ -22,6 +26,8 @@ class SandboxStore {
         'connection': false,
         'port': false,
         'fixture': false,
+        'junction': false,
+        'pipe': false,
         'device': false
     });
 
@@ -64,9 +70,32 @@ class SandboxStore {
                 'ingress': ingress,
                 'egress': egress,
             });
+
+        this.addJunction(device);
+
         return id;
     }
 
+    @action addJunction(device) {
+        let junctionExists = false;
+        this.sandbox.junctions.map((j) => {
+            if (j.id === device) {
+                junctionExists = true;
+            }
+        });
+        if (!junctionExists) {
+            this.sandbox.junctions.push({
+                    'id': device,
+            });
+        }
+
+    }
+
+    @action addPipe(pipe) {
+        this.sandbox.pipes.push(pipe);
+
+        console.log('adding pipe between '+pipe.a + ' and '+ pipe.z);
+    }
 
     @action updateFixture(id, vlan, ingress, egress) {
         this.sandbox.fixtures.map((entry) => {
@@ -103,6 +132,12 @@ class SandboxStore {
         this.modals.forEach((value, key) => {
             this.modals.set(key, false);
         });
+    }
+
+    @action selectJunction(junction) {
+        this.selection.junction = junction;
+        this.closeModals();
+        this.openModal('junction');
     }
 
     @action selectDevice(device) {

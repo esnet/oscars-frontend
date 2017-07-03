@@ -11,18 +11,46 @@ export default class SandboxFixtures extends Component {
     }
 
     render() {
-        let fixtureNodes = this.props.sandboxStore.sandbox.fixtures.map((entry) => {
-            let port = entry.port;
-            let device = entry.device;
-            let key = entry.id;
-            let id = entry.id;
+        let junctionNodes = this.props.sandboxStore.sandbox.junctions.map((junction) => {
+            let device = junction.id;
+            let key = junction.id;
+            let fixtureNodes = this.props.sandboxStore.sandbox.fixtures.map((entry) => {
+                if (entry.device === device) {
+                    let port = entry.port;
+                    let key = entry.id;
+                    let id = entry.id;
+                    return (<Fixture key={key} id={id} device={device} port={port}/>)
+                }
+            });
 
-            return (<Fixture key={key} id={id} device={device} port={port}/>)
+            return (
+                <ListGroupItem key={key}>
+                    <div onClick={() => {
+                        this.props.onJunctionClick(device);
+                        this.props.sandboxStore.selectJunction(device)
+
+                    }}>{device}</div>
+                    <ListGroup>
+                        {fixtureNodes}
+                    </ListGroup>
+
+                </ListGroupItem>)
+
         });
 
+        let pipeNodes =
+            <ListGroup> {
+                this.props.sandboxStore.sandbox.pipes.map((p, index) => {
+
+                    return(<ListGroupItem key={index}>{p.a} {p.azBw} / {p.zaBw} {p.z}</ListGroupItem>)
+                })
+            }
+            </ListGroup>;
         return <div>
-            <p>Reservation fixtures:</p>
-            <ListGroup>{fixtureNodes}</ListGroup>
+            <p>Junctions and fixtures:</p>
+            <ListGroup>{junctionNodes}</ListGroup>
+            <p>Pipes</p>
+            {pipeNodes}
         </div>
     };
 

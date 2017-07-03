@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {toJS} from 'mobx';
 import {Button, Grid, Row, Col} from 'react-bootstrap';
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
@@ -21,7 +20,7 @@ export default class FixtureParamsForm extends Component {
 
     state = {
         modified: false
-    }
+    };
 
     closeModal() {
         this.props.sandboxStore.closeModal(this.props.modal);

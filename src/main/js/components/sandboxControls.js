@@ -36,25 +36,25 @@ export default class SandboxControls extends Component {
 
     validate() {
         this.props.sandboxStore.validate();
-        setTimeout(() => {this.props.sandboxStore.postValidate(true)}, 1000)
+        setTimeout(() => {this.props.sandboxStore.postValidate(true)}, 1000);
         return false;
 
     }
     preCheck() {
         this.props.sandboxStore.check();
-        setTimeout(() => {this.props.sandboxStore.postCheck(true)}, 1000)
+        setTimeout(() => {this.props.sandboxStore.postCheck(true)}, 1000);
         return false;
 
     }
     hold() {
         this.props.sandboxStore.hold();
-        setTimeout(() => {this.props.sandboxStore.postHold(true)}, 1000)
+        setTimeout(() => {this.props.sandboxStore.postHold(true)}, 1000);
         return false;
 
     }
     commit() {
         this.props.sandboxStore.commit();
-        setTimeout(() => {this.props.sandboxStore.postCommit(true)}, 1000)
+        setTimeout(() => {this.props.sandboxStore.postCommit(true)}, 1000);
         return false;
     }
     reset() {
