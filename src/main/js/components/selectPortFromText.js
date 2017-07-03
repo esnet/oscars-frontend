@@ -27,6 +27,7 @@ export default class SelectPortFromText extends Component {
         });
         if (isInAvailPorts) {
             this.props.sandboxStore.selectPort(port, device);
+            this.typeAhead.getInstance().clear();
         }
     }
 
@@ -40,6 +41,7 @@ export default class SelectPortFromText extends Component {
         }
         return (
             <Typeahead
+                ref={(ref) => { this.typeAhead = ref; }}
                 placeholder='type to add a fixture'
                 options={options}
                 maxVisible={2}

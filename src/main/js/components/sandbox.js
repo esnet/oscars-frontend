@@ -5,7 +5,7 @@ import {ListGroup, ListGroupItem, Button} from 'react-bootstrap';
 
 @inject('sandboxStore')
 @observer
-export default class SandboxFixtures extends Component {
+export default class Sandbox extends Component {
     constructor(props) {
         super(props);
     }
@@ -25,48 +25,56 @@ export default class SandboxFixtures extends Component {
 
             return (
                 <ListGroupItem key={key}>
-                    <div onClick={() => {
-                        this.props.onJunctionClick(device);
-                        this.props.sandboxStore.selectJunction(device)
-
-                    }}>{device}</div>
                     <ListGroup>
-                        {fixtureNodes}
-                    </ListGroup>
+                        <ListGroupItem key={key + 'dev'} onClick={() => {
+                            this.props.onJunctionClick(device);
+                            this.props.sandboxStore.selectJunction(device)
 
-                </ListGroupItem>)
+                        }}>{device}</ListGroupItem>
+
+                        <ListGroupItem key={key + 'fix'}>
+                            <ListGroup>
+                                {fixtureNodes}
+                            </ListGroup>
+                        </ListGroupItem>
+                    </ListGroup>
+                </ListGroupItem>
+            )
 
         });
 
         let pipeItems = [];
         let pipes = this.props.sandboxStore.sandbox.pipes;
-        for (let index = 0; index < pipes.length; index++) {
+        for (let index = 0; index
+        < pipes.length; index++) {
             let p = pipes[index];
-            pipeItems.push(<ListGroupItem key={index}>
-                <div onClick={() => {
-                    this.props.onPipeClick(p);
-                    this.props.sandboxStore.openModal('pipe');
-                }
-                }> {p.a} {p.azBw} / {p.zaBw} {p.z}</div>
+            pipeItems.push(<ListGroupItem key={index} onClick={() => {
+                this.props.onPipeClick(p);
+                this.props.sandboxStore.openModal('pipe');
+            }
+            }> {p.a} {p.azBw} / {p.zaBw} {p.z}
             </ListGroupItem>)
 
         }
 
         let addPipeButton = null;
         /*
-        if (this.props.sandboxStore.sandbox.junctions.length >=2) {
-            addPipeButton = <Button onClick={this.props.sandboxStore.openModal('pipe')}>Add a pipe..</Button>
-        }
-        */
-        let pipeList = <ListGroup> {pipeItems }</ListGroup>
+         if (this.props.sandboxStore.sandbox.junctions.length >=2) {
+         addPipeButton = <Button onClick={this.props.sandboxStore.openModal('pipe')}>Add a pipe..</Button>
+         }
+         */
+        let pipeList =
+            <ListGroup> {pipeItems }</ListGroup>
 
-        return <div>
-            <p>Junctions and fixtures:</p>
-            <ListGroup>{junctionNodes}</ListGroup>
-            <p>Pipes</p>
-            {pipeList}
-            {addPipeButton}
-        </div>
+        return (
+            <div>
+                <h4>Junctions and fixtures:</h4>
+                <ListGroup>{junctionNodes}</ListGroup>
+                <h4>Pipes</h4>
+                {pipeList}
+                {addPipeButton}
+            </div>
+        )
     };
 
 };

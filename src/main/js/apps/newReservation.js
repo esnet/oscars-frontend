@@ -4,7 +4,7 @@ import {Grid, Row, Col} from 'react-bootstrap';
 
 import SelectPortFromText from '../components/selectPortFromText';
 import SelectPortFromMap from '../components/selectPortFromMap';
-import SandboxFixtures from '../components/sandboxFixtures';
+import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 import ConnectionParamsModal from '../components/connectionParamsModal';
 import JunctionParamsModal from '../components/junctionParamsModal';
@@ -55,7 +55,7 @@ export default class NewReservationApp extends Component {
                         </Col>
                         <Col md={3}>
                             <SelectPortFromText  />
-                            <SandboxFixtures onJunctionClick={this.selectJunction} onPipeClick={this.setPipe}/>
+                            <Sandbox onJunctionClick={this.selectJunction} onPipeClick={this.setPipe}/>
                         </Col>
                     </Row>
                     <Row>

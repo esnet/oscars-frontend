@@ -166,9 +166,10 @@ class SandboxStore {
             let junctionStillHasFixtures = false;
             this.sandbox.fixtures.map((entry) => {
                 if (entry.device === affectedJunction) {
+                    console.log(id+' still has fixtures remaining');
                     junctionStillHasFixtures = true;
                 }
-            })
+            });
 
             if (!junctionStillHasFixtures) {
                 this.deleteJunction(affectedJunction);
@@ -183,14 +184,26 @@ class SandboxStore {
                 idxToRemove = index;
             }
         });
+        let pipesToRemove = [];
         if (idxToRemove > -1) {
-            this.sandbox.junctions.splice(idxToRemove, 1);
             this.sandbox.pipes.map((entry, index) => {
                 if (entry.a === id || entry.z === id) {
-                    this.deletePipe(entry.a, entry.z);
+                    pipesToRemove.push(entry);
                 }
             });
+            this.sandbox.junctions.splice(idxToRemove, 1);
         }
+        pipesToRemove.map((p) => {
+            let pipeIdxToRemove = -1;
+            this.sandbox.pipes.map((entry, index) => {
+                if (entry.a === p.a && entry.z === p.z) {
+                    pipeIdxToRemove = index;
+                }
+            });
+            if (pipeIdxToRemove > -1) {
+                this.sandbox.pipes.splice(pipeIdxToRemove, 1);
+            }
+        });
     }
 
 
