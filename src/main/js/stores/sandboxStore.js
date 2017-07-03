@@ -11,6 +11,9 @@ class SandboxStore {
         device: '',
         port: '',
         fixture: '',
+        vlan: '',
+        ingress: 0,
+        egress: 0
     };
 
     @observable connState = 'INITIAL';
@@ -22,8 +25,18 @@ class SandboxStore {
         'device': false
     });
 
+    findFixture(id) {
+        let result = null;
+        this.sandbox.fixtures.map((f) => {
+           if (f.id === id) {
+               result = f;
+           }
+        });
+        return result;
+    }
 
-    @action addFixture(port, device) {
+
+    @action addFixture(port, device, vlan, ingress, egress) {
         let idx = 0;
         let id = port + '-' + idx;
         let idMightBeTaken = true;
@@ -46,10 +59,25 @@ class SandboxStore {
             {
                 'id': id,
                 'port': port,
-                'device': device
+                'device': device,
+                'vlan': vlan,
+                'ingress': ingress,
+                'egress': egress,
             });
         return id;
     }
+
+
+    @action updateFixture(id, vlan, ingress, egress) {
+        this.sandbox.fixtures.map((entry) => {
+            if (entry.id === id) {
+                entry.vlan = vlan;
+                entry.ingress = ingress;
+                entry.egress = egress;
+            }
+        });
+    }
+
 
     @action deleteFixture(id) {
         let idxToRemove = -1;
@@ -92,6 +120,15 @@ class SandboxStore {
 
     @action selectFixture(id, openModal) {
         this.selection.fixture = id;
+        this.sandbox.fixtures.map((entry) => {
+            if (entry.id === id) {
+                this.selection.device = entry.device;
+                this.selection.port = entry.port;
+                this.selection.vlan = entry.vlan;
+                this.selection.ingress = entry.ingress;
+                this.selection.egress = entry.egress;
+            }
+        });
         this.closeModals();
         if (openModal) {
             this.openModal('fixture');
