@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
+import {toJS} from 'mobx';
 
 @inject('topologyStore', 'sandboxStore')
 @observer
