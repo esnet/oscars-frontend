@@ -45,7 +45,7 @@ export default class BwSelect extends Component {
     }
 
     onIngressBwChange(e) {
-        this.props.setModified();
+        this.props.setModified(true);
         if (this.state.symmetrical) {
             this.egressControl.value = e.target.value;
             this.props.sandboxStore.selection.egress = e.target.value;
@@ -54,12 +54,12 @@ export default class BwSelect extends Component {
     }
 
     onEgressBwChange(e) {
-        this.props.setModified();
+        this.props.setModified(true);
         this.props.sandboxStore.selection.egress = e.target.value;
     }
 
     fixtureSelected(e) {
-        this.props.setModified();
+        this.props.setModified(true);
         let fixtureId = e.target.value;
         this.setState({
             fixtureIdToCopy: e.target.value
@@ -146,7 +146,7 @@ export default class BwSelect extends Component {
 
         let bwSelectOptions =
             <FormControl componentClass="select" onChange={(e) => {
-                this.props.setModified();
+                this.props.setModified(true);
                 this.setState({
                     bwSelectMode: e.target.value,
                 });

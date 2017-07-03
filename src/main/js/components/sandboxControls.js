@@ -68,10 +68,10 @@ export default class SandboxControls extends Component {
             <div>
                 <p>connectionId</p>
                 <p>date and time</p>
-                <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>
-                <Button disabled={this.isDisabled('precheck')} onClick={this.preCheck}>Precheck</Button>
-                <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>
-                <Button disabled={this.isDisabled('commit')}  onClick={this.commit}>Commit</Button>
+                <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>{' '}
+                <Button disabled={this.isDisabled('precheck')} onClick={this.preCheck}>Precheck</Button>{' '}
+                <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>{' '}
+                <Button disabled={this.isDisabled('commit')}  onClick={this.commit}>Commit</Button>{' '}
                 <Button onClick={this.reset}>Reset</Button>
 
             </div>

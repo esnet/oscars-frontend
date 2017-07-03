@@ -4,9 +4,6 @@ import {action} from 'mobx';
 import vis from 'vis';
 
 import myClient from '../agents/client';
-import FixtureParamsModal from './fixtureParamsModal';
-import DevicePortsModal from './devicePortsModal';
-import AddPortModal from './addPortModal';
 
 @inject('sandboxStore', 'topologyStore')
 export default class SelectPortFromMap extends Component {
@@ -25,7 +22,7 @@ export default class SelectPortFromMap extends Component {
                 action((response) => {
                         let topology = JSON.parse(response);
                         let options = {
-                            height: '450px',
+                            height: '650px',
                             interaction: {
                                 hover: false,
                                 navigationButtons: false,
@@ -48,7 +45,7 @@ export default class SelectPortFromMap extends Component {
                         };
 
 
-                    let network = new vis.Network(this.mapRef, datasource, options);
+                        let network = new vis.Network(this.mapRef, datasource, options);
                         network.on('click', (params) => {
                             if (params.nodes.length > 0) {
                                 let nodeId = params.nodes[0];
@@ -80,18 +77,7 @@ export default class SelectPortFromMap extends Component {
     render() {
 
         return (
-            <div>
-                <FixtureParamsModal />
-                <DevicePortsModal />
-                <AddPortModal />
-
-                <div ref={(ref) => {
-                    this.mapRef = ref;
-                }}
-                     className="col-md-10">
-
-                </div>
-            </div>
+            <div ref={(ref) => { this.mapRef = ref; }}  />
         );
     }
 }

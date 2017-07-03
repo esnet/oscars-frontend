@@ -8,6 +8,11 @@ import SandboxFixtures from '../components/sandboxFixtures';
 import SandboxControls from '../components/sandboxControls';
 import ConnectionParamsModal from '../components/connectionParamsModal';
 import JunctionParamsModal from '../components/junctionParamsModal';
+import PipeParamsModal from '../components/pipeParamsModal';
+import FixtureParamsModal from '../components/fixtureParamsModal';
+import DevicePortsModal from '../components/devicePortsModal';
+import AddPortModal from '../components/addPortModal';
+import NavBar from '../components/navbar'
 
 @inject('sandboxStore')
 @observer
@@ -16,10 +21,12 @@ export default class NewReservationApp extends Component {
     constructor(props) {
         super(props);
         this.selectJunction = this.selectJunction.bind(this);
+        this.setPipe = this.setPipe.bind(this);
     }
 
     state = {
-        junction: ''
+        junction: '',
+        pipe: {}
     };
 
     selectJunction(junction) {
@@ -28,19 +35,27 @@ export default class NewReservationApp extends Component {
         });
     }
 
+    setPipe(pipe) {
+        this.setState({
+            pipe: pipe
+        });
+    }
+
     render() {
 
         return (
             <div>
-                <p>{this.props.sandboxStore.selection.device}</p>
-                <Grid>
+                <Grid fluid={true}>
+                    <Row>
+                        <NavBar/>
+                    </Row>
                     <Row>
                         <Col md={9}>
                             <SelectPortFromMap div_id="new_resv_map"/>
                         </Col>
                         <Col md={3}>
                             <SelectPortFromText  />
-                            <SandboxFixtures onJunctionClick={this.selectJunction} />
+                            <SandboxFixtures onJunctionClick={this.selectJunction} onPipeClick={this.setPipe}/>
                         </Col>
                     </Row>
                     <Row>
@@ -51,9 +66,16 @@ export default class NewReservationApp extends Component {
                             <SandboxControls />
                         </Col>
                     </Row>
+                    <Row>
+                        <FixtureParamsModal />
+                        <DevicePortsModal />
+                        <AddPortModal />
+
+                        <ConnectionParamsModal />
+                        <JunctionParamsModal junction={this.state.junction} setPipe={this.setPipe}/>
+                        <PipeParamsModal pipe={this.state.pipe}/>
+                    </Row>
                 </Grid>
-                <ConnectionParamsModal />
-                <JunctionParamsModal junction={this.state.junction}/>
             </div>
         );
     }

@@ -13,11 +13,12 @@ class SandboxStore {
         fixture: '',
         vlan: '',
         junction: '',
-        otherJunction: '',
-        azBw: 0,
-        zaBw: 0,
         ingress: 0,
-        egress: 0
+        egress: 0,
+        pipe: {
+            a: '',
+            z: ''
+        }
     };
 
     @observable connState = 'INITIAL';
@@ -40,6 +41,7 @@ class SandboxStore {
         });
         return result;
     }
+
 
 
     @action addFixture(port, device, vlan, ingress, egress) {
@@ -78,24 +80,66 @@ class SandboxStore {
 
     @action addJunction(device) {
         let junctionExists = false;
+        let otherDeviceExists = false;
+        let otherDevice = null;
         this.sandbox.junctions.map((j) => {
             if (j.id === device) {
                 junctionExists = true;
+            } else {
+                otherDeviceExists = true;
+                otherDevice = j.id;
             }
         });
         if (!junctionExists) {
             this.sandbox.junctions.push({
                     'id': device,
             });
+            if (otherDeviceExists) {
+                let newPipe = {
+                    a: device,
+                    z: otherDevice,
+                    azBw: 0,
+                    zaBw: 0
+                };
+
+                this.sandbox.pipes.push(newPipe);
+            }
+
         }
 
     }
 
     @action addPipe(pipe) {
         this.sandbox.pipes.push(pipe);
-
-        console.log('adding pipe between '+pipe.a + ' and '+ pipe.z);
     }
+
+    @action updatePipe(pipe) {
+        this.sandbox.pipes.map((entry) => {
+            if (entry.a === pipe.a && entry.z === pipe.z) {
+                entry.azBw = pipe.azBw;
+                entry.zaBw = pipe.zaBw;
+            } else if (entry.a === pipe.z && entry.z === pipe.a) {
+                entry.azBw = pipe.zaBw;
+                entry.zaBw = pipe.azBw;
+            }
+        });
+    }
+
+    @action deletePipe(a, z) {
+        let idxToRemove = -1;
+        this.sandbox.pipes.map((entry, index) => {
+            if (entry.a === a && entry.z === z) {
+                idxToRemove = index;
+            } else if (entry.a === z && entry.z === a) {
+                idxToRemove = index;
+            }
+        });
+        if (idxToRemove > -1) {
+            this.sandbox.pipes.splice(idxToRemove, 1);
+        }
+    }
+
+
 
     @action updateFixture(id, vlan, ingress, egress) {
         this.sandbox.fixtures.map((entry) => {
@@ -110,15 +154,45 @@ class SandboxStore {
 
     @action deleteFixture(id) {
         let idxToRemove = -1;
+        let affectedJunction = '';
         this.sandbox.fixtures.map((entry, index) => {
+            if (entry.id === id) {
+                idxToRemove = index;
+                affectedJunction = entry.device;
+            }
+        });
+        if (idxToRemove > -1) {
+            this.sandbox.fixtures.splice(idxToRemove, 1);
+            let junctionStillHasFixtures = false;
+            this.sandbox.fixtures.map((entry) => {
+                if (entry.device === affectedJunction) {
+                    junctionStillHasFixtures = true;
+                }
+            })
+
+            if (!junctionStillHasFixtures) {
+                this.deleteJunction(affectedJunction);
+            }
+
+        }
+    }
+    @action deleteJunction(id) {
+        let idxToRemove = -1;
+        this.sandbox.junctions.map((entry, index) => {
             if (entry.id === id) {
                 idxToRemove = index;
             }
         });
         if (idxToRemove > -1) {
-            this.sandbox.fixtures.splice(idxToRemove, 1);
+            this.sandbox.junctions.splice(idxToRemove, 1);
+            this.sandbox.pipes.map((entry, index) => {
+                if (entry.a === id || entry.z === id) {
+                    this.deletePipe(entry.a, entry.z);
+                }
+            });
         }
     }
+
 
     @action openModal(type) {
         this.modals.set(type, true);

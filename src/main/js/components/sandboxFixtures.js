@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
-import {ListGroup, ListGroupItem} from 'react-bootstrap';
+import {ListGroup, ListGroupItem, Button} from 'react-bootstrap';
 
 @inject('sandboxStore')
 @observer
@@ -38,19 +38,34 @@ export default class SandboxFixtures extends Component {
 
         });
 
-        let pipeNodes =
-            <ListGroup> {
-                this.props.sandboxStore.sandbox.pipes.map((p, index) => {
+        let pipeItems = [];
+        let pipes = this.props.sandboxStore.sandbox.pipes;
+        for (let index = 0; index < pipes.length; index++) {
+            let p = pipes[index];
+            pipeItems.push(<ListGroupItem key={index}>
+                <div onClick={() => {
+                    this.props.onPipeClick(p);
+                    this.props.sandboxStore.openModal('pipe');
+                }
+                }> {p.a} {p.azBw} / {p.zaBw} {p.z}</div>
+            </ListGroupItem>)
 
-                    return(<ListGroupItem key={index}>{p.a} {p.azBw} / {p.zaBw} {p.z}</ListGroupItem>)
-                })
-            }
-            </ListGroup>;
+        }
+
+        let addPipeButton = null;
+        /*
+        if (this.props.sandboxStore.sandbox.junctions.length >=2) {
+            addPipeButton = <Button onClick={this.props.sandboxStore.openModal('pipe')}>Add a pipe..</Button>
+        }
+        */
+        let pipeList = <ListGroup> {pipeItems }</ListGroup>
+
         return <div>
             <p>Junctions and fixtures:</p>
             <ListGroup>{junctionNodes}</ListGroup>
             <p>Pipes</p>
-            {pipeNodes}
+            {pipeList}
+            {addPipeButton}
         </div>
     };
 

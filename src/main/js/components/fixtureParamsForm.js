@@ -32,6 +32,7 @@ export default class FixtureParamsForm extends Component {
         const egress = this.props.sandboxStore.selection.egress;
         const vlan = this.props.sandboxStore.selection.vlan;
         let id = this.props.sandboxStore.selection.fixture;
+        this.setModified(false);
         this.props.sandboxStore.updateFixture(id, vlan, ingress, egress);
     }
 
@@ -52,8 +53,8 @@ export default class FixtureParamsForm extends Component {
         this.closeModal();
     }
 
-    setModified() {
-        this.setState({modified: true});
+    setModified(state) {
+        this.setState({modified: state});
     }
 
 
@@ -63,7 +64,8 @@ export default class FixtureParamsForm extends Component {
         if (this.props.modal === 'fixture') {
             if (this.state.modified) {
                 buttons = <div>
-                    <Button onClick={this.updateFixture}>Update</Button>
+                    <Button bsStyle='primary' onClick={this.updateFixture}>Update</Button>
+                    {' '}
                     <Button onClick={this.deleteFixture}>Delete</Button>
                 </div>;
             } else {
@@ -74,7 +76,7 @@ export default class FixtureParamsForm extends Component {
 
         } else {
             buttons = <div>
-                <Button onClick={this.addFixture}>Add</Button>
+                <Button bsStyle='primary' onClick={this.addFixture}>Add</Button>
             </div>;
         }
 

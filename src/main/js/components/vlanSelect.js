@@ -22,7 +22,7 @@ export default class VlanSelect extends Component {
 
     fixtureSelected(e) {
         let fixtureId = e.target.value;
-        this.props.setModified();
+        this.props.setModified(true);
         this.props.sandboxStore.sandbox.fixtures.map((f) => {
             if (f.id === fixtureId) {
                 this.props.sandboxStore.selection.vlan = f.vlan;
@@ -75,7 +75,7 @@ export default class VlanSelect extends Component {
     }
 
     setSelectedVlan(e) {
-        this.props.setModified();
+        this.props.setModified(true);
         this.props.sandboxStore.selection.vlan = e.target.value;
     }
 
@@ -95,7 +95,7 @@ export default class VlanSelect extends Component {
 
         let vlanSelectOptions =
             <FormControl componentClass="select" onChange={(e) => {
-                this.props.setModified();
+                this.props.setModified(true);
                 let disableTextControl = e.target.value !== 'typeIn';
                 this.setState({
                     vlanSelectMode: e.target.value,
