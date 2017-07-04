@@ -63,6 +63,11 @@ module.exports = {
                 secure: false,
                 changeOrigin: true,
                 target: 'https://localhost:8001/'
+            },
+            '/vlan/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8001/'
             }
 
         }

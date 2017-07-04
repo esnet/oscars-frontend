@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import {toJS, action} from 'mobx';
+import {FormGroup, Button, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap';
+
+import myClient from '../agents/client';
 
 import FixtureSelect from './fixtureSelect';
 
@@ -16,6 +19,7 @@ export default class VlanSelect extends Component {
     state = {
         vlanSelectMode: 'typeIn',
         textControlDisabled: false,
+        availableVlans: '',
         currentVlan: '',
         fixtureIdToCopy: ''
     };
@@ -85,6 +89,21 @@ export default class VlanSelect extends Component {
                 'currentVlan': this.props.sandboxStore.selection.vlan
             });
         }
+        let selection = toJS(this.props.sandboxStore.selection);
+        let request = {
+            'urns': [selection.port],
+            'startDate':selection.startAt,
+            'endDate':selection.endAt,
+        }
+        myClient.submit('POST', '/vlan/port', request)
+            .then(
+                action((response) => {
+                    let parsed = JSON.parse(response);
+                    // TODO: make sure available vlans exist etc
+                    this.setState({
+                        availableVlans: parsed['portVlans'][selection.port]['vlanExpression']
+                    });
+                }));
     }
 
     render() {
@@ -125,9 +144,12 @@ export default class VlanSelect extends Component {
         if (this.state.vlanSelectMode === 'sameAs') {
             fixtureSelect = <FixtureSelect fixtures={fixtures} onChange={this.fixtureSelected}/>;
         }
+        let buttons = <div>
+            <Button bsStyle='primary'>Set</Button>{' '}<Button>Release</Button>
 
+        </div>
 
-        let vlanTextBox = <FormGroup controlId="typeVLAN">
+            let vlanTextBox = <FormGroup controlId="typeVLAN">
             <ControlLabel>VLAN expression:</ControlLabel>
             {' '}
             <FormControl type="text" placeholder="2000-2999"
@@ -137,6 +159,8 @@ export default class VlanSelect extends Component {
                          disabled={this.state.textControlDisabled}
                          onChange={this.setSelectedVlan}
                          defaultValue={this.state.currentVlan}/>
+            <HelpBlock>Available with your schedule: {this.state.availableVlans}</HelpBlock>
+            { buttons }
         </FormGroup>;
 
         return (

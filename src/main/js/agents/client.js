@@ -39,6 +39,14 @@ class MyXHRClient {
             }
         });
     }
+
+    submit(method, url, payload) {
+
+        let headers = {};
+
+        return this.loadJSON({method: method, url: url, headers: headers, params: payload});
+    }
 }
+
 
 export default new MyXHRClient();
