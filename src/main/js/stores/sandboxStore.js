@@ -15,6 +15,9 @@ class SandboxStore {
         junction: '',
         ingress: 0,
         egress: 0,
+        startAt: '',
+        endAt: '',
+        connectionId: '',
         pipe: {
             a: '',
             z: ''
@@ -42,7 +45,16 @@ class SandboxStore {
         return result;
     }
 
+    @action setConnectionId(connId) {
+        this.selection.connectionId = connId;
+    }
 
+    @action setStartAt(date) {
+        this.selection.startAt = date;
+    }
+    @action setEndAt(date) {
+        this.selection.endAt = date;
+    }
 
     @action addFixture(port, device, vlan, ingress, egress) {
         let idx = 0;

@@ -27,7 +27,7 @@ export default class Sandbox extends Component {
                 <ListGroupItem key={key}>
                     <ListGroup>
                         <ListGroupItem key={key + 'dev'} onClick={() => {
-                            this.props.onJunctionClick(device);
+                            this.props.onJunctionClicked(device);
                             this.props.sandboxStore.selectJunction(device)
 
                         }}>{device}</ListGroupItem>
@@ -49,7 +49,7 @@ export default class Sandbox extends Component {
         < pipes.length; index++) {
             let p = pipes[index];
             pipeItems.push(<ListGroupItem key={index} onClick={() => {
-                this.props.onPipeClick(p);
+                this.props.onPipeClicked(p);
                 this.props.sandboxStore.openModal('pipe');
             }
             }> {p.a} {p.azBw} / {p.zaBw} {p.z}

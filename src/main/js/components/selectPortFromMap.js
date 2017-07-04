@@ -22,7 +22,7 @@ export default class SelectPortFromMap extends Component {
                 action((response) => {
                         let topology = JSON.parse(response);
                         let options = {
-                            height: '650px',
+                            height: '400px',
                             interaction: {
                                 hover: false,
                                 navigationButtons: false,

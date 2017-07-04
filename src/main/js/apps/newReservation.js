@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {Grid, Row, Col} from 'react-bootstrap';
+import {Grid, Row, Col, Panel} from 'react-bootstrap';
 
-import SelectPortFromText from '../components/selectPortFromText';
-import SelectPortFromMap from '../components/selectPortFromMap';
+import SelectPort from '../components/selectPort';
 import Sandbox from '../components/sandbox';
+import SandboxMap from '../components/sandboxMap';
 import SandboxControls from '../components/sandboxControls';
 import ConnectionParamsModal from '../components/connectionParamsModal';
 import JunctionParamsModal from '../components/junctionParamsModal';
@@ -21,7 +21,9 @@ export default class NewReservationApp extends Component {
     constructor(props) {
         super(props);
         this.selectJunction = this.selectJunction.bind(this);
+        this.selectAndOpenJunction = this.selectAndOpenJunction.bind(this);
         this.setPipe = this.setPipe.bind(this);
+        this.setAndOpenPipe = this.setAndOpenPipe.bind(this);
     }
 
     state = {
@@ -41,6 +43,22 @@ export default class NewReservationApp extends Component {
         });
     }
 
+    selectAndOpenJunction(junction) {
+        this.setState({
+            junction: junction
+        });
+        this.props.sandboxStore.openModal('junction');
+    }
+
+    setAndOpenPipe(pipe) {
+        this.setState({
+            pipe: pipe
+        });
+        this.props.sandboxStore.openModal('pipe');
+
+    }
+
+
     render() {
 
         return (
@@ -51,18 +69,13 @@ export default class NewReservationApp extends Component {
                     </Row>
                     <Row>
                         <Col md={9}>
-                            <SelectPortFromMap div_id="new_resv_map"/>
+                            <SelectPort  />
+                            <Panel>
+                                <SandboxMap onPipeClicked={this.setAndOpenPipe} onJunctionClicked={this.selectAndOpenJunction}/>
+                            </Panel>
                         </Col>
                         <Col md={3}>
-                            <SelectPortFromText  />
-                            <Sandbox onJunctionClick={this.selectJunction} onPipeClick={this.setPipe}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={8}>
-                            <h2>sandbox graph</h2>
-                        </Col>
-                        <Col md={4}>
+                            <Sandbox onJunctionClicked={this.selectJunction} onPipeClicked={this.setPipe}/>
                             <SandboxControls />
                         </Col>
                     </Row>

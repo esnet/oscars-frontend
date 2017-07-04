@@ -124,7 +124,7 @@ export default class JunctionParamsModal extends Component {
         let junction = this.props.junction;
         let showModal = this.props.sandboxStore.modals.get('junction');
         let unconnectedJunctions = this.unconnectedJunctions();
-        let pipeSelection = null;
+        let pipeSelection = <div>No other junctions found that are not already connected. Can not add a new pipe from here.</div>;
         let addPipeButton = null;
 
         if (this.state.showAddPipeButton) {

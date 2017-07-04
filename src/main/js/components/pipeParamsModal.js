@@ -26,13 +26,15 @@ export default class PipeParamsModal extends Component {
     };
 
     onAzBwChange(e) {
+        let newState = {
+            modified: true,
+            azBw: e.target.value,
+        };
         if (this.state.symmetrical) {
             this.zabBwControl.value = e.target.value;
+            newState.zaBw = e.target.value;
         }
-        this.setState({
-            modified: true,
-            azBw: e.target.value
-        });
+        this.setState(newState);
     }
 
 
@@ -46,18 +48,17 @@ export default class PipeParamsModal extends Component {
     setSymmetrical(e) {
         let newSymmetrical = e.target.checked;
 
-        if (newSymmetrical) {
-            this.setState({
-                zaBw: this.state.azBw
-            });
-            this.zabBwControl.value = this.state.azBw;
-        }
-
-        this.setState({
+        let newState = {
             modified: true,
             symmetrical: newSymmetrical,
             disableZaBw: newSymmetrical,
-        });
+        };
+        if (newSymmetrical) {
+            newState.zaBw = this.state.azBw;
+            this.zabBwControl.value = this.state.azBw;
+        }
+
+        this.setState(newState);
     }
 
     deletePipe() {
@@ -85,21 +86,13 @@ export default class PipeParamsModal extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.pipe.azBw === nextProps.pipe.zaBw) {
-            this.setState({
-                symmetrical: true,
-                disableZaBw: true,
-                azBw: nextProps.pipe.azBw,
-                zaBw: nextProps.pipe.zaBw
-            });
-        } else {
-            this.setState({
-                symmetrical: false,
-                disableZaBw: false,
-                azBw: nextProps.pipe.azBw,
-                zaBw: nextProps.pipe.zaBw
-            });
-        }
+        let isSymmetrical = nextProps.pipe.azBw===nextProps.pipe.zaBw;
+        this.setState({
+            disableZaBw: isSymmetrical,
+            azBw: nextProps.pipe.azBw,
+            zaBw: nextProps.pipe.zaBw,
+            symmetrical: isSymmetrical
+        });
     }
 
 

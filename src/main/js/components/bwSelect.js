@@ -67,7 +67,6 @@ export default class BwSelect extends Component {
 
         this.props.sandboxStore.sandbox.fixtures.map((f) => {
             if (f.id === fixtureId) {
-                console.log(f);
                 let ingress = f.ingress;
                 let egress = f.egress;
 
@@ -165,7 +164,6 @@ export default class BwSelect extends Component {
                     this.ingressControl.value = newIngress;
                     this.egressControl.value = newEgress;
 
-                    console.log(e.target.value);
                     this.setState({
                         showSymmetrical: false,
                         disableIngress: true,
@@ -176,7 +174,6 @@ export default class BwSelect extends Component {
 
 
                 } else {
-                    console.log(e.target.value);
                     this.egressControl.value = 0;
                     this.ingressControl.value = 0;
                     this.setState({
