@@ -13,10 +13,6 @@ export default class SelectPort extends Component {
         this.props.topologyStore.loadAvailablePorts();
     }
 
-    state = {
-        showMap: true
-    };
-
     constructor(props) {
         super(props);
     }
@@ -73,20 +69,11 @@ export default class SelectPort extends Component {
             onInputChange={this.onTypeaheadSelection}
         />;
 
-        let icon = this.state.showMap ? 'chevron-down' : 'chevron-right';
-
-        let mapHeader = <div onClick={ () => this.setState({showMap: !this.state.showMap})}>
-            Network map <Glyphicon className='pull-right' glyph={icon}/>
-        </div>;
-
-
         return (
             <div>
                 {typeAhead}
+                <TopologyMap onClickDevice={this.selectDevice} />
 
-                <Panel collapsible expanded={this.state.showMap} header={mapHeader}>
-                    <TopologyMap onClickDevice={this.selectDevice} />
-                </Panel>
 
             </div>
         );

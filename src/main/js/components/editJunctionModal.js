@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, FormControl, ControlLabel, FormGroup, Form, ListGroup, ListGroupItem} from 'react-bootstrap';
+import {Modal, Button, Panel, FormControl, ControlLabel, FormGroup, Form, ListGroup, ListGroupItem} from 'react-bootstrap';
 
 const modalName = 'editJunction';
 
@@ -157,9 +157,11 @@ export default class EditJunctionModal extends Component {
                         <Modal.Title>{junction}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                        <Panel>
                         {pipeNodes}
                         {pipeSelection}
-                        <Button bsStyle='warning' onClick={this.deleteJunction}>Delete junction</Button>
+                        <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete junction</Button>
+                        </Panel>
 
                     </Modal.Body>
                     <Modal.Footer>

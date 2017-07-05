@@ -15,7 +15,9 @@ export default class FixtureSelect extends Component {
                 {' '}
                 <FormControl componentClass="select"
                              onChange={this.props.onChange}
-                             placeholder="select">{
+                             placeholder="select">
+                    <option value='choose'>Choose..</option>
+                    {
 
                     Object.keys(fixtures).map((fixtureId) => {
                         const fixture = fixtures[fixtureId];

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorunAsync} from 'mobx';
+import {Panel, Glyphicon} from 'react-bootstrap';
+
 import vis from 'vis';
 
 
@@ -18,6 +20,11 @@ export default class SandboxMap extends Component {
         };
     }
 
+
+    state = {
+        showMap: true
+    };
+
     onFixtureClicked = (fixture) => {
         this.props.controlsStore.selectFixture(fixture);
         this.props.controlsStore.openModal('editFixture');
@@ -31,6 +38,7 @@ export default class SandboxMap extends Component {
         this.props.controlsStore.selectPipe(pipe.id);
         this.props.controlsStore.openModal('editPipe');
     };
+
 
     componentDidMount() {
         let options = {
@@ -53,22 +61,22 @@ export default class SandboxMap extends Component {
             }
         };
 
-        let network = new vis.Network(this.mapRef, this.datasource, options);
+        this.network = new vis.Network(this.mapRef, this.datasource, options);
 
-        network.on('dragEnd', (params) => {
+        this.network.on('dragEnd', (params) => {
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
                 this.datasource.nodes.update({id: nodeId, fixed: {x: true, y: true}});
             }
         });
 
-        network.on('dragStart', (params) => {
+        this.network.on('dragStart', (params) => {
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
                 this.datasource.nodes.update({id: nodeId, fixed: {x: false, y: false}});
             }
         });
-        network.on('click', (params) => {
+        this.network.on('click', (params) => {
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
                 let nodeEntry = this.datasource.nodes.get(nodeId);
@@ -92,12 +100,13 @@ export default class SandboxMap extends Component {
         this.disposeOfMapUpdate();
     }
 
+
     // this automagically updates the map;
     // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
     disposeOfMapUpdate = autorunAsync(() => {
 
 
-        let { sandbox } = this.props.sandboxStore;
+        let {sandbox} = this.props.sandboxStore;
         let junctions = sandbox.junctions;
         let fixtures = sandbox.fixtures;
         let pipes = sandbox.pipes;
@@ -129,7 +138,7 @@ export default class SandboxMap extends Component {
             };
             nodes.push(fixtureNode);
             let edge = {
-                id: f.device+' --- '+f.id,
+                id: f.device + ' --- ' + f.id,
                 from: f.device,
                 to: f.id,
                 length: 3,
@@ -159,10 +168,22 @@ export default class SandboxMap extends Component {
 
 
     render() {
-
+        let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
+        let header = <div>Sandbox
+            <div className='pull-right'>
+                <Glyphicon onClick={ () => { this.network.fit() }} glyph='zoom-out'/>
+                {' '}
+                <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
+            </div>
+        </div>;
 
         return (
-            <div ref={(ref) => { this.mapRef = ref; }}><p>sandbox map</p></div>
+            <Panel collapsible expanded={this.state.showMap} header={header}>
+                <div ref={(ref) => {
+                    this.mapRef = ref;
+                }}><p>sandbox map</p></div>
+            </Panel>
+
         );
     }
 }

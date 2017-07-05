@@ -65,7 +65,7 @@ class SandboxStore {
                     z: lastDevice,
                     azBw: 0,
                     zaBw: 0
-                }
+                };
                 this.addPipe(pipe);
             }
         }
@@ -114,7 +114,7 @@ class SandboxStore {
             'ingress': params.ingress,
             'egress': params.egress,
             'label': id,
-        }
+        };
 
         this.sandbox.fixtures.push(entry);
         return entry;

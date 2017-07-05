@@ -79,14 +79,18 @@ export default class VlanExpression extends Component {
     };
 
     fixtureSelected = (e) => {
-        console.log(e.target.value);
-        let fixture = JSON.parse(e.target.value);
-        this.props.setModified(true);
-        console.log(fixture);
-        let newVlanExpression = fixture.vlanExpression;
-        if (fixture.vlan !== null) {
-            newVlanExpression = fixture.vlan;
+
+        let newVlanExpression = '';
+
+        if (e.target.value !== 'choose') {
+            let fixture = JSON.parse(e.target.value);
+            this.props.setModified(true);
+            newVlanExpression = fixture.vlanExpression;
+            if (fixture.vlan !== null) {
+                newVlanExpression = fixture.vlan;
+            }
         }
+
         this.props.controlsStore.setVlanExpression(newVlanExpression);
         this.vlanExpressionControl.value = newVlanExpression;
     };

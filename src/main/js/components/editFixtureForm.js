@@ -45,7 +45,7 @@ export default class EditFixtureForm extends Component {
             updateButton = <Button bsStyle='primary' onClick={this.updateFixture}>Update</Button>;
         }
 
-        let buttons = <div>
+        let buttons = <div className='pull-right'>
             { updateButton }
             {' '}
             { deleteButton }

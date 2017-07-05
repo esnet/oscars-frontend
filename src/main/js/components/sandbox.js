@@ -12,44 +12,58 @@ export default class Sandbox extends Component {
 
     render() {
         const sandbox = this.props.sandboxStore.sandbox;
+        let haveFixtures = false;
 
-        let junctionNodes = sandbox.junctions.map((junction) => {
-            let device = junction.id;
-            let key = junction.id;
-            let fixtureNodes = sandbox.fixtures.map((entry) => {
-                if (entry.device === device) {
-                    let key = entry.id;
-                    let label = entry.label;
-                    return <ListGroupItem key={key} onClick={() => {
-                        this.props.controlsStore.selectFixture(entry);
-                        this.props.controlsStore.openModal('editFixture');
-                    }}>{label}</ListGroupItem>
+        let fixtureNodes = <ListGroup> {
+            sandbox.junctions.map((junction) => {
+                let device = junction.id;
+                let key = junction.id;
+                let fixtureNodes = sandbox.fixtures.map((entry) => {
+                    haveFixtures = true;
+                    if (entry.device === device) {
 
-                }
-            });
+                        let key = entry.id;
+                        let label = entry.label;
+                        return <ListGroupItem key={key} onClick={() => {
+                            this.props.controlsStore.selectFixture(entry);
+                            this.props.controlsStore.openModal('editFixture');
+                        }}>{label}</ListGroupItem>
 
-            return (
-                <ListGroupItem key={key}>
-                    <ListGroup>
-                        <ListGroupItem key={key + 'dev'} onClick={() => {
-                            this.props.controlsStore.selectJunction(device);
-                            this.props.controlsStore.openModal('editJunction');
+                    }
+                });
 
-                        }}>{device}</ListGroupItem>
+                return (
+                    <ListGroupItem key={key}>
+                        <ListGroup>
+                            <ListGroupItem key={key + 'dev'} onClick={() => {
+                                this.props.controlsStore.selectJunction(device);
+                                this.props.controlsStore.openModal('editJunction');
 
-                        <ListGroupItem key={key + 'fix'}>
-                            <ListGroup>
-                                {fixtureNodes}
-                            </ListGroup>
-                        </ListGroupItem>
-                    </ListGroup>
-                </ListGroupItem>
-            )
+                            }}>{device}</ListGroupItem>
 
-        });
+                            <ListGroupItem key={key + 'fix'}>
+                                <ListGroup>
+                                    {fixtureNodes}
+                                </ListGroup>
+                            </ListGroupItem>
+                        </ListGroup>
+                    </ListGroupItem>
+                )
 
+            })
+        }
+        </ListGroup>;
+
+        let fixturesHeader = <h4>Fixtures</h4>;
+        if (!haveFixtures) {
+            fixturesHeader = null;
+        }
+
+        let havePipes = false;
         let pipeNodes = <ListGroup> {
             sandbox.pipes.map((pipe) => {
+                havePipes = true;
+
                 return <ListGroupItem key={pipe.id} onClick={() => {
                     this.props.controlsStore.selectPipe(pipe.id);
                     this.props.controlsStore.openModal('editPipe');
@@ -57,20 +71,17 @@ export default class Sandbox extends Component {
             })
         }
         </ListGroup>;
+        let pipesHeader = <h4>Pipes</h4>;
+        if (!havePipes) {
+            pipesHeader = null;
+        }
 
-        let addPipeButton = null;
-        /*
-         if (this.props.sandboxStore.sandbox.junctions.length >=2) {
-         addPipeButton = <Button onClick={this.props.sandboxStore.openModal('pipe')}>Add a pipe..</Button>
-         }
-         */
         return (
             <Panel>
-                <h4>Junctions and fixtures:</h4>
-                <ListGroup>{junctionNodes}</ListGroup>
-                <h4>Pipes</h4>
+                {fixturesHeader}
+                {fixtureNodes}
+                {pipesHeader}
                 {pipeNodes}
-                {addPipeButton}
             </Panel>
         )
     };

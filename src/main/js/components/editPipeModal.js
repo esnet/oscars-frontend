@@ -116,10 +116,8 @@ export default class PipeParamsModal extends Component {
                                          type="text" placeholder="0-10000"/>
                         </FormGroup>
                         {' '}
-                        <FormGroup>
-                            {buttons}
-                        </FormGroup>
                     </Form>
+                    {buttons}
                 </Panel>
 
             </div>

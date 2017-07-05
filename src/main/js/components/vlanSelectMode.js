@@ -1,12 +1,8 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {toJS, action} from 'mobx';
-import {FormGroup, Button, FormControl, ControlLabel, Panel, HelpBlock} from 'react-bootstrap';
+import {FormControl} from 'react-bootstrap';
 
-import myClient from '../agents/client';
-
-import FixtureSelect from './fixtureSelect';
-import VlanExpression from './vlanExpression';
 
 @inject('sandboxStore', 'controlsStore')
 @observer
@@ -14,7 +10,6 @@ export default class VlanSelectMode extends Component {
 
     vlanSelectModeChanged = (e) => {
         let mode = e.target.value;
-        let fixtures = this.props.controlsStore.selection.otherFixtures;
         this.props.setModified(true);
 
         let params = {
@@ -27,21 +22,8 @@ export default class VlanSelectMode extends Component {
             params.disableVlanExpression = true;
         }
 
-        let firstFixture = null;
-
-        Object.keys(fixtures).map((fixtureId) => {
-            let fixture = fixtures[fixtureId];
-            if (firstFixture === null) {
-                firstFixture = fixture;
-            }
-        });
-
-
         if (mode === 'sameAs') {
-            params.vlanExpression = firstFixture.vlanExpression;
-            if (firstFixture.vlan !== null) {
-                params.vlanExpression = firstFixture.vlan;
-            }
+            params.vlanExpression = '';
         } else if (mode === 'chooseForMe') {
             params.vlanExpression = this.props.controlsStore.fixture.availableVlans;
         } else {

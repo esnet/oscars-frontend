@@ -65,16 +65,20 @@ export default class BwSelect extends Component {
 
     otherFixtureSelected = (e) => {
         this.props.setModified(true);
-        console.log(e.target.value);
-        let otherFixture = JSON.parse(e.target.value);
+        let newIngress = 0;
+        let newEgress = 0;
 
-        let newIngress = otherFixture.ingress;
-        let newEgress = otherFixture.egress;
+        if (e.target.value !== 'choose') {
+            let otherFixture = JSON.parse(e.target.value);
 
-        if (this.state.bwSelectMode === 'oppositeOf') {
-            newIngress = otherFixture.egress;
-            newEgress = otherFixture.ingress;
+            newIngress = otherFixture.ingress;
+            newEgress = otherFixture.egress;
+            if (this.state.bwSelectMode === 'oppositeOf') {
+                newIngress = otherFixture.egress;
+                newEgress = otherFixture.ingress;
+            }
         }
+
         let params = {
             ingress: newIngress,
             egress: newEgress,
@@ -215,28 +219,11 @@ class BwSelectModeOptions extends Component {
         const mode = e.target.value;
         this.props.setModified(true);
         this.props.setBwSelectMode(mode);
-        const otherFixtures = this.props.otherFixtures;
-        let firstFixture = null;
 
-        Object.keys(otherFixtures).map((fixtureId) => {
-            let fixture = otherFixtures[fixtureId];
-            if (firstFixture === null) {
-                firstFixture = fixture;
-            }
-        });
         if (e.target.value === 'sameAs' || e.target.value === 'oppositeOf') {
-            let referredFixture = firstFixture;
-
-            let newIngress = referredFixture.ingress;
-            let newEgress = referredFixture.egress;
-
-            if (e.target.value === 'oppositeOf') {
-                newIngress = referredFixture.egress;
-                newEgress = referredFixture.ingress;
-            }
             this.props.updateControls({
-                ingress: newIngress,
-                egress: newEgress,
+                ingress: 0,
+                egress: 0,
                 disable: ['bw-ingress', 'bw-egress'],
                 enable: [],
                 symmetrical: false,

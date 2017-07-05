@@ -33,9 +33,7 @@ export default class NewReservationApp extends Component {
                     <Row>
                         <Col md={9} sm={9}>
                             <SelectPort  />
-                            <Panel>
-                                <SandboxMap />
-                            </Panel>
+                            <SandboxMap />
                         </Col>
 
                         <Col md={3} sm={3}>
