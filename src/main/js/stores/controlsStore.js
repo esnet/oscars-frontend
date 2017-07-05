@@ -15,6 +15,7 @@ class ControlsStore {
 
         startAt: '',
         endAt: '',
+        otherFixtures: {}
 
 
     };
@@ -46,6 +47,9 @@ class ControlsStore {
         this.selection.connectionId = connId;
     }
 
+    @action setOtherFixtures(otherFixtures) {
+        this.selection.otherFixtures = otherFixtures;
+    }
 
     @action disableControl(name) {
         this.disabledControls[name] = true;

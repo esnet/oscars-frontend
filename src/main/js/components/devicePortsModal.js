@@ -77,8 +77,8 @@ class DevicePortList extends Component {
                 this.props.onAddClicked(device, port);
             };
             return (
-                <ListGroupItem key={port}>{port}
-                    <Glyphicon onClick={clickHandler} className='pull-right' glyph='plus'/>
+                <ListGroupItem key={port} onClick={clickHandler}>{port}
+                    <Glyphicon  className='pull-right' glyph='plus'/>
                 </ListGroupItem>
             )
 
@@ -86,5 +86,5 @@ class DevicePortList extends Component {
 
         return <ListGroup>{portsNodes}</ListGroup>
     };
-};
+}
 

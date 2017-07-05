@@ -28,10 +28,10 @@ export default class PipeParamsModal extends Component {
         let params = {
             azBw: newAzBw,
             zaBw: this.props.controlsStore.selection.zaBw,
-        }
+        };
         this.setState({modified: true});
         this.updateControls(params);
-    }
+    };
 
 
     onZaBwChange = (e) => {
@@ -42,13 +42,13 @@ export default class PipeParamsModal extends Component {
         };
         this.setState({modified: true});
         this.updateControls(params);
-    }
+    };
 
     deletePipe = () => {
         let pipeId = this.props.controlsStore.selection.pipe;
         this.props.sandboxStore.deletePipe(pipeId);
         this.closeModal();
-    }
+    };
 
     updatePipe = () => {
         let selection = this.props.controlsStore.selection;
@@ -61,7 +61,7 @@ export default class PipeParamsModal extends Component {
         this.setState({
             modified: false,
         });
-    }
+    };
 
     closeModal = () => {
         this.props.controlsStore.closeModal(modalName);
@@ -84,7 +84,7 @@ export default class PipeParamsModal extends Component {
             <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>
         </div>;
 
-        let body = <div>No pipe found!</div>
+        let body = <div>No pipe found!</div>;
         if (pipe !== null) {
             let header = <span>Pipe bandwidth</span>;
             body = <div>

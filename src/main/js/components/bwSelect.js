@@ -65,7 +65,8 @@ export default class BwSelect extends Component {
 
     otherFixtureSelected = (e) => {
         this.props.setModified(true);
-        let otherFixture = e.target.value;
+        console.log(e.target.value);
+        let otherFixture = JSON.parse(e.target.value);
 
         let newIngress = otherFixture.ingress;
         let newEgress = otherFixture.egress;
@@ -123,7 +124,7 @@ export default class BwSelect extends Component {
             symmetrical: params.symmetrical,
             showCheckbox: params.showCheckbox
         });
-    }
+    };
 
     componentWillMount() {
         const controlsStore = this.props.controlsStore;
@@ -140,6 +141,9 @@ export default class BwSelect extends Component {
             });
             controlsStore.enableControl('bw-egress');
         }
+        controlsStore.enableControl('bw-ingress');
+        this.props.controlsStore.setOtherFixtures(this.otherFixtures());
+
     }
 
 
@@ -147,11 +151,10 @@ export default class BwSelect extends Component {
         const controlsStore = this.props.controlsStore;
         const fixture = controlsStore.fixture;
 
-        let otherFixtures = this.otherFixtures();
 
         let fixtureSelect = null;
         if (this.state.bwSelectMode === 'sameAs' || this.state.bwSelectMode === 'oppositeOf') {
-            fixtureSelect = <FixtureSelect fixtures={otherFixtures} onChange={this.otherFixtureSelected}/>;
+            fixtureSelect = <FixtureSelect onChange={this.otherFixtureSelected}/>;
         }
 
         let symmetricalControl = null;
@@ -166,18 +169,17 @@ export default class BwSelect extends Component {
                 </FormGroup>;
         }
 
-        let header = <span>Bandwidth</span>
+        let header = <span>Bandwidth</span>;
 
         return (
             <Panel header={header}>
                 <FormGroup controlId="bandwidth">
-                    <ControlLabel>Selection mode:</ControlLabel>
-
                     <BwSelectModeOptions setModified={this.props.setModified}
                                          updateControls={this.updateControls}
                                          setBwSelectMode={this.setBwSelectMode}
-                                         otherFixtures={otherFixtures}/>
+                                         otherFixtures={this.props.controlsStore.selection.otherFixtures}/>
                     {fixtureSelect}
+                    {' '}
 
                     <FormGroup controlId="ingress">
                         <ControlLabel>Ingress:</ControlLabel>

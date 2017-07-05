@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Panel } from 'react-bootstrap';
+import {Panel} from 'react-bootstrap';
 
 import VlanExpression from './vlanExpression';
-import VlanSet from './vlanSet';
+import VlanPick from './vlanPick';
 
 export default class VlanSelect extends Component {
 
@@ -11,9 +11,8 @@ export default class VlanSelect extends Component {
         return (
             <Panel header={header}>
                 <VlanExpression setModified={this.props.setModified}/>
-                <VlanSet />
-
-
+                {' '}
+                <VlanPick setModified={this.props.setModified}/>
             </Panel>
         );
 

@@ -156,7 +156,7 @@ class SandboxStore {
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.vlan = null;
-                entry.label = entry.port + ':?';
+                entry.label = entry.id;
             }
         });
     }

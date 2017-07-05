@@ -56,7 +56,7 @@ export default class Sandbox extends Component {
                 }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
             })
         }
-        </ListGroup>
+        </ListGroup>;
 
         let addPipeButton = null;
         /*

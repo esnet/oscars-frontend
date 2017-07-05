@@ -32,8 +32,7 @@ export default class SandboxMap extends Component {
         this.props.controlsStore.openModal('editPipe');
     };
 
-
-    updateMap = autorunAsync(() => {
+    componentDidMount() {
         let options = {
             height: '350px',
             interaction: {
@@ -53,8 +52,6 @@ export default class SandboxMap extends Component {
                 color: {background: 'white'}
             }
         };
-
-
 
         let network = new vis.Network(this.mapRef, this.datasource, options);
 
@@ -89,11 +86,22 @@ export default class SandboxMap extends Component {
                 }
             }
         });
+    }
+
+    componentWillUnmount() {
+        this.disposeOfMapUpdate();
+    }
+
+    // this automagically updates the map;
+    // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
+    disposeOfMapUpdate = autorunAsync(() => {
+
 
         let { sandbox } = this.props.sandboxStore;
         let junctions = sandbox.junctions;
         let fixtures = sandbox.fixtures;
         let pipes = sandbox.pipes;
+
 
         this.datasource.nodes.clear();
         this.datasource.edges.clear();

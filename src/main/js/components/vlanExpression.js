@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
-import {FormGroup, Button, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap';
+import {FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 
@@ -48,9 +48,11 @@ export default class VlanExpression extends Component {
         const controlsStore = this.props.controlsStore;
         const fixture = controlsStore.fixture;
 
+
         if (fixture === null) {
             return;
         }
+        this.props.controlsStore.setOtherFixtures(this.fixturesAllowingSameVlan());
 
         const port = fixture.port;
 
@@ -69,8 +71,6 @@ export default class VlanExpression extends Component {
     }
 
     updateVlanExpression = (params) => {
-        console.log(params);
-
         this.vlanExpressionControl.value = params.vlanExpression;
         this.vlanExpressionControl.disabled = params.disableVlanExpression;
         this.setState({
@@ -79,19 +79,23 @@ export default class VlanExpression extends Component {
     };
 
     fixtureSelected = (e) => {
-        let fixture = e.target.value;
+        console.log(e.target.value);
+        let fixture = JSON.parse(e.target.value);
         this.props.setModified(true);
-
-        this.props.controlsStore.setVlanExpression(fixture.vlanExpression);
-        this.vlanExpressionControl.value = fixture.vlanExpression;
+        console.log(fixture);
+        let newVlanExpression = fixture.vlanExpression;
+        if (fixture.vlan !== null) {
+            newVlanExpression = fixture.vlan;
+        }
+        this.props.controlsStore.setVlanExpression(newVlanExpression);
+        this.vlanExpressionControl.value = newVlanExpression;
     };
 
     render() {
 
-        let fixturesAllowingSameVlan = this.fixturesAllowingSameVlan();
         let fixtureSelect = null;
         if (this.state.vlanSelectMode === 'sameAs') {
-            fixtureSelect = <FixtureSelect fixtures={fixturesAllowingSameVlan} onChange={this.fixtureSelected}/>;
+            fixtureSelect = <FixtureSelect onChange={this.fixtureSelected}/>;
         }
 
         let vlanExpression = this.props.controlsStore.fixture.vlanExpression;
@@ -101,21 +105,21 @@ export default class VlanExpression extends Component {
         let result = <div />;
         if (vlan === null) {
             result = <div>
-                <VlanSelectMode fixturesAllowingSameVlan={fixturesAllowingSameVlan}
-                                setModified={this.props.setModified}
+                <VlanSelectMode setModified={this.props.setModified}
                                 updateVlanExpression={this.updateVlanExpression}/>
+                {' '}
                 { fixtureSelect }
+                {' '}
                 <FormGroup controlId="vlanExpression">
                     <ControlLabel>VLAN expression:</ControlLabel>
                     {' '}
-
                     <FormControl inputRef={ref => {
                         this.vlanExpressionControl = ref;
                     }}
                                  defaultValue={vlanExpression}
                                  type="text"
                                  onChange={this.setVlanExpression}/>
-
+                    {' '}
                     <HelpBlock>Available: {availableVlans}</HelpBlock>
                 </FormGroup>
             </div>;

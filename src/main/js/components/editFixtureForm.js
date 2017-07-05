@@ -39,10 +39,10 @@ export default class EditFixtureForm extends Component {
     };
 
     render() {
-        let deleteButton = <Button bsStyle='warning' onClick={this.deleteFixture}>Delete</Button>
+        let deleteButton = <Button bsStyle='warning' onClick={this.deleteFixture}>Delete</Button>;
         let updateButton = null;
         if (this.state.modified) {
-            updateButton = <Button bsStyle='primary' onClick={this.updateFixture}>Update</Button>
+            updateButton = <Button bsStyle='primary' onClick={this.updateFixture}>Update</Button>;
         }
 
         let buttons = <div>
@@ -53,20 +53,18 @@ export default class EditFixtureForm extends Component {
 
 
         return (
-            <form>
-                <Grid>
-                    <Row>
-                        <Col md={3} sm={3}>
-                            <VlanSelect setModified={this.setModified}/>
+            <Grid fluid={true}>
+                <Row>
+                    <Col md={6} sm={6}>
+                        <VlanSelect setModified={this.setModified}/>
 
-                        </Col>
-                        <Col md={3} sm={3}>
-                            <BwSelect setModified={this.setModified}/>
-                        </Col>
-                    </Row>
-                </Grid>
+                    </Col>
+                    <Col md={6} sm={6}>
+                        <BwSelect setModified={this.setModified}/>
+                    </Col>
+                </Row>
                 { buttons }
-            </form>
+            </Grid>
         );
     }
 
