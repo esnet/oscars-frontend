@@ -1,39 +1,56 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {Grid, Row, Col} from 'react-bootstrap';
+import {Grid, Row, Col, Panel} from 'react-bootstrap';
 
-import SelectFixtureFromText from '../components/selectFixtureFromText';
-import SelectFixtureFromMap from '../components/selectFixtureFromMap';
-import SandboxFixtures from '../components/sandboxFixtures';
+
+import NavBar from '../components/navbar'
+import SelectPort from '../components/selectPort';
+import DevicePortsModal from '../components/devicePortsModal';
+import EditFixtureModal from '../components/editFixtureModal';
+import EditJunctionModal from '../components/editJunctionModal';
+import EditPipeModal from '../components/editPipeModal';
+import SandboxMap from '../components/sandboxMap';
+import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 
 @inject('sandboxStore')
 @observer
 export default class NewReservationApp extends Component {
 
+    constructor(props) {
+        super(props);
+    }
+
+
     render() {
+
         return (
             <div>
-                <p>{this.props.sandboxStore.selection.device}</p>
-                <Grid>
+                <Grid fluid={true}>
                     <Row>
-                        <Col md={10}>
-                            <SelectFixtureFromMap div_id="new_resv_map"/>
-                        </Col>
-                        <Col md={2}>
-                            <SelectFixtureFromText  />
-                            <SandboxFixtures /></Col>
+                        <NavBar/>
                     </Row>
                     <Row>
-                        <Col md={8}>
-                            <h2>sandbox graph</h2>
+                        <Col md={9} sm={9}>
+                            <SelectPort  />
+                            <SandboxMap />
                         </Col>
-                        <Col md={4}>
+
+                        <Col md={3} sm={3}>
+                            <Sandbox />
                             <SandboxControls />
                         </Col>
+                    </Row>
+                    <Row>
+                        <DevicePortsModal />
+                        <EditFixtureModal />
+                        <EditJunctionModal />
+                        <EditPipeModal />
+
                     </Row>
                 </Grid>
             </div>
         );
     }
+
 }

@@ -9,7 +9,7 @@ const PATHS = {
 };
 
 module.exports = {
-    entry: './src/main/js/index.js',
+    entry: ['./src/main/js/index.js'],
     devtool: 'sourcemaps',
     cache: true,
     output: {
@@ -25,14 +25,18 @@ module.exports = {
                 query: {
                     cacheDirectory: true,
                     presets: ['es2015', 'react', 'stage-1'],
-                    plugins: ["transform-decorators-legacy"]
+                    plugins: ['transform-decorators-legacy']
                 }
+            },
+            {
+                test: /\.css$/,
+                use: [ 'style-loader', 'css-loader' ]
             }
         ]
     },
     plugins: [new HtmlWebpackPlugin({
-        template: PATHS.templates + "/template_index.html",
-        inject: "body"
+        template: PATHS.templates + '/template_index.html',
+        inject: 'body'
     })],
 
     devServer: {
@@ -45,16 +49,27 @@ module.exports = {
             poll: 1000
         },
         proxy: {
-            "/topology/*": {
+            '/topology/*': {
                 secure: false,
                 changeOrigin: true,
-                target: "https://localhost:8001/"
+                target: 'https://localhost:8001/'
             },
-            "/viz/*": {
+            '/viz/*': {
                 secure: false,
                 changeOrigin: true,
-                target: "https://localhost:8001/"
+                target: 'https://localhost:8001/'
+            },
+            '/resv/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8001/'
+            },
+            '/vlan/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8001/'
             }
+
         }
     }
 };
