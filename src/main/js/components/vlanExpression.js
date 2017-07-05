@@ -67,6 +67,9 @@ export default class VlanExpression extends Component {
                     let parsed = JSON.parse(response);
                     let vlanExpr = parsed['portVlans'][port]['vlanExpression'];
                     this.props.controlsStore.setAvailableVlans(vlanExpr);
+                    if (this.props.controlsStore.fixture.vlan === null) {
+                        this.vlanExpressionControl.value = vlanExpr;
+                    }
                 }));
     }
 

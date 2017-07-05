@@ -24,11 +24,13 @@ export default class VlanSelectMode extends Component {
 
         if (mode === 'sameAs') {
             params.vlanExpression = '';
-        } else if (mode === 'chooseForMe') {
+        } else if (mode === 'chooseForMe' || mode === 'typeIn') {
             params.vlanExpression = this.props.controlsStore.fixture.availableVlans;
         } else {
             params.vlanExpression = '';
         }
+        this.props.controlsStore.setVlanExpression(params.vlanExpression);
+
         this.props.updateVlanExpression(params);
     };
 
@@ -43,7 +45,7 @@ export default class VlanSelectMode extends Component {
             );
         }
         vlanSelectModeOpts.push(
-            {value: 'chooseForMe', label: 'Auto'}
+            {value: 'chooseForMe', label    : 'Auto'}
         );
 
         return (

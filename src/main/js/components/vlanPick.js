@@ -13,11 +13,14 @@ export default class VlanPick extends Component {
             'connectionId': this.props.controlsStore.selection.connectionId,
             'port': this.props.controlsStore.fixture.port,
             'vlanExpression': this.props.controlsStore.fixture.vlanExpression,
+            'startDate': this.props.controlsStore.selection.startAt,
+            'endDate': this.props.controlsStore.selection.endAt,
         };
+//        console.log(request);
+
         myClient.submit('POST', '/vlan/pick', request)
             .then(
                 action((response) => {
-
                     let parsed = JSON.parse(response);
                     this.props.controlsStore.setVlan(parsed.vlanId);
                     this.props.sandboxStore.setFixtureVlan(this.props.controlsStore.fixture.id, parsed.vlanId);
@@ -30,6 +33,7 @@ export default class VlanPick extends Component {
             'port': this.props.controlsStore.fixture.port,
             'vlanId': this.props.controlsStore.fixture.vlan,
         };
+//        console.log(request);
 
         myClient.submit('POST', '/vlan/release', request)
             .then(
