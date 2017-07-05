@@ -1,20 +1,13 @@
 import React, {Component} from 'react';
-import {inject} from 'mobx-react';
-import {action} from 'mobx';
 import vis from 'vis';
+import { action } from 'mobx';
 
 import myClient from '../agents/client';
 
-@inject('sandboxStore', 'topologyStore')
-export default class SelectPortFromMap extends Component {
+export default class TopologyMap extends Component {
     constructor(props) {
         super(props);
     }
-
-    componentWillMount() {
-        this.props.topologyStore.loadAvailablePorts();
-    }
-
 
     componentDidMount() {
         myClient.loadJSON({method: 'GET', url: '/viz/topology/multilayer'})
@@ -49,7 +42,7 @@ export default class SelectPortFromMap extends Component {
                         network.on('click', (params) => {
                             if (params.nodes.length > 0) {
                                 let nodeId = params.nodes[0];
-                                this.props.sandboxStore.selectDevice(nodeId);
+                                this.props.onClickDevice(nodeId);
                             }
                         });
 

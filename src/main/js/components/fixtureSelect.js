@@ -7,19 +7,23 @@ export default class FixtureSelect extends Component {
     render() {
 
         return (
-        <FormGroup controlId="fixtureSelect">
-            <ControlLabel>Fixture:</ControlLabel>
-            {' '}
-            <FormControl componentClass="select"
-                         onChange={this.props.onChange}
-                         placeholder="select">{
-                this.props.fixtures.map((fixture, index) => {
-                    return <option key={index} value={fixture.id}>{fixture.id}</option>
-                })
-            }
-            </FormControl>
-        </FormGroup>
-    );
+            <FormGroup controlId="fixtureSelect">
+                <ControlLabel>Fixture:</ControlLabel>
+                {' '}
+                <FormControl componentClass="select"
+                             onChange={this.props.onChange}
+                             placeholder="select">{
+
+                    Object.keys(this.props.fixtures).map((fixtureId) => {
+                        const fixture = this.props.fixtures[fixtureId];
+                        return <option key={fixtureId} value={fixture}>{fixture.label}</option>
+                    })
+
+                }
+                </FormControl>
+            </FormGroup>
+        );
 
     }
 }
+

@@ -10,7 +10,7 @@ import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 
 
-@inject('sandboxStore')
+@inject('controlsStore', 'stateStore')
 @observer
 export default class SandboxControls extends Component {
     constructor(props) {
@@ -32,19 +32,19 @@ export default class SandboxControls extends Component {
         let endAt = new Date();
         endAt.setDate(endAt.getDate() + 1);
         endAt.setTime(endAt.getTime() + 15000 * 60);
-        this.props.sandboxStore.setStartAt(startAt);
-        this.props.sandboxStore.setEndAt(endAt);
+        this.props.controlsStore.setStartAt(startAt);
+        this.props.controlsStore.setEndAt(endAt);
         myClient.loadJSON({method: 'GET', url: '/resv/newConnectionId'})
             .then(
                 action((response) => {
                     let connId = JSON.parse(response)['connectionId'];
-                    this.props.sandboxStore.setConnectionId(connId);
+                    this.props.controlsStore.setConnectionId(connId);
                 }));
 
     }
 
     isDisabled(what) {
-        let connState = this.props.sandboxStore.connState;
+        let connState = this.props.stateStore.connState;
         if (what === 'validate') {
             return connState !== 'INITIAL';
         }
@@ -61,56 +61,56 @@ export default class SandboxControls extends Component {
     }
 
     validate() {
-        this.props.sandboxStore.validate();
+        this.props.stateStore.validate();
         setTimeout(() => {
-            this.props.sandboxStore.postValidate(true)
+            this.props.stateStore.postValidate(true)
         }, 1000);
         return false;
 
     }
 
     preCheck() {
-        this.props.sandboxStore.check();
+        this.props.stateStore.check();
         setTimeout(() => {
-            this.props.sandboxStore.postCheck(true)
+            this.props.stateStore.postCheck(true)
         }, 1000);
         return false;
     }
 
     hold() {
-        this.props.sandboxStore.hold();
+        this.props.stateStore.hold();
         setTimeout(() => {
-            this.props.sandboxStore.postHold(true)
+            this.props.stateStore.postHold(true)
         }, 1000);
         return false;
 
     }
 
     commit() {
-        this.props.sandboxStore.commit();
+        this.props.stateStore.commit();
         setTimeout(() => {
-            this.props.sandboxStore.postCommit(true)
+            this.props.stateStore.postCommit(true)
         }, 1000);
         return false;
     }
 
     reset() {
-        this.props.sandboxStore.reset();
+        this.props.stateStore.reset();
         return false;
     }
 
     handleStartDateChange = (newMoment) => {
-        this.props.sandboxStore.setStartAt(newMoment.toDate());
+        this.props.controlsStore.setStartAt(newMoment.toDate());
 
     };
 
     handleEndDateChange = (newMoment) => {
-        this.props.sandboxStore.setEndAt(newMoment.toDate());
+        this.props.controlsStore.setEndAt(newMoment.toDate());
 
     };
 
     render() {
-        let header = <span>Connection id: {this.props.sandboxStore.selection.connectionId}</span>
+        let header = <span>Connection id: {this.props.controlsStore.selection.connectionId}</span>;
 
         return (
             <Panel header={header}>
@@ -119,7 +119,7 @@ export default class SandboxControls extends Component {
                     <Datetime
                         size="8"
                         name="Start"
-                        value={this.props.sandboxStore.selection.startAt}
+                        value={this.props.controlsStore.selection.startAt}
                         onChange={this.handleStartDateChange}
                     />
                 </FormGroup>
@@ -128,7 +128,7 @@ export default class SandboxControls extends Component {
                     <Datetime
                         size="8"
                         name="End"
-                        value={this.props.sandboxStore.selection.endAt}
+                        value={this.props.controlsStore.selection.endAt}
                         onChange={this.handleEndDateChange}
                     />
                 </FormGroup>

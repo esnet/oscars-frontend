@@ -11,14 +11,18 @@ import { Provider } from 'mobx-react';
 import Welcome from './apps/welcome';
 import NewReservationApp from './apps/newReservation';
 
-import sandboxStore from './stores/sandboxStore';
-import topologyStore from './stores/topologyStore';
 import commonStore from './stores/commonStore';
+import controlsStore from './stores/controlsStore';
+import sandboxStore from './stores/sandboxStore';
+import stateStore from './stores/stateStore';
+import topologyStore from './stores/topologyStore';
 
 const stores = {
-    topologyStore,
     commonStore,
-    sandboxStore
+    controlsStore,
+    sandboxStore,
+    stateStore,
+    topologyStore,
 };
 useStrict(true);
 

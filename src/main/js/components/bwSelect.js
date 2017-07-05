@@ -1,139 +1,265 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {FormGroup, FormControl, Checkbox, ControlLabel} from 'react-bootstrap';
+import {FormGroup, FormControl, Checkbox, ControlLabel, Panel} from 'react-bootstrap';
 import FixtureSelect from './fixtureSelect';
 
 
-@inject('sandboxStore')
+@inject('controlsStore', 'sandboxStore')
 @observer
 export default class BwSelect extends Component {
     constructor(props) {
         super(props);
-        this.setSymmetrical = this.setSymmetrical.bind(this);
-        this.onIngressBwChange = this.onIngressBwChange.bind(this);
-        this.onEgressBwChange = this.onEgressBwChange.bind(this);
-        this.fixtureSelected = this.fixtureSelected.bind(this);
-
-
     }
 
     state = {
         symmetrical: true,
-        showSymmetrical: true,
-        disableIngress: false,
-        disableEgress: true,
-        currentIngress: '',
-        currentEgress: '',
-        fixtureIdToCopy: '',
+        showCheckbox: true,
         bwSelectMode: 'typeIn'
     };
 
-    setSymmetrical(e) {
-        let newSymmetrical = e.target.checked;
+    symmetricalCheckboxClicked = (e) => {
+        const controlsStore = this.props.controlsStore;
+        const fixture = controlsStore.fixture;
 
-        this.setState({
-            symmetrical: newSymmetrical,
-            disableEgress: newSymmetrical
-        });
-        if (newSymmetrical) {
-            this.setState({
-                currentEgress: this.state.currentIngress
-            });
-            this.props.sandboxStore.selection.egress = this.state.currentIngress;
-            this.egressControl.value = this.state.currentIngress;
+        const mustBecomeSymmetrical = e.target.checked;
+        let newState = {
+            symmetrical: mustBecomeSymmetrical,
+        };
+        if (mustBecomeSymmetrical) {
+            controlsStore.disableControl('bw-egress');
+        } else {
+            controlsStore.enableControl('bw-egress');
         }
-    }
 
-    onIngressBwChange(e) {
-        this.props.setModified(true);
-        if (this.state.symmetrical) {
-            this.egressControl.value = e.target.value;
-            this.props.sandboxStore.selection.egress = e.target.value;
-        }
-        this.props.sandboxStore.selection.ingress = e.target.value;
-    }
 
-    onEgressBwChange(e) {
-        this.props.setModified(true);
-        this.props.sandboxStore.selection.egress = e.target.value;
-    }
-
-    fixtureSelected(e) {
-        this.props.setModified(true);
-        let fixtureId = e.target.value;
-        this.setState({
-            fixtureIdToCopy: e.target.value
-        });
-
-        this.props.sandboxStore.sandbox.fixtures.map((f) => {
-            if (f.id === fixtureId) {
-                let ingress = f.ingress;
-                let egress = f.egress;
-
-                if (this.state.bwSelectMode === 'oppositeOf') {
-                    ingress = f.egress;
-                    egress = f.ingress;
-                }
-                this.egressControl.value = egress;
-                this.ingressControl.value = ingress;
-
-                this.props.sandboxStore.selection.ingress = ingress;
-                this.props.sandboxStore.selection.egress = egress;
+        const currentEgress = fixture.egress;
+        const currentIngress = fixture.ingress;
+        if (currentIngress !== currentEgress) {
+            if (mustBecomeSymmetrical) {
+                controlsStore.setEgress(currentIngress);
+                controlsStore.disableControl('bw-egress');
+                this.egressControl.value = currentIngress;
+                this.props.setModified(true);
             }
+        }
+        this.setState(newState);
+    };
 
+    onIngressBwChange = (e) => {
+        const newIngress = e.target.value;
+        this.props.setModified(true);
+        const controlsStore = this.props.controlsStore;
+
+        if (this.state.symmetrical) {
+            this.egressControl.value = newIngress;
+            controlsStore.setEgress(newIngress);
+        }
+        controlsStore.setIngress(newIngress);
+    };
+
+    onEgressBwChange = (e) => {
+        const newEgress = e.target.value;
+        this.props.setModified(true);
+        this.props.controlsStore.setEgress(newEgress);
+    };
+
+    otherFixtureSelected = (e) => {
+        this.props.setModified(true);
+        let otherFixture = e.target.value;
+
+        let newIngress = otherFixture.ingress;
+        let newEgress = otherFixture.egress;
+
+        if (this.state.bwSelectMode === 'oppositeOf') {
+            newIngress = otherFixture.egress;
+            newEgress = otherFixture.ingress;
+        }
+        let params = {
+            ingress: newIngress,
+            egress: newEgress,
+            disable: ['bw-ingress', 'bw-egress'],
+            enable: [],
+            symmetrical: false,
+            showCheckbox: false,
+        };
+        this.updateControls(params)
+    };
+
+    otherFixtures() {
+        let thisFixtureId = this.props.controlsStore.fixture.id;
+
+        // i can only choose to have the same / different bandwidth with another fixture
+        let result = {};
+        this.props.sandboxStore.sandbox.fixtures.map((f) => {
+            if (f.id !== thisFixtureId) {
+                result[f.id] = f
+            }
         });
-
+        return result;
     }
 
-    otherFixtures(modal) {
-        if (modal === 'port') {
-            // in the 'port' modal we are adding a new fixture
-            return this.props.sandboxStore.sandbox.fixtures;
+    setBwSelectMode = (mode) => {
+        this.setState({
+            bwSelectMode: mode
+        });
 
-        } else if (modal === 'fixture') {
-            // in the 'fixture' modal we can choose any modal except the selected one
-            let selectedFixture = this.props.sandboxStore.selection.fixture;
+    };
 
-            // i can only choose to have the same / different bandwidth with another fixture
-            let result = [];
-            this.props.sandboxStore.sandbox.fixtures.map((f) => {
-                if (f.id !== selectedFixture) {
-                    result.push(f);
-                }
-            });
-            return result;
-        }
-        return [];
+    updateControls = (params) => {
+        const controlsStore = this.props.controlsStore;
+
+        this.ingressControl.value = params.ingress;
+        this.egressControl.value = params.egress;
+        controlsStore.setIngress(params.ingress);
+        controlsStore.setEgress(params.egress);
+        params.disable.map((controlName) => {
+            controlsStore.disableControl(controlName);
+        });
+        params.enable.map((controlName) => {
+            controlsStore.enableControl(controlName);
+        });
+
+        this.setState({
+            symmetrical: params.symmetrical,
+            showCheckbox: params.showCheckbox
+        });
     }
 
     componentWillMount() {
-        if (this.props.modal === 'fixture') {
-            this.setState({
-                'currentIngress': this.props.sandboxStore.selection.ingress,
-                'currentEgress': this.props.sandboxStore.selection.egress
-            });
+        const controlsStore = this.props.controlsStore;
+        const fixture = controlsStore.fixture;
 
-            if (this.props.sandboxStore.selection.ingress === this.props.sandboxStore.selection.egress) {
-                this.setState({
-                    symmetrical: true,
-                    disableEgress: true
-                });
-            } else {
-                this.setState({
-                    symmetrical: false,
-                    disableEgress: false
-                });
-            }
+        if (fixture.ingress === fixture.egress) {
+            this.setState({
+                symmetrical: true,
+            });
+            controlsStore.disableControl('bw-egress');
+        } else {
+            this.setState({
+                symmetrical: false,
+            });
+            controlsStore.enableControl('bw-egress');
         }
     }
 
 
     render() {
+        const controlsStore = this.props.controlsStore;
+        const fixture = controlsStore.fixture;
+
+        let otherFixtures = this.otherFixtures();
+
+        let fixtureSelect = null;
+        if (this.state.bwSelectMode === 'sameAs' || this.state.bwSelectMode === 'oppositeOf') {
+            fixtureSelect = <FixtureSelect fixtures={otherFixtures} onChange={this.otherFixtureSelected}/>;
+        }
+
+        let symmetricalControl = null;
+        if (this.state.showCheckbox) {
+            symmetricalControl =
+                <FormGroup controlId="symmetrical">
+                    <Checkbox
+                        defaultChecked={this.state.symmetrical} inline
+                        onChange={this.symmetricalCheckboxClicked}>
+                        Symmetrical
+                    </Checkbox>
+                </FormGroup>;
+        }
+
+        let header = <span>Bandwidth</span>
+
+        return (
+            <Panel header={header}>
+                <FormGroup controlId="bandwidth">
+                    <ControlLabel>Selection mode:</ControlLabel>
+
+                    <BwSelectModeOptions setModified={this.props.setModified}
+                                         updateControls={this.updateControls}
+                                         setBwSelectMode={this.setBwSelectMode}
+                                         otherFixtures={otherFixtures}/>
+                    {fixtureSelect}
+
+                    <FormGroup controlId="ingress">
+                        <ControlLabel>Ingress:</ControlLabel>
+                        <FormControl inputRef={ref => {
+                            this.ingressControl = ref;
+                        }}
+                                     disabled={controlsStore.disabledControls['bw-ingress']}
+                                     defaultValue={fixture.ingress}
+                                     type="text" placeholder="0-100000"
+                                     onChange={this.onIngressBwChange}/>
+                    </FormGroup>
+                    {symmetricalControl}
+                    <FormGroup controlId="egress">
+                        <ControlLabel>Egress:</ControlLabel>
+                        <FormControl inputRef={ref => {
+                            this.egressControl = ref;
+                        }}
+                                     disabled={controlsStore.disabledControls['bw-egress']}
+                                     defaultValue={fixture.egress}
+                                     onChange={this.onEgressBwChange}
+
+                                     type="text" placeholder="0-10000"/>
+                    </FormGroup>
+                </FormGroup>
+            </Panel>
+        );
+
+    }
+}
+
+class BwSelectModeOptions extends Component {
+    onSelectModeChange = (e) => {
+        const mode = e.target.value;
+        this.props.setModified(true);
+        this.props.setBwSelectMode(mode);
+        const otherFixtures = this.props.otherFixtures;
+        let firstFixture = null;
+
+        Object.keys(otherFixtures).map((fixtureId) => {
+            let fixture = otherFixtures[fixtureId];
+            if (firstFixture === null) {
+                firstFixture = fixture;
+            }
+        });
+        if (e.target.value === 'sameAs' || e.target.value === 'oppositeOf') {
+            let referredFixture = firstFixture;
+
+            let newIngress = referredFixture.ingress;
+            let newEgress = referredFixture.egress;
+
+            if (e.target.value === 'oppositeOf') {
+                newIngress = referredFixture.egress;
+                newEgress = referredFixture.ingress;
+            }
+            this.props.updateControls({
+                ingress: newIngress,
+                egress: newEgress,
+                disable: ['bw-ingress', 'bw-egress'],
+                enable: [],
+                symmetrical: false,
+                showCheckbox: false
+            });
+
+        } else {
+            this.props.updateControls({
+                ingress: 0,
+                egress: 0,
+                enable: ['bw-ingress'],
+                disable: ['bw-egress'],
+                symmetrical: true,
+                showCheckbox: true
+            });
+        }
+    };
+
+
+    render() {
 
         let bwSelectModeOpts = [{value: 'typeIn', label: 'From text input..'}];
-        let otherFixtures = this.otherFixtures(this.props.modal);
+        let otherFixtures = this.props.otherFixtures;
 
-        if (otherFixtures.length > 0) {
+        if (Object.keys(otherFixtures).length > 0) {
             bwSelectModeOpts.push(
                 {value: 'sameAs', label: 'Same as..'}
             );
@@ -142,110 +268,12 @@ export default class BwSelect extends Component {
             )
         }
 
-
-        let bwSelectOptions =
-            <FormControl componentClass="select" onChange={(e) => {
-                this.props.setModified(true);
-                this.setState({
-                    bwSelectMode: e.target.value,
-                });
-                if (e.target.value === 'sameAs' || e.target.value === 'oppositeOf') {
-                    let referredFixture = otherFixtures[0];
-                    if (this.state.fixtureIdToCopy !== '') {
-                        referredFixture = this.props.sandboxStore.findFixture(this.state.fixtureIdToCopy);
-                    }
-                    let newIngress = referredFixture.ingress;
-                    let newEgress = referredFixture.egress;
-
-                    if (e.target.value === 'oppositeOf') {
-                        newIngress = referredFixture.egress;
-                        newEgress = referredFixture.ingress;
-                    }
-                    this.ingressControl.value = newIngress;
-                    this.egressControl.value = newEgress;
-
-                    this.setState({
-                        showSymmetrical: false,
-                        disableIngress: true,
-                        disableEgress: true,
-                        currentIngress: this.props.sandboxStore.sandbox.fixtures[0].ingress,
-                        currentEgress: this.props.sandboxStore.sandbox.fixtures[0].egress,
-                    });
-
-
-                } else {
-                    this.egressControl.value = 0;
-                    this.ingressControl.value = 0;
-                    this.setState({
-                        showSymmetrical: true,
-                        disableIngress: false,
-                        disableEgress: false,
-                        symmetrical: true,
-                        currentIngress: 0,
-                        currentEgress: 0,
-                    });
-
-                }
+        return <FormControl componentClass="select" onChange={this.onSelectModeChange}>
+            {
+                bwSelectModeOpts.map((option, index) => {
+                    return <option key={index} value={option.value}>{option.label}</option>
+                })
             }
-            }>
-                {
-                    bwSelectModeOpts.map((option, index) => {
-                        return <option key={index} value={option.value}>{option.label}</option>
-                    })
-                }
-            </FormControl>;
-
-        let fixtureSelect = <FixtureSelect fixtures={otherFixtures} onChange={this.fixtureSelected}/>;
-
-        let bwControl = null;
-        if (this.state.bwSelectMode === 'sameAs') {
-            bwControl = fixtureSelect;
-        } else if (this.state.bwSelectMode === 'oppositeOf') {
-            bwControl = fixtureSelect;
-        }
-        let symmetricalControl = null;
-        if (this.state.showSymmetrical) {
-            symmetricalControl =
-                <FormGroup controlId="symmetrical">
-                    <Checkbox
-                        defaultChecked={this.state.symmetrical} inline
-                        onChange={this.setSymmetrical}>
-
-                        Symmetrical
-                    </Checkbox>
-                </FormGroup>;
-        }
-
-
-        return (
-            <FormGroup controlId="bandwidth">
-                <ControlLabel>Bandwidth selection:</ControlLabel>
-                {bwSelectOptions}
-                {bwControl}
-                <FormGroup controlId="ingress">
-                    <ControlLabel>Ingress:</ControlLabel>
-                    <FormControl inputRef={ref => {
-                        this.ingressControl = ref;
-                    }}
-                                 disabled={this.state.disableIngress}
-                                 defaultValue={this.state.currentIngress}
-                                 type="text" placeholder="0-100000"
-                                 onChange={this.onIngressBwChange}/>
-                </FormGroup>
-                {symmetricalControl}
-                <FormGroup controlId="egress">
-                    <ControlLabel>Egress:</ControlLabel>
-                    <FormControl inputRef={ref => {
-                        this.egressControl = ref;
-                    }}
-                                 disabled={this.state.disableEgress}
-                                 defaultValue={this.state.currentEgress}
-                                 onChange={this.onEgressBwChange}
-
-                                 type="text" placeholder="0-10000"/>
-                </FormGroup>
-            </FormGroup>
-        );
-
+        </FormControl>;
     }
 }

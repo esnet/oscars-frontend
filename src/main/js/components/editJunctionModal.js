@@ -2,74 +2,74 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, FormControl, ControlLabel, FormGroup, Form, ListGroup, ListGroupItem} from 'react-bootstrap';
 
+const modalName = 'editJunction';
 
-@inject('sandboxStore')
+@inject('sandboxStore', 'controlsStore')
 @observer
-export default class JunctionParamsModal extends Component {
+export default class EditJunctionModal extends Component {
     constructor(props) {
         super(props);
-        this.closeModal = this.closeModal.bind(this);
-        this.onAzBwChange = this.onAzBwChange.bind(this);
-        this.onZaBwChange = this.onZaBwChange.bind(this);
-        this.addPipe = this.addPipe.bind(this);
-        this.selectOtherJunction = this.selectOtherJunction.bind(this);
-
     }
 
     state = {
         showAddPipeButton: false,
         otherJunction: 'choose',
-        azBw: 0,
-        zaBw: 0
     };
 
-    onAzBwChange(e) {
-        this.setState({
-            azBw: e.target.value
-        });
-    }
+    closeModal = () => {
+        this.props.controlsStore.closeModal(modalName);
+    };
 
-    onZaBwChange(e) {
-        this.setState({
-            zaBw: e.target.value
-        });
-    }
 
-    closeModal() {
-        this.props.sandboxStore.closeModal('junction');
-    }
+    onAzBwChange =(e) => {
+        this.props.controlsStore.setAzBw(e.target.value);
+    };
 
-    addPipe() {
-        let junction = this.props.junction;
+    onZaBwChange = (e) => {
+        this.props.controlsStore.setZaBw(e.target.value);
+    };
+
+    deleteJunction = () => {
+        let junction = this.props.controlsStore.selection.junction;
+
+        this.props.sandboxStore.deleteJunctionDeep(junction);
+        this.closeModal();
+    };
+
+
+    addPipe = () => {
+        let junction = this.props.controlsStore.selection.junction;
+
         if (this.state.otherJunction !== 'choose') {
             let pipe = {
                 a: junction,
                 z: this.state.otherJunction,
-                azBw: this.state.azBw,
-                zaBw: this.state.zaBw
+                azBw: this.props.controlsStore.selection.azBw,
+                zaBw: this.props.controlsStore.selection.zaBw
             };
             console.log(pipe);
             this.props.sandboxStore.addPipe(pipe);
-            this.props.setPipe(pipe);
-            this.closeModal();
-            this.props.sandboxStore.openModal('pipe');
+            this.props.controlsStore.selectPipe(pipe.id);
+            this.props.controlsStore.openModal('editPipe');
         }
-    }
+    };
 
     unconnectedJunctions() {
-        let junction = this.props.junction;
-        let pipes = this.props.sandboxStore.sandbox.pipes;
+        let junction = this.props.controlsStore.selection.junction;
+        let pipes = this.props.sandboxStore.pipesConnectedTo(junction);
         let junctions = this.props.sandboxStore.sandbox.junctions;
 
         let unconnectedJunctions = [{
             label: 'Choose one..',
             value: 'choose'
         }];
+
+
         junctions.map((j) => {
             if (j.id !== junction) {
                 let foundPipeBetween = false;
                 pipes.map((p) => {
-                    if (p.a === j.id && p.z === junction || p.a === junction && p.z === j.id) {
+                    if (p.a === j.id || p.z === j.id) {
                         foundPipeBetween = true;
                     }
                 });
@@ -85,44 +85,21 @@ export default class JunctionParamsModal extends Component {
         return unconnectedJunctions;
     }
 
-    connectedPipes() {
-        let junction = this.props.junction;
-        let pipes = this.props.sandboxStore.sandbox.pipes;
-        let connectedPipes = [];
-        pipes.map((p) => {
-            if (p.a === junction) {
-                connectedPipes.push({
-                    a: p.a,
-                    z: p.z,
-                    azBw: p.azBw,
-                    zaBw: p.zaBw,
-                })
-            } else if (p.z === junction) {
-                connectedPipes.push({
-                    a: p.z,
-                    z: p.a,
-                    azBw: p.zaBw,
-                    zaBw: p.azBw,
-                })
-
-            }
-        });
-        return connectedPipes;
-    }
-
-    selectOtherJunction(e) {
-        console.log(e.target.value);
-        let showAddPipe = e.target.value !== 'choose';
+    selectOtherJunction = (e) => {
+        const otherJunction = e.target.value;
+        let showAddPipe = otherJunction !== 'choose';
 
         this.setState({
-            otherJunction: e.target.value,
+            otherJunction: otherJunction,
             showAddPipeButton: showAddPipe
         });
-    }
+    };
 
     render() {
-        let junction = this.props.junction;
-        let showModal = this.props.sandboxStore.modals.get('junction');
+
+        let junction = this.props.controlsStore.selection.junction;
+        let showModal = this.props.controlsStore.modals.get(modalName);
+
         let unconnectedJunctions = this.unconnectedJunctions();
         let pipeSelection = <div>No other junctions found that are not already connected. Can not add a new pipe from here.</div>;
         let addPipeButton = null;
@@ -160,22 +137,18 @@ export default class JunctionParamsModal extends Component {
             </Form>
         }
 
-        let pipeItems = [];
-        let pipes = this.connectedPipes();
-        for (let index = 0; index < pipes.length; index++) {
-            let p = pipes[index];
-            pipeItems.push(
-                <ListGroupItem key={index}>
-                    <div>{p.a} {p.azBw} / {p.zaBw} {p.z}</div>
-                    {' '}
-                    <Button onClick={() => {
-                        this.props.setPipe(p);
-                        this.closeModal();
-                        this.props.sandboxStore.openModal('pipe');
-                    }}>Edit</Button>
-            </ListGroupItem>)
+        let connectedPipes = this.props.sandboxStore.pipesConnectedTo(junction);
+
+        let pipeNodes = <ListGroup> {
+            connectedPipes.map((pipe) => {
+                return <ListGroupItem key={pipe.id} onClick={() => {
+                    this.props.controlsStore.selectPipe(pipe.id);
+                    this.props.controlsStore.openModal('editPipe');
+                }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
+            })
         }
-        let pipeList = <ListGroup> {pipeItems }</ListGroup>;
+        </ListGroup>;
+
 
         return (
             <div>
@@ -184,8 +157,10 @@ export default class JunctionParamsModal extends Component {
                         <Modal.Title>{junction}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {pipeList}
+                        {pipeNodes}
                         {pipeSelection}
+                        <Button bsStyle='warning' onClick={this.deleteJunction}>Delete junction</Button>
+
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.closeModal}>Close</Button>

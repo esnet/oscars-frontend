@@ -3,10 +3,10 @@ import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import {Panel, Glyphicon} from 'react-bootstrap';
-import SelectPortFromMap from "./selectPortFromMap";
+import TopologyMap from './topologyMap';
 
 
-@inject('topologyStore', 'sandboxStore')
+@inject('topologyStore', 'controlsStore', 'sandboxStore')
 @observer
 export default class SelectPort extends Component {
     componentWillMount() {
@@ -19,10 +19,14 @@ export default class SelectPort extends Component {
 
     constructor(props) {
         super(props);
-        this.handleFixtureSelection = this.handleFixtureSelection.bind(this);
     }
+    selectDevice = (device) => {
+        this.props.controlsStore.selectDevice(device);
+        this.props.controlsStore.openModal('devicePorts');
+    };
 
-    handleFixtureSelection(port) {
+
+    onTypeaheadSelection = (port) => {
         const {availPorts} = this.props.topologyStore;
         let isInAvailPorts = false;
         let device = '';
@@ -33,14 +37,26 @@ export default class SelectPort extends Component {
             }
         });
         if (isInAvailPorts) {
-            this.props.sandboxStore.selectPort(port, device);
+            let params ={
+                'port': port,
+                'device': device,
+                'vlan': null,
+                'vlanExpression': '',
+                'availableVlans': '',
+                'ingress': 0,
+                'egress': 0
+            };
             this.typeAhead.getInstance().clear();
+
+            let fixture = this.props.sandboxStore.addFixtureDeep(params);
+            this.props.controlsStore.selectFixture(fixture);
+            this.props.controlsStore.openModal('editFixture');
+
         }
-    }
+    };
 
     render() {
         const {availPorts} = this.props.topologyStore;
-
 
         let options = [];
         if (typeof availPorts !== 'undefined') {
@@ -54,8 +70,9 @@ export default class SelectPort extends Component {
             placeholder='type to add a fixture'
             options={options}
             maxVisible={2}
-            onInputChange={this.handleFixtureSelection}
+            onInputChange={this.onTypeaheadSelection}
         />;
+
         let icon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
         let mapHeader = <div onClick={ () => this.setState({showMap: !this.state.showMap})}>
@@ -68,7 +85,7 @@ export default class SelectPort extends Component {
                 {typeAhead}
 
                 <Panel collapsible expanded={this.state.showMap} header={mapHeader}>
-                    <SelectPortFromMap />
+                    <TopologyMap onClickDevice={this.selectDevice} />
                 </Panel>
 
             </div>

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
-import {ListGroup, ListGroupItem, Button} from 'react-bootstrap';
+import {ListGroup, ListGroupItem, Panel} from 'react-bootstrap';
 
-@inject('sandboxStore')
+@inject('sandboxStore', 'controlsStore')
 @observer
 export default class Sandbox extends Component {
     constructor(props) {
@@ -11,15 +11,20 @@ export default class Sandbox extends Component {
     }
 
     render() {
-        let junctionNodes = this.props.sandboxStore.sandbox.junctions.map((junction) => {
+        const sandbox = this.props.sandboxStore.sandbox;
+
+        let junctionNodes = sandbox.junctions.map((junction) => {
             let device = junction.id;
             let key = junction.id;
-            let fixtureNodes = this.props.sandboxStore.sandbox.fixtures.map((entry) => {
+            let fixtureNodes = sandbox.fixtures.map((entry) => {
                 if (entry.device === device) {
-                    let port = entry.port;
                     let key = entry.id;
-                    let id = entry.id;
-                    return (<Fixture key={key} id={id} device={device} port={port}/>)
+                    let label = entry.label;
+                    return <ListGroupItem key={key} onClick={() => {
+                        this.props.controlsStore.selectFixture(entry);
+                        this.props.controlsStore.openModal('editFixture');
+                    }}>{label}</ListGroupItem>
+
                 }
             });
 
@@ -27,8 +32,8 @@ export default class Sandbox extends Component {
                 <ListGroupItem key={key}>
                     <ListGroup>
                         <ListGroupItem key={key + 'dev'} onClick={() => {
-                            this.props.onJunctionClicked(device);
-                            this.props.sandboxStore.selectJunction(device)
+                            this.props.controlsStore.selectJunction(device);
+                            this.props.controlsStore.openModal('editJunction');
 
                         }}>{device}</ListGroupItem>
 
@@ -43,19 +48,15 @@ export default class Sandbox extends Component {
 
         });
 
-        let pipeItems = [];
-        let pipes = this.props.sandboxStore.sandbox.pipes;
-        for (let index = 0; index
-        < pipes.length; index++) {
-            let p = pipes[index];
-            pipeItems.push(<ListGroupItem key={index} onClick={() => {
-                this.props.onPipeClicked(p);
-                this.props.sandboxStore.openModal('pipe');
-            }
-            }> {p.a} {p.azBw} / {p.zaBw} {p.z}
-            </ListGroupItem>)
-
+        let pipeNodes = <ListGroup> {
+            sandbox.pipes.map((pipe) => {
+                return <ListGroupItem key={pipe.id} onClick={() => {
+                    this.props.controlsStore.selectPipe(pipe.id);
+                    this.props.controlsStore.openModal('editPipe');
+                }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
+            })
         }
+        </ListGroup>
 
         let addPipeButton = null;
         /*
@@ -63,36 +64,15 @@ export default class Sandbox extends Component {
          addPipeButton = <Button onClick={this.props.sandboxStore.openModal('pipe')}>Add a pipe..</Button>
          }
          */
-        let pipeList =
-            <ListGroup> {pipeItems }</ListGroup>
-
         return (
-            <div>
+            <Panel>
                 <h4>Junctions and fixtures:</h4>
                 <ListGroup>{junctionNodes}</ListGroup>
                 <h4>Pipes</h4>
-                {pipeList}
+                {pipeNodes}
                 {addPipeButton}
-            </div>
+            </Panel>
         )
     };
 
 };
-
-
-@inject('sandboxStore')
-class Fixture extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    onFixtureClicked = () => {
-        this.props.sandboxStore.selectFixture(this.props.id, true);
-    };
-
-    render() {
-        return (
-            <ListGroupItem onClick={this.onFixtureClicked} key={this.props.id}>{this.props.id}</ListGroupItem>
-        )
-    }
-}

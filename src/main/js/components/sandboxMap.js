@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
+import {autorunAsync} from 'mobx';
 import vis from 'vis';
 
 
-@inject('sandboxStore')
+@inject('controlsStore', 'sandboxStore')
 @observer
 export default class SandboxMap extends Component {
     constructor(props) {
@@ -17,12 +18,22 @@ export default class SandboxMap extends Component {
         };
     }
 
-    onFixtureClicked = (id) => {
-        this.props.sandboxStore.selectFixture(id, true);
+    onFixtureClicked = (fixture) => {
+        this.props.controlsStore.selectFixture(fixture);
+        this.props.controlsStore.openModal('editFixture');
+    };
+
+    onJunctionClicked = (junction) => {
+        this.props.controlsStore.selectJunction(junction.id);
+        this.props.controlsStore.openModal('editJunction');
+    };
+    onPipeClicked = (pipe) => {
+        this.props.controlsStore.selectPipe(pipe.id);
+        this.props.controlsStore.openModal('editPipe');
     };
 
 
-    componentDidMount() {
+    updateMap = autorunAsync(() => {
         let options = {
             height: '350px',
             interaction: {
@@ -63,20 +74,21 @@ export default class SandboxMap extends Component {
         network.on('click', (params) => {
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
-                this.datasource.nodes.get(nodeId).onClick(nodeId);
+                let nodeEntry = this.datasource.nodes.get(nodeId);
+                if (nodeEntry.onClick !== null) {
+                    nodeEntry.onClick(nodeEntry.data);
+                }
+
             }
             if (params.edges.length > 0) {
                 let edgeId = params.edges[0];
                 let edgeEntry = this.datasource.edges.get(edgeId);
+
                 if (edgeEntry.onClick !== null) {
                     edgeEntry.onClick(edgeEntry.data);
                 }
             }
         });
-    }
-
-
-    render() {
 
         let { sandbox } = this.props.sandboxStore;
         let junctions = sandbox.junctions;
@@ -94,15 +106,17 @@ export default class SandboxMap extends Component {
                 id: j.id,
                 label: j.id,
                 size: 20,
-                onClick: this.props.onJunctionClicked
+                data: j,
+                onClick: this.onJunctionClicked
             };
             nodes.push(junctionNode);
         });
         fixtures.map((f) => {
             let fixtureNode = {
                 id: f.id,
-                label: f.id,
+                label: f.label,
                 size: 8,
+                data: f,
                 onClick: this.onFixtureClicked
             };
             nodes.push(fixtureNode);
@@ -118,13 +132,13 @@ export default class SandboxMap extends Component {
         });
         pipes.map((p) => {
             let edge = {
-                id: p.a+' --- '+p.z,
+                id: p.id,
                 from: p.a,
                 to: p.z,
                 length: 10,
                 width: 5,
                 data: p,
-                onClick: this.props.onPipeClicked
+                onClick: this.onPipeClicked
 
             };
             edges.push(edge);
@@ -132,6 +146,12 @@ export default class SandboxMap extends Component {
         });
         this.datasource.edges.add(edges);
         this.datasource.nodes.add(nodes);
+
+    }, 500);
+
+
+    render() {
+
 
         return (
             <div ref={(ref) => { this.mapRef = ref; }}><p>sandbox map</p></div>
