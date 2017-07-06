@@ -13,14 +13,14 @@ class Transformer {
             vlan: fixture.vlan,
             ingress: fixture.ingress,
             egress: fixture.egress,
+            bwPreviouslySet: fixture.bwPreviouslySet,
 
             availableVlans: '',
             vlanExpression: '',
 
             copiedVlan: '',
             showCopiedVlan: false,
-
-            vlanSelectionMode: 'typeIn',
+            vlanSelectionMode: 'fromAvailable',
             vlanSelectionModeOptions: [],
             vlanCopyFromOptions: [],
 
@@ -64,12 +64,14 @@ class Transformer {
             vlan: fixture.vlan,
             ingress: 0,
             egress: 0,
+            bwPreviouslySet: false,
 
             vlanExpression: '',
             showVlanExpression: true,
 
-            vlanSelectionMode: 'typeIn',
+            vlanSelectionMode: 'fromAvailable',
             copiedVlan: '',
+            showCopiedVlan: false,
 
             showVlanReleaseControls: false,
             showVlanPickButton: true,

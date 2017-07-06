@@ -4,6 +4,7 @@ import {FormGroup, FormControl, Checkbox, ControlLabel, Panel, Button, Well} fro
 import {toJS, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 import FixtureSelect from './fixtureSelect';
+import validator from '../lib/validation'
 
 
 @inject('controlsStore', 'sandboxStore')
@@ -81,6 +82,7 @@ export default class BwSelect extends Component {
                 result[f.id] = {
                     id: f.id,
                     label: f.label,
+                    device: f.device,
                     ingress: f.ingress,
                     egress: f.egress,
                 };
@@ -109,6 +111,7 @@ export default class BwSelect extends Component {
             egress: newEgress,
             showBwSetButton: false,
             bwBeingEdited: false,
+            bwPreviouslySet: true,
         };
 
         this.props.controlsStore.setParamsForEditFixture(efParams);
@@ -119,7 +122,9 @@ export default class BwSelect extends Component {
         this.props.sandboxStore.unsetFixtureBandwidth(fixtureId);
         this.props.controlsStore.setParamsForEditFixture({
             showBwSetButton: true,
-            bwBeingEdited: true
+            bwBeingEdited: true,
+            bwPreviouslySet: false,
+
         });
 
     };
@@ -158,7 +163,8 @@ export default class BwSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
         let showFixtureSelect = ef.bwSelectionMode === 'sameAs' || ef.bwSelectionMode === 'oppositeOf';
 
-        let header = <span>Bandwidth</span>;
+        const validationLabel = validator.fixtureBwLabel(ef);
+        const header = <span>Bandwidth <span className='pull-right'>{validationLabel}</span></span>;
 
         let result =
             <Panel header={header}>
@@ -206,10 +212,10 @@ export default class BwSelect extends Component {
                 </ToggleDisplay>
 
                 <ToggleDisplay show={ef.showBwSetButton}>
-                    <Button bsStyle='primary' onClick={this.setFixtureBw}>Set</Button>
+                    <Button bsStyle='primary' className='pull-right' onClick={this.setFixtureBw}>Set bandwidth</Button>
                 </ToggleDisplay>
                 <ToggleDisplay show={!ef.bwBeingEdited}>
-                    <Button bsStyle='primary' onClick={this.unsetFixtureBw}>Edit</Button>
+                    <Button bsStyle='warning' className='pull-right' onClick={this.unsetFixtureBw}>Edit</Button>
                 </ToggleDisplay>
             </Panel>;
         return result;

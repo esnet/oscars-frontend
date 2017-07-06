@@ -11,7 +11,7 @@ export default class VlanSelectMode extends Component {
 
 
     render() {
-        let vlanSelectModeOpts = [{value: 'typeIn', label: 'From text input..'}];
+        let vlanSelectModeOpts = [{value: 'fromAvailable', label    : 'Any from available'}];
         let fixtures = this.props.controlsStore.editFixture.vlanCopyFromOptions;
 
         if (Object.keys(fixtures).length > 0) {
@@ -19,9 +19,7 @@ export default class VlanSelectMode extends Component {
                 {value: 'sameAs', label: 'Copy from...'}
             );
         }
-        vlanSelectModeOpts.push(
-            {value: 'fromAvailable', label    : 'Any from available'}
-        );
+        vlanSelectModeOpts.push({value: 'typeIn', label: 'From text input..'});
 
         return (
             <FormControl componentClass="select" onChange={this.props.selectModeChanged}>

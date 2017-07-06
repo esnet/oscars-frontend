@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, Grid, Row, Col} from 'react-bootstrap';
 
+import {toJS, action, autorun, computed, whyRun} from 'mobx';
+
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
 
@@ -21,19 +23,18 @@ export default class EditFixtureModal extends Component {
     deleteFixture = () => {
         const editFixture = this.props.controlsStore.editFixture;
         this.props.sandboxStore.deleteFixtureDeep(editFixture.fixtureId);
-        this.props.closeModal();
+        this.closeModal();
     };
 
 
     render() {
         let showModal = this.props.controlsStore.modals.get(modalName);
-        let fixture = this.props.controlsStore.editFixture.fixtureId;
+        let ef = this.props.controlsStore.editFixture;
 
-        let label =  'Error - fixture not found!';
-        if (fixture !== null) {
-            label =  fixture.label;
-        }
+        let label = ef.device + ':' + ef.label;
+        let vlan = ef.vlan + '';
 
+        whyRun();
 
         return (
             <div>

@@ -124,7 +124,7 @@ export default class EditJunctionModal extends Component {
         let junction = editJunction.junction;
         let showModal = this.props.controlsStore.modals.get(modalName);
 
-        let pipeSelection = <div>No other junctions found that are not already connected. Can not add a new pipe from
+        let noPipesText = <div>No other junctions found that are not already connected. Can not add a new pipe from
             here.</div>;
 
         let addPipeButton = null;
@@ -137,13 +137,14 @@ export default class EditJunctionModal extends Component {
 
         if (unconnectedJunctions.length > 1) {
             showAddPipeControls = true;
+            noPipesText = null;
         }
 
         let connectedPipes = this.props.sandboxStore.pipesConnectedTo(junction);
 
         return (
             <div>
-                <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
+                <Modal show={showModal} onHide={this.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>{junction}</Modal.Title>
                     </Modal.Header>
@@ -162,7 +163,7 @@ export default class EditJunctionModal extends Component {
                             </ListGroup>
                             {' '}
                             <ToggleDisplay show={showAddPipeControls}>
-                                <Form inline>
+                                <Form>
                                     <FormGroup controlId="pipe">
                                         <ControlLabel>Pipe to:</ControlLabel>
                                         {' '}
@@ -190,7 +191,8 @@ export default class EditJunctionModal extends Component {
                                 </Form>
                             </ToggleDisplay>
 
-                            {pipeSelection}
+                            {noPipesText}
+
                             <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
                                 junction</Button>
                         </Panel>
