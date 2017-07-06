@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {FormGroup, FormControl, Checkbox, ControlLabel, Panel} from 'react-bootstrap';
+import {FormGroup, FormControl, Checkbox, ControlLabel, Panel, Button, Well} from 'react-bootstrap';
+import {toJS, whyRun} from 'mobx';
+import ToggleDisplay from 'react-toggle-display';
 import FixtureSelect from './fixtureSelect';
 
 
@@ -11,244 +13,218 @@ export default class BwSelect extends Component {
         super(props);
     }
 
-    state = {
-        symmetrical: true,
-        showCheckbox: true,
-        bwSelectMode: 'typeIn'
-    };
 
     symmetricalCheckboxClicked = (e) => {
-        const controlsStore = this.props.controlsStore;
-        const fixture = controlsStore.fixture;
+        const ef = this.props.controlsStore.editFixture;
 
         const mustBecomeSymmetrical = e.target.checked;
-        let newState = {
+        let params = {
             symmetrical: mustBecomeSymmetrical,
+
         };
         if (mustBecomeSymmetrical) {
-            controlsStore.disableControl('bw-egress');
-        } else {
-            controlsStore.enableControl('bw-egress');
+            params.egress = ef.ingress;
+            this.egressControl.value = ef.ingress;
         }
-
-
-        const currentEgress = fixture.egress;
-        const currentIngress = fixture.ingress;
-        if (currentIngress !== currentEgress) {
-            if (mustBecomeSymmetrical) {
-                controlsStore.setEgress(currentIngress);
-                controlsStore.disableControl('bw-egress');
-                this.egressControl.value = currentIngress;
-                this.props.setModified(true);
-            }
-        }
-        this.setState(newState);
+        this.props.controlsStore.setParamsForEditFixture(params);
     };
 
     onIngressBwChange = (e) => {
         const newIngress = e.target.value;
-        this.props.setModified(true);
-        const controlsStore = this.props.controlsStore;
-
-        if (this.state.symmetrical) {
+        let params = {
+            ingress: newIngress,
+        };
+        if (this.props.controlsStore.editFixture.symmetrical) {
+            params.egress = newIngress;
             this.egressControl.value = newIngress;
-            controlsStore.setEgress(newIngress);
         }
-        controlsStore.setIngress(newIngress);
+        this.props.controlsStore.setParamsForEditFixture(params);
     };
 
     onEgressBwChange = (e) => {
         const newEgress = e.target.value;
-        this.props.setModified(true);
-        this.props.controlsStore.setEgress(newEgress);
+        this.props.controlsStore.setParamsForEditFixture({
+            egress: newEgress,
+        });
     };
 
     otherFixtureSelected = (e) => {
-        this.props.setModified(true);
-        let newIngress = 0;
-        let newEgress = 0;
-
+        const ef = this.props.controlsStore.editFixture;
+        let params = {};
         if (e.target.value !== 'choose') {
             let otherFixture = JSON.parse(e.target.value);
 
-            newIngress = otherFixture.ingress;
-            newEgress = otherFixture.egress;
-            if (this.state.bwSelectMode === 'oppositeOf') {
-                newIngress = otherFixture.egress;
-                newEgress = otherFixture.ingress;
+            params.copiedIngress = otherFixture.ingress;
+            params.copiedEgress = otherFixture.egress;
+            if (ef.bwSelectionMode === 'oppositeOf') {
+                params.copiedIngress = otherFixture.egress;
+                params.copiedEgress = otherFixture.ingress;
             }
+            params.showBwSetButton = true;
+        } else {
+            params.copiedEgress = '-';
+            params.copiedIngress = '-';
+            params.showBwSetButton = false;
         }
 
-        let params = {
-            ingress: newIngress,
-            egress: newEgress,
-            disable: ['bw-ingress', 'bw-egress'],
-            enable: [],
-            symmetrical: false,
-            showCheckbox: false,
-        };
-        this.updateControls(params)
+
+        this.props.controlsStore.setParamsForEditFixture(params);
     };
 
     otherFixtures() {
-        let thisFixtureId = this.props.controlsStore.fixture.id;
+        const ef = this.props.controlsStore.editFixture;
 
-        // i can only choose to have the same / different bandwidth with another fixture
+        // can only choose to have the same / different bandwidth with some other fixture
         let result = {};
         this.props.sandboxStore.sandbox.fixtures.map((f) => {
-            if (f.id !== thisFixtureId) {
-                result[f.id] = f
+            if (f.id !== ef.fixtureId && f.bwPreviouslySet) {
+                result[f.id] = {
+                    id: f.id,
+                    label: f.label,
+                    ingress: f.ingress,
+                    egress: f.egress,
+                };
             }
         });
         return result;
     }
 
-    setBwSelectMode = (mode) => {
-        this.setState({
-            bwSelectMode: mode
+
+    setFixtureBw = () => {
+        const ef = this.props.controlsStore.editFixture;
+        let newIngress = ef.ingress;
+        let newEgress = ef.egress;
+        if (ef.showCopiedBw) {
+            newIngress = ef.copiedIngress;
+            newEgress = ef.copiedEgress;
+        }
+        let sbParams = {
+            ingress: newIngress,
+            egress: newEgress,
+        };
+
+        this.props.sandboxStore.setFixtureBandwidth(ef.fixtureId, sbParams);
+        let efParams = {
+            ingress: newIngress,
+            egress: newEgress,
+            showBwSetButton: false,
+            bwBeingEdited: false,
+        };
+
+        this.props.controlsStore.setParamsForEditFixture(efParams);
+    };
+
+    unsetFixtureBw = () => {
+        const fixtureId = this.props.controlsStore.editFixture.fixtureId;
+        this.props.sandboxStore.unsetFixtureBandwidth(fixtureId);
+        this.props.controlsStore.setParamsForEditFixture({
+            showBwSetButton: true,
+            bwBeingEdited: true
         });
 
     };
 
-    updateControls = (params) => {
-        const controlsStore = this.props.controlsStore;
-
-        this.ingressControl.value = params.ingress;
-        this.egressControl.value = params.egress;
-        controlsStore.setIngress(params.ingress);
-        controlsStore.setEgress(params.egress);
-        params.disable.map((controlName) => {
-            controlsStore.disableControl(controlName);
-        });
-        params.enable.map((controlName) => {
-            controlsStore.enableControl(controlName);
-        });
-
-        this.setState({
-            symmetrical: params.symmetrical,
-            showCheckbox: params.showCheckbox
-        });
-    };
 
     componentWillMount() {
-        const controlsStore = this.props.controlsStore;
-        const fixture = controlsStore.fixture;
-
-        if (fixture.ingress === fixture.egress) {
-            this.setState({
-                symmetrical: true,
-            });
-            controlsStore.disableControl('bw-egress');
-        } else {
-            this.setState({
-                symmetrical: false,
-            });
-            controlsStore.enableControl('bw-egress');
-        }
-        controlsStore.enableControl('bw-ingress');
-        this.props.controlsStore.setOtherFixtures(this.otherFixtures());
-
+        this.props.controlsStore.setParamsForEditFixture({
+            bwCopyFromOptions: this.otherFixtures()
+        });
     }
 
 
+    onSelectModeChange = (e) => {
+
+        const mode = e.target.value;
+
+        let params = {
+            bwSelectionMode: mode,
+            showCopiedBw: (mode === 'sameAs' || mode === 'oppositeOf')
+        };
+
+        if (mode === 'oppositeOf' || mode === 'sameAs') {
+            params.showBwSetButton = false;
+            params.copiedEgress = '-';
+            params.copiedIngress = '-';
+
+            this.fixtureSelect.clearSelection()
+        }
+
+        this.props.controlsStore.setParamsForEditFixture(params);
+
+    };
+
+
     render() {
-        const controlsStore = this.props.controlsStore;
-        const fixture = controlsStore.fixture;
-
-
-        let fixtureSelect = null;
-        if (this.state.bwSelectMode === 'sameAs' || this.state.bwSelectMode === 'oppositeOf') {
-            fixtureSelect = <FixtureSelect onChange={this.otherFixtureSelected}/>;
-        }
-
-        let symmetricalControl = null;
-        if (this.state.showCheckbox) {
-            symmetricalControl =
-                <FormGroup controlId="symmetrical">
-                    <Checkbox
-                        defaultChecked={this.state.symmetrical} inline
-                        onChange={this.symmetricalCheckboxClicked}>
-                        Symmetrical
-                    </Checkbox>
-                </FormGroup>;
-        }
+        const ef = this.props.controlsStore.editFixture;
+        let showFixtureSelect = ef.bwSelectionMode === 'sameAs' || ef.bwSelectionMode === 'oppositeOf';
 
         let header = <span>Bandwidth</span>;
 
-        return (
+        let result =
             <Panel header={header}>
-                <FormGroup controlId="bandwidth">
-                    <BwSelectModeOptions setModified={this.props.setModified}
-                                         updateControls={this.updateControls}
-                                         setBwSelectMode={this.setBwSelectMode}
-                                         otherFixtures={this.props.controlsStore.selection.otherFixtures}/>
-                    {fixtureSelect}
-                    {' '}
+                <ToggleDisplay show={ef.bwBeingEdited}>
+                    <BwSelectModeOptions onSelectModeChange={this.onSelectModeChange}/>
+                    { ' ' }
+                    <ToggleDisplay show={showFixtureSelect}>
+                        <FixtureSelect mode='bw' onRef={ref => {
+                            this.fixtureSelect = ref
+                        }} onChange={this.otherFixtureSelected}/>
+                        <ToggleDisplay show={ef.showCopiedBw}>
+                            <Well>New ingress: {ef.copiedIngress}</Well>
+                            {' '}
+                            <Well>New egress: {ef.copiedEgress}</Well>
+                        </ToggleDisplay>
+                    </ToggleDisplay>
+                    <ToggleDisplay show={!showFixtureSelect}>
+                        <FormGroup controlId="ingress">
+                            <ControlLabel>Ingress:</ControlLabel>
+                            <FormControl defaultValue={ef.ingress}
+                                         type="text" placeholder="0-100000"
+                                         onChange={this.onIngressBwChange}/>
+                        </FormGroup>
+                        <FormGroup controlId="egress">
+                            <ControlLabel>Egress:</ControlLabel>
+                            <FormControl defaultValue={ef.egress}
+                                         disabled={ef.symmetrical}
+                                         inputRef={ref => {
+                                             this.egressControl = ref;
+                                         }}
+                                         onChange={this.onEgressBwChange}
+                                         type="text" placeholder="0-10000"/>
+                        </FormGroup>
+                        <FormGroup controlId="symmetrical">
+                            <Checkbox defaultChecked={ef.symmetrical} inline
+                                      onChange={this.symmetricalCheckboxClicked}>Symmetrical
+                            </Checkbox>
 
-                    <FormGroup controlId="ingress">
-                        <ControlLabel>Ingress:</ControlLabel>
-                        <FormControl inputRef={ref => {
-                            this.ingressControl = ref;
-                        }}
-                                     disabled={controlsStore.disabledControls['bw-ingress']}
-                                     defaultValue={fixture.ingress}
-                                     type="text" placeholder="0-100000"
-                                     onChange={this.onIngressBwChange}/>
-                    </FormGroup>
-                    {symmetricalControl}
-                    <FormGroup controlId="egress">
-                        <ControlLabel>Egress:</ControlLabel>
-                        <FormControl inputRef={ref => {
-                            this.egressControl = ref;
-                        }}
-                                     disabled={controlsStore.disabledControls['bw-egress']}
-                                     defaultValue={fixture.egress}
-                                     onChange={this.onEgressBwChange}
+                        </FormGroup>
+                    </ToggleDisplay>
+                </ToggleDisplay>
+                <ToggleDisplay show={!ef.bwBeingEdited}>
+                    <Well>Set ingress: {ef.ingress}</Well>
+                    <Well>Set egress: {ef.egress}</Well>
+                </ToggleDisplay>
 
-                                     type="text" placeholder="0-10000"/>
-                    </FormGroup>
-                </FormGroup>
-            </Panel>
-        );
-
+                <ToggleDisplay show={ef.showBwSetButton}>
+                    <Button bsStyle='primary' onClick={this.setFixtureBw}>Set</Button>
+                </ToggleDisplay>
+                <ToggleDisplay show={!ef.bwBeingEdited}>
+                    <Button bsStyle='primary' onClick={this.unsetFixtureBw}>Edit</Button>
+                </ToggleDisplay>
+            </Panel>;
+        return result;
     }
 }
 
+@inject('controlsStore')
+@observer
 class BwSelectModeOptions extends Component {
-    onSelectModeChange = (e) => {
-        const mode = e.target.value;
-        this.props.setModified(true);
-        this.props.setBwSelectMode(mode);
-
-        if (e.target.value === 'sameAs' || e.target.value === 'oppositeOf') {
-            this.props.updateControls({
-                ingress: 0,
-                egress: 0,
-                disable: ['bw-ingress', 'bw-egress'],
-                enable: [],
-                symmetrical: false,
-                showCheckbox: false
-            });
-
-        } else {
-            this.props.updateControls({
-                ingress: 0,
-                egress: 0,
-                enable: ['bw-ingress'],
-                disable: ['bw-egress'],
-                symmetrical: true,
-                showCheckbox: true
-            });
-        }
-    };
-
-
     render() {
 
         let bwSelectModeOpts = [{value: 'typeIn', label: 'From text input..'}];
-        let otherFixtures = this.props.otherFixtures;
+        let fixtures = this.props.controlsStore.editFixture.bwCopyFromOptions;
 
-        if (Object.keys(otherFixtures).length > 0) {
+        if (Object.keys(fixtures).length > 0) {
             bwSelectModeOpts.push(
                 {value: 'sameAs', label: 'Same as..'}
             );
@@ -257,7 +233,7 @@ class BwSelectModeOptions extends Component {
             )
         }
 
-        return <FormControl componentClass="select" onChange={this.onSelectModeChange}>
+        return <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>
             {
                 bwSelectModeOpts.map((option, index) => {
                     return <option key={index} value={option.value}>{option.label}</option>

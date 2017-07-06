@@ -2,131 +2,122 @@ import {observable, action} from 'mobx';
 
 class ControlsStore {
 
-    @observable selection = {
+    @observable connection = {
         connectionId: '',
-
-        device: '',
-
-        pipe: '',
-        azBw: 0,
-        zaBw: 0,
-
-        junction: '',
-
         startAt: '',
         endAt: '',
-        otherFixtures: {}
-
-
     };
 
-    @observable fixture = {
-        vlanExpression: '',
-        vlan: null,
+    @observable editFixture = {
+        fixtureId: '',
+        label: '',
+        port: '',
+
+        vlan: '',
         availableVlans: '',
+        availableVlanRanges: [],
+        vlanExpression: '',
+
+        vlanSelectionMode: '',
+        vlanCopyFromOptions: [],
+
+        copiedVlan: '',
+        showCopiedVlan: false,
+
+        showVlanPickButton: false,
+        showVlanPickControls: false,
+        showVlanReleaseControls: false,
+
+
+
         ingress: 0,
         egress: 0,
-        device: '',
-        port: '',
-        label: '',
-        id: ''
+        symmetrical: true,
+
+        bwBeingEdited: false,
+        bwPreviouslySet: false,
+        bwSelectionMode: '',
+        bwSelectionModeOptions: [],
+        showBwSetButton: true,
+
+        showCopiedBw: false,
+        copiedIngress: 0,
+        copiedEgress: 0,
+        bwCopyFromOptions: [],
+    }
+    ;
+    @observable
+    addFixture = {
+        device: ''
+    };
+    @observable
+    editJunction = {
+        junction: '',
+        showAddPipeButton: '',
+        azBw: '',
+        zaBw: '',
+        otherJunction: '',
+    };
+    @observable
+    editPipe = {
+        pipeId: '',
+        azBw: '',
+        zaBw: '',
+        showUpdateButton: false,
+
     };
 
 
-    @observable disabledControls = {};
+    @action
+    setParamsForEditPipe(params) {
+        Object.assign(this.editPipe, params);
+    }
 
+    @action
+    setParamsForEditJunction(params) {
+        Object.assign(this.editJunction, params);
+    }
 
-    @observable modals = observable.map({
+    @action
+    setParamsForEditFixture(params) {
+        Object.assign(this.editFixture, params);
+    }
+
+    @action
+    setParamsForAddFixture(params) {
+        Object.assign(this.addFixture, params);
+    }
+
+    @action
+    setParamsForConnection(params) {
+        Object.assign(this.connection, params);
+    }
+
+    @observable
+    modals = observable.map({
         'editFixture': false,
         'editJunction': false,
         'editPipe': false,
-        'devicePorts': false
+        'addFixture': false
     });
 
-    @action setConnectionId(connId) {
-        this.selection.connectionId = connId;
-    }
 
-    @action setOtherFixtures(otherFixtures) {
-        this.selection.otherFixtures = otherFixtures;
-    }
-
-    @action disableControl(name) {
-        this.disabledControls[name] = true;
-    }
-    @action enableControl(name) {
-        this.disabledControls[name] = false;
-    }
-
-
-    @action setStartAt(date) {
-        this.selection.startAt = date;
-    }
-
-    @action setEndAt(date) {
-        this.selection.endAt = date;
-    }
-
-    @action openModal(type) {
+    @action
+    openModal(type) {
         this.closeModals();
         this.modals.set(type, true);
     }
 
-    @action closeModal(type) {
+    @action
+    closeModal(type) {
         this.modals.set(type, false);
     }
 
-    @action closeModals() {
+    @action
+    closeModals() {
         this.modals.forEach((value, key) => {
             this.modals.set(key, false);
         });
-    }
-
-    @action selectJunction(junction) {
-        this.selection.junction = junction;
-    }
-
-    @action selectDevice(device) {
-        this.selection.device = device;
-    }
-
-    @action selectPipe(id) {
-        this.selection.pipe = id;
-    }
-
-    @action setAzBw(bw) {
-        this.selection.azBw = bw;
-    }
-
-    @action setZaBw(bw) {
-        this.selection.zaBw = bw;
-    }
-
-
-
-
-    @action selectFixture(fixture) {
-        this.fixture = fixture;
-    }
-
-    @action setAvailableVlans(vlans) {
-        this.fixture.availableVlans = vlans;
-    }
-
-    @action setVlanExpression(expression) {
-        this.fixture.vlanExpression = expression;
-    }
-    @action setVlan(vlan) {
-        this.fixture.vlan = vlan;
-    }
-
-
-    @action setIngress(value) {
-        this.fixture.ingress = value;
-    }
-
-    @action setEgress(value) {
-        this.fixture.egress = value;
     }
 
 

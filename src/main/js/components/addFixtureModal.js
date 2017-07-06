@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, ListGroup, ListGroupItem, Glyphicon} from 'react-bootstrap';
+import transformer from '../lib/transform';
 
-const modalName = 'devicePorts';
+const modalName = 'addFixture';
 
 @inject('topologyStore', 'controlsStore', 'sandboxStore')
 @observer
-export default class DevicePortsModal extends Component {
+export default class AddFixtureModal extends Component {
     componentWillMount() {
         this.props.topologyStore.loadAvailablePorts();
     }
@@ -19,19 +20,16 @@ export default class DevicePortsModal extends Component {
         let params = {
             device: device,
             port: port,
-            ingress: 0,
-            egress: 0,
-            vlan: null,
-            vlanExpression: '',
-            availableVlans: ''
         };
         let fixture = this.props.sandboxStore.addFixtureDeep(params);
-        this.props.controlsStore.selectFixture(fixture);
+
+        const editFixtureParams = transformer.newFixtureToEditParams(fixture);
+        this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
         this.props.controlsStore.openModal('editFixture');
     };
 
     render() {
-        const device = this.props.controlsStore.selection.device;
+        const device = this.props.controlsStore.addFixture.device;
         const devicePorts = this.props.topologyStore.availPortsByDevice;
 
         let ports = [];

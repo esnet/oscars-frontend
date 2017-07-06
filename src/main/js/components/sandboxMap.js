@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync} from 'mobx';
+import {autorunAsync, toJS} from 'mobx';
 import {Panel, Glyphicon} from 'react-bootstrap';
-
+import transformer from '../lib/transform';
 import vis from 'vis';
 
 
@@ -26,19 +26,20 @@ export default class SandboxMap extends Component {
     };
 
     onFixtureClicked = (fixture) => {
-        this.props.controlsStore.selectFixture(fixture);
+        const params = transformer.existingFixtureToEditParams(fixture);
+        this.props.controlsStore.setParamsForEditFixture(params);
         this.props.controlsStore.openModal('editFixture');
     };
 
     onJunctionClicked = (junction) => {
-        this.props.controlsStore.selectJunction(junction.id);
+        this.props.controlsStore.setParamsForEditJunction({junction: junction.id});
         this.props.controlsStore.openModal('editJunction');
     };
     onPipeClicked = (pipe) => {
-        this.props.controlsStore.selectPipe(pipe.id);
+        const params = transformer.existingPipeToEditParams(pipe);
+        this.props.controlsStore.setParamsForEditPipe(params);
         this.props.controlsStore.openModal('editPipe');
     };
-
 
     componentDidMount() {
         let options = {
@@ -107,9 +108,9 @@ export default class SandboxMap extends Component {
 
 
         let {sandbox} = this.props.sandboxStore;
-        let junctions = sandbox.junctions;
-        let fixtures = sandbox.fixtures;
-        let pipes = sandbox.pipes;
+        let junctions = toJS(sandbox.junctions);
+        let fixtures = toJS(sandbox.fixtures);
+        let pipes = toJS(sandbox.pipes);
 
 
         this.datasource.nodes.clear();
@@ -165,7 +166,6 @@ export default class SandboxMap extends Component {
         this.datasource.nodes.add(nodes);
 
     }, 500);
-
 
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
