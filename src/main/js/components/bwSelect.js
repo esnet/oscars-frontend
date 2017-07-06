@@ -62,9 +62,10 @@ export default class BwSelect extends Component {
             }
             params.showBwSetButton = true;
         } else {
+            params.copiedEgress = '-';
+            params.copiedIngress = '-';
             params.showBwSetButton = false;
         }
-        console.log(params);
 
 
         this.props.controlsStore.setParamsForEditFixture(params);
@@ -76,7 +77,7 @@ export default class BwSelect extends Component {
         // can only choose to have the same / different bandwidth with some other fixture
         let result = {};
         this.props.sandboxStore.sandbox.fixtures.map((f) => {
-            if (f.id !== ef.fixtureId) {
+            if (f.id !== ef.fixtureId && f.bwPreviouslySet) {
                 result[f.id] = {
                     id: f.id,
                     label: f.label,
@@ -148,7 +149,6 @@ export default class BwSelect extends Component {
             this.fixtureSelect.clearSelection()
         }
 
-        console.log(params);
         this.props.controlsStore.setParamsForEditFixture(params);
 
     };
