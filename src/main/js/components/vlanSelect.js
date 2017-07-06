@@ -39,7 +39,6 @@ export default class VlanSelect extends Component {
 
                     this.props.controlsStore.setParamsForEditFixture(params);
                     this.props.sandboxStore.setFixtureVlan(ef.fixtureId, parsed.vlanId);
-                    this.updateAvailableVlans();
                 }));
     };
 
@@ -66,7 +65,6 @@ export default class VlanSelect extends Component {
                     };
                     this.props.controlsStore.setParamsForEditFixture(params);
                     this.props.sandboxStore.unsetFixtureVlan(ef.fixtureId);
-                    this.updateAvailableVlans();
                 }));
 
 
@@ -114,15 +112,19 @@ export default class VlanSelect extends Component {
         return result;
     }
 
-    updateAvailableVlans() {
+    updateAvailableVlans = autorun(() => {
         const controlsStore = this.props.controlsStore;
         const ef = this.props.controlsStore.editFixture;
+        let foo = ef.fixtureId + ef.vlan + ef.bwSelectionMode + ef.bwBeingEdited;
+        
+
 
         let request = {
             'urns': [ef.port],
             'startDate': controlsStore.connection.startAt,
             'endDate': controlsStore.connection.endAt,
         };
+        console.log(request);
 
         myClient.submit('POST', '/vlan/port', request)
             .then(
@@ -139,16 +141,10 @@ export default class VlanSelect extends Component {
                     });
 
                 }));
-    }
+        whyRun();
 
-    componentWillMount() {
+    });
 
-        this.props.controlsStore.setParamsForEditFixture({
-            vlanCopyFromOptions: this.fixturesAllowingSameVlan()
-        });
-        this.updateAvailableVlans();
-
-    }
 
     selectModeChanged = (e) => {
         const mode = e.target.value;
@@ -176,10 +172,6 @@ export default class VlanSelect extends Component {
         }
 
         this.props.controlsStore.setParamsForEditFixture(params);
-
-        this.props.controlsStore.setParamsForEditFixture({
-            vlanCopyFromOptions: this.fixturesAllowingSameVlan()
-        });
 
     };
 

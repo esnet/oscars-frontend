@@ -27,12 +27,9 @@ export default class EditFixtureModal extends Component {
 
     render() {
         let showModal = this.props.controlsStore.modals.get(modalName);
-        let fixture = this.props.controlsStore.editFixture.fixtureId;
+        let ef = this.props.controlsStore.editFixture;
 
-        let label =  'Error - fixture not found!';
-        if (fixture !== null) {
-            label =  fixture.label;
-        }
+        const label = ef.device + ':' + ef.label;
 
 
         return (
