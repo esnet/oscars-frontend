@@ -104,7 +104,7 @@ class SandboxStore {
     @action addFixture(params) {
         let idResult = this.makeFixtureId(params.port);
 
-        let label = params.port.split(':')[1]+':'+idResult.suffix
+        let label = params.port.split(':')[1] + ':' + idResult.suffix
         let entry = {
             id: idResult.id,
             port: params.port,
@@ -131,6 +131,7 @@ class SandboxStore {
             }
         });
     }
+
     @action unsetFixtureBandwidth(id) {
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
@@ -156,23 +157,36 @@ class SandboxStore {
 
     @action setFixtureVlan(id, vlan) {
 
+        let outLabel = null;
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
-                const label = entry.port.split(':')[1]+':'+vlan;
+                const label = entry.port.split(':')[1] + ':' + vlan;
 
                 entry.vlan = vlan;
                 entry.label = label;
+                outLabel = label;
             }
         });
+        return outLabel;
     }
 
     @action unsetFixtureVlan(id) {
+        let outLabel = null;
+
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
+                const label = entry.port.split(':')[1] +':'+ entry.id.split(':')[2];
+
                 entry.vlan = null;
-                entry.label = entry.id;
+                entry.label = label;
+
+
+                outLabel = label;
+
             }
         });
+        return outLabel;
+
     }
 
     lastDeviceExcept(device) {

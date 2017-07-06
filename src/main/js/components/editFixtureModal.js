@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, Grid, Row, Col} from 'react-bootstrap';
 
+import {toJS, action, autorun, computed, whyRun} from 'mobx';
+
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
 
@@ -29,8 +31,10 @@ export default class EditFixtureModal extends Component {
         let showModal = this.props.controlsStore.modals.get(modalName);
         let ef = this.props.controlsStore.editFixture;
 
-        const label = ef.device + ':' + ef.label;
+        let label = ef.device + ':' + ef.label;
+        let vlan = ef.vlan + '';
 
+        whyRun();
 
         return (
             <div>

@@ -66,9 +66,16 @@ class DevicePortList extends Component {
     constructor(props) {
         super(props);
     }
+    portSort = (a, b ) => {
+        if (a.port < b.port)
+            return -1;
+        if (a.port > b.port)
+            return 1;
+        return 0;
+    }
 
     render() {
-        let portsNodes = this.props.ports.map((entry) => {
+        let portsNodes = this.props.ports.sort(this.portSort).map((entry) => {
             let port = entry.port;
             let device = entry.device;
             let portLabel =  port.split(':')[1];

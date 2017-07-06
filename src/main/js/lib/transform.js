@@ -20,7 +20,7 @@ class Transformer {
 
             copiedVlan: '',
             showCopiedVlan: false,
-            vlanSelectionMode: 'typeIn',
+            vlanSelectionMode: 'fromAvailable',
             vlanSelectionModeOptions: [],
             vlanCopyFromOptions: [],
 
@@ -69,7 +69,7 @@ class Transformer {
             vlanExpression: '',
             showVlanExpression: true,
 
-            vlanSelectionMode: 'typeIn',
+            vlanSelectionMode: 'fromAvailable',
             copiedVlan: '',
             showCopiedVlan: false,
 
