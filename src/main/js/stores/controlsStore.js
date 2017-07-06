@@ -15,6 +15,7 @@ class ControlsStore {
 
         vlan: '',
         availableVlans: '',
+        availableVlanRanges: [],
         vlanExpression: '',
 
         vlanSelectionMode: '',

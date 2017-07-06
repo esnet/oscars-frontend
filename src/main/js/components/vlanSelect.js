@@ -83,13 +83,21 @@ export default class VlanSelect extends Component {
         const port = ef.port;
         const device = ef.device;
         this.props.sandboxStore.sandbox.fixtures.map((f) => {
-            let add = false;
+            let maybeAdd = false;
             if (f.id !== ef.fixtureId && f.vlan !== null) {
                 if (f.device !== device) {
-                    add = true;
+                    maybeAdd = true;
                 } else if (f.port !== port) {
-                    add = true;
+                    maybeAdd = true;
                 }
+            }
+            let add = false;
+            if (maybeAdd) {
+                ef.availableVlanRanges.map((r) => {
+                    if (f.vlan >= r.floor && f.vlan <= r.ceiling) {
+                        add = true;
+                    }
+                });
             }
             if (add) {
                 result[f.id] = {
@@ -117,9 +125,11 @@ export default class VlanSelect extends Component {
                 action((response) => {
                     let parsed = JSON.parse(response);
                     let availableVlans = parsed['portVlans'][ef.port]['vlanExpression'];
+                    let availableVlanRanges = parsed['portVlans'][ef.port]['vlanRanges'];
 
                     this.props.controlsStore.setParamsForEditFixture({
-                        availableVlans: availableVlans
+                        availableVlans: availableVlans,
+                        availableVlanRanges: availableVlanRanges,
                     });
 
                 }));
