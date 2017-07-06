@@ -19,7 +19,6 @@ export default class FixtureSelect extends Component {
     }
 
     clearSelection() {
-        console.log('clearing..');
         ReactDOM.findDOMNode(this.selectControl).value = 'choose';
     }
 
@@ -47,7 +46,7 @@ export default class FixtureSelect extends Component {
                         const fixture = fixtures[fixtureId];
                         const fixtureJSON = JSON.stringify(fixture);
 
-                        return <option key={fixtureId} value={fixtureJSON}>{fixture.label}</option>
+                        return <option key={fixtureId} value={fixtureJSON}>{fixture.device} {fixture.label}</option>
                     })
 
                 }

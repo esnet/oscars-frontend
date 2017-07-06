@@ -71,11 +71,13 @@ class DevicePortList extends Component {
         let portsNodes = this.props.ports.map((entry) => {
             let port = entry.port;
             let device = entry.device;
+            let portLabel =  port.split(':')[1];
+
             let clickHandler = () => {
                 this.props.onAddClicked(device, port);
             };
             return (
-                <ListGroupItem key={port} onClick={clickHandler}>{port}
+                <ListGroupItem key={port} onClick={clickHandler}>{portLabel}
                     <Glyphicon  className='pull-right' glyph='plus'/>
                 </ListGroupItem>
             )

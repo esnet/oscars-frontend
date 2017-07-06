@@ -21,7 +21,7 @@ export default class EditFixtureModal extends Component {
     deleteFixture = () => {
         const editFixture = this.props.controlsStore.editFixture;
         this.props.sandboxStore.deleteFixtureDeep(editFixture.fixtureId);
-        this.props.closeModal();
+        this.closeModal();
     };
 
 

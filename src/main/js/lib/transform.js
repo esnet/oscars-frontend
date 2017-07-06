@@ -13,6 +13,7 @@ class Transformer {
             vlan: fixture.vlan,
             ingress: fixture.ingress,
             egress: fixture.egress,
+            bwPreviouslySet: fixture.bwPreviouslySet,
 
             availableVlans: '',
             vlanExpression: '',
@@ -64,6 +65,7 @@ class Transformer {
             vlan: fixture.vlan,
             ingress: 0,
             egress: 0,
+            bwPreviouslySet: false,
 
             vlanExpression: '',
             showVlanExpression: true,

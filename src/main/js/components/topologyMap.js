@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import vis from 'vis';
+import {inject, observer} from 'mobx-react';
 import {action} from 'mobx';
 import {Panel, Glyphicon} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 
+@inject('controlsStore')
 export default class TopologyMap extends Component {
     constructor(props) {
         super(props);
@@ -14,13 +16,19 @@ export default class TopologyMap extends Component {
         showMap: true
     };
 
+    selectDevice = (device) => {
+        this.props.controlsStore.setParamsForAddFixture({device: device});
+        this.props.controlsStore.openModal('addFixture');
+    };
+
+
     componentDidMount() {
         myClient.loadJSON({method: 'GET', url: '/viz/topology/multilayer'})
             .then(
                 action((response) => {
                         let topology = JSON.parse(response);
                         let options = {
-                            height: '400px',
+                            height: '330px',
                             interaction: {
                                 hover: false,
                                 navigationButtons: false,
@@ -47,7 +55,7 @@ export default class TopologyMap extends Component {
                         this.network.on('click', (params) => {
                             if (params.nodes.length > 0) {
                                 let nodeId = params.nodes[0];
-                                this.props.onClickDevice(nodeId);
+                                this.selectDevice(nodeId);
                             }
                         });
 
@@ -75,13 +83,14 @@ export default class TopologyMap extends Component {
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
-        let header = <div>Network Map
-            <div className='pull-right'>
-                <Glyphicon onClick={ () => { this.network.fit() }} glyph='zoom-out'/>
-                {' '}
-                <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
-            </div>
-        </div>;
+        let header =
+            <span>Network Map
+                <span className='pull-right'>
+                    <Glyphicon onClick={ () => { this.network.fit() }} glyph='zoom-out'/>
+                    {' '}
+                    <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
+                </span>
+            </span>;
         return (
             <Panel collapsible expanded={this.state.showMap} header={header}>
                 <div ref={(ref) => {

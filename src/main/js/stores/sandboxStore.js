@@ -40,7 +40,7 @@ class SandboxStore {
                 id = port + ':' + suffix;
             }
         }
-        return id;
+        return {id: id, suffix: suffix};
     }
 
     fixturesOf(junctionId) {
@@ -102,17 +102,19 @@ class SandboxStore {
 
 
     @action addFixture(params) {
-        let id = this.makeFixtureId(params.port);
+        let idResult = this.makeFixtureId(params.port);
 
+        let label = params.port.split(':')[1]+':'+idResult.suffix
         let entry = {
-            id: id,
+            id: idResult.id,
             port: params.port,
             device: params.device,
-            label: id,
+            label: label,
             vlan: null,
             ingress: 0,
             egress: 0,
             bwPreviouslySet: false,
+
         };
 
 
@@ -153,10 +155,13 @@ class SandboxStore {
     }
 
     @action setFixtureVlan(id, vlan) {
+
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
+                const label = entry.port.split(':')[1]+':'+vlan;
+
                 entry.vlan = vlan;
-                entry.label = entry.port + ':' + vlan;
+                entry.label = label;
             }
         });
     }

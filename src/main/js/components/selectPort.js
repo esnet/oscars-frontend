@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
-import {Panel, Glyphicon} from 'react-bootstrap';
-import TopologyMap from './topologyMap';
+import transformer from '../lib/transform';
+import {Panel} from 'react-bootstrap';
 
 
 @inject('topologyStore', 'controlsStore', 'sandboxStore')
@@ -16,11 +16,6 @@ export default class SelectPort extends Component {
     constructor(props) {
         super(props);
     }
-    selectDevice = (device) => {
-        this.props.controlsStore.setParamsForAddFixture({device: device});
-        this.props.controlsStore.openModal('addFixture');
-    };
-
 
     onTypeaheadSelection = (port) => {
         const {availPorts} = this.props.topologyStore;
@@ -33,7 +28,7 @@ export default class SelectPort extends Component {
             }
         });
         if (isInAvailPorts) {
-            let params ={
+            let params = {
                 'port': port,
                 'device': device,
             };
@@ -42,10 +37,10 @@ export default class SelectPort extends Component {
 
 
             let fixture = this.props.sandboxStore.addFixtureDeep(params);
-            this.props.controlsStore.setParamsForEditFixture({
-                fixtureId: fixture.id,
-                label: fixture.label,
-            });
+
+            const editFixtureParams = transformer.newFixtureToEditParams(fixture);
+            this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
+
             this.props.controlsStore.openModal('editFixture');
 
         }
@@ -70,12 +65,9 @@ export default class SelectPort extends Component {
         />;
 
         return (
-            <div>
+            <Panel>
                 {typeAhead}
-                <TopologyMap onClickDevice={this.selectDevice} />
-
-
-            </div>
+            </Panel>
         );
     }
 }

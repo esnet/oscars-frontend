@@ -4,6 +4,7 @@ import {autorunAsync, toJS} from 'mobx';
 import {Panel, Glyphicon} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import vis from 'vis';
+import validator from '../lib/validation'
 
 
 @inject('controlsStore', 'sandboxStore')
@@ -43,7 +44,7 @@ export default class SandboxMap extends Component {
 
     componentDidMount() {
         let options = {
-            height: '350px',
+            height: '300px',
             interaction: {
                 hover: false,
                 navigationButtons: false,
@@ -134,6 +135,7 @@ export default class SandboxMap extends Component {
                 id: f.id,
                 label: f.label,
                 size: 8,
+                color: {'background': validator.fixtureMapColor(f)},
                 data: f,
                 onClick: this.onFixtureClicked
             };
@@ -154,6 +156,8 @@ export default class SandboxMap extends Component {
                 from: p.a,
                 to: p.z,
                 length: 10,
+                color: validator.pipeMapColor(p),
+
                 width: 5,
                 data: p,
                 onClick: this.onPipeClicked
@@ -171,7 +175,9 @@ export default class SandboxMap extends Component {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
         let header = <div>Sandbox
             <div className='pull-right'>
-                <Glyphicon onClick={ () => { this.network.fit() }} glyph='zoom-out'/>
+                <Glyphicon onClick={ () => {
+                    this.network.fit()
+                }} glyph='zoom-out'/>
                 {' '}
                 <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
             </div>

@@ -5,6 +5,7 @@ import {Panel, FormGroup, Button, FormControl, ControlLabel, HelpBlock, Well} fr
 import ToggleDisplay from 'react-toggle-display';
 
 import myClient from '../agents/client';
+import validator from '../lib/validation'
 
 import FixtureSelect from './fixtureSelect';
 import VlanSelectMode from './vlanSelectMode';
@@ -51,7 +52,7 @@ export default class VlanSelect extends Component {
             'port': ef.port,
             'vlanId': ef.vlan,
         };
-        console.log(request);
+//        console.log(request);
 
         myClient.submit('POST', '/vlan/release', request)
             .then(
@@ -93,6 +94,8 @@ export default class VlanSelect extends Component {
             }
             let add = false;
             if (maybeAdd) {
+//                console.log(toJS(f));
+//                console.log(toJS(ef.availableVlanRanges));
                 ef.availableVlanRanges.map((r) => {
                     if (f.vlan >= r.floor && f.vlan <= r.ceiling) {
                         add = true;
@@ -103,6 +106,7 @@ export default class VlanSelect extends Component {
                 result[f.id] = {
                     id: f.id,
                     label: f.label,
+                    device: f.device,
                     vlan: f.vlan,
                 };
             }
@@ -126,10 +130,12 @@ export default class VlanSelect extends Component {
                     let parsed = JSON.parse(response);
                     let availableVlans = parsed['portVlans'][ef.port]['vlanExpression'];
                     let availableVlanRanges = parsed['portVlans'][ef.port]['vlanRanges'];
+//                    console.log(response);
 
                     this.props.controlsStore.setParamsForEditFixture({
                         availableVlans: availableVlans,
                         availableVlanRanges: availableVlanRanges,
+                        vlanCopyFromOptions: this.fixturesAllowingSameVlan()
                     });
 
                 }));
@@ -171,6 +177,10 @@ export default class VlanSelect extends Component {
 
         this.props.controlsStore.setParamsForEditFixture(params);
 
+        this.props.controlsStore.setParamsForEditFixture({
+            vlanCopyFromOptions: this.fixturesAllowingSameVlan()
+        });
+
     };
 
     fixtureSelected = (e) => {
@@ -202,7 +212,8 @@ export default class VlanSelect extends Component {
 
     render() {
         const ef = this.props.controlsStore.editFixture;
-        let header = <span>VLAN selection</span>;
+        const validationLabel = validator.fixtureVlanLabel(ef);
+        const header = <span>VLAN selection <span className='pull-right'>{validationLabel}</span></span>;
 
 
         return (

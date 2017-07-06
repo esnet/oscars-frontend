@@ -12,8 +12,29 @@ class Validator {
             bsStyle = 'warning'
         }
         return <Label bsStyle={bsStyle}><Glyphicon glyph={icon} /></Label>
-
     }
+
+    mapNodeColor(state) {
+        if (!state) {
+            return 'orange';
+        }
+        return null;
+    }
+    mapEdgeColor(state) {
+        if (!state) {
+            return 'orange';
+        }
+        return null;
+    }
+
+    fixtureVlanLabel(fixture) {
+        return this.label(fixture.vlan !== null);
+    }
+
+    fixtureBwLabel(fixture) {
+        return this.label(fixture.bwPreviouslySet);
+    }
+
 
     fixtureState(fixture) {
         if (fixture.vlan === null || !fixture.bwPreviouslySet) {
@@ -27,6 +48,13 @@ class Validator {
             return false;
         }
         return true;
+    }
+
+    fixtureMapColor(fixture) {
+        return this.mapNodeColor(this.fixtureState(fixture));
+    }
+    pipeMapColor(pipe) {
+        return this.mapEdgeColor(this.pipeState(pipe));
     }
 
     fixtureLabel(fixture) {

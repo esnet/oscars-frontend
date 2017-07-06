@@ -61,23 +61,27 @@ export default class PipeParamsModal extends Component {
 
         let pipeExists = false;
         let header = <span>Pipe bandwidth</span>;
+        let zaLabel = '';
+        let azLabel = '';
         if (pipe !== null) {
             pipeExists = true;
             header = <span>{pipe.a} - {pipe.z} bandwidth</span>;
+            azLabel = 'From '+ pipe.a +' to '+pipe.z;
+            zaLabel = 'From '+ pipe.z +' to '+pipe.a;
         }
 
         return (
             <div>
-                <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
+                <Modal show={showModal} onHide={this.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Editing pipe</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <ToggleDisplay show={pipeExists}>
                             <Panel header={header}>
-                                <Form inline>
+                                <Form>
                                     <FormGroup>
-                                        <ControlLabel>A-Z:</ControlLabel>
+                                        <ControlLabel>{azLabel}</ControlLabel>
                                         {' '}
                                         <FormControl type="text"
                                                      placeholder="0-100000"
@@ -86,7 +90,7 @@ export default class PipeParamsModal extends Component {
                                     </FormGroup>
                                     {' '}
                                     <FormGroup>
-                                        <ControlLabel>Z-A:</ControlLabel>
+                                        <ControlLabel>{zaLabel}</ControlLabel>
                                         {' '}
                                         <FormControl onChange={this.onZaBwChange}
                                                      defaultValue={editPipe.zaBw}
