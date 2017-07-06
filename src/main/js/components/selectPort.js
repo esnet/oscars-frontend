@@ -17,8 +17,8 @@ export default class SelectPort extends Component {
         super(props);
     }
     selectDevice = (device) => {
-        this.props.controlsStore.selectDevice(device);
-        this.props.controlsStore.openModal('devicePorts');
+        this.props.controlsStore.setParamsForAddFixture({device: device});
+        this.props.controlsStore.openModal('addFixture');
     };
 
 
@@ -36,16 +36,16 @@ export default class SelectPort extends Component {
             let params ={
                 'port': port,
                 'device': device,
-                'vlan': null,
-                'vlanExpression': '',
-                'availableVlans': '',
-                'ingress': 0,
-                'egress': 0
             };
             this.typeAhead.getInstance().clear();
+            this.typeAhead.getInstance().blur();
+
 
             let fixture = this.props.sandboxStore.addFixtureDeep(params);
-            this.props.controlsStore.selectFixture(fixture);
+            this.props.controlsStore.setParamsForEditFixture({
+                fixtureId: fixture.id,
+                label: fixture.label,
+            });
             this.props.controlsStore.openModal('editFixture');
 
         }

@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
+import validator from '../lib/validation'
 import {ListGroup, ListGroupItem, Panel} from 'react-bootstrap';
+import transformer from '../lib/transform';
 
 @inject('sandboxStore', 'controlsStore')
 @observer
@@ -18,16 +20,18 @@ export default class Sandbox extends Component {
             sandbox.junctions.map((junction) => {
                 let device = junction.id;
                 let key = junction.id;
-                let fixtureNodes = sandbox.fixtures.map((entry) => {
+                let fixtureNodes = sandbox.fixtures.map((fixture) => {
                     haveFixtures = true;
-                    if (entry.device === device) {
+                    if (fixture.device === device) {
+                        let key = fixture.id;
+                        let label = fixture.label;
+                        const validationLabel = validator.fixtureLabel(fixture);
 
-                        let key = entry.id;
-                        let label = entry.label;
                         return <ListGroupItem key={key} onClick={() => {
-                            this.props.controlsStore.selectFixture(entry);
+                            const params = transformer.existingFixtureToEditParams(fixture);
+                            this.props.controlsStore.setParamsForEditFixture(params);
                             this.props.controlsStore.openModal('editFixture');
-                        }}>{label}</ListGroupItem>
+                        }}>{label}<span className='pull-right'>{validationLabel}</span></ListGroupItem>
 
                     }
                 });
@@ -36,7 +40,7 @@ export default class Sandbox extends Component {
                     <ListGroupItem key={key}>
                         <ListGroup>
                             <ListGroupItem key={key + 'dev'} onClick={() => {
-                                this.props.controlsStore.selectJunction(device);
+                                this.props.controlsStore.setParamsForEditJunction({junction: device});
                                 this.props.controlsStore.openModal('editJunction');
 
                             }}>{device}</ListGroupItem>
@@ -63,11 +67,14 @@ export default class Sandbox extends Component {
         let pipeNodes = <ListGroup> {
             sandbox.pipes.map((pipe) => {
                 havePipes = true;
+                const validationLabel = validator.pipeLabel(pipe);
 
                 return <ListGroupItem key={pipe.id} onClick={() => {
-                    this.props.controlsStore.selectPipe(pipe.id);
+                    const params = transformer.existingPipeToEditParams(pipe);
+                    this.props.controlsStore.setParamsForEditPipe(params);
+
                     this.props.controlsStore.openModal('editPipe');
-                }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
+                }}>{pipe.a} --- {pipe.z}<span className='pull-right'>{validationLabel}</span></ListGroupItem>
             })
         }
         </ListGroup>;

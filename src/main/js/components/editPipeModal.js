@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, FormControl, ControlLabel, FormGroup, Form, Panel} from 'react-bootstrap';
+import ToggleDisplay from 'react-toggle-display';
 
 const modalName = 'editPipe';
 
@@ -9,57 +10,42 @@ const modalName = 'editPipe';
 export default class PipeParamsModal extends Component {
     constructor(props) {
         super(props);
-
     }
 
-    state = {
-        modified: false
-    };
-
-    updateControls(params) {
-        this.zaBwControl.value = params.zaBw;
-        this.azBwControl.value = params.azBw;
-        this.props.controlsStore.setAzBw(params.azBw);
-        this.props.controlsStore.setZaBw(params.zaBw);
-    }
 
     onAzBwChange = (e) => {
         let newAzBw = e.target.value;
-        let params = {
+        this.props.controlsStore.setParamsForEditPipe({
             azBw: newAzBw,
-            zaBw: this.props.controlsStore.selection.zaBw,
-        };
-        this.setState({modified: true});
-        this.updateControls(params);
+            showUpdateButton: true
+        });
     };
 
 
     onZaBwChange = (e) => {
         let newZaBw = e.target.value;
-        let params = {
+        this.props.controlsStore.setParamsForEditPipe({
             zaBw: newZaBw,
-            azBw: this.props.controlsStore.selection.azBw,
-        };
-        this.setState({modified: true});
-        this.updateControls(params);
+            showUpdateButton: true
+        });
     };
 
     deletePipe = () => {
-        let pipeId = this.props.controlsStore.selection.pipe;
+        let pipeId = this.props.controlsStore.editPipe.pipeId;
         this.props.sandboxStore.deletePipe(pipeId);
         this.closeModal();
     };
 
     updatePipe = () => {
-        let selection = this.props.controlsStore.selection;
+        let editPipe = this.props.controlsStore.editPipe;
         let params = {
-            azBw: selection.azBw,
-            zaBw: selection.zaBw
+            azBw: editPipe.azBw,
+            zaBw: editPipe.zaBw
         };
-        let pipeId = selection.pipe;
+        let pipeId = editPipe.pipeId;
         this.props.sandboxStore.updatePipe(pipeId, params);
-        this.setState({
-            modified: false,
+        this.props.controlsStore.setParamsForEditPipe({
+            showUpdateButton: false
         });
     };
 
@@ -67,60 +53,17 @@ export default class PipeParamsModal extends Component {
         this.props.controlsStore.closeModal(modalName);
     };
 
-
     render() {
-        let selection = this.props.controlsStore.selection;
+        let editPipe = this.props.controlsStore.editPipe;
         let showModal = this.props.controlsStore.modals.get(modalName);
-        let pipe = this.props.sandboxStore.findPipe(selection.pipe);
+        let pipe = this.props.sandboxStore.findPipe(editPipe.pipeId);
 
-        let update = null;
-        if (this.state.modified) {
-            update = <Button bsStyle='primary' onClick={this.updatePipe}>Update</Button>;
-        }
 
-        let buttons = <div className='pull-right'>
-            {update}
-            {' '}
-            <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>
-        </div>;
-
-        let body = <div>No pipe found!</div>;
+        let pipeExists = false;
+        let header = <span>Pipe bandwidth</span>;
         if (pipe !== null) {
-            let header = <span>Pipe bandwidth</span>;
-            body = <div>
-                <h3>A : {pipe.a}</h3>
-                <h3>Z : {pipe.z}</h3>
-
-                <Panel header={header}>
-                    <Form inline>
-                        <FormGroup>
-                            <ControlLabel>A-Z:</ControlLabel>
-                            {' '}
-                            <FormControl type="text" placeholder="0-100000"
-                                         inputRef={ref => {
-                                             this.azBwControl = ref;
-                                         }}
-                                         defaultValue={selection.azBw}
-
-                                         onChange={this.onAzBwChange}/>
-                        </FormGroup>
-                        {' '}
-                        <FormGroup>
-                            <ControlLabel>Z-A:</ControlLabel>
-                            {' '}
-                            <FormControl inputRef={ref => {
-                                this.zaBwControl = ref;
-                            }}
-                                         onChange={this.onZaBwChange}
-                                         defaultValue={selection.zaBw}
-                                         type="text" placeholder="0-10000"/>
-                        </FormGroup>
-                        {' '}
-                    </Form>
-                    {buttons}
-                </Panel>
-
-            </div>
+            pipeExists = true;
+            header = <span>{pipe.a} - {pipe.z} bandwidth</span>;
         }
 
         return (
@@ -130,7 +73,36 @@ export default class PipeParamsModal extends Component {
                         <Modal.Title>Editing pipe</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {body}
+                        <ToggleDisplay show={pipeExists}>
+                            <Panel header={header}>
+                                <Form inline>
+                                    <FormGroup>
+                                        <ControlLabel>A-Z:</ControlLabel>
+                                        {' '}
+                                        <FormControl type="text"
+                                                     placeholder="0-100000"
+                                                     defaultValue={editPipe.azBw}
+                                                     onChange={this.onAzBwChange}/>
+                                    </FormGroup>
+                                    {' '}
+                                    <FormGroup>
+                                        <ControlLabel>Z-A:</ControlLabel>
+                                        {' '}
+                                        <FormControl onChange={this.onZaBwChange}
+                                                     defaultValue={editPipe.zaBw}
+                                                     type="text" placeholder="0-10000"/>
+                                    </FormGroup>
+                                    {' '}
+                                </Form>
+                                <div className='pull-right'>
+                                    <ToggleDisplay show={editPipe.showUpdateButton}>
+                                        <Button bsStyle='primary' onClick={this.updatePipe}>Update</Button>
+                                    </ToggleDisplay>
+                                    {' '}
+                                    <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>
+                                </div>
+                            </Panel>
+                        </ToggleDisplay>
 
                     </Modal.Body>
                     <Modal.Footer>

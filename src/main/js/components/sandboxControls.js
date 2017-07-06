@@ -15,13 +15,6 @@ import 'react-datetime/css/react-datetime.css';
 export default class SandboxControls extends Component {
     constructor(props) {
         super(props);
-        this.isDisabled = this.isDisabled.bind(this);
-
-        this.validate = this.validate.bind(this);
-        this.preCheck = this.preCheck.bind(this);
-        this.hold = this.hold.bind(this);
-        this.commit = this.commit.bind(this);
-        this.reset = this.reset.bind(this);
     }
 
 
@@ -32,18 +25,21 @@ export default class SandboxControls extends Component {
         let endAt = new Date();
         endAt.setDate(endAt.getDate() + 1);
         endAt.setTime(endAt.getTime() + 15000 * 60);
-        this.props.controlsStore.setStartAt(startAt);
-        this.props.controlsStore.setEndAt(endAt);
         myClient.loadJSON({method: 'GET', url: '/resv/newConnectionId'})
             .then(
                 action((response) => {
                     let connId = JSON.parse(response)['connectionId'];
-                    this.props.controlsStore.setConnectionId(connId);
+                    let params = {
+                        startAt: startAt,
+                        endAt: endAt,
+                        connectionId: connId
+                    };
+                    this.props.controlsStore.setParamsForConnection(params);
                 }));
 
     }
 
-    isDisabled(what) {
+    isDisabled = (what) => {
         let connState = this.props.stateStore.connState;
         if (what === 'validate') {
             return connState !== 'INITIAL';
@@ -60,7 +56,9 @@ export default class SandboxControls extends Component {
         }
     }
 
-    validate() {
+    validate = () => {
+        let conn = this.props.controlsStore.connection;
+        console.log(conn);
         this.props.stateStore.validate();
         setTimeout(() => {
             this.props.stateStore.postValidate(true)
@@ -69,7 +67,7 @@ export default class SandboxControls extends Component {
 
     }
 
-    preCheck() {
+    preCheck = () => {
         this.props.stateStore.check();
         setTimeout(() => {
             this.props.stateStore.postCheck(true)
@@ -77,7 +75,7 @@ export default class SandboxControls extends Component {
         return false;
     }
 
-    hold() {
+    hold = () => {
         this.props.stateStore.hold();
         setTimeout(() => {
             this.props.stateStore.postHold(true)
@@ -86,7 +84,7 @@ export default class SandboxControls extends Component {
 
     }
 
-    commit() {
+    commit = () => {
         this.props.stateStore.commit();
         setTimeout(() => {
             this.props.stateStore.postCommit(true)
@@ -94,23 +92,29 @@ export default class SandboxControls extends Component {
         return false;
     }
 
-    reset() {
+    reset = () => {
         this.props.stateStore.reset();
         return false;
     }
 
     handleStartDateChange = (newMoment) => {
-        this.props.controlsStore.setStartAt(newMoment.toDate());
+        let params = {
+            startAt: newMoment.toDate()
+        };
+        this.props.controlsStore.setConnection(params);
 
     };
 
     handleEndDateChange = (newMoment) => {
-        this.props.controlsStore.setEndAt(newMoment.toDate());
-
+        let params = {
+            endAt: newMoment.toDate()
+        };
+        this.props.controlsStore.setConnection(params);
     };
 
     render() {
-        let header = <span>Connection id: {this.props.controlsStore.selection.connectionId}</span>;
+        let conn = this.props.controlsStore.connection;
+        let header = <span>Connection id: {conn.connectionId}</span>;
 
         return (
             <Panel header={header}>
@@ -119,7 +123,7 @@ export default class SandboxControls extends Component {
                     <Datetime
                         size="8"
                         name="Start"
-                        value={this.props.controlsStore.selection.startAt}
+                        value={conn.startAt}
                         onChange={this.handleStartDateChange}
                     />
                 </FormGroup>
@@ -128,7 +132,7 @@ export default class SandboxControls extends Component {
                     <Datetime
                         size="8"
                         name="End"
-                        value={this.props.controlsStore.selection.endAt}
+                        value={conn.endAt}
                         onChange={this.handleEndDateChange}
                     />
                 </FormGroup>

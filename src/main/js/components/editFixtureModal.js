@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal, Button, Grid, Row, Col} from 'react-bootstrap';
 
-import EditFixtureForm from './editFixtureForm';
+import VlanSelect from './vlanSelect';
+import BwSelect from './bwSelect';
 
 const modalName = 'editFixture';
 
@@ -13,14 +14,20 @@ export default class EditFixtureModal extends Component {
         super(props);
     }
 
-
     closeModal = () => {
         this.props.controlsStore.closeModal(modalName);
     };
 
+    deleteFixture = () => {
+        const editFixture = this.props.controlsStore.editFixture;
+        this.props.sandboxStore.deleteFixtureDeep(editFixture.fixtureId);
+        this.props.closeModal();
+    };
+
+
     render() {
         let showModal = this.props.controlsStore.modals.get(modalName);
-        let fixture = this.props.controlsStore.fixture;
+        let fixture = this.props.controlsStore.editFixture.fixtureId;
 
         let label =  'Error - fixture not found!';
         if (fixture !== null) {
@@ -35,7 +42,18 @@ export default class EditFixtureModal extends Component {
                         <Modal.Title>{label}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <EditFixtureForm closeModal={this.closeModal} />
+                        <Grid fluid={true}>
+                            <Row>
+                                <Col md={6} sm={6}>
+                                    <VlanSelect />
+                                </Col>
+                                <Col md={6} sm={6}>
+                                    <BwSelect />
+                                </Col>
+                            </Row>
+                            <Button bsStyle='warning' className='pull-right'
+                                    onClick={this.deleteFixture}>Delete</Button>
+                        </Grid>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.closeModal}>Close</Button>

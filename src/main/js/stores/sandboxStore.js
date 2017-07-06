@@ -105,30 +105,39 @@ class SandboxStore {
         let id = this.makeFixtureId(params.port);
 
         let entry = {
-            'id': id,
-            'port': params.port,
-            'device': params.device,
-            'vlan': params.vlan,
-            'vlanExpression': params.vlanExpression,
-            'availableVlans': params.availableVlans,
-            'ingress': params.ingress,
-            'egress': params.egress,
-            'label': id,
+            id: id,
+            port: params.port,
+            device: params.device,
+            label: id,
+            vlan: null,
+            ingress: 0,
+            egress: 0,
+            bwPreviouslySet: false,
         };
+
 
         this.sandbox.fixtures.push(entry);
         return entry;
     }
 
-    @action updateFixture(id, params) {
-        // param keys: ingress, egress, label, vlan, vlanExpression
+    @action setFixtureBandwidth(id, params) {
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.ingress = params.ingress;
                 entry.egress = params.egress;
-                entry.vlanExpression = params.vlanExpression;
+                entry.bwPreviouslySet = true;
             }
         });
+    }
+    @action unsetFixtureBandwidth(id) {
+        this.sandbox.fixtures.map((entry) => {
+            if (entry.id === id) {
+                entry.bwPreviouslySet = false;
+                entry.bwSelectMode = 'typeIn';
+
+            }
+        });
+
     }
 
     @action deleteFixture(id) {
@@ -223,16 +232,18 @@ class SandboxStore {
 
     @action addPipe(pipe) {
         pipe.id = this.makePipeId(pipe);
+        pipe.bwPreviouslySet = false;
 
         this.sandbox.pipes.push(pipe);
         return pipe.id;
     }
 
     @action updatePipe(id, params) {
-        this.sandbox.pipes.map((entry) => {
-            if (entry.id === id) {
-                entry.azBw = params.azBw;
-                entry.zaBw = params.zaBw;
+        this.sandbox.pipes.map((pipe) => {
+            if (pipe.id === id) {
+                pipe.azBw = params.azBw;
+                pipe.zaBw = params.zaBw;
+                pipe.bwPreviouslySet = true;
             }
         });
     }
