@@ -34,8 +34,6 @@ export default class EditFixtureModal extends Component {
         let label = ef.device + ':' + ef.label;
         let vlan = ef.vlan + '';
 
-        whyRun();
-
         return (
             <div>
                 <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
