@@ -1,22 +1,26 @@
 import React, {Component} from 'react';
 
-import {observer, inject} from 'mobx-react';
-import {Button, Panel, FormGroup, ControlLabel} from 'react-bootstrap';
-import myClient from '../agents/client';
 import {action} from 'mobx';
+import {observer, inject} from 'mobx-react';
 
+import ToggleDisplay from 'react-toggle-display';
+import {Button, Panel, ListGroup, ListGroupItem, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import Datetime from 'react-datetime';
 
 import 'react-datetime/css/react-datetime.css';
 
+import myClient from '../agents/client';
+import reservation from '../lib/reservation';
+import validator from '../lib/validation';
+import PrecheckButton from './prechecker';
 
-@inject('controlsStore', 'stateStore')
+
+@inject('controlsStore', 'stateStore', 'sandboxStore')
 @observer
 export default class SandboxControls extends Component {
     constructor(props) {
         super(props);
     }
-
 
     componentWillMount() {
         let startAt = new Date();
@@ -32,6 +36,7 @@ export default class SandboxControls extends Component {
                     let params = {
                         startAt: startAt,
                         endAt: endAt,
+                        description: '',
                         connectionId: connId
                     };
                     this.props.controlsStore.setParamsForConnection(params);
@@ -54,26 +59,22 @@ export default class SandboxControls extends Component {
         if (what === 'commit') {
             return connState !== 'HOLD_OK';
         }
-    }
+    };
 
     validate = () => {
-        let conn = this.props.controlsStore.connection;
-        console.log(conn);
+        let validationParams = {
+            connection: this.props.controlsStore.connection,
+            junctions: this.props.sandboxStore.sandbox.junctions,
+            fixtures: this.props.sandboxStore.sandbox.fixtures,
+            pipes: this.props.sandboxStore.sandbox.pipes,
+        };
+        this.props.stateStore.clearErrors();
         this.props.stateStore.validate();
-        setTimeout(() => {
-            this.props.stateStore.postValidate(true)
-        }, 1000);
-        return false;
 
-    }
-
-    preCheck = () => {
-        this.props.stateStore.check();
-        setTimeout(() => {
-            this.props.stateStore.postCheck(true)
-        }, 1000);
+        const result = validator.validatePrecheck(validationParams);
+        this.props.stateStore.postValidate(result.ok, result.errors);
         return false;
-    }
+    };
 
     hold = () => {
         this.props.stateStore.hold();
@@ -82,7 +83,7 @@ export default class SandboxControls extends Component {
         }, 1000);
         return false;
 
-    }
+    };
 
     commit = () => {
         this.props.stateStore.commit();
@@ -90,41 +91,55 @@ export default class SandboxControls extends Component {
             this.props.stateStore.postCommit(true)
         }, 1000);
         return false;
-    }
+    };
 
     reset = () => {
         this.props.stateStore.reset();
         return false;
-    }
-
-    handleStartDateChange = (newMoment) => {
-        let params = {
-            startAt: newMoment.toDate()
-        };
-        this.props.controlsStore.setConnection(params);
-
     };
 
-    handleEndDateChange = (newMoment) => {
-        let params = {
+    onDescriptionChange = (e) => {
+        const params = {
+            description: e.target.value
+        };
+        this.props.controlsStore.setParamsForConnection(params);
+    };
+
+    onStartDateChange = (newMoment) => {
+        const params = {
+            startAt: newMoment.toDate()
+        };
+        this.props.controlsStore.setParamsForConnection(params);
+    };
+
+    onEndDateChange = (newMoment) => {
+        const params = {
             endAt: newMoment.toDate()
         };
-        this.props.controlsStore.setConnection(params);
+        this.props.controlsStore.setParamsForConnection(params);
     };
 
     render() {
-        let conn = this.props.controlsStore.connection;
-        let header = <span>Connection id: {conn.connectionId}</span>;
+        const conn = this.props.controlsStore.connection;
+        const header = <span>Connection id: {conn.connectionId}</span>;
 
         return (
             <Panel header={header}>
+                <FormGroup>
+                    <ControlLabel>Description</ControlLabel>
+                    {' '}
+                    <FormControl type="text"
+                                 defaultValue={conn.description}
+                                 onChange={this.onDescriptionChange}/>
+                </FormGroup>
+
                 <FormGroup>
                     <ControlLabel>Start:</ControlLabel>
                     <Datetime
                         size="8"
                         name="Start"
                         value={conn.startAt}
-                        onChange={this.handleStartDateChange}
+                        onChange={this.onStartDateChange}
                     />
                 </FormGroup>
                 <FormGroup>
@@ -133,17 +148,31 @@ export default class SandboxControls extends Component {
                         size="8"
                         name="End"
                         value={conn.endAt}
-                        onChange={this.handleEndDateChange}
+                        onChange={this.onEndDateChange}
                     />
                 </FormGroup>
                 <FormGroup>
-
                     <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>{' '}
-                    <Button disabled={this.isDisabled('precheck')} onClick={this.preCheck}>Precheck</Button>{' '}
+                    <PrecheckButton disabled={this.isDisabled('precheck')} />
+
                     <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>{' '}
                     <Button disabled={this.isDisabled('commit')} onClick={this.commit}>Commit</Button>{' '}
                     <Button onClick={this.reset}>Reset</Button>
                 </FormGroup>
+                <ToggleDisplay show={this.props.stateStore.errors.length > 0}>
+                    <Panel header='Errors'>
+                        <ListGroup>{
+                            this.props.stateStore.errors.map((error, idx) => {
+                                return (
+                                    <ListGroupItem key={idx}>{error}</ListGroupItem>
+                                )
+
+                            })
+                        }
+                        </ListGroup>
+                    </Panel>
+
+                </ToggleDisplay>
 
             </Panel>
         );

@@ -2,9 +2,11 @@ import {observable, action} from 'mobx';
 
 class StateStore {
     @observable connState = 'INITIAL';
+    @observable errors = [];
 
     @action reset() {
         this.connState = 'INITIAL';
+        this.clearErrors();
     }
 
     @action validate() {
@@ -12,11 +14,15 @@ class StateStore {
             this.connState = 'VALIDATING';
         }
     }
+    @action clearErrors() {
+        this.errors = [];
+    }
 
-    @action postValidate(ok) {
+    @action postValidate(ok, errors) {
         if (ok) {
             this.connState = 'VALIDATE_OK';
         } else {
+            this.errors = errors;
             this.connState = 'INITIAL';
         }
     }

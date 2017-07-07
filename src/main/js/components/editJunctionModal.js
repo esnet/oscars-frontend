@@ -11,8 +11,10 @@ import {
     ListGroup,
     ListGroupItem
 } from 'react-bootstrap';
+
 import ToggleDisplay from 'react-toggle-display';
 
+import picker from '../lib/picking';
 
 const modalName = 'editJunction';
 
@@ -42,6 +44,12 @@ export default class EditJunctionModal extends Component {
 
     deleteJunction = () => {
         let junction = this.props.controlsStore.editJunction.junction;
+        let fixtures = this.props.sandboxStore.fixturesOf(junction);
+        fixtures.map((f) => {
+            if (f.vlan !== null) {
+                picker.releaseDeleted(f.port, f.vlan);
+            }
+        });
 
         this.props.sandboxStore.deleteJunctionDeep(junction);
         this.closeModal();

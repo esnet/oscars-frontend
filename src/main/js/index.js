@@ -13,6 +13,7 @@ import NewReservationApp from './apps/newReservation';
 
 import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
+import mapStore from './stores/mapStore';
 import sandboxStore from './stores/sandboxStore';
 import stateStore from './stores/stateStore';
 import topologyStore from './stores/topologyStore';
@@ -20,6 +21,7 @@ import topologyStore from './stores/topologyStore';
 const stores = {
     commonStore,
     controlsStore,
+    mapStore,
     sandboxStore,
     stateStore,
     topologyStore,

@@ -100,7 +100,7 @@ class Transformer {
             z: pipe.z,
             azBw: pipe.azBw,
             zaBw: pipe.zaBw,
-            showUpdateButton: false
+            showUpdateButton: !pipe.bwPreviouslySet
         };
 
     }

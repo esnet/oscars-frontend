@@ -4,6 +4,7 @@ class ControlsStore {
 
     @observable connection = {
         connectionId: '',
+        description: '',
         startAt: '',
         endAt: '',
     };
