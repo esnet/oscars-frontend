@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import vis from 'vis';
 import {inject, observer} from 'mobx-react';
 import {autorun, autorunAsync, whyRun, toJS, action} from 'mobx';
+import ToggleDisplay from 'react-toggle-display';
 
 import {Panel, Glyphicon} from 'react-bootstrap';
 
@@ -22,50 +23,6 @@ export default class TopologyMap extends Component {
         this.props.controlsStore.setParamsForAddFixture({device: device});
         this.props.controlsStore.openModal('addFixture');
     };
-
-
-    bestFit(network, nodes) {
-
-        console.log('bestfit');
-        network.moveTo({scale: 10, animation: true});
-        network.stopSimulation();
-
-        let bigBB = {top: Infinity, left: Infinity, right: -Infinity, bottom: -Infinity};
-        nodes.map((i) => {
-            let bb = network.getBoundingBox(i);
-            if (bb.top < bigBB.top) bigBB.top = bb.top;
-            if (bb.left < bigBB.left) bigBB.left = bb.left;
-            if (bb.right > bigBB.right) bigBB.right = bb.right;
-            if (bb.bottom > bigBB.bottom) bigBB.bottom = bb.bottom;
-        });
-
-        let canvasWidth = network.canvas.body.container.clientWidth;
-        let canvasHeight = network.canvas.body.container.clientHeight;
-
-        let scaleX = canvasWidth / (bigBB.right - bigBB.left);
-        let scaleY = canvasHeight / (bigBB.bottom - bigBB.top);
-        let scale = scaleX;
-        if (scale * (bigBB.bottom - bigBB.top) > canvasWidth) scale = scaleY;
-
-        console.log(bigBB);
-        console.log(scaleX + ' ' + scaleY + ' ' + scale);
-        console.log(canvasWidth + ' ' + canvasHeight);
-
-//        if (scale > 1) scale = 0.9 * scale;
-
-
-        network.moveTo({
-            scale: scale,
-            position: {
-                x: (bigBB.right + bigBB.left) / 2,
-                y: (bigBB.bottom + bigBB.top) / 2
-            },
-            animation: true
-        });
-        console.log(network.getScale());
-
-
-    }
 
     // this automagically updates the map;
     disposeOfMapUpdate = autorunAsync('map update', () => {
@@ -169,10 +126,9 @@ export default class TopologyMap extends Component {
         this.props.mapStore.network.coloredNodes.map((entry) => {
             nodeIds.push(entry.id);
         });
-        console.log(nodeIds);
         this.network.fit({nodes: nodeIds, animation: true});
-
     }
+
     componentWillUnmount() {
         this.disposeOfMapUpdate();
     }
@@ -194,7 +150,9 @@ export default class TopologyMap extends Component {
         let header =
             <span>Network Map
                 <span className='pull-right'>
-                    <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
+                    <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0} >
+                        <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
+                    </ToggleDisplay>
                     {' '}
                     <Glyphicon onClick={ () => { this.network.fit()}} glyph='zoom-out'/>
                     {' '}
