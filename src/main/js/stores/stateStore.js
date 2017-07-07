@@ -14,7 +14,6 @@ class StateStore {
     }
 
     @action postValidate(ok, errors) {
-        console.log(errors);
         this.st.errors = errors;
         if (ok) {
             this.st.connState = 'VALIDATE_OK';
