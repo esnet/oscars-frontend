@@ -175,9 +175,7 @@ export default class SandboxMap extends Component {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
         let header = <div>Sandbox
             <div className='pull-right'>
-                <Glyphicon onClick={ () => {
-                    this.network.fit()
-                }} glyph='zoom-out'/>
+                <Glyphicon onClick={ () => { this.network.fit({animation: true}) }} glyph='zoom-out'/>
                 {' '}
                 <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
             </div>

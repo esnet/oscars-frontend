@@ -1,65 +1,79 @@
 import {observable, action} from 'mobx';
 
 class StateStore {
-    @observable connState = 'INITIAL';
-
-    @action reset() {
-        this.connState = 'INITIAL';
+    @observable st = {
+        connState: 'INITIAL',
+        errors: [],
     }
 
+
     @action validate() {
-        if (this.connState === 'INITIAL') {
-            this.connState = 'VALIDATING';
+        if (this.st.connState === 'INITIAL') {
+            this.st.connState = 'VALIDATING';
         }
     }
 
-    @action postValidate(ok) {
+    @action postValidate(ok, errors) {
+        console.log(errors);
+        this.st.errors = errors;
         if (ok) {
-            this.connState = 'VALIDATE_OK';
+            this.st.connState = 'VALIDATE_OK';
         } else {
-            this.connState = 'INITIAL';
+            this.st.connState = 'INITIAL';
         }
     }
 
     @action check() {
-        if (this.connState === 'INITIAL') {
-            this.connState = 'CHECKING';
+        if (this.st.connState === 'INITIAL') {
+            this.st.connState = 'CHECKING';
         }
     }
 
     @action postCheck(ok) {
         if (ok) {
-            this.connState = 'CHECK_OK';
+            this.st.connState = 'CHECK_OK';
         } else {
-            this.connState = 'INITIAL';
+            this.st.connState = 'INITIAL';
         }
     }
 
     @action hold() {
-        if (this.connState === 'CHECK_OK') {
-            this.connState = 'HOLDING';
+        if (this.st.connState === 'CHECK_OK') {
+            this.st.connState = 'HOLDING';
         }
     }
 
     @action postHold(ok) {
         if (ok) {
-            this.connState = 'HOLD_OK';
+            this.st.connState = 'HOLD_OK';
         } else {
-            this.connState = 'INITIAL';
+            this.st.connState = 'INITIAL';
+        }
+    }
+
+    @action release() {
+        if (this.st.connState === 'HOLD_OK') {
+            this.st.connState = 'RELEASING';
+        }
+    }
+
+    @action postRelease() {
+        if (this.st.connState === 'RELEASING') {
+            this.st.connState = 'CHECK_OK';
         }
     }
 
     @action commit() {
-        if (this.connState === 'HOLD_OK') {
-            this.connState = 'COMMITTING';
+        if (this.st.connState === 'HOLD_OK') {
+            this.st.connState = 'COMMITTING';
         }
     }
 
     @action postCommit(ok) {
         if (ok) {
-            this.connState = 'COMMITTED';
+            this.st.connState = 'COMMITTED';
         } else {
-            this.connState = 'INITIAL';
+            this.st.connState = 'INITIAL';
         }
     }
 

@@ -64,5 +64,83 @@ class Validator {
     pipeLabel(pipe) {
         return this.label(this.pipeState(pipe));
     }
+
+    validatePrecheck(params){
+        let result = {
+            ok: true,
+            errors: [],
+        };
+        const junctions = params.junctions;
+        const pipes = params.pipes;
+        const fixtures = params.fixtures;
+        const connection = params.connection;
+
+        if (connection.description === '') {
+            result.ok = false;
+            result.errors.push('description not set.');
+        }
+        if (connection.connectionId === '') {
+            result.ok = false;
+            result.errors.push('connectionId not set.');
+        }
+        const now = Date.now();
+        if (connection.startAt < now || connection.endAt < now) {
+            result.ok = false;
+            result.errors.push('start or end time set in the past.');
+        }
+        if (connection.startAt > connection.endAt) {
+            result.ok = false;
+            result.errors.push('end time set before start time .');
+        }
+
+        if (junctions.length < 1) {
+            result.ok = false;
+            result.errors.push('not enough junctions - need at least 1.');
+        }
+
+        if (fixtures.length < 2) {
+            result.ok = false;
+            result.errors.push('not enough fixtures - need at least 2.');
+        }
+        fixtures.map((f) => {
+            if (f.vlan === null) {
+                result.ok = false;
+                result.errors.push('fixture '+f.label+' vlan not set');
+            }
+            if (!f.bwPreviouslySet) {
+                result.ok = false;
+                result.errors.push('fixture '+f.label+' bandwidth not set');
+            }
+        });
+        pipes.map((p) => {
+            if (!p.bwPreviouslySet) {
+                result.ok = false;
+                result.errors.push('pipe '+p.id+' bandwidth not set');
+            }
+        });
+
+        return result;
+
+    }
+
+    descriptionControl(val) {
+        if (val === '') {
+            return 'error';
+        }
+        return 'success';
+    }
+    startAtControl(start) {
+        if (start < new Date()) {
+            return 'error';
+        }
+        return 'success';
+    }
+    endAtControl(start, end) {
+        if (end < new Date() || start > end) {
+            return 'error';
+        }
+        return 'success';
+    }
+
 }
 export default new Validator();

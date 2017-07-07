@@ -1,22 +1,25 @@
 import React, {Component} from 'react';
 
+import {action, autorunAsync, whyRun} from 'mobx';
 import {observer, inject} from 'mobx-react';
-import {Button, Panel, FormGroup, ControlLabel} from 'react-bootstrap';
-import myClient from '../agents/client';
-import {action} from 'mobx';
 
+import ToggleDisplay from 'react-toggle-display';
+import {Button, Modal, Panel, ListGroup, ListGroupItem, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import Datetime from 'react-datetime';
 
 import 'react-datetime/css/react-datetime.css';
 
+import myClient from '../agents/client';
+import validator from '../lib/validation';
+import {PrecheckButton, HoldButton, ReleaseButton, CommitButton} from './controlButtons';
 
-@inject('controlsStore', 'stateStore')
+
+@inject('controlsStore', 'stateStore', 'sandboxStore')
 @observer
 export default class SandboxControls extends Component {
     constructor(props) {
         super(props);
     }
-
 
     componentWillMount() {
         let startAt = new Date();
@@ -32,6 +35,7 @@ export default class SandboxControls extends Component {
                     let params = {
                         startAt: startAt,
                         endAt: endAt,
+                        description: '',
                         connectionId: connId
                     };
                     this.props.controlsStore.setParamsForConnection(params);
@@ -40,7 +44,7 @@ export default class SandboxControls extends Component {
     }
 
     isDisabled = (what) => {
-        let connState = this.props.stateStore.connState;
+        let connState = this.props.stateStore.st.connState;
         if (what === 'validate') {
             return connState !== 'INITIAL';
         }
@@ -51,98 +55,104 @@ export default class SandboxControls extends Component {
             return connState !== 'CHECK_OK';
 
         }
+        if (what === 'release') {
+            return connState !== 'HOLD_OK';
+        }
         if (what === 'commit') {
             return connState !== 'HOLD_OK';
         }
-    }
+    };
 
-    validate = () => {
-        let conn = this.props.controlsStore.connection;
-        console.log(conn);
-        this.props.stateStore.validate();
+    disposeOfValidate = autorunAsync('validate', () => {
+        let validationParams = {
+            connection: this.props.controlsStore.connection,
+            junctions: this.props.sandboxStore.sandbox.junctions,
+            fixtures: this.props.sandboxStore.sandbox.fixtures,
+            pipes: this.props.sandboxStore.sandbox.pipes,
+        };
+        const result = validator.validatePrecheck(validationParams);
         setTimeout(() => {
-            this.props.stateStore.postValidate(true)
-        }, 1000);
-        return false;
+            this.props.stateStore.validate();
+            this.props.stateStore.postValidate(result.ok, result.errors);
+        }, 15);
 
+
+    }, 1000);
+
+    componentWillUnmount() {
+        this.disposeOfValidate();
     }
 
-    preCheck = () => {
-        this.props.stateStore.check();
-        setTimeout(() => {
-            this.props.stateStore.postCheck(true)
-        }, 1000);
-        return false;
-    }
+    onDescriptionChange = (e) => {
+        const params = {
+            description: e.target.value
+        };
+        this.props.controlsStore.setParamsForConnection(params);
+    };
 
-    hold = () => {
-        this.props.stateStore.hold();
-        setTimeout(() => {
-            this.props.stateStore.postHold(true)
-        }, 1000);
-        return false;
-
-    }
-
-    commit = () => {
-        this.props.stateStore.commit();
-        setTimeout(() => {
-            this.props.stateStore.postCommit(true)
-        }, 1000);
-        return false;
-    }
-
-    reset = () => {
-        this.props.stateStore.reset();
-        return false;
-    }
-
-    handleStartDateChange = (newMoment) => {
-        let params = {
+    onStartDateChange = (newMoment) => {
+        const params = {
             startAt: newMoment.toDate()
         };
-        this.props.controlsStore.setConnection(params);
-
+        this.props.controlsStore.setParamsForConnection(params);
     };
 
-    handleEndDateChange = (newMoment) => {
-        let params = {
+    onEndDateChange = (newMoment) => {
+        const params = {
             endAt: newMoment.toDate()
         };
-        this.props.controlsStore.setConnection(params);
+        this.props.controlsStore.setParamsForConnection(params);
     };
 
+
     render() {
-        let conn = this.props.controlsStore.connection;
-        let header = <span>Connection id: {conn.connectionId}</span>;
+        const conn = this.props.controlsStore.connection;
+        const header = <span>Connection id: {conn.connectionId}</span>;
 
         return (
             <Panel header={header}>
-                <FormGroup>
-                    <ControlLabel>Start:</ControlLabel>
-                    <Datetime
-                        size="8"
-                        name="Start"
-                        value={conn.startAt}
-                        onChange={this.handleStartDateChange}
-                    />
+                <FormGroup validationState={validator.descriptionControl(conn.description)}>
+                    <ControlLabel>Description</ControlLabel>
+                    {' '}
+                    <FormControl type="text"
+                                 defaultValue={conn.description}
+                                 onChange={this.onDescriptionChange}/>
                 </FormGroup>
-                <FormGroup>
-                    <ControlLabel>End:</ControlLabel>
-                    <Datetime
-                        size="8"
-                        name="End"
-                        value={conn.endAt}
-                        onChange={this.handleEndDateChange}
-                    />
-                </FormGroup>
-                <FormGroup>
 
-                    <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>{' '}
-                    <Button disabled={this.isDisabled('precheck')} onClick={this.preCheck}>Precheck</Button>{' '}
-                    <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>{' '}
-                    <Button disabled={this.isDisabled('commit')} onClick={this.commit}>Commit</Button>{' '}
-                    <Button onClick={this.reset}>Reset</Button>
+                <FormGroup validationState={validator.startAtControl(conn.startAt)}>
+                    <ControlLabel>Start:</ControlLabel>
+                    <Datetime size="8" name="Start" value={conn.startAt}
+                              onChange={this.onStartDateChange}
+                    />
+                </FormGroup>
+                <FormGroup validationState={validator.endAtControl(conn.startAt, conn.endAt)}>
+                    <ControlLabel>End:</ControlLabel>
+                    <Datetime size="8" name="End" value={conn.endAt}
+                              onChange={this.onEndDateChange}
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
+                        <Button onClick={() => {
+                            this.props.controlsStore.openModal('displayErrors');
+                        }}>Display errors</Button>{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('precheck')}>
+                        <PrecheckButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('hold')}>
+                        <HoldButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('release')}>
+                        <ReleaseButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('commit')}>
+                        <CommitButton />{' '}
+                    </ToggleDisplay>
                 </FormGroup>
 
             </Panel>

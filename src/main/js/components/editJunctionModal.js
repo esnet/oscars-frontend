@@ -11,8 +11,10 @@ import {
     ListGroup,
     ListGroupItem
 } from 'react-bootstrap';
+
 import ToggleDisplay from 'react-toggle-display';
 
+import picker from '../lib/picking';
 
 const modalName = 'editJunction';
 
@@ -42,6 +44,13 @@ export default class EditJunctionModal extends Component {
 
     deleteJunction = () => {
         let junction = this.props.controlsStore.editJunction.junction;
+        let fixtureIds = this.props.sandboxStore.fixturesOf(junction);
+        fixtureIds.map((id) => {
+            let f = this.props.sandboxStore.findFixture(id);
+            if (f.vlan !== null) {
+                picker.releaseDeleted(f.port, f.vlan);
+            }
+        });
 
         this.props.sandboxStore.deleteJunctionDeep(junction);
         this.closeModal();
@@ -143,68 +152,67 @@ export default class EditJunctionModal extends Component {
         let connectedPipes = this.props.sandboxStore.pipesConnectedTo(junction);
 
         return (
-            <div>
-                <Modal show={showModal} onHide={this.closeModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{junction}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Panel>
-                            <ListGroup> {
-                                connectedPipes.map((pipe) => {
-                                    return <ListGroupItem key={pipe.id} onClick={() => {
-                                        this.props.controlsStore.setParamsForEditPipe({
-                                            pipeId: pipe.id
-                                        });
-                                        this.props.controlsStore.openModal('editPipe');
-                                    }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
-                                })
-                            }
-                            </ListGroup>
-                            {' '}
-                            <ToggleDisplay show={showAddPipeControls}>
-                                <Form>
-                                    <FormGroup controlId="pipe">
-                                        <ControlLabel>Pipe to:</ControlLabel>
-                                        {' '}
-                                        <FormControl componentClass="select" defaultValue='choose' onChange={this.selectOtherJunction}>
-                                            {
-                                                unconnectedJunctions.map((option, index) => {
-                                                    return <option key={index} value={option.value}>{option.label}</option>
-                                                })
-                                            }
-                                        </FormControl>
-                                    </FormGroup>
+            <Modal show={showModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{junction}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Panel>
+                        <ListGroup> {
+                            connectedPipes.map((pipe) => {
+                                return <ListGroupItem key={pipe.id} onClick={() => {
+                                    this.props.controlsStore.setParamsForEditPipe({
+                                        pipeId: pipe.id
+                                    });
+                                    this.props.controlsStore.openModal('editPipe');
+                                }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
+                            })
+                        }
+                        </ListGroup>
+                        {' '}
+                        <ToggleDisplay show={showAddPipeControls}>
+                            <Form>
+                                <FormGroup controlId="pipe">
+                                    <ControlLabel>Pipe to:</ControlLabel>
                                     {' '}
-                                    <FormGroup controlId="a_z_bw">
-                                        <ControlLabel>Bandwidth (A to Z):</ControlLabel>
-                                        <FormControl size='8' onChange={this.onAzBwChange}/>
-                                    </FormGroup>
-                                    {' '}
-                                    <FormGroup controlId="z_a_bw">
-                                        <ControlLabel>Bandwidth (Z to A):</ControlLabel>
-                                        <FormControl size='8' onChange={this.onZaBwChange}/>
-                                    </FormGroup>
-                                    {' '}
-                                    {addPipeButton}
+                                    <FormControl componentClass="select" defaultValue='choose'
+                                                 onChange={this.selectOtherJunction}>
+                                        {
+                                            unconnectedJunctions.map((option, index) => {
+                                                return <option key={index} value={option.value}>{option.label}</option>
+                                            })
+                                        }
+                                    </FormControl>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup controlId="a_z_bw">
+                                    <ControlLabel>Bandwidth (A to Z):</ControlLabel>
+                                    <FormControl size='8' onChange={this.onAzBwChange}/>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup controlId="z_a_bw">
+                                    <ControlLabel>Bandwidth (Z to A):</ControlLabel>
+                                    <FormControl size='8' onChange={this.onZaBwChange}/>
+                                </FormGroup>
+                                {' '}
+                                {addPipeButton}
 
-                                </Form>
-                            </ToggleDisplay>
+                            </Form>
+                        </ToggleDisplay>
 
-                            {noPipesText}
+                        {noPipesText}
 
-                            <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
-                                junction</Button>
-                        </Panel>
+                        <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
+                            junction</Button>
+                    </Panel>
 
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={this.closeModal}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.closeModal}>Close</Button>
+                </Modal.Footer>
+            </Modal>
 
 
-            </div>
         );
     }
 }

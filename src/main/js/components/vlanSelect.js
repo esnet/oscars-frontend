@@ -9,78 +9,19 @@ import validator from '../lib/validation'
 
 import FixtureSelect from './fixtureSelect';
 import VlanSelectMode from './vlanSelectMode';
+import picker from '../lib/picking';
+
 
 @inject('sandboxStore', 'controlsStore')
 @observer
 export default class VlanSelect extends Component {
 
     onPickClick = () => {
-        const ef = this.props.controlsStore.editFixture;
-        const conn = this.props.controlsStore.connection;
-
-        let requestExpression = ef.vlanExpression;
-
-        if (ef.vlanSelectionMode === 'fromAvailable') {
-            requestExpression = ef.availableVlans;
-        } else if (ef.vlanSelectionMode === 'sameAs') {
-            requestExpression = ef.copiedVlan;
-        }
-
-        const request = toJS({
-            'connectionId': conn.connectionId,
-            'port': ef.port,
-            'vlanExpression': requestExpression,
-            'startDate': conn.startAt,
-            'endDate': conn.endAt,
-        });
-
-        console.log(ef.bwSelectionMode);
-        console.log(request);
-
-        myClient.submit('POST', '/vlan/pick', request)
-            .then(
-                action((response) => {
-                    const parsed = JSON.parse(response);
-
-                    let label = this.props.sandboxStore.setFixtureVlan(ef.fixtureId, parsed.vlanId);
-                    const params = {
-                        vlan: parsed.vlanId,
-                        showVlanPickButton: false,
-                        showVlanPickControls: false,
-                        showVlanReleaseControls: true,
-                        label: label,
-                    };
-
-                    this.props.controlsStore.setParamsForEditFixture(params);
-                }));
+        picker.pick();
     };
 
     onReleaseClick = () => {
-        const ef = this.props.controlsStore.editFixture;
-        const conn = this.props.controlsStore.connection;
-
-        const request = {
-            'connectionId': conn.connectionId,
-            'port': ef.port,
-            'vlanId': ef.vlan,
-        };
-//        console.log(request);
-
-        myClient.submit('POST', '/vlan/release', request)
-            .then(
-                action(() => {
-                    let label = this.props.sandboxStore.unsetFixtureVlan(ef.fixtureId);
-
-                    const params = {
-                        vlan: null,
-                        showVlanPickButton: true,
-                        showVlanPickControls: true,
-                        showVlanReleaseControls: false,
-                        label: label,
-                    };
-                    this.props.controlsStore.setParamsForEditFixture(params);
-                }));
-
+       picker.release();
 
     };
 
@@ -106,8 +47,6 @@ export default class VlanSelect extends Component {
             }
             let add = false;
             if (maybeAdd) {
-//                console.log(toJS(f));
-//                console.log(toJS(ef.availableVlanRanges));
                 ef.availableVlanRanges.map((r) => {
                     if (f.vlan >= r.floor && f.vlan <= r.ceiling) {
                         add = true;
@@ -126,19 +65,21 @@ export default class VlanSelect extends Component {
         return result;
     }
 
-    updateAvailableVlans = autorun(() => {
+    vlanUpdateDispose = autorun('availVlanUpdate', () => {
         const controlsStore = this.props.controlsStore;
         const ef = this.props.controlsStore.editFixture;
         let foo = ef.fixtureId + ef.bwSelectionMode + ef.vlan +  + ef.bwBeingEdited;
-        
 
+
+        this.props.controlsStore.setParamsForEditFixture({
+            retrievingAvailVlans: true
+        });
 
         let request = {
             'urns': [ef.port],
             'startDate': controlsStore.connection.startAt,
             'endDate': controlsStore.connection.endAt,
         };
-        console.log(request);
 
         myClient.submit('POST', '/vlan/port', request)
             .then(
@@ -149,16 +90,20 @@ export default class VlanSelect extends Component {
 //                    console.log(response);
 
                     this.props.controlsStore.setParamsForEditFixture({
+                        retrievingAvailVlans: false,
                         availableVlans: availableVlans,
                         availableVlanRanges: availableVlanRanges,
                         vlanCopyFromOptions: this.fixturesAllowingSameVlan()
                     });
 
                 }));
-        whyRun();
 
     });
 
+
+    componentWillUnmount() {
+        this.vlanUpdateDispose();
+    }
 
     selectModeChanged = (e) => {
         const mode = e.target.value;
@@ -261,7 +206,7 @@ export default class VlanSelect extends Component {
                     <Button bsStyle='warning' onClick={this.onReleaseClick}>Release</Button>
                 </ToggleDisplay>
                 {' '}
-                <ToggleDisplay show={ef.showVlanPickButton}>
+                <ToggleDisplay show={ef.showVlanPickButton && !ef.retrievingAvailVlans}>
                     <Button bsStyle='primary' onClick={this.onPickClick}>Pick</Button>
                 </ToggleDisplay>
             </Panel>

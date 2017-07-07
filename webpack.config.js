@@ -1,7 +1,8 @@
 var packageJSON = require('./package.json');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-
+var webpack = require('webpack');
+var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 const PATHS = {
     build: path.join(__dirname, 'target', 'classes', 'META-INF', 'resources', 'webjars', packageJSON.name, packageJSON.version),
@@ -25,19 +26,32 @@ module.exports = {
                 query: {
                     cacheDirectory: true,
                     presets: ['es2015', 'react', 'stage-1'],
-                    plugins: ['transform-decorators-legacy']
+                    plugins: ['transform-decorators-legacy', 'lodash']
                 }
             },
             {
                 test: /\.css$/,
-                use: [ 'style-loader', 'css-loader' ]
+                use: ['style-loader', 'css-loader']
             }
         ]
     },
-    plugins: [new HtmlWebpackPlugin({
-        template: PATHS.templates + '/template_index.html',
-        inject: 'body'
-    })],
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: PATHS.templates + '/template_index.html',
+            inject: 'body'
+        }),
+        /*
+        new LodashModuleReplacementPlugin,
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.optimize.UglifyJsPlugin(),
+        new webpack.optimize.AggressiveMergingPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('production')
+            }
+        }),
+        */
+    ],
 
     devServer: {
         port: 8181,

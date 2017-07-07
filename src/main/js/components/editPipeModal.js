@@ -66,54 +66,52 @@ export default class PipeParamsModal extends Component {
         if (pipe !== null) {
             pipeExists = true;
             header = <span>{pipe.a} - {pipe.z} bandwidth</span>;
-            azLabel = 'From '+ pipe.a +' to '+pipe.z;
-            zaLabel = 'From '+ pipe.z +' to '+pipe.a;
+            azLabel = 'From ' + pipe.a + ' to ' + pipe.z;
+            zaLabel = 'From ' + pipe.z + ' to ' + pipe.a;
         }
 
         return (
-            <div>
-                <Modal show={showModal} onHide={this.closeModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Editing pipe</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <ToggleDisplay show={pipeExists}>
-                            <Panel header={header}>
-                                <Form>
-                                    <FormGroup>
-                                        <ControlLabel>{azLabel}</ControlLabel>
-                                        {' '}
-                                        <FormControl type="text"
-                                                     placeholder="0-100000"
-                                                     defaultValue={editPipe.azBw}
-                                                     onChange={this.onAzBwChange}/>
-                                    </FormGroup>
+            <Modal show={showModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Editing pipe</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ToggleDisplay show={pipeExists}>
+                        <Panel header={header}>
+                            <Form>
+                                <FormGroup>
+                                    <ControlLabel>{azLabel}</ControlLabel>
                                     {' '}
-                                    <FormGroup>
-                                        <ControlLabel>{zaLabel}</ControlLabel>
-                                        {' '}
-                                        <FormControl onChange={this.onZaBwChange}
-                                                     defaultValue={editPipe.zaBw}
-                                                     type="text" placeholder="0-10000"/>
-                                    </FormGroup>
+                                    <FormControl type="text"
+                                                 placeholder="0-100000"
+                                                 defaultValue={editPipe.azBw}
+                                                 onChange={this.onAzBwChange}/>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup>
+                                    <ControlLabel>{zaLabel}</ControlLabel>
                                     {' '}
-                                </Form>
-                                <div className='pull-right'>
-                                    <ToggleDisplay show={editPipe.showUpdateButton}>
-                                        <Button bsStyle='primary' onClick={this.updatePipe}>Update</Button>
-                                    </ToggleDisplay>
-                                    {' '}
-                                    <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>
-                                </div>
-                            </Panel>
-                        </ToggleDisplay>
+                                    <FormControl onChange={this.onZaBwChange}
+                                                 defaultValue={editPipe.zaBw}
+                                                 type="text" placeholder="0-10000"/>
+                                </FormGroup>
+                                {' '}
+                            </Form>
+                            <div className='pull-right'>
+                                <ToggleDisplay show={editPipe.showUpdateButton}>
+                                    <Button bsStyle='primary' onClick={this.updatePipe}>Update</Button>
+                                </ToggleDisplay>
+                                {' '}
+                                <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>
+                            </div>
+                        </Panel>
+                    </ToggleDisplay>
 
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={this.closeModal}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.closeModal}>Close</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 }

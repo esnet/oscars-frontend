@@ -9,6 +9,7 @@ import AddFixtureModal from '../components/addFixtureModal';
 import EditFixtureModal from '../components/editFixtureModal';
 import EditJunctionModal from '../components/editJunctionModal';
 import EditPipeModal from '../components/editPipeModal';
+import DisplayErrorsModal from '../components/displayErrorsModal';
 import SandboxMap from '../components/sandboxMap';
 import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
@@ -48,6 +49,7 @@ export default class NewReservationApp extends Component {
                         <EditFixtureModal />
                         <EditJunctionModal />
                         <EditPipeModal />
+                        <DisplayErrorsModal />
 
                     </Row>
                 </Grid>

@@ -1,0 +1,138 @@
+import React, {Component} from 'react';
+
+import {action} from 'mobx';
+import {observer, inject} from 'mobx-react';
+
+import {Button} from 'react-bootstrap';
+
+
+import myClient from '../agents/client';
+import reservation from '../lib/reservation';
+import picker from '../lib/picking';
+
+@inject('stateStore', 'mapStore')
+export class PrecheckButton extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    preCheck = () => {
+        this.props.stateStore.check();
+
+
+        // release all temporary holds
+        picker.releaseAll();
+
+        myClient.submit('POST', '/resv/advanced_precheck', reservation.reservation)
+            .then(action((response) => {
+                const parsed = JSON.parse(response);
+
+                let coloredNodes = [];
+                parsed.nodesToHighlight.map((n, idx) => {
+                    coloredNodes.push({
+                        id: n,
+                        color: 'green'
+                    })
+                });
+
+                let coloredEdges = [];
+                parsed.linksToHighlight.map((n) => {
+                    coloredEdges.push({
+                        id: n,
+                        color: 'green'
+                    })
+                });
+
+                picker.reserveAll();
+
+                this.props.mapStore.setColoredEdges(coloredEdges);
+                this.props.mapStore.setColoredNodes(coloredNodes);
+                this.props.mapStore.setZoomOnColored(true);
+                this.props.stateStore.postCheck(true);
+
+            }));
+
+        return false;
+    };
+
+
+    render() {
+        return <Button onClick={this.preCheck}>Precheck</Button>
+    }
+}
+
+@inject('stateStore')
+export class HoldButton extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    hold = () => {
+        this.props.stateStore.hold();
+
+        // release all temporary holds; won't need them from now on
+        picker.releaseAll();
+
+
+        myClient.submit('POST', '/resv/advanced_hold', reservation.reservation)
+            .then(action((response) => {
+                console.log(response);
+
+                this.props.stateStore.postHold(true);
+
+            }));
+
+        return false;
+    };
+
+
+    render() {
+        return <Button onClick={this.hold}>Hold</Button>
+    }
+}
+
+@inject('stateStore')
+export class ReleaseButton extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    release = () => {
+        this.props.stateStore.release();
+        // TODO: implement this on backend
+
+        this.props.stateStore.postRelease(true);
+    };
+
+
+    render() {
+        return <Button onClick={this.release}>Release</Button>
+    }
+}
+
+
+@inject('stateStore')
+export class CommitButton extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    commit = () => {
+        this.props.stateStore.commit();
+
+        myClient.submit('POST', '/resv/commit', reservation.reservation.connectionId)
+            .then(action((response) => {
+                console.log(response);
+
+                this.props.stateStore.postCommit(true);
+
+            }));
+
+        return false;
+    };
+
+
+    render() {
+        return <Button onClick={this.commit}>Commit</Button>
+    }
+}

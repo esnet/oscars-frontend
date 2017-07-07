@@ -6,6 +6,7 @@ import {toJS, action, autorun, computed, whyRun} from 'mobx';
 
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
+import picker from '../lib/picking';
 
 const modalName = 'editFixture';
 
@@ -21,8 +22,11 @@ export default class EditFixtureModal extends Component {
     };
 
     deleteFixture = () => {
-        const editFixture = this.props.controlsStore.editFixture;
-        this.props.sandboxStore.deleteFixtureDeep(editFixture.fixtureId);
+        const ef = this.props.controlsStore.editFixture;
+        if (ef.vlan !== null) {
+            picker.releaseDeleted(ef.port, ef.vlan);
+        }
+        this.props.sandboxStore.deleteFixtureDeep(ef.fixtureId);
         this.closeModal();
     };
 
@@ -34,33 +38,29 @@ export default class EditFixtureModal extends Component {
         let label = ef.device + ':' + ef.label;
         let vlan = ef.vlan + '';
 
-        whyRun();
-
         return (
-            <div>
-                <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{label}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Grid fluid={true}>
-                            <Row>
-                                <Col md={6} sm={6}>
-                                    <VlanSelect />
-                                </Col>
-                                <Col md={6} sm={6}>
-                                    <BwSelect />
-                                </Col>
-                            </Row>
-                            <Button bsStyle='warning' className='pull-right'
-                                    onClick={this.deleteFixture}>Delete</Button>
-                        </Grid>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={this.closeModal}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
+            <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{label}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Grid fluid={true}>
+                        <Row>
+                            <Col md={6} sm={6}>
+                                <VlanSelect />
+                            </Col>
+                            <Col md={6} sm={6}>
+                                <BwSelect />
+                            </Col>
+                        </Row>
+                        <Button bsStyle='warning' className='pull-right'
+                                onClick={this.deleteFixture}>Delete</Button>
+                    </Grid>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.closeModal}>Close</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 }
