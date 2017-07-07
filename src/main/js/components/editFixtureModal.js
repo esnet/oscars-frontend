@@ -39,30 +39,28 @@ export default class EditFixtureModal extends Component {
         let vlan = ef.vlan + '';
 
         return (
-            <div>
-                <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{label}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Grid fluid={true}>
-                            <Row>
-                                <Col md={6} sm={6}>
-                                    <VlanSelect />
-                                </Col>
-                                <Col md={6} sm={6}>
-                                    <BwSelect />
-                                </Col>
-                            </Row>
-                            <Button bsStyle='warning' className='pull-right'
-                                    onClick={this.deleteFixture}>Delete</Button>
-                        </Grid>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={this.closeModal}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
+            <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{label}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Grid fluid={true}>
+                        <Row>
+                            <Col md={6} sm={6}>
+                                <VlanSelect />
+                            </Col>
+                            <Col md={6} sm={6}>
+                                <BwSelect />
+                            </Col>
+                        </Row>
+                        <Button bsStyle='warning' className='pull-right'
+                                onClick={this.deleteFixture}>Delete</Button>
+                    </Grid>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.closeModal}>Close</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 }

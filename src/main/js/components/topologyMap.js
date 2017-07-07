@@ -115,10 +115,19 @@ export default class TopologyMap extends Component {
                     this.datasource.nodes.update({id: nodeId, fixed: {x: false, y: false}});
                 }
             });
+            this.network.on('stabilizationIterationsDone', () => {
+                if (this.props.mapStore.network.zoomedOnColored) {
+
+                    this.zoomOnColored();
+                    this.props.mapStore.setZoomOnColored(false);
+                }
+            });
+
         }
 
 
     }, 500);
+
 
     zoomOnColored = () => {
 
@@ -126,8 +135,10 @@ export default class TopologyMap extends Component {
         this.props.mapStore.network.coloredNodes.map((entry) => {
             nodeIds.push(entry.id);
         });
+        console.log(nodeIds);
+
         this.network.fit({nodes: nodeIds, animation: true});
-    }
+    };
 
     componentWillUnmount() {
         this.disposeOfMapUpdate();
@@ -150,11 +161,13 @@ export default class TopologyMap extends Component {
         let header =
             <span>Network Map
                 <span className='pull-right'>
-                    <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0} >
+                    <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
                         <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
                     </ToggleDisplay>
                     {' '}
-                    <Glyphicon onClick={ () => { this.network.fit()}} glyph='zoom-out'/>
+                    <Glyphicon onClick={ () => {
+                        this.network.fit({animation: true})
+                    }} glyph='zoom-out'/>
                     {' '}
                     <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
                 </span>

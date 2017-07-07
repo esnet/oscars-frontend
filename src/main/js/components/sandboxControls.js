@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
 
-import {action} from 'mobx';
+import {action, autorunAsync, whyRun} from 'mobx';
 import {observer, inject} from 'mobx-react';
 
 import ToggleDisplay from 'react-toggle-display';
-import {Button, Panel, ListGroup, ListGroupItem, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import {Button, Modal, Panel, ListGroup, ListGroupItem, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import Datetime from 'react-datetime';
 
 import 'react-datetime/css/react-datetime.css';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
-import PrecheckButton from './prechecker';
+import {PrecheckButton, HoldButton, ReleaseButton, CommitButton} from './controlButtons';
 
 
 @inject('controlsStore', 'stateStore', 'sandboxStore')
@@ -44,7 +44,7 @@ export default class SandboxControls extends Component {
     }
 
     isDisabled = (what) => {
-        let connState = this.props.stateStore.connState;
+        let connState = this.props.stateStore.st.connState;
         if (what === 'validate') {
             return connState !== 'INITIAL';
         }
@@ -55,47 +55,33 @@ export default class SandboxControls extends Component {
             return connState !== 'CHECK_OK';
 
         }
+        if (what === 'release') {
+            return connState !== 'HOLD_OK';
+        }
         if (what === 'commit') {
             return connState !== 'HOLD_OK';
         }
     };
 
-    validate = () => {
+    disposeOfValidate = autorunAsync('validate', () => {
         let validationParams = {
             connection: this.props.controlsStore.connection,
             junctions: this.props.sandboxStore.sandbox.junctions,
             fixtures: this.props.sandboxStore.sandbox.fixtures,
             pipes: this.props.sandboxStore.sandbox.pipes,
         };
-        this.props.stateStore.clearErrors();
-        this.props.stateStore.validate();
-
         const result = validator.validatePrecheck(validationParams);
-        this.props.stateStore.postValidate(result.ok, result.errors);
-        return false;
-    };
-
-    hold = () => {
-        this.props.stateStore.hold();
         setTimeout(() => {
-            this.props.stateStore.postHold(true)
-        }, 1000);
-        return false;
+            this.props.stateStore.validate();
+            this.props.stateStore.postValidate(result.ok, result.errors);
+        }, 15);
 
-    };
 
-    commit = () => {
-        this.props.stateStore.commit();
-        setTimeout(() => {
-            this.props.stateStore.postCommit(true)
-        }, 1000);
-        return false;
-    };
+    }, 1000);
 
-    reset = () => {
-        this.props.stateStore.reset();
-        return false;
-    };
+    componentWillUnmount() {
+        this.disposeOfValidate();
+    }
 
     onDescriptionChange = (e) => {
         const params = {
@@ -117,6 +103,7 @@ export default class SandboxControls extends Component {
         };
         this.props.controlsStore.setParamsForConnection(params);
     };
+
 
     render() {
         const conn = this.props.controlsStore.connection;
@@ -145,27 +132,28 @@ export default class SandboxControls extends Component {
                     />
                 </FormGroup>
                 <FormGroup>
-                    <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>{' '}
-                    <PrecheckButton disabled={this.isDisabled('precheck')}/>
+                    <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
+                        <Button onClick={() => {
+                            this.props.controlsStore.openModal('displayErrors');
+                        }}>Display errors</Button>{' '}
+                    </ToggleDisplay>
 
-                    <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>{' '}
-                    <Button disabled={this.isDisabled('commit')} onClick={this.commit}>Commit</Button>{' '}
-                    <Button onClick={this.reset}>Reset</Button>
+                    <ToggleDisplay show={!this.isDisabled('precheck')}>
+                        <PrecheckButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('hold')}>
+                        <HoldButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('release')}>
+                        <ReleaseButton />{' '}
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={!this.isDisabled('commit')}>
+                        <CommitButton />{' '}
+                    </ToggleDisplay>
                 </FormGroup>
-                <ToggleDisplay show={this.props.stateStore.errors.length > 0}>
-                    <Panel header='Errors'>
-                        <ListGroup>{
-                            this.props.stateStore.errors.map((error, idx) => {
-                                return (
-                                    <ListGroupItem key={idx}>{error}</ListGroupItem>
-                                )
-
-                            })
-                        }
-                        </ListGroup>
-                    </Panel>
-
-                </ToggleDisplay>
 
             </Panel>
         );

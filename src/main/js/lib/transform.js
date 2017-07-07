@@ -17,6 +17,7 @@ class Transformer {
 
             availableVlans: '',
             vlanExpression: '',
+            retrievingAvailVlans: false,
 
             copiedVlan: '',
             showCopiedVlan: false,
@@ -76,6 +77,7 @@ class Transformer {
             showVlanReleaseControls: false,
             showVlanPickButton: true,
             showVlanPickControls: true,
+            retrievingAvailVlans: false,
 
             bwSelectionMode: 'typeIn',
             bwSelectionModeOptions: [],

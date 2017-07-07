@@ -28,7 +28,7 @@ class ControlsStore {
         showVlanPickButton: false,
         showVlanPickControls: false,
         showVlanReleaseControls: false,
-
+        retrievingAvailVlans: false,
 
 
         ingress: 0,
@@ -99,7 +99,8 @@ class ControlsStore {
         'editFixture': false,
         'editJunction': false,
         'editPipe': false,
-        'addFixture': false
+        'addFixture': false,
+        'displayErrors': false
     });
 
 

@@ -45,19 +45,17 @@ export default class AddFixtureModal extends Component {
 
         let showModal = this.props.controlsStore.modals.get(modalName);
         return (
-            <div>
-                <Modal show={showModal} onHide={this.closeModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{device}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <DevicePortList ports={ports} onAddClicked={this.addFixture}/>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={this.closeModal}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
+            <Modal show={showModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{device}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <DevicePortList ports={ports} onAddClicked={this.addFixture}/>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.closeModal}>Close</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 }
@@ -66,7 +64,8 @@ class DevicePortList extends Component {
     constructor(props) {
         super(props);
     }
-    portSort = (a, b ) => {
+
+    portSort = (a, b) => {
         if (a.port < b.port)
             return -1;
         if (a.port > b.port)
@@ -78,14 +77,14 @@ class DevicePortList extends Component {
         let portsNodes = this.props.ports.sort(this.portSort).map((entry) => {
             let port = entry.port;
             let device = entry.device;
-            let portLabel =  port.split(':')[1];
+            let portLabel = port.split(':')[1];
 
             let clickHandler = () => {
                 this.props.onAddClicked(device, port);
             };
             return (
                 <ListGroupItem key={port} onClick={clickHandler}>{portLabel}
-                    <Glyphicon  className='pull-right' glyph='plus'/>
+                    <Glyphicon className='pull-right' glyph='plus'/>
                 </ListGroupItem>
             )
 

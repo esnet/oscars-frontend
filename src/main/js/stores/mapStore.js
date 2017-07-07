@@ -9,6 +9,7 @@ class MapStore {
         edges: [],
         coloredNodes: [],
         coloredEdges: [],
+        zoomedOnColored: false,
         initialized: false,
     }
 
@@ -22,6 +23,11 @@ class MapStore {
     }
     @action setColoredEdges(edges) {
         this.network.coloredEdges = edges;
+    }
+
+    @action setZoomOnColored(val) {
+        this.network.zoomedOnColored = val;
+
     }
 }
 

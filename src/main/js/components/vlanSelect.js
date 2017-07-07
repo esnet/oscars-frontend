@@ -47,8 +47,6 @@ export default class VlanSelect extends Component {
             }
             let add = false;
             if (maybeAdd) {
-//                console.log(toJS(f));
-//                console.log(toJS(ef.availableVlanRanges));
                 ef.availableVlanRanges.map((r) => {
                     if (f.vlan >= r.floor && f.vlan <= r.ceiling) {
                         add = true;
@@ -67,12 +65,15 @@ export default class VlanSelect extends Component {
         return result;
     }
 
-    updateAvailableVlans = autorun(() => {
+    vlanUpdateDispose = autorun('availVlanUpdate', () => {
         const controlsStore = this.props.controlsStore;
         const ef = this.props.controlsStore.editFixture;
         let foo = ef.fixtureId + ef.bwSelectionMode + ef.vlan +  + ef.bwBeingEdited;
-        
 
+
+        this.props.controlsStore.setParamsForEditFixture({
+            retrievingAvailVlans: true
+        });
 
         let request = {
             'urns': [ef.port],
@@ -89,6 +90,7 @@ export default class VlanSelect extends Component {
 //                    console.log(response);
 
                     this.props.controlsStore.setParamsForEditFixture({
+                        retrievingAvailVlans: false,
                         availableVlans: availableVlans,
                         availableVlanRanges: availableVlanRanges,
                         vlanCopyFromOptions: this.fixturesAllowingSameVlan()
@@ -98,6 +100,10 @@ export default class VlanSelect extends Component {
 
     });
 
+
+    componentWillUnmount() {
+        this.vlanUpdateDispose();
+    }
 
     selectModeChanged = (e) => {
         const mode = e.target.value;
@@ -200,7 +206,7 @@ export default class VlanSelect extends Component {
                     <Button bsStyle='warning' onClick={this.onReleaseClick}>Release</Button>
                 </ToggleDisplay>
                 {' '}
-                <ToggleDisplay show={ef.showVlanPickButton}>
+                <ToggleDisplay show={ef.showVlanPickButton && !ef.retrievingAvailVlans}>
                     <Button bsStyle='primary' onClick={this.onPickClick}>Pick</Button>
                 </ToggleDisplay>
             </Panel>
