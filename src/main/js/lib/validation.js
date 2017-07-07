@@ -123,5 +123,24 @@ class Validator {
 
     }
 
+    descriptionControl(val) {
+        if (val === '') {
+            return 'error';
+        }
+        return 'success';
+    }
+    startAtControl(start) {
+        if (start < new Date()) {
+            return 'error';
+        }
+        return 'success';
+    }
+    endAtControl(start, end) {
+        if (end < new Date() || start > end) {
+            return 'error';
+        }
+        return 'success';
+    }
+
 }
 export default new Validator();

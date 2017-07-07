@@ -10,7 +10,6 @@ import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 
 import myClient from '../agents/client';
-import reservation from '../lib/reservation';
 import validator from '../lib/validation';
 import PrecheckButton from './prechecker';
 
@@ -125,7 +124,7 @@ export default class SandboxControls extends Component {
 
         return (
             <Panel header={header}>
-                <FormGroup>
+                <FormGroup validationState={validator.descriptionControl(conn.description)}>
                     <ControlLabel>Description</ControlLabel>
                     {' '}
                     <FormControl type="text"
@@ -133,27 +132,21 @@ export default class SandboxControls extends Component {
                                  onChange={this.onDescriptionChange}/>
                 </FormGroup>
 
-                <FormGroup>
+                <FormGroup validationState={validator.startAtControl(conn.startAt)}>
                     <ControlLabel>Start:</ControlLabel>
-                    <Datetime
-                        size="8"
-                        name="Start"
-                        value={conn.startAt}
-                        onChange={this.onStartDateChange}
+                    <Datetime size="8" name="Start" value={conn.startAt}
+                              onChange={this.onStartDateChange}
                     />
                 </FormGroup>
-                <FormGroup>
+                <FormGroup validationState={validator.endAtControl(conn.startAt, conn.endAt)}>
                     <ControlLabel>End:</ControlLabel>
-                    <Datetime
-                        size="8"
-                        name="End"
-                        value={conn.endAt}
-                        onChange={this.onEndDateChange}
+                    <Datetime size="8" name="End" value={conn.endAt}
+                              onChange={this.onEndDateChange}
                     />
                 </FormGroup>
                 <FormGroup>
                     <Button disabled={this.isDisabled('validate')} onClick={this.validate}>Validate</Button>{' '}
-                    <PrecheckButton disabled={this.isDisabled('precheck')} />
+                    <PrecheckButton disabled={this.isDisabled('precheck')}/>
 
                     <Button disabled={this.isDisabled('hold')} onClick={this.hold}>Hold</Button>{' '}
                     <Button disabled={this.isDisabled('commit')} onClick={this.commit}>Commit</Button>{' '}

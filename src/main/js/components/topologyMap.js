@@ -163,6 +163,16 @@ export default class TopologyMap extends Component {
 
     }, 500);
 
+    zoomOnColored = () => {
+
+        let nodeIds = [];
+        this.props.mapStore.network.coloredNodes.map((entry) => {
+            nodeIds.push(entry.id);
+        });
+        console.log(nodeIds);
+        this.network.fit({nodes: nodeIds, animation: true});
+
+    }
     componentWillUnmount() {
         this.disposeOfMapUpdate();
     }
@@ -184,9 +194,9 @@ export default class TopologyMap extends Component {
         let header =
             <span>Network Map
                 <span className='pull-right'>
-                    <Glyphicon onClick={ () => {
-                        this.network.fit()
-                    }} glyph='zoom-out'/>
+                    <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
+                    {' '}
+                    <Glyphicon onClick={ () => { this.network.fit()}} glyph='zoom-out'/>
                     {' '}
                     <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
                 </span>

@@ -44,8 +44,9 @@ export default class EditJunctionModal extends Component {
 
     deleteJunction = () => {
         let junction = this.props.controlsStore.editJunction.junction;
-        let fixtures = this.props.sandboxStore.fixturesOf(junction);
-        fixtures.map((f) => {
+        let fixtureIds = this.props.sandboxStore.fixturesOf(junction);
+        fixtureIds.map((id) => {
+            let f = this.props.sandboxStore.findFixture(id);
             if (f.vlan !== null) {
                 picker.releaseDeleted(f.port, f.vlan);
             }
