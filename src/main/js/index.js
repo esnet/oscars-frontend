@@ -32,7 +32,7 @@ ReactDOM.render(
             <div>
                 <Route exact path="/" component={NewReservationApp}/>
                 <Route exact path="/welcome" component={Welcome}/>
-                <Route exact path="/react/new" component={NewReservationApp}/>
+                <Route exact path="/frontend" component={NewReservationApp}/>
             </div>
         </Router>
     </Provider>, document.getElementById('react'));

@@ -155,7 +155,6 @@ export default class VlanSelect extends Component {
                     });
 
                 }));
-        whyRun();
 
     });
 
