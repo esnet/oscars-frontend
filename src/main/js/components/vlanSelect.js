@@ -206,11 +206,11 @@ export default class VlanSelect extends Component {
                 <ToggleDisplay show={ef.showVlanReleaseControls}>
                     <Well>Picked VLAN: {ef.vlan}</Well>
                     {' '}
-                    <Button bsStyle='warning' onClick={this.onReleaseClick}>Release</Button>
+                    <Button bsStyle='warning' className='pull-right' onClick={this.onReleaseClick}>Release</Button>
                 </ToggleDisplay>
                 {' '}
                 <ToggleDisplay show={ef.showVlanPickButton && !ef.retrievingAvailVlans}>
-                    <Button bsStyle='primary' onClick={this.onPickClick}>Pick</Button>
+                    <Button bsStyle='primary' className='pull-right' onClick={this.onPickClick}>Pick</Button>
                 </ToggleDisplay>
             </Panel>
 

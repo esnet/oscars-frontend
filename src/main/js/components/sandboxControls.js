@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, whyRun} from 'mobx';
+import {action, autorunAsync, toJS} from 'mobx';
+
+import chrono from 'chrono-node';
+import Moment from 'moment';
 
 import ToggleDisplay from 'react-toggle-display';
-import {Button, Panel, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
-import Datetime from 'react-datetime';
-
-import 'react-datetime/css/react-datetime.css';
+import {HelpBlock, Form, Button, Panel, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
@@ -23,18 +23,21 @@ export default class SandboxControls extends Component {
 
     componentWillMount() {
         let startAt = new Date();
-        startAt.setTime(startAt.getTime() + 5000 * 60);
+        startAt.setTime(startAt.getTime() + 5 * 60 * 1000);
 
         let endAt = new Date();
-        endAt.setDate(endAt.getDate() + 1);
-        endAt.setTime(endAt.getTime() + 15000 * 60);
+        endAt.setDate(endAt.getDate());
+        endAt.setTime(endAt.getTime() + 20 * 60 * 1000);
+
         myClient.loadJSON({method: 'GET', url: '/resv/newConnectionId'})
             .then(
                 action((response) => {
                     let connId = JSON.parse(response)['connectionId'];
                     let params = {
                         startAt: startAt,
+                        startAtInput: 'in 5 minutes',
                         endAt: endAt,
+                        endAtInput: 'in 20 minutes',
                         description: '',
                         connectionId: connId
                     };
@@ -92,72 +95,142 @@ export default class SandboxControls extends Component {
         this.props.controlsStore.setParamsForConnection(params);
     };
 
-    onStartDateChange = (newMoment) => {
-        const params = {
-            startAt: newMoment.toDate()
-        };
+    onStartDateChange = (e) => {
+        let expr = e.target.value;
+
+        let parsed = chrono.parseDate(expr);
+        let params = {
+            startAtValidation: 'error',
+            startAtValidationText: 'Set new value',
+            endAtValidationText: ''
+        }
+        if (parsed !== null) {
+            params.startAtInput = expr;
+            params.endAtInput = toJS(this.props.controlsStore.connection.endAtInput);
+            this.validateStartEnd(params);
+        } else {
+            params.startAtValidationText = 'Invalid date';
+        }
         this.props.controlsStore.setParamsForConnection(params);
     };
 
-    onEndDateChange = (newMoment) => {
-        const params = {
-            endAt: newMoment.toDate()
+    onEndDateChange = (e) => {
+        let expr = e.target.value;
+        let params = {
+            startAtValidationText: '',
+            endAtValidation: 'error',
+            endAtValidationText: 'Set new value',
         };
+
+        let parsed = chrono.parseDate(expr);
+        if (parsed !== null) {
+            params.startAtInput = toJS(this.props.controlsStore.connection.startAtInput);
+            params.endAtInput = expr;
+            this.validateStartEnd(params);
+        } else {
+            params.endAtValidationText = 'Invalid date.';
+        }
         this.props.controlsStore.setParamsForConnection(params);
     };
+
+    validateStartEnd(params) {
+        params.startAtValidation = 'success';
+        params.endAtValidation = 'success';
+
+        let startAt = chrono.parseDate(params.startAtInput);
+        let endAt = chrono.parseDate(params.endAtInput);
+        let startError = false;
+        let endError = false;
+
+        if (startAt < new Date()) {
+            params.startAtValidation = 'error';
+            params.startAtValidationText = 'Start time is before now.';
+            startError = true;
+        }
+        if (endAt < new Date()) {
+            params.endAtValidation = 'error';
+            params.endAtValidationText = 'End time is before now.';
+            endError = true;
+        }
+
+        if (startAt > endAt) {
+            params.startAtValidation = 'error';
+            params.endAtValidation = 'error';
+            params.startAtValidationText = 'Start time before end time.';
+            params.endAtValidationText = 'Start time before end time.';
+            startError = true;
+            endError = true;
+        }
+        if (!startError) {
+            params.startAt = startAt;
+        }
+        if (!endError) {
+            params.endAt = endAt;
+        }
+
+    }
 
 
     render() {
         const conn = this.props.controlsStore.connection;
         const header = <span>Connection id: {conn.connectionId}</span>;
+        const format = 'Y/MM/DD HH:mm';
 
         return (
             <Panel header={header}>
-                <FormGroup validationState={validator.descriptionControl(conn.description)}>
-                    <ControlLabel>Description</ControlLabel>
+                <Form inline={true}>
+                    <FormGroup validationState={validator.descriptionControl(conn.description)}>
+                        {' '}
+                        <FormControl type='text' placeholder='description'
+                                     defaultValue={conn.description}
+                                     onChange={this.onDescriptionChange}/>
+                    </FormGroup>
                     {' '}
-                    <FormControl type="text"
-                                 defaultValue={conn.description}
-                                 onChange={this.onDescriptionChange}/>
-                </FormGroup>
+                    <FormGroup className='pull-right'>
+                        <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
+                            <Button bsStyle='warning' className='pull-right'
+                                    onClick={() => {
+                                        this.props.controlsStore.openModal('displayErrors');
+                                    }}>Display errors</Button>{' '}
+                        </ToggleDisplay>
 
-                <FormGroup validationState={validator.startAtControl(conn.startAt)}>
-                    <ControlLabel>Start:</ControlLabel>
-                    <Datetime size="8" name="Start" value={conn.startAt}
-                              onChange={this.onStartDateChange}
-                    />
-                </FormGroup>
-                <FormGroup validationState={validator.endAtControl(conn.startAt, conn.endAt)}>
-                    <ControlLabel>End:</ControlLabel>
-                    <Datetime size="8" name="End" value={conn.endAt}
-                              onChange={this.onEndDateChange}
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
-                        <Button onClick={() => {
-                            this.props.controlsStore.openModal('displayErrors');
-                        }}>Display errors</Button>{' '}
-                    </ToggleDisplay>
+                        <ToggleDisplay show={!this.isDisabled('precheck')}>
+                            <PrecheckButton />{' '}
+                        </ToggleDisplay>
 
-                    <ToggleDisplay show={!this.isDisabled('precheck')}>
-                        <PrecheckButton />{' '}
-                    </ToggleDisplay>
+                        <ToggleDisplay show={!this.isDisabled('hold')}>
+                            <HoldButton />{' '}
+                        </ToggleDisplay>
 
-                    <ToggleDisplay show={!this.isDisabled('hold')}>
-                        <HoldButton />{' '}
-                    </ToggleDisplay>
+                        <ToggleDisplay show={!this.isDisabled('release')}>
+                            <ReleaseButton />{' '}
+                        </ToggleDisplay>
 
-                    <ToggleDisplay show={!this.isDisabled('release')}>
-                        <ReleaseButton />{' '}
-                    </ToggleDisplay>
+                        <ToggleDisplay show={!this.isDisabled('commit')}>
+                            <CommitButton />{' '}
+                        </ToggleDisplay>
+                    </FormGroup>
+                </Form>
+                {'  '}
 
-                    <ToggleDisplay show={!this.isDisabled('commit')}>
-                        <CommitButton />{' '}
-                    </ToggleDisplay>
-                </FormGroup>
+                <Form>
+                    <FormGroup className='pull-left' validationState={conn.startAtValidation}>
+                        <ControlLabel>Start:</ControlLabel>
+                        <FormControl type='text'
+                                     defaultValue='in 5 minutes'
+                                     onChange={this.onStartDateChange}/>
 
-            </Panel>
+                        <HelpBlock><p>{Moment(conn.startAt).format(format)}</p><p>{conn.startAtValidationText}</p></HelpBlock>
+                    </FormGroup>
+                    <FormGroup className='pull-right' validationState={conn.endAtValidation}>
+                        <ControlLabel>End:</ControlLabel>
+                        <FormControl type='text'
+                                     defaultValue='in 20 minutes'
+                                     onChange={this.onEndDateChange}/>
+                        <HelpBlock><p>{Moment(conn.endAt).format(format)}</p><p>{conn.endAtValidationText}</p></HelpBlock>
+                    </FormGroup>
+                </Form>
+            </ Panel >
         );
     }
 }

@@ -7,6 +7,12 @@ class ControlsStore {
         description: '',
         startAt: '',
         endAt: '',
+        startAtInput: '',
+        endAtInput: '',
+        startAtValidation: 'success',
+        endAtValidation: 'success',
+        startAtValidationText: '',
+        endAtValidationText: ''
     };
 
     @observable editFixture = {

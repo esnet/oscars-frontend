@@ -57,7 +57,7 @@ export class PrecheckButton extends Component {
 
 
     render() {
-        return <Button onClick={this.preCheck}>Precheck</Button>
+        return <Button className='pull-right' bsStyle='info' onClick={this.preCheck}>Precheck</Button>
     }
 }
 
@@ -87,7 +87,7 @@ export class HoldButton extends Component {
 
 
     render() {
-        return <Button onClick={this.hold}>Hold</Button>
+        return <Button className='pull-right' bsStyle='primary'  onClick={this.hold}>Hold</Button>
     }
 }
 
@@ -106,7 +106,7 @@ export class ReleaseButton extends Component {
 
 
     render() {
-        return <Button onClick={this.release}>Release</Button>
+        return <Button className='pull-right' onClick={this.release}>Release</Button>
     }
 }
 
@@ -133,6 +133,6 @@ export class CommitButton extends Component {
 
 
     render() {
-        return <Button onClick={this.commit}>Commit</Button>
+        return <Button bsStyle='success' className='pull-right' onClick={this.commit}>Commit</Button>
     }
 }
