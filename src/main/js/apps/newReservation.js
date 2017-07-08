@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {inject, observer} from 'mobx-react';
 import {Grid, Row, Col} from 'react-bootstrap';
 
 
@@ -15,8 +14,6 @@ import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 import SelectPort from '../components/selectPort';
 
-@inject('sandboxStore')
-@observer
 export default class NewReservationApp extends Component {
 
     constructor(props) {
@@ -27,33 +24,27 @@ export default class NewReservationApp extends Component {
     render() {
 
         return (
-            <div>
-                <Grid fluid={true}>
-                    <Row>
-                        <NavBar/>
-                    </Row>
-                    <Row>
-                        <Col md={8} sm={8}>
-                            <TopologyMap />
-                            <SandboxMap />
-                        </Col>
-                        <Col md={4} sm={4}>
-                            <SelectPort/>
-                            <Sandbox />
-                            <SandboxControls />
-                        </Col>
-
-                    </Row>
-                    <Row>
-                        <AddFixtureModal />
-                        <EditFixtureModal />
-                        <EditJunctionModal />
-                        <EditPipeModal />
-                        <DisplayErrorsModal />
-
-                    </Row>
-                </Grid>
-            </div>
+            <Grid fluid={true}>
+                <Row>
+                    <NavBar/>
+                </Row>
+                <Row>
+                    <Col md={8} sm={8}>
+                        <TopologyMap />
+                        <SandboxMap />
+                    </Col>
+                    <Col md={4} sm={4}>
+                        <SelectPort/>
+                        <SandboxControls />
+                        <Sandbox />
+                    </Col>
+                </Row>
+                <AddFixtureModal />
+                <EditFixtureModal />
+                <EditJunctionModal />
+                <EditPipeModal />
+                <DisplayErrorsModal />
+            </Grid>
         );
     }
 

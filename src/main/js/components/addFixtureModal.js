@@ -71,7 +71,7 @@ class DevicePortList extends Component {
         if (a.port > b.port)
             return 1;
         return 0;
-    }
+    };
 
     render() {
         let portsNodes = this.props.ports.sort(this.portSort).map((entry) => {
@@ -94,3 +94,8 @@ class DevicePortList extends Component {
     };
 }
 
+
+DevicePortList.propTypes = {
+    onAddClicked: React.PropTypes.func.isRequired,
+    ports: React.PropTypes.array.isRequired,
+};

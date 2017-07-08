@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom';
 import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
 
-import {toJS} from 'mobx';
 
 @inject('controlsStore')
 @observer
@@ -57,3 +56,6 @@ export default class FixtureSelect extends Component {
     }
 }
 
+FixtureSelect.propTypes = {
+    onRef: React.PropTypes.func.isRequired,
+};

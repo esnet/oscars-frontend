@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {Glyphicon, Label} from 'react-bootstrap';
 
 
 class Transformer {

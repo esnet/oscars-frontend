@@ -11,7 +11,7 @@ class MapStore {
         coloredEdges: [],
         zoomedOnColored: false,
         initialized: false,
-    }
+    };
 
     @action setNetwork(nodes, edges) {
         this.network.initialized = true;

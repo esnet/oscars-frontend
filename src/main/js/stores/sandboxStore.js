@@ -104,7 +104,7 @@ class SandboxStore {
     @action addFixture(params) {
         let idResult = this.makeFixtureId(params.port);
 
-        let label = params.port.split(':')[1] + ':' + idResult.suffix
+        let label = params.port.split(':')[1] + ':' + idResult.suffix;
         let entry = {
             id: idResult.id,
             port: params.port,

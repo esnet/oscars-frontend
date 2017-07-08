@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {FormGroup, FormControl, Checkbox, ControlLabel, Panel, Button, Well} from 'react-bootstrap';
-import {toJS, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 import FixtureSelect from './fixtureSelect';
 import validator from '../lib/validation'
@@ -166,7 +165,7 @@ export default class BwSelect extends Component {
         const validationLabel = validator.fixtureBwLabel(ef);
         const header = <span>Bandwidth <span className='pull-right'>{validationLabel}</span></span>;
 
-        let result =
+        return (
             <Panel header={header}>
                 <ToggleDisplay show={ef.bwBeingEdited}>
                     <BwSelectModeOptions onSelectModeChange={this.onSelectModeChange}/>
@@ -217,8 +216,7 @@ export default class BwSelect extends Component {
                 <ToggleDisplay show={!ef.bwBeingEdited}>
                     <Button bsStyle='warning' className='pull-right' onClick={this.unsetFixtureBw}>Edit</Button>
                 </ToggleDisplay>
-            </Panel>;
-        return result;
+            </Panel>);
     }
 }
 
@@ -248,3 +246,7 @@ class BwSelectModeOptions extends Component {
         </FormControl>;
     }
 }
+
+BwSelectModeOptions.propTypes = {
+    onSelectModeChange: React.PropTypes.func.isRequired
+};

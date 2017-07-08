@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 
-import {action, autorunAsync, whyRun} from 'mobx';
 import {observer, inject} from 'mobx-react';
+import {action, autorunAsync, whyRun} from 'mobx';
 
 import ToggleDisplay from 'react-toggle-display';
-import {Button, Modal, Panel, ListGroup, ListGroupItem, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import {Button, Panel, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import Datetime from 'react-datetime';
 
 import 'react-datetime/css/react-datetime.css';
@@ -56,7 +56,9 @@ export default class SandboxControls extends Component {
 
         }
         if (what === 'release') {
-            return connState !== 'HOLD_OK';
+            return true;
+            // TODO: implement release, then
+            // return connState !== 'HOLD_OK';
         }
         if (what === 'commit') {
             return connState !== 'HOLD_OK';

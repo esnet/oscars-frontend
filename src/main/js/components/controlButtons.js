@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {action} from 'mobx';
-import {observer, inject} from 'mobx-react';
+import {inject} from 'mobx-react';
 
 import {Button} from 'react-bootstrap';
 
@@ -28,7 +28,7 @@ export class PrecheckButton extends Component {
                 const parsed = JSON.parse(response);
 
                 let coloredNodes = [];
-                parsed.nodesToHighlight.map((n, idx) => {
+                parsed['nodesToHighlight'].map((n) => {
                     coloredNodes.push({
                         id: n,
                         color: 'green'
@@ -36,7 +36,7 @@ export class PrecheckButton extends Component {
                 });
 
                 let coloredEdges = [];
-                parsed.linksToHighlight.map((n) => {
+                parsed['linksToHighlight'].map((n) => {
                     coloredEdges.push({
                         id: n,
                         color: 'green'

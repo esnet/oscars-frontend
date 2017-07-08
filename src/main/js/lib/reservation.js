@@ -18,7 +18,7 @@ class Reservation {
         };
 
         sandboxStore.sandbox.junctions.map((sj) => {
-            let resFixtures = {}
+            let resFixtures = {};
             sandboxStore.sandbox.fixtures.map((sf) => {
                 if (sf.device === sj.id) {
                     resFixtures[sf.id] = {

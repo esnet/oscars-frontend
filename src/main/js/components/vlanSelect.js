@@ -199,10 +199,13 @@ export default class VlanSelect extends Component {
                     <ToggleDisplay show={ef.vlanSelectionMode === 'fromAvailable'}>
                         <Well>Available for your schedule: <b>{ef.availableVlans}</b></Well>
                     </ToggleDisplay>
+                    {' '}
 
                 </ToggleDisplay>
+                {' '}
                 <ToggleDisplay show={ef.showVlanReleaseControls}>
                     <Well>Picked VLAN: {ef.vlan}</Well>
+                    {' '}
                     <Button bsStyle='warning' onClick={this.onReleaseClick}>Release</Button>
                 </ToggleDisplay>
                 {' '}
