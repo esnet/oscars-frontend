@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import validator from '../lib/validation'
-import {Label, Panel, Glyphicon, Nav, NavItem} from 'react-bootstrap';
+import {Panel, Glyphicon, Nav, NavItem} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import ToggleDisplay from 'react-toggle-display';
 

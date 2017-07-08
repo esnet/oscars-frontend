@@ -8,7 +8,7 @@ import { useStrict } from 'mobx';
 import { Provider } from 'mobx-react';
 // import DevTools from 'mobx-react-devtools'
 
-import Welcome from './apps/welcome';
+import ListReservationsApp from './apps/listReservations';
 import NewReservationApp from './apps/newReservation';
 
 import commonStore from './stores/commonStore';
@@ -33,7 +33,7 @@ ReactDOM.render(
         <Router>
             <div>
                 <Route exact path="/" component={NewReservationApp}/>
-                <Route exact path="/welcome" component={Welcome}/>
+                <Route exact path="/list" component={ListReservationsApp}/>
                 <Route exact path="/frontend" component={NewReservationApp}/>
             </div>
         </Router>

@@ -15,10 +15,10 @@ export default class NavBar extends Component {
                 <LinkContainer to="/">
                     <NavItem >Home</NavItem>
                 </LinkContainer>
-                <LinkContainer to="/welcome">
-                    <NavItem >Welcome</NavItem>
+                <LinkContainer to="/list">
+                    <NavItem >List</NavItem>
                 </LinkContainer>
-                <LinkContainer to="/react/new">
+                <LinkContainer to="/frontend">
                     <NavItem >New Reservation</NavItem>
                 </LinkContainer>
             </Nav>

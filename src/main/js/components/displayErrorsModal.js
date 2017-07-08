@@ -5,17 +5,17 @@ import {
     Button,
     Panel,
     ListGroup,
-    ListGroupItem
 } from 'react-bootstrap';
 
 const modalName = 'displayErrors';
 
 @inject('stateStore', 'controlsStore')
 @observer
-export default class EditJunctionModal extends Component {
+export default class DisplayErrorsModal extends Component {
     constructor(props) {
         super(props);
     }
+
     closeModal = () => {
         this.props.controlsStore.closeModal(modalName);
     };
@@ -31,14 +31,7 @@ export default class EditJunctionModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <Panel>
-                        <ListGroup>{
-                            this.props.stateStore.st.errors.map((error, idx) => {
-                                return (
-                                    <ListGroupItem key={idx}>{error}</ListGroupItem>
-                                )
-                            })
-                        }
-                        </ListGroup>
+                        <ListGroup>{this.props.stateStore.st.errors}</ListGroup>
                     </Panel>
                 </Modal.Body>
                 <Modal.Footer>

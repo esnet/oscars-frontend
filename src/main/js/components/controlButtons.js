@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {action} from 'mobx';
-import {observer, inject} from 'mobx-react';
+import {inject} from 'mobx-react';
 
 import {Button} from 'react-bootstrap';
 
@@ -28,7 +28,7 @@ export class PrecheckButton extends Component {
                 const parsed = JSON.parse(response);
 
                 let coloredNodes = [];
-                parsed.nodesToHighlight.map((n, idx) => {
+                parsed['nodesToHighlight'].map((n) => {
                     coloredNodes.push({
                         id: n,
                         color: 'green'
@@ -36,7 +36,7 @@ export class PrecheckButton extends Component {
                 });
 
                 let coloredEdges = [];
-                parsed.linksToHighlight.map((n) => {
+                parsed['linksToHighlight'].map((n) => {
                     coloredEdges.push({
                         id: n,
                         color: 'green'
@@ -57,7 +57,7 @@ export class PrecheckButton extends Component {
 
 
     render() {
-        return <Button onClick={this.preCheck}>Precheck</Button>
+        return <Button className='pull-right' bsStyle='info' onClick={this.preCheck}>Precheck</Button>
     }
 }
 
@@ -87,7 +87,7 @@ export class HoldButton extends Component {
 
 
     render() {
-        return <Button onClick={this.hold}>Hold</Button>
+        return <Button className='pull-right' bsStyle='primary'  onClick={this.hold}>Hold</Button>
     }
 }
 
@@ -106,7 +106,7 @@ export class ReleaseButton extends Component {
 
 
     render() {
-        return <Button onClick={this.release}>Release</Button>
+        return <Button className='pull-right' onClick={this.release}>Release</Button>
     }
 }
 
@@ -133,6 +133,6 @@ export class CommitButton extends Component {
 
 
     render() {
-        return <Button onClick={this.commit}>Commit</Button>
+        return <Button bsStyle='success' className='pull-right' onClick={this.commit}>Commit</Button>
     }
 }

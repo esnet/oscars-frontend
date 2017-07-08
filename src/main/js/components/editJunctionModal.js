@@ -160,7 +160,7 @@ export default class EditJunctionModal extends Component {
                     <Panel>
                         <ListGroup> {
                             connectedPipes.map((pipe) => {
-                                return <ListGroupItem key={pipe.id} onClick={() => {
+                                return <ListGroupItem key={pipe.id+'-connected'} onClick={() => {
                                     this.props.controlsStore.setParamsForEditPipe({
                                         pipeId: pipe.id
                                     });
