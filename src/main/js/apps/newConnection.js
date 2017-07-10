@@ -15,7 +15,7 @@ import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 import SelectPort from '../components/selectPort';
 
-@inject('controlsStore', 'mapStore')
+@inject('controlsStore', 'mapStore', 'sandboxStore')
 export default class NewConnectionApp extends Component {
 
     constructor(props) {
@@ -25,6 +25,10 @@ export default class NewConnectionApp extends Component {
     componentWillMount() {
         this.props.mapStore.setColoredNodes([]);
         this.props.mapStore.setColoredEdges([]);
+        this.props.sandboxStore.clear();
+
+        // TODO: a better clear
+        this.props.controlsStore.setParamsForConnection({description: ''});
     }
     selectDevice = (device) => {
         this.props.controlsStore.setParamsForAddFixture({device: device});

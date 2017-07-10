@@ -2,7 +2,7 @@ var packageJSON = require('./package.json');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpack = require('webpack');
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+// var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 const PATHS = {
     build: path.join(__dirname, 'target', 'classes', 'META-INF', 'resources', 'webjars', packageJSON.name, packageJSON.version),
@@ -26,7 +26,7 @@ module.exports = {
                 query: {
                     cacheDirectory: true,
                     presets: ['es2015', 'react', 'stage-1'],
-                    plugins: ['transform-decorators-legacy', 'lodash']
+                    plugins: ['transform-decorators-legacy']
                 }
             },
             {

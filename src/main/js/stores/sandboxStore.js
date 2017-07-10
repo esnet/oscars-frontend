@@ -53,6 +53,15 @@ class SandboxStore {
         return fixturesOf;
     }
 
+    @action clear() {
+        this.sandbox.junctions = [];
+        this.sandbox.fixtures = [];
+        this.sandbox.pipes = [];
+
+
+    }
+
+
     @action addFixtureDeep(params) {
         let fixture = this.addFixture(params);
         let device = params.device;
@@ -175,7 +184,7 @@ class SandboxStore {
 
         this.sandbox.fixtures.map((entry) => {
             if (entry.id === id) {
-                const label = entry.port.split(':')[1] +':'+ entry.id.split(':')[2];
+                const label = entry.port.split(':')[1] + ':' + entry.id.split(':')[2];
 
                 entry.vlan = null;
                 entry.label = label;
