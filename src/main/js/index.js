@@ -8,8 +8,8 @@ import { useStrict } from 'mobx';
 import { Provider } from 'mobx-react';
 // import DevTools from 'mobx-react-devtools'
 
-import ListReservationsApp from './apps/listReservations';
-import NewReservationApp from './apps/newReservation';
+import ListConnectionsApp from './apps/listConnections';
+import NewConnectionApp from './apps/newConnection';
 
 import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
@@ -17,9 +17,11 @@ import mapStore from './stores/mapStore';
 import sandboxStore from './stores/sandboxStore';
 import stateStore from './stores/stateStore';
 import topologyStore from './stores/topologyStore';
+import connsStore from './stores/connsStore';
 
 const stores = {
     commonStore,
+    connsStore,
     controlsStore,
     mapStore,
     sandboxStore,
@@ -32,9 +34,9 @@ ReactDOM.render(
     <Provider {...stores}>
         <Router>
             <div>
-                <Route exact path="/" component={NewReservationApp}/>
-                <Route exact path="/list" component={ListReservationsApp}/>
-                <Route exact path="/frontend" component={NewReservationApp}/>
+                <Route exact path="/" component={NewConnectionApp}/>
+                <Route exact path="/list" component={ListConnectionsApp}/>
+                <Route exact path="/frontend" component={NewConnectionApp}/>
             </div>
         </Router>
     </Provider>, document.getElementById('react'));

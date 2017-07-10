@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {Nav, NavItem}from 'react-bootstrap';
 
-import {LinkContainer} from 'react-router-bootstrap';
+import {LinkContainer, IndexLinkContainer} from 'react-router-bootstrap';
 
 export default class NavBar extends Component {
     constructor(props) {
@@ -11,15 +11,15 @@ export default class NavBar extends Component {
 
     render() {
         return (
-            <Nav bsStyle="tabs">
-                <LinkContainer to="/">
-                    <NavItem >Home</NavItem>
+            <Nav bsStyle='tabs' activeKey={this.props.active}>
+                <IndexLinkContainer to='/'>
+                    <NavItem eventKey='home'>Home</NavItem>
+                </IndexLinkContainer>
+                <LinkContainer to='/list' >
+                    <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
-                <LinkContainer to="/list">
-                    <NavItem >List</NavItem>
-                </LinkContainer>
-                <LinkContainer to="/frontend">
-                    <NavItem >New Reservation</NavItem>
+                <LinkContainer to='/frontend' >
+                    <NavItem eventKey='new'>Reserve</NavItem>
                 </LinkContainer>
             </Nav>
 

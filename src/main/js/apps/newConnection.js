@@ -14,7 +14,7 @@ import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 import SelectPort from '../components/selectPort';
 
-export default class NewReservationApp extends Component {
+export default class NewConnectionApp extends Component {
 
     constructor(props) {
         super(props);
@@ -26,7 +26,10 @@ export default class NewReservationApp extends Component {
         return (
             <Grid fluid={true}>
                 <Row>
-                    <NavBar/>
+                    <NavBar active='new'/>
+                </Row>
+                <Row>
+                    <Col sm={4}>{' '}</Col>
                 </Row>
                 <Row>
                     <Col md={8} sm={8}>

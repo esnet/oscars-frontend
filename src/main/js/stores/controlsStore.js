@@ -106,7 +106,8 @@ class ControlsStore {
         'editJunction': false,
         'editPipe': false,
         'addFixture': false,
-        'displayErrors': false
+        'displayErrors': false,
+        'connection': false,
     });
 
 
