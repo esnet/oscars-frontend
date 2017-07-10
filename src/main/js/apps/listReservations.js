@@ -4,6 +4,7 @@ import {Grid, Row, Col} from 'react-bootstrap';
 
 import NavBar from '../components/navbar'
 import TopologyMap from '../components/topologyMap';
+import ReservationList from '../components/reservationList';
 
 export default class ListReservationsApp extends Component {
 
@@ -19,9 +20,8 @@ export default class ListReservationsApp extends Component {
                     <NavBar/>
                 </Row>
                 <Row>
-                    <Col>
-                        <TopologyMap />
-                    </Col>
+                    <TopologyMap />
+                    <ReservationList/>
 
                 </Row>
             </Grid>
