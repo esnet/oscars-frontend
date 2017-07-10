@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Grid, Row, Col} from 'react-bootstrap';
+import {inject} from 'mobx-react';
 
 
 import NavBar from '../components/navbar'
@@ -14,12 +15,21 @@ import Sandbox from '../components/sandbox';
 import SandboxControls from '../components/sandboxControls';
 import SelectPort from '../components/selectPort';
 
+@inject('controlsStore', 'mapStore')
 export default class NewConnectionApp extends Component {
 
     constructor(props) {
         super(props);
     }
 
+    componentWillMount() {
+        this.props.mapStore.setColoredNodes([]);
+        this.props.mapStore.setColoredEdges([]);
+    }
+    selectDevice = (device) => {
+        this.props.controlsStore.setParamsForAddFixture({device: device});
+        this.props.controlsStore.openModal('addFixture');
+    };
 
     render() {
 
@@ -33,7 +43,7 @@ export default class NewConnectionApp extends Component {
                 </Row>
                 <Row>
                     <Col md={8} sm={8}>
-                        <TopologyMap />
+                        <TopologyMap selectDevice={this.selectDevice}/>
                         <SandboxMap />
                     </Col>
                     <Col md={4} sm={4}>

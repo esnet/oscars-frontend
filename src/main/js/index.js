@@ -34,7 +34,7 @@ ReactDOM.render(
     <Provider {...stores}>
         <Router>
             <div>
-                <Route exact path="/" component={NewConnectionApp}/>
+                <Route exact path="/" component={ListConnectionsApp}/>
                 <Route exact path="/list" component={ListConnectionsApp}/>
                 <Route exact path="/frontend" component={NewConnectionApp}/>
             </div>

@@ -8,7 +8,7 @@ import {Panel, Glyphicon} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 
-@inject('controlsStore', 'mapStore')
+@inject('mapStore')
 @observer
 export default class TopologyMap extends Component {
     constructor(props) {
@@ -19,10 +19,6 @@ export default class TopologyMap extends Component {
         showMap: true
     };
 
-    selectDevice = (device) => {
-        this.props.controlsStore.setParamsForAddFixture({device: device});
-        this.props.controlsStore.openModal('addFixture');
-    };
 
     // this automagically updates the map;
     disposeOfMapUpdate = autorunAsync('map update', () => {
@@ -98,7 +94,7 @@ export default class TopologyMap extends Component {
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
-                    this.selectDevice(nodeId);
+                    this.props.selectDevice(nodeId);
                 }
             });
 
@@ -135,7 +131,6 @@ export default class TopologyMap extends Component {
         this.props.mapStore.network.coloredNodes.map((entry) => {
             nodeIds.push(entry.id);
         });
-        console.log(nodeIds);
 
         this.network.fit({nodes: nodeIds, animation: true});
     };

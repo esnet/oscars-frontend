@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {Panel, Table, Button} from 'react-bootstrap';
 import Moment from 'moment';
-
+import {toJS} from 'mobx';
 import {observer, inject} from 'mobx-react';
+import VisUtils from '../lib/vis';
 
 import myClient from '../agents/client';
 
-@inject('controlsStore', 'connsStore')
+@inject('controlsStore', 'connsStore', 'mapStore')
 @observer
 export default class ConnectionsList extends Component {
 
@@ -40,6 +41,7 @@ export default class ConnectionsList extends Component {
             .then(
                 (successResponse) => {
                     let conns = JSON.parse(successResponse);
+
                     this.props.connsStore.updateList(conns);
                 }
                 ,
@@ -49,8 +51,47 @@ export default class ConnectionsList extends Component {
             );
     };
 
-    showDetails = (c) => {
-        console.log(c);
+    showDetails = (connectionId) => {
+
+        let c = this.props.connsStore.findConnection(connectionId);
+
+        let coloredNodes = [];
+        let coloredEdges = [];
+
+        for (let junction of c.reserved.vlanFlow.junctions) {
+            coloredNodes.push({
+                id: junction.deviceUrn,
+                color: 'green'
+            });
+
+        }
+        for (let pipe of c.reserved.vlanFlow.mplsPipes) {
+            let nodes = [pipe.aJunction.deviceUrn, pipe.zJunction.deviceUrn];
+            let az = VisUtils.visFromERO(pipe.azERO);
+            let za = VisUtils.visFromERO(pipe.zaERO);
+
+            let edges = az.edges.concat(za.edges);
+            nodes = nodes.concat(az.nodes).concat(za.nodes);
+
+            for (let edgeId of edges) {
+                coloredEdges.push({
+                    id: edgeId,
+                    color: 'green'
+                });
+            }
+            for (let nodeId of nodes) {
+                coloredNodes.push({
+                    id: nodeId,
+                    color: 'green'
+                });
+            }
+        }
+
+        this.props.mapStore.setColoredEdges(coloredEdges);
+        this.props.mapStore.setColoredNodes(coloredNodes);
+        this.props.mapStore.setZoomOnColored(true);
+
+
         this.props.connsStore.setCurrent(c);
         this.props.controlsStore.openModal('connection');
     };
@@ -60,7 +101,9 @@ export default class ConnectionsList extends Component {
 
         let rows = this.props.connsStore.store.conns.map((c) => {
             return (
-                <tr key={c.connectionId} onClick={(e) => {this.showDetails(c)} }>
+                <tr key={c.connectionId} onClick={(e) => {
+                    this.showDetails(c.connectionId)
+                } }>
                     <td>{c.connectionId}</td>
                     <td>{c.specification.description}</td>
                     <td>

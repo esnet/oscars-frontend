@@ -15,6 +15,14 @@ class ConnectionsStore {
         this.store.conns = resvs;
     }
 
+    findConnection(connectionId) {
+        for (let conn of this.store.conns) {
+            if (conn.connectionId === connectionId) {
+                return conn;
+            }
+        }
+    }
+
 
 }
 
