@@ -18,6 +18,11 @@ class MapStore {
         this.network.nodes = nodes;
         this.network.edges = edges;
     }
+
+    @action addColoredNode(nodeId) {
+        this.network.coloredNodes.push(nodeId);
+    }
+
     @action setColoredNodes(nodes) {
         this.network.coloredNodes = nodes;
     }

@@ -6,7 +6,7 @@ import transformer from '../lib/transform';
 import {Panel} from 'react-bootstrap';
 
 
-@inject('topologyStore', 'controlsStore', 'sandboxStore')
+@inject('topologyStore', 'controlsStore', 'sandboxStore', 'mapStore')
 @observer
 export default class SelectPort extends Component {
     componentWillMount() {
@@ -37,6 +37,10 @@ export default class SelectPort extends Component {
 
 
             let fixture = this.props.sandboxStore.addFixtureDeep(params);
+
+            console.log(device);
+            this.props.mapStore.addColoredNode({id: device, color:'red'});
+            this.props.mapStore.setZoomOnColored(true);
 
             const editFixtureParams = transformer.newFixtureToEditParams(fixture);
             this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
