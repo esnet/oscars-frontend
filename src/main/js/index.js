@@ -10,6 +10,7 @@ import { Provider } from 'mobx-react';
 
 import ListConnectionsApp from './apps/listConnections';
 import NewConnectionApp from './apps/newConnection';
+import WelcomeApp from './apps/welcome';
 
 import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
@@ -34,9 +35,9 @@ ReactDOM.render(
     <Provider {...stores}>
         <Router>
             <div>
-                <Route exact path="/" component={ListConnectionsApp}/>
-                <Route exact path="/list" component={ListConnectionsApp}/>
-                <Route exact path="/frontend" component={NewConnectionApp}/>
+                <Route exact path="/" component={WelcomeApp}/>
+                <Route exact path="/pages/list" component={ListConnectionsApp}/>
+                <Route exact path="/pages/new" component={NewConnectionApp}/>
             </div>
         </Router>
     </Provider>, document.getElementById('react'));

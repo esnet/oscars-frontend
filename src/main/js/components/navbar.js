@@ -15,10 +15,10 @@ export default class NavBar extends Component {
                 <IndexLinkContainer to='/'>
                     <NavItem eventKey='home'>Home</NavItem>
                 </IndexLinkContainer>
-                <LinkContainer to='/list' >
+                <LinkContainer to='/pages/list' >
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/frontend' >
+                <LinkContainer to='/pages/new' >
                     <NavItem eventKey='new'>Reserve</NavItem>
                 </LinkContainer>
             </Nav>
