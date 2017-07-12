@@ -1,28 +1,76 @@
 import React, {Component} from 'react';
 
-import {Nav, NavItem}from 'react-bootstrap';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem}from 'react-bootstrap';
+import {observer, inject} from 'mobx-react';
 
 import {LinkContainer, IndexLinkContainer} from 'react-router-bootstrap';
 
+@inject('accountStore', 'commonStore')
+@observer
 export default class NavBar extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        return (
-            <Nav bsStyle='tabs' activeKey={this.props.active}>
-                <IndexLinkContainer to='/'>
-                    <NavItem eventKey='home'>Home</NavItem>
-                </IndexLinkContainer>
-                <LinkContainer to='/pages/list' >
+        let leftNav =
+            <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
+                <LinkContainer to='/login'>
+                    <NavItem eventKey='login'>Login</NavItem>
+                </LinkContainer>
+            </Nav>;
+        let rightNav = null;
+
+
+        if (this.props.accountStore.isLoggedIn()) {
+            let admin = null;
+
+            if (this.props.accountStore.isAdmin()) {
+                admin = <NavDropdown id='admin' eventKey='admin' title='Admin'>
+                    <LinkContainer to='/usersAdmin'>
+                        <MenuItem >Users</MenuItem>
+                    </LinkContainer>
+                </NavDropdown>
+            }
+
+            leftNav = <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
+                <LinkContainer to='/list'>
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/pages/new' >
+                <LinkContainer to='/new'>
                     <NavItem eventKey='new'>Reserve</NavItem>
                 </LinkContainer>
-            </Nav>
+                {admin}
+            </Nav>;
 
+
+            rightNav =
+                <Nav pullRight>
+                    <LinkContainer to='/account'>
+                        <NavItem eventKey='account'>My Account</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to='/logout'>
+                        <NavItem eventKey='logout'>Logout</NavItem>
+                    </LinkContainer>
+                </Nav>;
+
+        }
+
+        return (
+            <Navbar collapseOnSelect>
+                <Navbar.Header>
+                    <Navbar.Brand>
+                        <IndexLinkContainer to='/'>
+                            <NavItem eventKey='home'>OSCARS</NavItem>
+                        </IndexLinkContainer>
+                    </Navbar.Brand>
+                    <Navbar.Toggle />
+                </Navbar.Header>
+                <Navbar.Collapse>
+                    {leftNav}
+                    {rightNav}
+                </Navbar.Collapse>
+            </Navbar>
         )
     }
 }

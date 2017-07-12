@@ -10,11 +10,12 @@ const PATHS = {
 };
 
 module.exports = {
-    entry: ['./src/main/js/index.js'],
+    entry: ['babel-polyfill', './src/main/js/index.js'],
     devtool: 'sourcemaps',
     cache: true,
     output: {
         path: PATHS.build,
+        publicPath: '/webjars/oscars-frontend/1.0.0/bundle.js',
         filename: 'bundle.js'
     },
     module: {
@@ -63,6 +64,23 @@ module.exports = {
             poll: 1000
         },
         proxy: {
+            '/api/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            },
+            '/protected/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            },
+
+            '/admin/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            },
+
             '/topology/*': {
                 secure: false,
                 changeOrigin: true,

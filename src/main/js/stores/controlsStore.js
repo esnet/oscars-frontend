@@ -74,6 +74,29 @@ class ControlsStore {
 
     };
 
+    @observable
+    editUser = {
+        allUsers: [],
+        user: {},
+        password: ''
+    };
+
+
+    @action
+    setParamsForEditUser(params) {
+        Object.assign(this.editUser, params);
+    }
+
+    @action
+    setParamsForOneUser(params) {
+        Object.assign(this.editUser.user, params);
+    }
+    @action setPassword(value) {
+        this.editUser.password = value;
+    }
+
+
+
 
     @action
     setParamsForEditPipe(params) {
@@ -108,6 +131,7 @@ class ControlsStore {
         'addFixture': false,
         'displayErrors': false,
         'connection': false,
+        'userAdmin': false,
     });
 
 

@@ -1,3 +1,5 @@
+import accountStore from '../stores/accountStore';
+
 class MyXHRClient {
 
     loadJSON(opts) {
@@ -33,8 +35,7 @@ class MyXHRClient {
                     params = JSON.stringify(params);
                 }
                 xhr.send(params);
-            }
-            else {
+            } else {
                 xhr.send();
             }
         });
@@ -43,6 +44,14 @@ class MyXHRClient {
     submit(method, url, payload) {
 
         let headers = {};
+
+        return this.loadJSON({method: method, url: url, headers: headers, params: payload});
+    }
+
+    submitWithToken(method, url, payload) {
+        let token = accountStore.loggedin.token;
+        let headers = {'Authentication': token};
+
 
         return this.loadJSON({method: method, url: url, headers: headers, params: payload});
     }

@@ -3,12 +3,11 @@ import {Grid, Row, Col} from 'react-bootstrap';
 import {inject} from 'mobx-react';
 
 
-import NavBar from '../components/navbar'
 import ConnectionsList from '../components/connectionsList';
 import ConnectionModal from '../components/connectionModal';
 
 
-@inject('mapStore')
+@inject('mapStore', 'commonStore')
 export default class ListConnectionsApp extends Component {
 
     constructor(props) {
@@ -18,26 +17,16 @@ export default class ListConnectionsApp extends Component {
     componentWillMount() {
         this.props.mapStore.setColoredNodes([]);
         this.props.mapStore.setColoredEdges([]);
+        this.props.commonStore.setActiveNav('list');
     }
 
     render() {
         return (
-            <Grid fluid={true}>
-                <Row>
-                    <NavBar active='list'/>
-                </Row>
-                <Row>
-                    <Col sm={4}>{' '}</Col>
-                </Row>
-                <Row>
-                    <ConnectionsList/>
+            <Row>
+                <ConnectionsList/>
+                <ConnectionModal />
 
-                </Row>
-                <Row>
-                    <ConnectionModal />
-                </Row>
-
-            </Grid>
+            </Row>
         );
     }
 

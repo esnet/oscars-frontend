@@ -49,6 +49,7 @@ export default class ConnectionsList extends Component {
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
+
     };
 
     showDetails = (connectionId) => {
