@@ -39,11 +39,10 @@ export default class EditUserForm extends Component {
     render() {
         let editUser = this.props.controlsStore.editUser;
 
-        let user = editUser.user;
         let allUsers = this.props.controlsStore.editUser.allUsers;
 
-        if (!size(user)) {
-            return <div>loading..</div>;
+        if (Object.keys(this.props.controlsStore.editUser.user).length === 0) {
+            return <div>Waiting to load..</div>;
         }
 
 
@@ -57,7 +56,7 @@ export default class EditUserForm extends Component {
                             {' '}
                             <FormControl type='text'
                                          disabled={true}
-                                         defaultValue={size(user.username) ? user.username : '' }
+                                         defaultValue={size(editUser.user.username) ? editUser.user.username : '' }
                                          onKeyPress={this.handleParamKeyPress}
                                          onChange={(e) => this.onParamChange('username', e.target.value)}/>
                         </FormGroup>
@@ -67,7 +66,7 @@ export default class EditUserForm extends Component {
                             <ControlLabel>Full name</ControlLabel>
                             {' '}
                             <FormControl type='text'
-                                         defaultValue={size(user.fullName) ? user.fullName : 'not set' }
+                                         defaultValue={size(editUser.user.fullName) ? editUser.user.fullName : 'not set' }
                                          onKeyPress={this.handleParamKeyPress}
                                          onChange={(e) => this.onParamChange('fullName', e.target.value)}/>
                         </FormGroup>
@@ -76,7 +75,7 @@ export default class EditUserForm extends Component {
                             <ControlLabel>Email</ControlLabel>
                             {' '}
                             <FormControl type='text'
-                                         defaultValue={size(user.email) ? user.email : 'not set' }
+                                         defaultValue={size(editUser.user.email) ? editUser.user.email : 'not set' }
                                          onKeyPress={this.handleParamKeyPress}
                                          onChange={(e) => this.onParamChange('email', e.target.value)}/>
                         </FormGroup>
@@ -85,13 +84,13 @@ export default class EditUserForm extends Component {
                             <ControlLabel>Institution</ControlLabel>
                             {' '}
                             <FormControl type='text'
-                                         defaultValue={size(user.institution) ? user.institution : 'not set' }
+                                         defaultValue={size(editUser.user.institution) ? editUser.user.institution : 'not set' }
                                          onKeyPress={this.handleParamKeyPress}
                                          onChange={(e) => this.onParamChange('institution', e.target.value)}/>
                         </FormGroup>
                         {' '}
                         <FormGroup >
-                            <Checkbox defaultChecked={user.permissions.adminAllowed} inline
+                            <Checkbox defaultChecked={editUser.user.permissions.adminAllowed} inline
                                       disabled={true}>Is admin?
                             </Checkbox>
 
@@ -99,12 +98,12 @@ export default class EditUserForm extends Component {
                     </Form>
                     <div className='pull-right'>
                         <Button bsStyle='primary'
-                                disabled={!size(user.username)}
+                                disabled={!size(editUser.user.username)}
                                 onClick={this.props.submitUpdate}>Update</Button>
 
                         <ToggleDisplay show={this.props.allowDelete && size(allUsers) >= 2}>
                             <Button bsStyle='warning'
-                                    disabled={!size(user.username)}
+                                    disabled={!size(editUser.user.username)}
                                     onClick={this.props.submitDelete}>Delete</Button>
                         </ToggleDisplay>
                     </div>
@@ -125,7 +124,7 @@ export default class EditUserForm extends Component {
                             {' '}
                             <div className='pull-right'>
                                 <Button bsStyle={size(editUser.password) ? 'primary' : 'default'}
-                                        disabled={!size(editUser.password) || !size(user.username) }
+                                        disabled={!size(editUser.password) || !size(editUser.user.username) }
                                         onClick={() => {
                                             this.props.submitPassword(this.passwordRef)
                                         }}>Set</Button>

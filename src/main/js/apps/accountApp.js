@@ -13,9 +13,11 @@ export default class AccountApp extends Component {
     }
 
     componentWillMount() {
+        this.props.controlsStore.setParamsForEditUser({user: {}});
         myClient.submitWithToken('GET', '/protected/account', '')
             .then(
                 (response) => {
+                    console.log(response);
                     let parsed = JSON.parse(response);
                     this.props.controlsStore.setParamsForEditUser({user: parsed});
                 }
