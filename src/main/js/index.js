@@ -73,6 +73,13 @@ const stores = {
 };
 useStrict(true);
 
+let token = localStorage.getItem('token');
+if (token) {
+    accountStore.setLoggedinToken(token);
+    accountStore.setLoggedinUsername(localStorage.getItem('username'));
+    accountStore.setLoggedinAdmin(localStorage.getItem('admin'));
+}
+
 ReactDOM.render(
     <Provider {...stores}>
         <BrowserRouter >
@@ -87,10 +94,10 @@ ReactDOM.render(
                     <Route exact path="/" component={WelcomeApp}/>
                     <Route exact path="/login" component={Login}/>
                     <Route exact path="/logout" component={Logout}/>
-                    <PrivateRoute exact path="/list" component={ListConnectionsApp}/>
-                    <PrivateRoute exact path="/new" component={NewConnectionApp}/>
-                    <PrivateRoute exact path="/account" component={AccountApp}/>
-                    <AdminRoute exact path="/usersAdmin" component={AdminUsersApp}/>
+                    <PrivateRoute exact path="/pages/list" component={ListConnectionsApp}/>
+                    <PrivateRoute exact path="/pages/new" component={NewConnectionApp}/>
+                    <PrivateRoute exact path="/pages/account" component={AccountApp}/>
+                    <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
                 </Switch>
             </Grid>
         </BrowserRouter>

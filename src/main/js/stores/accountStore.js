@@ -36,6 +36,9 @@ class AccountStore {
         this.loggedin.username = '';
         this.loggedin.token = '';
         this.loggedin.admin = false;
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('admin');
     }
 
     @action setAttemptUsername(u) {
@@ -52,14 +55,17 @@ class AccountStore {
 
     @action setLoggedinUsername(u) {
         this.loggedin.username = u;
+        localStorage.setItem('username', u);
     }
 
     @action setLoggedinAdmin(a) {
         this.loggedin.admin = a;
+        localStorage.setItem('admin', a);
     }
 
     @action setLoggedinToken(t) {
         this.loggedin.token = t;
+        localStorage.setItem('token', t);
     }
 
     login() {

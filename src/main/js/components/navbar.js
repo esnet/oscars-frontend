@@ -27,17 +27,17 @@ export default class NavBar extends Component {
 
             if (this.props.accountStore.isAdmin()) {
                 admin = <NavDropdown id='admin' eventKey='admin' title='Admin'>
-                    <LinkContainer to='/usersAdmin'>
+                    <LinkContainer to='/pages/admin/users'>
                         <MenuItem >Users</MenuItem>
                     </LinkContainer>
                 </NavDropdown>
             }
 
             leftNav = <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
-                <LinkContainer to='/list'>
+                <LinkContainer to='/pages/list'>
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/new'>
+                <LinkContainer to='/pages/new'>
                     <NavItem eventKey='new'>Reserve</NavItem>
                 </LinkContainer>
                 {admin}
@@ -46,7 +46,7 @@ export default class NavBar extends Component {
 
             rightNav =
                 <Nav pullRight>
-                    <LinkContainer to='/account'>
+                    <LinkContainer to='/pages/account'>
                         <NavItem eventKey='account'>My Account</NavItem>
                     </LinkContainer>
                     <LinkContainer to='/logout'>
