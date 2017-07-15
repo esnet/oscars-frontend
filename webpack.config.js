@@ -74,19 +74,14 @@ module.exports = {
                 changeOrigin: true,
                 target: 'https://localhost:8201/'
             },
-
             '/admin/*': {
                 secure: false,
                 changeOrigin: true,
                 target: 'https://localhost:8201/'
             },
 
+
             '/topology/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
-            },
-            '/viz/*': {
                 secure: false,
                 changeOrigin: true,
                 target: 'https://localhost:8001/'

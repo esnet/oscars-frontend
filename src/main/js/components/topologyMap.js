@@ -142,7 +142,7 @@ export default class TopologyMap extends Component {
 
     componentDidMount() {
 
-        myClient.loadJSON({method: 'GET', url: '/viz/topology/multilayer'})
+        myClient.loadJSON({method: 'GET', url: '/api/map'})
             .then(action((response) => {
                 let topology = JSON.parse(response);
                 this.props.mapStore.setNetwork(topology.nodes, topology.edges);

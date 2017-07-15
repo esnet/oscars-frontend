@@ -63,7 +63,8 @@ class AccountStore {
     }
 
     login() {
-        return myClient.submit('POST', '/api/account/login', this.attempt)
+        let request = {username: this.attempt.username, password: this.attempt.password};
+        return myClient.submit('POST', '/api/account/login', request)
             .then(
                 (response) => {
                     this.setLoggedinUsername(this.attempt.username);
