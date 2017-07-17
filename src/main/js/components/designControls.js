@@ -6,6 +6,7 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 import {Button, Popover, Form, Glyphicon, Panel, FormGroup, FormControl, OverlayTrigger} from 'react-bootstrap';
 
+import Transformer from '../lib/transform';
 import myClient from '../agents/client';
 
 
@@ -40,18 +41,16 @@ export default class DesignControls extends Component {
     saveDesign = () => {
         let editDesign = this.props.controlsStore.editDesign;
         let username = this.props.accountStore.loggedin.username;
-        let emptyDesign = {
+        let cmp =  Transformer.toComponents(this.props.designStore.design);
+        let newDesign = {
             designId: editDesign.designId,
             description: editDesign.description,
             username: username,
-            cmp: {
-                junctions: [],
-                fixtures: [],
-                pipes: []
-            }
+            cmp: cmp
         };
 
-        myClient.submitWithToken('POST', '/protected/designs/'+editDesign.designId, emptyDesign)
+        console.log(newDesign);
+        myClient.submitWithToken('POST', '/protected/designs/'+editDesign.designId, newDesign)
             .then(
                 action((response) => {
                     console.log(response);

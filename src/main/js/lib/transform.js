@@ -105,5 +105,45 @@ class Transformer {
         };
 
     }
+
+    toComponents(design) {
+        let { junctions, pipes, fixtures } = design;
+        let cmp = {
+            junctions: [],
+            pipes: [],
+            fixtures: []
+        };
+        junctions.map((j) => {
+            let entry = {
+                refId: j.id,
+                deviceUrn: j.id,
+            };
+            cmp.junctions.push(entry);
+        });
+        pipes.map((p) => {
+            let entry = {
+                a: p.a,
+                z: p.z,
+                azBandwidth: p.azBw,
+                zaBandwidth: p.zaBw,
+
+            };
+            cmp.pipes.push(entry);
+        });
+        fixtures.map((f) => {
+            let entry = {
+                junction: f.device,
+                ingressBandwidth: f.ingress,
+                egressBandwidth: f.egress,
+                portUrn: f.port,
+                vlan: {
+                    vlanId: f.vlan
+                }
+            };
+            cmp.fixtures.push(entry);
+        });
+        return cmp;
+    }
+
 }
 export default new Transformer();
