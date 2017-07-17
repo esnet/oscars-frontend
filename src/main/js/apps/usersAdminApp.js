@@ -9,7 +9,10 @@ import {
     Form,
     FormGroup,
     FormControl,
-    ControlLabel
+    ControlLabel,
+    Popover,
+    OverlayTrigger,
+    Glyphicon
 } from 'react-bootstrap';
 import {toJS} from 'mobx';
 import myClient from '../agents/client';
@@ -18,7 +21,7 @@ import UserAdminModal from '../components/userAdminModal';
 import {size} from 'lodash'
 
 
-@inject('controlsStore')
+@inject('controlsStore', 'commonStore')
 @observer
 export default class UsersAdminApp extends Component {
 
@@ -27,6 +30,7 @@ export default class UsersAdminApp extends Component {
     }
 
     componentWillMount() {
+        this.props.commonStore.setActiveNav('admin');
         this.props.controlsStore.setParamsForEditUser({user: {username: ''}});
         this.refreshUserList();
     }
@@ -62,6 +66,17 @@ export default class UsersAdminApp extends Component {
             console.log('empty username');
             return;
         }
+        let existing = false;
+        this.props.controlsStore.editUser.allUsers.map((u) => {
+            if (u.username === user.username) {
+                existing = true;
+            }
+        });
+        if (existing) {
+            console.log('existing username');
+            return;
+        }
+
 
         this.props.controlsStore.setParamsForOneUser({
             fullName: 'Joe D. Newuser',
@@ -105,14 +120,33 @@ export default class UsersAdminApp extends Component {
         this.props.controlsStore.setParamsForOneUser({username: val});
     };
 
+    // key presses
+    handleAddUsernameKeyPress = (e) => {
+        if (e.key === 'Enter' && this.props.controlsStore.editUser.user.username.length > 0) {
+            this.addUser();
+        }
+    };
 
     render() {
         let editUser = this.props.controlsStore.editUser;
 
-        let header = <h4>Users administration</h4>;
+        let adminHelp = <Popover id='help-adminusers' title='Help'>
+            <p>This is the users administration form. The list shows all the users registered in the system.</p>
+                <p>Click on a username on the list to edit user details.</p>
+                <p>To add a new user, type a username in the box then click "Add new user" or press Enter.</p>
+        </Popover>;
+
+        let header = <div>Users administration
+            <div className='pull-right'>
+                <OverlayTrigger trigger="click" rootClose placement="left" overlay={adminHelp}>
+                    <Glyphicon glyph='question-sign'/>
+                </OverlayTrigger>
+            </div>
+        </div>;
+
         return (
             <Row>
-                <Col md={6} sm={6}>
+                <Col xs={8} xsOffset={2} md={6} mdOffset={3} sm={6} smOffset={3} lg={6} lgOffset={3}>
                     <Panel header={header}>
                         <ListGroup>
                             {
@@ -127,11 +161,14 @@ export default class UsersAdminApp extends Component {
                                 })
                             }
                         </ListGroup>
-                        <Form>
+                        <Form onSubmit={(e) => {
+                            e.preventDefault()
+                        }}>
                             <FormGroup>
                                 <ControlLabel>Username</ControlLabel>
                                 {' '}
                                 <FormControl type='text'
+                                             onKeyPress={this.handleAddUsernameKeyPress}
                                              onChange={(e) => this.onUsernameChange(e.target.value)}/>
                             </FormGroup>
                             <Button className='pull-right'

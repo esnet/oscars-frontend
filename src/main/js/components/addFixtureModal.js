@@ -5,7 +5,7 @@ import transformer from '../lib/transform';
 
 const modalName = 'addFixture';
 
-@inject('topologyStore', 'controlsStore', 'sandboxStore', 'mapStore')
+@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore')
 @observer
 export default class AddFixtureModal extends Component {
     componentWillMount() {
@@ -21,11 +21,11 @@ export default class AddFixtureModal extends Component {
             device: device,
             port: port,
         };
-        let fixture = this.props.sandboxStore.addFixtureDeep(params);
+        let fixture = this.props.designStore.addFixtureDeep(params);
 
         const editFixtureParams = transformer.newFixtureToEditParams(fixture);
         this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
-        this.props.mapStore.addColoredNode({id: device, color:'red'});
+        this.props.mapStore.addColoredNode({id: device, color:'green'});
         this.props.mapStore.setZoomOnColored(true);
 
         this.props.controlsStore.openModal('editFixture');

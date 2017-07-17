@@ -31,14 +31,6 @@ class Validator {
         return null;
     }
 
-    fixtureVlanLabel(fixture) {
-        return this.label(fixture.vlan !== null);
-    }
-
-    fixtureBwLabel(fixture) {
-        return this.label(fixture.bwPreviouslySet);
-    }
-
 
     fixtureState(fixture) {
         if (fixture.vlan === null || !fixture.bwPreviouslySet) {

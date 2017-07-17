@@ -1,7 +1,8 @@
 import {observable, action} from 'mobx';
 
-class SandboxStore {
-    @observable sandbox = {
+class DesignStore {
+
+    @observable design = {
         junctions: [],
         fixtures: [],
         pipes: [],
@@ -10,7 +11,7 @@ class SandboxStore {
 
     findFixture(id) {
         let result = null;
-        this.sandbox.fixtures.map((f) => {
+        this.design.fixtures.map((f) => {
             if (f.id === id) {
                 result = f;
             }
@@ -28,7 +29,7 @@ class SandboxStore {
         let idMightBeTaken = true;
         while (idMightBeTaken) {
             let idIsTaken = false;
-            this.sandbox.fixtures.map((e) => {
+            this.design.fixtures.map((e) => {
                 if (e.id === id) {
                     idIsTaken = true;
                 }
@@ -36,7 +37,7 @@ class SandboxStore {
             if (!idIsTaken) {
                 idMightBeTaken = false;
             } else {
-                suffix = SandboxStore.nextChar(suffix);
+                suffix = DesignStore.nextChar(suffix);
                 id = port + ':' + suffix;
             }
         }
@@ -45,7 +46,7 @@ class SandboxStore {
 
     fixturesOf(junctionId) {
         let fixturesOf = [];
-        this.sandbox.fixtures.map((entry) => {
+        this.design.fixtures.map((entry) => {
             if (entry.device === junctionId) {
                 fixturesOf.push(entry.id);
             }
@@ -53,12 +54,15 @@ class SandboxStore {
         return fixturesOf;
     }
 
+    deviceOf(fixtureId) {
+        return this.findFixture(fixtureId).device;
+    }
+
+
     @action clear() {
-        this.sandbox.junctions = [];
-        this.sandbox.fixtures = [];
-        this.sandbox.pipes = [];
-
-
+        this.design.junctions = [];
+        this.design.fixtures = [];
+        this.design.pipes = [];
     }
 
 
@@ -127,12 +131,12 @@ class SandboxStore {
         };
 
 
-        this.sandbox.fixtures.push(entry);
+        this.design.fixtures.push(entry);
         return entry;
     }
 
     @action setFixtureBandwidth(id, params) {
-        this.sandbox.fixtures.map((entry) => {
+        this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.ingress = params.ingress;
                 entry.egress = params.egress;
@@ -142,7 +146,7 @@ class SandboxStore {
     }
 
     @action unsetFixtureBandwidth(id) {
-        this.sandbox.fixtures.map((entry) => {
+        this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.bwPreviouslySet = false;
                 entry.bwSelectMode = 'typeIn';
@@ -154,20 +158,20 @@ class SandboxStore {
 
     @action deleteFixture(id) {
         let idxToRemove = -1;
-        this.sandbox.fixtures.map((entry, index) => {
+        this.design.fixtures.map((entry, index) => {
             if (entry.id === id) {
                 idxToRemove = index;
             }
         });
         if (idxToRemove > -1) {
-            this.sandbox.fixtures.splice(idxToRemove, 1);
+            this.design.fixtures.splice(idxToRemove, 1);
         }
     }
 
     @action setFixtureVlan(id, vlan) {
 
         let outLabel = null;
-        this.sandbox.fixtures.map((entry) => {
+        this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 const label = entry.port.split(':')[1] + ':' + vlan;
 
@@ -182,7 +186,7 @@ class SandboxStore {
     @action unsetFixtureVlan(id) {
         let outLabel = null;
 
-        this.sandbox.fixtures.map((entry) => {
+        this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 const label = entry.port.split(':')[1] + ':' + entry.id.split(':')[2];
 
@@ -200,7 +204,7 @@ class SandboxStore {
 
     lastDeviceExcept(device) {
         let lastDeviceAdded = null;
-        this.sandbox.junctions.map((j) => {
+        this.design.junctions.map((j) => {
             if (j.id !== device) {
                 lastDeviceAdded = j.id;
             }
@@ -210,7 +214,7 @@ class SandboxStore {
 
     junctionExists(device) {
         let junctionExists = false;
-        this.sandbox.junctions.map((j) => {
+        this.design.junctions.map((j) => {
             if (j.id === device) {
                 junctionExists = true;
             }
@@ -219,24 +223,24 @@ class SandboxStore {
     }
 
     @action addJunction(device) {
-        this.sandbox.junctions.push({
+        this.design.junctions.push({
             'id': device,
         });
     }
 
     @action deleteJunction(id) {
         let idxToRemove = -1;
-        this.sandbox.junctions.map((entry, index) => {
+        this.design.junctions.map((entry, index) => {
             if (entry.id === id) {
                 idxToRemove = index;
             }
         });
-        this.sandbox.junctions.splice(idxToRemove, 1);
+        this.design.junctions.splice(idxToRemove, 1);
     }
 
     pipesConnectedTo(junctionId) {
         let connected = [];
-        this.sandbox.pipes.map((entry) => {
+        this.design.pipes.map((entry) => {
             if (entry.a === junctionId || entry.z === junctionId) {
                 connected.push(entry);
             }
@@ -250,7 +254,7 @@ class SandboxStore {
 
     findPipe(id) {
         let result = null;
-        this.sandbox.pipes.map((f) => {
+        this.design.pipes.map((f) => {
             if (f.id === id) {
                 result = f;
             }
@@ -262,12 +266,12 @@ class SandboxStore {
         pipe.id = this.makePipeId(pipe);
         pipe.bwPreviouslySet = false;
 
-        this.sandbox.pipes.push(pipe);
+        this.design.pipes.push(pipe);
         return pipe.id;
     }
 
     @action updatePipe(id, params) {
-        this.sandbox.pipes.map((pipe) => {
+        this.design.pipes.map((pipe) => {
             if (pipe.id === id) {
                 pipe.azBw = params.azBw;
                 pipe.zaBw = params.zaBw;
@@ -278,17 +282,17 @@ class SandboxStore {
 
     @action deletePipe(id) {
         let idxToRemove = -1;
-        this.sandbox.pipes.map((entry, index) => {
+        this.design.pipes.map((entry, index) => {
             if (entry.id === id) {
                 idxToRemove = index;
             }
         });
         if (idxToRemove > -1) {
-            this.sandbox.pipes.splice(idxToRemove, 1);
+            this.design.pipes.splice(idxToRemove, 1);
         }
     }
 
 
 }
 
-export default new SandboxStore();
+export default new DesignStore();

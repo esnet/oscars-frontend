@@ -78,8 +78,27 @@ class ControlsStore {
     editUser = {
         allUsers: [],
         user: {},
-        password: ''
+        password: '',
+        status: ''
     };
+
+    @observable editDesign = {
+        designId: '',
+        description: '',
+        allDesigns: [],
+    };
+
+
+
+    @action setParamsForEditDesign(params) {
+        Object.assign(this.editDesign, params);
+    }
+
+    @action clearEditDesign() {
+        console.log('clearing design params');
+        this.editDesign.designId = '';
+        this.editDesign.description = '';
+    }
 
 
     @action

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Modal, Panel, Button} from 'react-bootstrap';
 
 import {observer, inject} from 'mobx-react';
-import TopologyMap from "./topologyMap";
+import TopologyMap from "./networkMap";
 import {toJS} from 'mobx';
 
 const modalName = 'connection';
@@ -35,7 +35,7 @@ export default class ConnectionModal extends Component {
                     <Modal.Title>{conn.connectionId}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <TopologyMap deviceSelect={() => {}}/>
+                    <NetworkMap deviceSelect={() => {}}/>
                     <Panel collapsible={true} header='Connection data'>
                         <pre>
                         {JSON.stringify(toJS(conn), null, 2)}

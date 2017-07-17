@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, FormControl, ControlLabel, FormGroup, Form, Panel} from 'react-bootstrap';
+import {Modal, Button, FormControl, ControlLabel, FormGroup, Form,
+    Label, Panel, OverlayTrigger, Glyphicon, Popover} from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 const modalName = 'editPipe';
 
-@inject('sandboxStore', 'controlsStore')
+@inject('designStore', 'controlsStore')
 @observer
 export default class PipeParamsModal extends Component {
     constructor(props) {
@@ -32,7 +33,7 @@ export default class PipeParamsModal extends Component {
 
     deletePipe = () => {
         let pipeId = this.props.controlsStore.editPipe.pipeId;
-        this.props.sandboxStore.deletePipe(pipeId);
+        this.props.designStore.deletePipe(pipeId);
         this.closeModal();
     };
 
@@ -43,7 +44,7 @@ export default class PipeParamsModal extends Component {
             zaBw: editPipe.zaBw
         };
         let pipeId = editPipe.pipeId;
-        this.props.sandboxStore.updatePipe(pipeId, params);
+        this.props.designStore.updatePipe(pipeId, params);
         this.props.controlsStore.setParamsForEditPipe({
             showUpdateButton: false
         });
@@ -56,19 +57,38 @@ export default class PipeParamsModal extends Component {
     render() {
         let editPipe = this.props.controlsStore.editPipe;
         let showModal = this.props.controlsStore.modals.get(modalName);
-        let pipe = this.props.sandboxStore.findPipe(editPipe.pipeId);
+        let pipe = this.props.designStore.findPipe(editPipe.pipeId);
 
 
         let pipeExists = false;
-        let header = <span>Pipe bandwidth</span>;
+        let showWarning = false;
+        let pipeTitle = '';
         let zaLabel = '';
         let azLabel = '';
         if (pipe !== null) {
             pipeExists = true;
-            header = <span>{pipe.a} - {pipe.z} bandwidth</span>;
+            showWarning = !pipe.bwPreviouslySet;
+            pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
             azLabel = 'From ' + pipe.a + ' to ' + pipe.z;
             zaLabel = 'From ' + pipe.z + ' to ' + pipe.a;
         }
+
+
+        let helpPopover = <Popover id='help-pipeControls' title='Pipe controls'>
+            <p>Here you can edit the pipe parameters. Every pipe in a design
+                must have locked in A-Z and Z-A bandwidth quantities.</p>
+            <p>Use the textboxes to input the bandwidth you want, and click "Set" to lock
+                the values in.</p>
+            <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
+        </Popover>;
+
+
+        let header = <p>Pipe controls for {pipeTitle}
+            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+        </p>;
+
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>
@@ -78,6 +98,10 @@ export default class PipeParamsModal extends Component {
                 <Modal.Body>
                     <ToggleDisplay show={pipeExists}>
                         <Panel header={header}>
+                            <ToggleDisplay show={showWarning}>
+                                <h3><Label bsStyle='warning'>Bandwidth not set!</Label></h3>
+                            </ToggleDisplay>
+
                             <Form>
                                 <FormGroup>
                                     <ControlLabel>{azLabel}</ControlLabel>
@@ -99,7 +123,7 @@ export default class PipeParamsModal extends Component {
                             </Form>
                             <div className='pull-right'>
                                 <ToggleDisplay show={editPipe.showUpdateButton}>
-                                    <Button bsStyle='primary' onClick={this.updatePipe}>Update</Button>
+                                    <Button bsStyle='primary' onClick={this.updatePipe}>Set</Button>
                                 </ToggleDisplay>
                                 {' '}
                                 <Button bsStyle='warning' onClick={this.deletePipe}>Delete</Button>

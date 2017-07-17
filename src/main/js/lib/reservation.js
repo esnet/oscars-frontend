@@ -1,5 +1,5 @@
 import Moment from 'moment';
-import sandboxStore from '../stores/sandboxStore'
+import sandboxStore from '../stores/designStore'
 import controlsStore from '../stores/controlsStore'
 import stateStore from '../stores/stateStore'
 import {computed} from 'mobx';
@@ -17,9 +17,9 @@ class Reservation {
             status: stateStore.connState
         };
 
-        sandboxStore.sandbox.junctions.map((sj) => {
+        sandboxStore.design.junctions.map((sj) => {
             let resFixtures = {};
-            sandboxStore.sandbox.fixtures.map((sf) => {
+            sandboxStore.design.fixtures.map((sf) => {
                 if (sf.device === sj.id) {
                     resFixtures[sf.id] = {
                         port: sf.port,
@@ -37,7 +37,7 @@ class Reservation {
         });
 
         let resPipes = {};
-        sandboxStore.sandbox.pipes.map((p) => {
+        sandboxStore.design.pipes.map((p) => {
             resPipes[p.id] = {
                 a: p.a,
                 z: p.z,

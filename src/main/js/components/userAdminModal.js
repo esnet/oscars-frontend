@@ -68,12 +68,14 @@ export default class UserAdminModal extends Component {
                 (response) => {
                     // delete
                     this.props.refresh();
+                    this.closeModal();
                 }
                 ,
                 (failResponse) => {
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
+
     };
 
 

@@ -23,6 +23,20 @@ class MapStore {
         this.network.coloredNodes.push(nodeId);
     }
 
+    @action deleteColoredNode(nodeId) {
+        let idxToRemove = -1;
+        this.network.coloredNodes.map((node, index) => {
+            if (node.id === nodeId) {
+                idxToRemove = index;
+            }
+        });
+        if (idxToRemove > -1) {
+            this.network.coloredNodes.splice(idxToRemove, 1);
+        }
+
+
+    }
+
     @action setColoredNodes(nodes) {
         this.network.coloredNodes = nodes;
     }

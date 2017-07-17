@@ -5,7 +5,7 @@ import myClient from '../agents/client';
 import EditUserForm from '../components/editUserForm';
 import {size} from 'lodash'
 
-@inject('controlsStore')
+@inject('controlsStore', 'commonStore')
 @observer
 export default class AccountApp extends Component {
     constructor(props) {
@@ -13,11 +13,12 @@ export default class AccountApp extends Component {
     }
 
     componentWillMount() {
+        this.props.commonStore.setActiveNav('account');
+
         this.props.controlsStore.setParamsForEditUser({user: {}});
         myClient.submitWithToken('GET', '/protected/account', '')
             .then(
                 (response) => {
-                    console.log(response);
                     let parsed = JSON.parse(response);
                     this.props.controlsStore.setParamsForEditUser({user: parsed});
                 }
@@ -35,15 +36,18 @@ export default class AccountApp extends Component {
             console.log('username not set');
             return;
         }
+        this.props.controlsStore.setParamsForEditUser({status: 'updating..'});
 
         myClient.submitWithToken('POST', '/protected/account', user)
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
                     this.props.controlsStore.setParamsForEditUser({user: parsed});
+                    this.props.controlsStore.setParamsForEditUser({status: 'Updated!'});
                 }
                 ,
                 (failResponse) => {
+                    this.props.controlsStore.setParamsForEditUser({status: failResponse.statusText});
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );

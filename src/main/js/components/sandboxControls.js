@@ -14,7 +14,7 @@ import validator from '../lib/validation';
 import {PrecheckButton, HoldButton, ReleaseButton, CommitButton} from './controlButtons';
 
 
-@inject('controlsStore', 'stateStore', 'sandboxStore')
+@inject('controlsStore', 'stateStore', 'designStore')
 @observer
 export default class SandboxControls extends Component {
     constructor(props) {
@@ -71,9 +71,9 @@ export default class SandboxControls extends Component {
     disposeOfValidate = autorunAsync('validate', () => {
         let validationParams = {
             connection: this.props.controlsStore.connection,
-            junctions: this.props.sandboxStore.sandbox.junctions,
-            fixtures: this.props.sandboxStore.sandbox.fixtures,
-            pipes: this.props.sandboxStore.sandbox.pipes,
+            junctions: this.props.designStore.design.junctions,
+            fixtures: this.props.designStore.design.fixtures,
+            pipes: this.props.designStore.design.pipes,
         };
         const result = validator.validatePrecheck(validationParams);
         setTimeout(() => {
@@ -178,12 +178,31 @@ export default class SandboxControls extends Component {
 
         return (
             <Panel header={header}>
-                <Form inline={true}>
+                <Form >
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
                         <FormControl type='text' placeholder='description'
                                      defaultValue={conn.description}
                                      onChange={this.onDescriptionChange}/>
+                    </FormGroup>
+                    {' '}
+                    <FormGroup validationState={conn.startAtValidation}>
+                        <ControlLabel>Start:</ControlLabel>
+                        <FormControl type='text'
+                                     defaultValue='in 5 minutes'
+                                     onChange={this.onStartDateChange}/>
+
+                        <HelpBlock><p>{Moment(conn.startAt).format(format)}</p><p>{conn.startAtValidationText}</p>
+                        </HelpBlock>
+                    </FormGroup>
+                    {' '}
+                    <FormGroup validationState={conn.endAtValidation}>
+                        <ControlLabel>End:</ControlLabel>
+                        <FormControl type='text'
+                                     defaultValue='in 20 minutes'
+                                     onChange={this.onEndDateChange}/>
+                        <HelpBlock><p>{Moment(conn.endAt).format(format)}</p><p>{conn.endAtValidationText}</p>
+                        </HelpBlock>
                     </FormGroup>
                     {' '}
                     <FormGroup className='pull-right'>
@@ -193,7 +212,6 @@ export default class SandboxControls extends Component {
                                         this.props.controlsStore.openModal('displayErrors');
                                     }}>Display errors</Button>{' '}
                         </ToggleDisplay>
-
                         <ToggleDisplay show={!this.isDisabled('precheck')}>
                             <PrecheckButton />{' '}
                         </ToggleDisplay>
@@ -210,25 +228,8 @@ export default class SandboxControls extends Component {
                             <CommitButton />{' '}
                         </ToggleDisplay>
                     </FormGroup>
-                </Form>
-                {'  '}
 
-                <Form>
-                    <FormGroup className='pull-left' validationState={conn.startAtValidation}>
-                        <ControlLabel>Start:</ControlLabel>
-                        <FormControl type='text'
-                                     defaultValue='in 5 minutes'
-                                     onChange={this.onStartDateChange}/>
 
-                        <HelpBlock><p>{Moment(conn.startAt).format(format)}</p><p>{conn.startAtValidationText}</p></HelpBlock>
-                    </FormGroup>
-                    <FormGroup className='pull-right' validationState={conn.endAtValidation}>
-                        <ControlLabel>End:</ControlLabel>
-                        <FormControl type='text'
-                                     defaultValue='in 20 minutes'
-                                     onChange={this.onEndDateChange}/>
-                        <HelpBlock><p>{Moment(conn.endAt).format(format)}</p><p>{conn.endAtValidationText}</p></HelpBlock>
-                    </FormGroup>
                 </Form>
             </ Panel >
         );

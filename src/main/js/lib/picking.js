@@ -1,4 +1,4 @@
-import sandboxStore from '../stores/sandboxStore'
+import sandboxStore from '../stores/designStore'
 import controlsStore from '../stores/controlsStore'
 import {toJS, action} from 'mobx';
 import myClient from '../agents/client';
@@ -95,7 +95,7 @@ class Picker {
     releaseAll() {
         const conn = controlsStore.connection;
 
-        const funcs = sandboxStore.sandbox.fixtures.map(f => () => {
+        const funcs = sandboxStore.design.fixtures.map(f => () => {
             const request = toJS({
                 'connectionId': conn.connectionId,
                 'port': f.port,
@@ -109,7 +109,7 @@ class Picker {
 
     reserveAll() {
         const conn = controlsStore.connection;
-        const funcs = sandboxStore.sandbox.fixtures.map(f => () => {
+        const funcs = sandboxStore.design.fixtures.map(f => () => {
             const request = toJS({
                 'connectionId': conn.connectionId,
                 'port': f.port,

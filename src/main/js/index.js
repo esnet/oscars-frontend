@@ -9,7 +9,8 @@ import {useStrict} from 'mobx';
 import {Provider} from 'mobx-react';
 
 import ListConnectionsApp from './apps/listConnections';
-import NewConnectionApp from './apps/newConnection';
+import SelectDesignApp from './apps/selectDesign';
+import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
@@ -22,7 +23,7 @@ import accountStore from './stores/accountStore';
 import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
 import mapStore from './stores/mapStore';
-import sandboxStore from './stores/sandboxStore';
+import designStore from './stores/designStore';
 import stateStore from './stores/stateStore';
 import topologyStore from './stores/topologyStore';
 import connsStore from './stores/connsStore';
@@ -67,7 +68,7 @@ const stores = {
     connsStore,
     controlsStore,
     mapStore,
-    sandboxStore,
+    designStore,
     stateStore,
     topologyStore,
 };
@@ -95,7 +96,8 @@ ReactDOM.render(
                     <Route exact path="/login" component={Login}/>
                     <Route exact path="/logout" component={Logout}/>
                     <PrivateRoute exact path="/pages/list" component={ListConnectionsApp}/>
-                    <PrivateRoute exact path="/pages/new" component={NewConnectionApp}/>
+                    <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
+                    <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
                     <PrivateRoute exact path="/pages/account" component={AccountApp}/>
                     <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
                 </Switch>

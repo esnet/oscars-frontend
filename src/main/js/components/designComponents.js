@@ -2,31 +2,46 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import validator from '../lib/validation'
-import {Panel, Glyphicon, Nav, NavItem} from 'react-bootstrap';
+import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import ToggleDisplay from 'react-toggle-display';
 
-@inject('sandboxStore', 'controlsStore')
+@inject('designStore', 'controlsStore')
 @observer
-export default class Sandbox extends Component {
+export default class DesignComponents extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
 
-        const sandbox = this.props.sandboxStore.sandbox;
+        const design = this.props.designStore.design;
+
+
+        let compHelp = <Popover id='help-designComponents' title='Help'>
+            This list will auto-update to reflect changes to
+            the design junctions, fixtures, and pipes as they are
+            added, deleted, or updated.
+            Click on any component to bring up its edit form.
+            Any component with an orange flag needs attention from the user.
+        </Popover>;
+
+        let header = <p>Components
+            <OverlayTrigger trigger='click' rootClose placement='left' overlay={compHelp}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+        </p>
 
 
         return (
 
-            <Panel header='Components' collapsible defaultExpanded={true}>
-                <ToggleDisplay show={sandbox.junctions.length > 0}>
+            <Panel header={header} >
+                <ToggleDisplay show={design.junctions.length > 0}>
                     <h5><u>Junctions & fixtures</u></h5>
                     {
-                        sandbox.junctions.map((junction) => {
+                        design.junctions.map((junction) => {
                             let device = junction.id;
-                            let fixtureNodes = sandbox.fixtures.map((fixture) => {
+                            let fixtureNodes = design.fixtures.map((fixture) => {
                                 if (fixture.device === device) {
                                     let key = fixture.id;
                                     let label = fixture.label;
@@ -37,9 +52,9 @@ export default class Sandbox extends Component {
                                         this.props.controlsStore.setParamsForEditFixture(params);
                                         this.props.controlsStore.openModal('editFixture');
                                     }}>
-                                        <Glyphicon glyph='minus'/>{' '}
+                                        {validationLabel}
+                                        {' '}
                                         {label}
-                                        <span className='pull-right'>{validationLabel}</span>
                                     </NavItem>
 
                                 }
@@ -60,11 +75,11 @@ export default class Sandbox extends Component {
                         })
                     }
                 </ToggleDisplay>
-                <ToggleDisplay show={sandbox.pipes.length > 0}>
+                <ToggleDisplay show={design.pipes.length > 0}>
                     <h5><u>Pipes</u></h5>
                     <Nav bsStyle='pills' stacked>
                         {
-                            sandbox.pipes.map((pipe) => {
+                            design.pipes.map((pipe) => {
                                 const validationLabel = validator.pipeLabel(pipe);
 
                                 return <NavItem key={pipe.id} onClick={() => {
@@ -72,8 +87,10 @@ export default class Sandbox extends Component {
                                     this.props.controlsStore.setParamsForEditPipe(params);
 
                                     this.props.controlsStore.openModal('editPipe');
-                                }}>{pipe.a} --- {pipe.z}<span
-                                    className='pull-right'>{validationLabel}</span></NavItem>
+                                }}>{validationLabel}
+                                    {' '}
+                                    {pipe.a} --- {pipe.z}
+                                </NavItem>
                             })
                         }
                     </Nav>

@@ -28,7 +28,7 @@ export default class NavBar extends Component {
             if (this.props.accountStore.isAdmin()) {
                 admin = <NavDropdown id='admin' eventKey='admin' title='Admin'>
                     <LinkContainer to='/pages/admin/users'>
-                        <MenuItem >Users</MenuItem>
+                        <MenuItem>Users</MenuItem>
                     </LinkContainer>
                 </NavDropdown>
             }
@@ -37,9 +37,13 @@ export default class NavBar extends Component {
                 <LinkContainer to='/pages/list'>
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/pages/new'>
-                    <NavItem eventKey='new'>Reserve</NavItem>
+                <LinkContainer to='/pages/newDesign'>
+                    <NavItem eventKey='newDesign'>New</NavItem>
                 </LinkContainer>
+                <LinkContainer to='/pages/selectDesign'>
+                    <NavItem eventKey='selectDesign'>Copy</NavItem>
+                </LinkContainer>
+
                 {admin}
             </Nav>;
 

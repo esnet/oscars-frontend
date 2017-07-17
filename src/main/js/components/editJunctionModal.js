@@ -9,7 +9,10 @@ import {
     FormGroup,
     Form,
     ListGroup,
-    ListGroupItem
+    ListGroupItem,
+    OverlayTrigger,
+    Glyphicon,
+    Popover
 } from 'react-bootstrap';
 
 import ToggleDisplay from 'react-toggle-display';
@@ -18,7 +21,7 @@ import picker from '../lib/picking';
 
 const modalName = 'editJunction';
 
-@inject('sandboxStore', 'controlsStore')
+@inject('designStore', 'controlsStore', 'mapStore')
 @observer
 export default class EditJunctionModal extends Component {
     constructor(props) {
@@ -44,15 +47,17 @@ export default class EditJunctionModal extends Component {
 
     deleteJunction = () => {
         let junction = this.props.controlsStore.editJunction.junction;
-        let fixtureIds = this.props.sandboxStore.fixturesOf(junction);
+        let fixtureIds = this.props.designStore.fixturesOf(junction);
         fixtureIds.map((id) => {
-            let f = this.props.sandboxStore.findFixture(id);
+            let f = this.props.designStore.findFixture(id);
             if (f.vlan !== null) {
                 picker.releaseDeleted(f.port, f.vlan);
             }
         });
 
-        this.props.sandboxStore.deleteJunctionDeep(junction);
+        this.props.designStore.deleteJunctionDeep(junction);
+
+        this.props.mapStore.deleteColoredNode(junction);
         this.closeModal();
     };
 
@@ -66,12 +71,12 @@ export default class EditJunctionModal extends Component {
                 a: junction,
                 z: otherJunction,
             };
-            const pipeId = this.props.sandboxStore.addPipe(pipe);
+            const pipeId = this.props.designStore.addPipe(pipe);
             let bwUpdate = {
                 azBw: editJunction.azBw,
                 zaBw: editJunction.zaBw,
             };
-            this.props.sandboxStore.updatePipe(pipeId, bwUpdate);
+            this.props.designStore.updatePipe(pipeId, bwUpdate);
 
             this.props.controlsStore.setParamsForEditPipe({
                 pipeId: pipe.id,
@@ -87,8 +92,8 @@ export default class EditJunctionModal extends Component {
 
     unconnectedJunctions() {
         let junction = this.props.controlsStore.editJunction.junction;
-        let pipes = this.props.sandboxStore.pipesConnectedTo(junction);
-        let junctions = this.props.sandboxStore.sandbox.junctions;
+        let pipes = this.props.designStore.pipesConnectedTo(junction);
+        let junctions = this.props.designStore.design.junctions;
 
         let unconnectedJunctions = [{
             label: 'Choose one..',
@@ -149,7 +154,24 @@ export default class EditJunctionModal extends Component {
             noPipesText = null;
         }
 
-        let connectedPipes = this.props.sandboxStore.pipesConnectedTo(junction);
+        let connectedPipes = this.props.designStore.pipesConnectedTo(junction);
+
+
+        let helpPopover = <Popover id='help-junctionControls' title='Junction Controls'>
+            <p>Here you can view a list of pipes connected to this junction; click
+                on one of them to open the form that edits the pipe parameters.</p>
+            <p>If the design contains other junctions that could potentially be connected to this
+                with a new pipe, a set of controls will appear allowing you to select the other end
+                of the pipe, set A-Z and Z-A bandwidth, and finally click "Add" to add it.</p>
+            <p>Finally, you may click the "Delete" button to remove this junction as
+                well as all the fixtures belonging to it and pipes connecting to here. </p>
+        </Popover>;
+
+        let header = <p>Junction controls
+            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+        </p>;
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>
@@ -157,15 +179,15 @@ export default class EditJunctionModal extends Component {
                     <Modal.Title>{junction}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Panel>
+                    <Panel header={header}>
                         <ListGroup> {
                             connectedPipes.map((pipe) => {
-                                return <ListGroupItem key={pipe.id+'-connected'} onClick={() => {
+                                return <ListGroupItem key={pipe.id + '-connected'} onClick={() => {
                                     this.props.controlsStore.setParamsForEditPipe({
                                         pipeId: pipe.id
                                     });
                                     this.props.controlsStore.openModal('editPipe');
-                                }}>{pipe.a} {pipe.azBw} / {pipe.zaBw} {pipe.z}</ListGroupItem>
+                                }}>Pipe: {pipe.a} -- {pipe.z}</ListGroupItem>
                             })
                         }
                         </ListGroup>
@@ -173,7 +195,7 @@ export default class EditJunctionModal extends Component {
                         <ToggleDisplay show={showAddPipeControls}>
                             <Form>
                                 <FormGroup controlId="pipe">
-                                    <ControlLabel>Pipe to:</ControlLabel>
+                                    <ControlLabel>New pipe to:</ControlLabel>
                                     {' '}
                                     <FormControl componentClass="select" defaultValue='choose'
                                                  onChange={this.selectOtherJunction}>
