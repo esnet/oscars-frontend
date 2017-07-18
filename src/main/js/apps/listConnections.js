@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Grid, Row, Col} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import {inject} from 'mobx-react';
 
 

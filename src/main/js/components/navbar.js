@@ -64,11 +64,8 @@ export default class NavBar extends Component {
             <Navbar collapseOnSelect>
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <IndexLinkContainer to='/'>
-                            <NavItem eventKey='home'>OSCARS</NavItem>
-                        </IndexLinkContainer>
+                        OSCARS
                     </Navbar.Brand>
-                    <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>
                     {leftNav}

@@ -33,8 +33,11 @@ class MapStore {
         if (idxToRemove > -1) {
             this.network.coloredNodes.splice(idxToRemove, 1);
         }
+    }
 
-
+    @action clearColored() {
+        this.setColoredNodes([]);
+        this.setColoredEdges([]);
     }
 
     @action setColoredNodes(nodes) {

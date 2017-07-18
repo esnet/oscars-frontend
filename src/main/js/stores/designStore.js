@@ -2,10 +2,35 @@ import {observable, action} from 'mobx';
 
 class DesignStore {
 
+    /*
+    junction: { id: Device URN }
+    fixture: {
+            id: some id,
+            port: port URN,
+            device: device URN,
+            label: a label
+            vlan: int,
+            ingress: int,
+            egress: int,
+            bwPreviouslySet: bool,
+    }
+    pipe: {
+           id: some id,
+           azBw: int
+           zaBW: int,
+           bwPreviouslySet: bool,
+    }
+
+
+
+     */
+
+
     @observable design = {
         junctions: [],
         fixtures: [],
         pipes: [],
+        errors: [],
     };
 
 
@@ -58,15 +83,31 @@ class DesignStore {
         return this.findFixture(fixtureId).device;
     }
 
+    @action
+    setComponents(cmp) {
+        this.design.junctions = cmp.junctions;
+        this.design.fixtures = cmp.fixtures;
+        this.design.pipes = cmp.pipes;
 
-    @action clear() {
-        this.design.junctions = [];
-        this.design.fixtures = [];
-        this.design.pipes = [];
     }
 
 
-    @action addFixtureDeep(params) {
+
+    @action
+    clear() {
+        this.design.junctions = [];
+        this.design.fixtures = [];
+        this.design.pipes = [];
+        this.design.errors = [];
+    }
+
+    @action
+    setErrors(errs) {
+        this.design.errors = errs;
+    }
+
+    @action
+    addFixtureDeep(params) {
         let fixture = this.addFixture(params);
         let device = params.device;
         if (!this.junctionExists(device)) {
@@ -85,7 +126,8 @@ class DesignStore {
         return fixture;
     }
 
-    @action deleteFixtureDeep(fixtureId) {
+    @action
+    deleteFixtureDeep(fixtureId) {
         let fixture = this.findFixture(fixtureId);
 
         this.deleteFixture(fixtureId);
@@ -100,7 +142,8 @@ class DesignStore {
         }
     }
 
-    @action deleteJunctionDeep(device) {
+    @action
+    deleteJunctionDeep(device) {
         this.fixturesOf(device).map((fixtureId) => {
             this.deleteFixture(fixtureId);
         });
@@ -114,7 +157,8 @@ class DesignStore {
     }
 
 
-    @action addFixture(params) {
+    @action
+    addFixture(params) {
         let idResult = this.makeFixtureId(params.port);
 
         let label = params.port.split(':')[1] + ':' + idResult.suffix;
@@ -135,7 +179,8 @@ class DesignStore {
         return entry;
     }
 
-    @action setFixtureBandwidth(id, params) {
+    @action
+    setFixtureBandwidth(id, params) {
         this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.ingress = params.ingress;
@@ -145,7 +190,8 @@ class DesignStore {
         });
     }
 
-    @action unsetFixtureBandwidth(id) {
+    @action
+    unsetFixtureBandwidth(id) {
         this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.bwPreviouslySet = false;
@@ -156,7 +202,8 @@ class DesignStore {
 
     }
 
-    @action deleteFixture(id) {
+    @action
+    deleteFixture(id) {
         let idxToRemove = -1;
         this.design.fixtures.map((entry, index) => {
             if (entry.id === id) {
@@ -168,7 +215,8 @@ class DesignStore {
         }
     }
 
-    @action setFixtureVlan(id, vlan) {
+    @action
+    setFixtureVlan(id, vlan) {
 
         let outLabel = null;
         this.design.fixtures.map((entry) => {
@@ -183,7 +231,8 @@ class DesignStore {
         return outLabel;
     }
 
-    @action unsetFixtureVlan(id) {
+    @action
+    unsetFixtureVlan(id) {
         let outLabel = null;
 
         this.design.fixtures.map((entry) => {
@@ -222,13 +271,15 @@ class DesignStore {
         return junctionExists;
     }
 
-    @action addJunction(device) {
+    @action
+    addJunction(device) {
         this.design.junctions.push({
             'id': device,
         });
     }
 
-    @action deleteJunction(id) {
+    @action
+    deleteJunction(id) {
         let idxToRemove = -1;
         this.design.junctions.map((entry, index) => {
             if (entry.id === id) {
@@ -262,7 +313,8 @@ class DesignStore {
         return result;
     }
 
-    @action addPipe(pipe) {
+    @action
+    addPipe(pipe) {
         pipe.id = this.makePipeId(pipe);
         pipe.bwPreviouslySet = false;
 
@@ -270,7 +322,8 @@ class DesignStore {
         return pipe.id;
     }
 
-    @action updatePipe(id, params) {
+    @action
+    updatePipe(id, params) {
         this.design.pipes.map((pipe) => {
             if (pipe.id === id) {
                 pipe.azBw = params.azBw;
@@ -280,7 +333,8 @@ class DesignStore {
         });
     }
 
-    @action deletePipe(id) {
+    @action
+    deletePipe(id) {
         let idxToRemove = -1;
         this.design.pipes.map((entry, index) => {
             if (entry.id === id) {

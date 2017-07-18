@@ -85,8 +85,6 @@ class Transformer {
             copiedEgress: 0,
             bwBeingEdited: true,
             showBwSetButton: true,
-
-
         };
 
 
@@ -106,7 +104,56 @@ class Transformer {
 
     }
 
-    toComponents(design) {
+    fromBackend(cmp) {
+        let result = {
+            junctions: [],
+            fixtures: [],
+            pipes: []
+        };
+
+        let { junctions, fixtures, pipes} = cmp;
+
+        if (typeof junctions !== 'undefined') {
+            junctions.map((dj) => {
+                let entry = {
+                    id: dj.deviceUrn
+                };
+                result.junctions.push(entry);
+            });
+        }
+        if (typeof fixtures !== 'undefined') {
+            fixtures.map((df) => {
+                let entry = {
+                    id: df.portUrn + ':' + df.vlan.vlanId,
+                    port: df.portUrn,
+                    device: df.junction,
+                    ingress: df.ingressBandwidth,
+                    egress: df.egressBandwidth,
+                    vlan: df.vlan.vlanId,
+                    label: df.portUrn + ':' + df.vlan.vlanId,
+                    bwPreviouslySet: true
+                };
+                result.fixtures.push(entry);
+            });
+        }
+        if (typeof pipes !== 'undefined') {
+            pipes.map((dp) => {
+                let entry = {
+                    id: dp.a + ' -- ' + dp.z,
+                    a: dp.a,
+                    z: dp.z,
+                    azBw: p.azBandwidth,
+                    zaBw: p.zaBandwidth,
+
+                };
+                result.pipes.push(entry);
+            });
+        }
+
+        return result;
+    }
+
+    toBackend(design) {
         let { junctions, pipes, fixtures } = design;
         let cmp = {
             junctions: [],
@@ -120,16 +167,18 @@ class Transformer {
             };
             cmp.junctions.push(entry);
         });
-        pipes.map((p) => {
-            let entry = {
-                a: p.a,
-                z: p.z,
-                azBandwidth: p.azBw,
-                zaBandwidth: p.zaBw,
+        if (typeof pipes !== 'undefined') {
+            pipes.map((p) => {
+                let entry = {
+                    a: p.a,
+                    z: p.z,
+                    azBandwidth: p.azBw,
+                    zaBandwidth: p.zaBw,
 
-            };
-            cmp.pipes.push(entry);
-        });
+                };
+                cmp.pipes.push(entry);
+            });
+        }
         fixtures.map((f) => {
             let entry = {
                 junction: f.device,

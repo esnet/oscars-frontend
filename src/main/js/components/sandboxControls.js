@@ -36,8 +36,10 @@ export default class SandboxControls extends Component {
                     let params = {
                         startAt: startAt,
                         startAtInput: 'in 5 minutes',
+                        startAtValidation: 'success',
                         endAt: endAt,
                         endAtInput: 'in 20 minutes',
+                        endAtValidation: 'success',
                         description: '',
                         connectionId: connId
                     };
@@ -72,10 +74,10 @@ export default class SandboxControls extends Component {
         let validationParams = {
             connection: this.props.controlsStore.connection,
             junctions: this.props.designStore.design.junctions,
-            fixtures: this.props.designStore.design.fixtures,
             pipes: this.props.designStore.design.pipes,
+            fixtures: this.props.designStore.design.fixtures,
         };
-        const result = validator.validatePrecheck(validationParams);
+        const result = validator.validateConnection(validationParams);
         setTimeout(() => {
             this.props.stateStore.validate();
             this.props.stateStore.postValidate(result.ok, result.errors);
@@ -103,7 +105,8 @@ export default class SandboxControls extends Component {
             startAtValidation: 'error',
             startAtValidationText: 'Set new value',
             endAtValidationText: ''
-        }
+        };
+
         if (parsed !== null) {
             params.startAtInput = expr;
             params.endAtInput = toJS(this.props.controlsStore.connection.endAtInput);
@@ -178,7 +181,7 @@ export default class SandboxControls extends Component {
 
         return (
             <Panel header={header}>
-                <Form >
+                <Form>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
                         <FormControl type='text' placeholder='description'
@@ -209,29 +212,29 @@ export default class SandboxControls extends Component {
                         <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
                             <Button bsStyle='warning' className='pull-right'
                                     onClick={() => {
-                                        this.props.controlsStore.openModal('displayErrors');
+                                        this.props.controlsStore.openModal('connectionErrors');
                                     }}>Display errors</Button>{' '}
                         </ToggleDisplay>
                         <ToggleDisplay show={!this.isDisabled('precheck')}>
-                            <PrecheckButton />{' '}
+                            <PrecheckButton/>{' '}
                         </ToggleDisplay>
 
                         <ToggleDisplay show={!this.isDisabled('hold')}>
-                            <HoldButton />{' '}
+                            <HoldButton/>{' '}
                         </ToggleDisplay>
 
                         <ToggleDisplay show={!this.isDisabled('release')}>
-                            <ReleaseButton />{' '}
+                            <ReleaseButton/>{' '}
                         </ToggleDisplay>
 
                         <ToggleDisplay show={!this.isDisabled('commit')}>
-                            <CommitButton />{' '}
+                            <CommitButton/>{' '}
                         </ToggleDisplay>
                     </FormGroup>
 
 
                 </Form>
-            </ Panel >
+            </ Panel>
         );
     }
 }

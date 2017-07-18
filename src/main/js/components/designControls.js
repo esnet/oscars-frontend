@@ -5,9 +5,11 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 
 import {Button, Popover, Form, Glyphicon, Panel, FormGroup, FormControl, OverlayTrigger} from 'react-bootstrap';
+import ToggleDisplay from 'react-toggle-display';
 
 import Transformer from '../lib/transform';
 import myClient from '../agents/client';
+import validator from '../lib/validation';
 
 
 @inject('controlsStore', 'designStore', 'accountStore')
@@ -41,7 +43,7 @@ export default class DesignControls extends Component {
     saveDesign = () => {
         let editDesign = this.props.controlsStore.editDesign;
         let username = this.props.accountStore.loggedin.username;
-        let cmp =  Transformer.toComponents(this.props.designStore.design);
+        let cmp = Transformer.toBackend(this.props.designStore.design);
         let newDesign = {
             designId: editDesign.designId,
             description: editDesign.description,
@@ -50,12 +52,29 @@ export default class DesignControls extends Component {
         };
 
         console.log(newDesign);
-        myClient.submitWithToken('POST', '/protected/designs/'+editDesign.designId, newDesign)
+        myClient.submitWithToken('POST', '/protected/designs/' + editDesign.designId, newDesign)
             .then(
                 action((response) => {
                     console.log(response);
                 }));
     };
+
+    disposeOfValidate = autorunAsync('validate', () => {
+        let cmp = {
+            junctions: this.props.designStore.design.junctions,
+            pipes: this.props.designStore.design.pipes,
+            fixtures: this.props.designStore.design.fixtures,
+        };
+
+        const result = validator.validateDesign(cmp);
+        this.props.designStore.setErrors(result.errors);
+
+    }, 1000);
+
+
+    componentWillUnmount() {
+        this.disposeOfValidate();
+    }
 
 
     onDescriptionChange = (e) => {
@@ -65,8 +84,12 @@ export default class DesignControls extends Component {
         this.props.controlsStore.setParamsForEditDesign(params);
     };
 
-    render()  {
+    render() {
         let editDesign = this.props.controlsStore.editDesign;
+
+        let cmp = this.props.designStore.design;
+
+        let designOk = validator.validateDesign(cmp).ok;
 
 
         let helpPopover = <Popover id='help-designMap' title='Help'>
@@ -85,7 +108,6 @@ export default class DesignControls extends Component {
         </Popover>;
 
 
-
         let header = <div>Design controls
             <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
                 <Glyphicon className='pull-right' glyph='question-sign'/>
@@ -95,7 +117,9 @@ export default class DesignControls extends Component {
 
         return (
             <Panel header={header}>
-                <Form inline={true}>
+                <Form inline onSubmit={(e) => {
+                    e.preventDefault()
+                }}>
                     <FormGroup>
                         <FormControl type='text' placeholder='description'
                                      defaultValue={editDesign.description}
@@ -103,11 +127,18 @@ export default class DesignControls extends Component {
                     </FormGroup>
                     {' '}
                     <FormGroup className='pull-right'>
-                        <Button onClick={this.saveDesign}>Save</Button>
+                        <ToggleDisplay show={designOk}>
+                            <Button onClick={this.saveDesign}>Save</Button>
+                        </ToggleDisplay>
+                        <ToggleDisplay show={!designOk}>
+                            <Button bsStyle='warning' onClick={() => {
+                                this.props.controlsStore.openModal('designErrors');
+                            }}>Design issues</Button>
+                        </ToggleDisplay>
                     </FormGroup>
                 </Form>
 
-            </ Panel >
+            </ Panel>
         );
     }
 }

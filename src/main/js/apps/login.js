@@ -28,7 +28,7 @@ export default class Login extends React.Component {
         this.props.commonStore.setActiveNav('login');
     }
 
-    handleLogin = (e) => {
+    handleLogin = () => {
         this.props.accountStore.login()
             .then(() => {
             })
@@ -43,8 +43,7 @@ export default class Login extends React.Component {
             return (<Redirect to='/'/>);
         }
 
-        let form =
-            <Row>
+        return <Row>
                 <Col md={4}>
                     <Panel>
                         <h4>Welcome to OSCARS. Please log in:</h4>
@@ -73,10 +72,6 @@ export default class Login extends React.Component {
                     </Panel>
                 </Col>
             </Row>;
-
-
-        return form;
-
 
     }
 }

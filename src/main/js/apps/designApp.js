@@ -8,7 +8,8 @@ import AddFixtureModal from '../components/addFixtureModal';
 import EditFixtureModal from '../components/editFixtureModal';
 import EditJunctionModal from '../components/editJunctionModal';
 import EditPipeModal from '../components/editPipeModal';
-import DisplayErrorsModal from '../components/displayErrorsModal';
+import DesignErrorsModal from '../components/designErrorsModal';
+import ConnectionErrorsModal from '../components/connectionErrorsModal';
 import DesignDrawing from '../components/designDrawing';
 import DesignComponents from '../components/designComponents';
 import SandboxControls from '../components/sandboxControls';
@@ -23,18 +24,13 @@ export default class DesignApp extends Component {
     }
 
     componentWillMount() {
-        this.props.mapStore.setColoredNodes([]);
-        this.props.mapStore.setColoredEdges([]);
-        this.props.designStore.clear();
         this.props.commonStore.setActiveNav('design');
-
-        // TODO: a better clear
-        this.props.controlsStore.setParamsForConnection({description: ''});
     }
 
     componentWillUnmount() {
-        this.props.mapStore.setColoredNodes([]);
-        this.props.mapStore.setColoredEdges([]);
+        this.props.mapStore.clearColored();
+        this.props.controlsStore.clearEditConnection();
+        this.props.controlsStore.clearEditDesign();
         this.props.designStore.clear();
     }
 
@@ -63,7 +59,8 @@ export default class DesignApp extends Component {
                 <EditFixtureModal />
                 <EditJunctionModal />
                 <EditPipeModal />
-                <DisplayErrorsModal />
+                <ConnectionErrorsModal />
+                <DesignErrorsModal />
             </Row>
         );
     }

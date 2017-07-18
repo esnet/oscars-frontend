@@ -157,9 +157,7 @@ export default class EditUserForm extends Component {
                     <Col xs={8} xsOffset={2} md={6} mdOffset={3} sm={6} smOffset={3} lg={6} lgOffset={3}>
                         <Panel header={passwordHeader}>
 
-                            <Form inline onSubmit={(e) => {
-                                e.preventDefault()
-                            }}>
+                            <Form inline onSubmit={(e) => {e.preventDefault()}}>
                                 <FormGroup>
                                     <ControlLabel>Password</ControlLabel>
                                     {' '}

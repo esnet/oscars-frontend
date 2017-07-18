@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {Row, Col, ListGroup, ListGroupItem, Panel, OverlayTrigger, Popover, Glyphicon} from 'react-bootstrap';
+import {Link} from 'react-router-dom';
 import {observer, inject} from 'mobx-react';
 import {toJS, whyRun} from 'mobx';
 
 import myClient from '../agents/client';
+import transformer from '../lib/transform';
 
-
-@inject('controlsStore', 'accountStore', 'commonStore')
+@inject('controlsStore', 'accountStore', 'commonStore', 'designStore', 'mapStore')
 @observer
 export default class SelectDesign extends Component {
 
@@ -27,6 +28,7 @@ export default class SelectDesign extends Component {
             .then(
                 (successResponse) => {
                     let designs = JSON.parse(successResponse);
+//                    console.log(successResponse);
                     this.props.controlsStore.setParamsForEditDesign({allDesigns: designs});
                 }
                 ,
@@ -36,8 +38,18 @@ export default class SelectDesign extends Component {
             );
     }
 
-    selectDesign = (id) => {
-        this.props.controlsStore.setParamsForEditDesign({designId: id});
+    selectDesign = (design) => {
+        this.props.controlsStore.setParamsForEditDesign({designId: design.designId, description: design.description});
+        let cmp = transformer.fromBackend(design.cmp);
+        this.props.designStore.setComponents(cmp);
+        let coloredNodes = [];
+        cmp.junctions.map((j) => {
+            coloredNodes.push({
+                id: j.id,
+                color: 'green',
+            });
+        });
+        this.props.mapStore.setColoredNodes(coloredNodes);
     };
 
 
@@ -84,12 +96,13 @@ export default class SelectDesign extends Component {
                         <ListGroup>
                             {
                                 myDesigns.map((d) => {
-                                    return <ListGroupItem
-                                        onClick={(d) => {
-                                            this.selectDesign(d.designId)
-                                        }}
-                                        key={d.designId}>
-                                        {d.description}</ListGroupItem>
+                                    return <Link key={d.designId}
+                                                 onClick={(e) => {
+                                                     this.selectDesign(d)
+                                                 }}
+                                                 to='/pages/newDesign'>
+                                        <ListGroupItem>{d.description}</ListGroupItem>
+                                    </Link>
                                 })
                             }
                         </ListGroup>
@@ -97,15 +110,16 @@ export default class SelectDesign extends Component {
                 </Col>
                 <Col xs={5} md={5} sm={5} lg={5}>
                     <Panel header={otherHeader}>
-                        <ListGroup >
+                        <ListGroup>
                             {
                                 otherDesigns.map((d) => {
-                                    return <ListGroupItem
-                                        onClick={(d) => {
-                                            this.selectDesign(d.designId)
-                                        }}
-                                        key={d.designId}>
-                                        {d.description}</ListGroupItem>
+                                    return <Link key={d.designId}
+                                                 onClick={(e) => {
+                                                     this.selectDesign(d)
+                                                 }}
+                                                 to='/pages/newDesign'>
+                                        <ListGroupItem>{d.description}</ListGroupItem>
+                                    </Link>
                                 })
                             }
                         </ListGroup>

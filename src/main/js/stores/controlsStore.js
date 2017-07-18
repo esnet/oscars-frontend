@@ -142,13 +142,22 @@ class ControlsStore {
         Object.assign(this.connection, params);
     }
 
+
+    @action
+    clearEditConnection() {
+        this.connection.connectionId = '';
+        this.connection.description = '';
+    }
+
+
     @observable
     modals = observable.map({
         'editFixture': false,
         'editJunction': false,
         'editPipe': false,
         'addFixture': false,
-        'displayErrors': false,
+        'designErrors': false,
+        'connectionErrors': false,
         'connection': false,
         'userAdmin': false,
     });
