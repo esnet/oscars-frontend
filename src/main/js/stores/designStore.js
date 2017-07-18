@@ -19,6 +19,7 @@ class DesignStore {
            azBw: int
            zaBW: int,
            bwPreviouslySet: bool,
+           ero: []
     }
 
 
@@ -118,7 +119,8 @@ class DesignStore {
                     a: device,
                     z: lastDevice,
                     azBw: 0,
-                    zaBw: 0
+                    zaBw: 0,
+                    ero: []
                 };
                 this.addPipe(pipe);
             }
@@ -326,9 +328,7 @@ class DesignStore {
     updatePipe(id, params) {
         this.design.pipes.map((pipe) => {
             if (pipe.id === id) {
-                pipe.azBw = params.azBw;
-                pipe.zaBw = params.zaBw;
-                pipe.bwPreviouslySet = true;
+                Object.assign(pipe, params);
             }
         });
     }
@@ -345,6 +345,7 @@ class DesignStore {
             this.design.pipes.splice(idxToRemove, 1);
         }
     }
+
 
 
 }

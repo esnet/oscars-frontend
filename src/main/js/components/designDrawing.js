@@ -36,6 +36,7 @@ export default class DesignDrawing extends Component {
         this.props.controlsStore.setParamsForEditJunction({junction: junction.id});
         this.props.controlsStore.openModal('editJunction');
     };
+
     onPipeClicked = (pipe) => {
         const params = transformer.existingPipeToEditParams(pipe);
         this.props.controlsStore.setParamsForEditPipe(params);

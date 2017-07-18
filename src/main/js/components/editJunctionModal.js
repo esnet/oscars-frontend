@@ -84,7 +84,7 @@ export default class EditJunctionModal extends Component {
                 z: pipe.z,
                 azBw: editJunction.azBw,
                 zaBw: editJunction.zaBw,
-                showUpdateButton: false,
+                nextHopsOrigin: pipe.a
             });
             this.props.controlsStore.openModal('editPipe');
         }

@@ -99,7 +99,7 @@ class Transformer {
             z: pipe.z,
             azBw: pipe.azBw,
             zaBw: pipe.zaBw,
-            showUpdateButton: !pipe.bwPreviouslySet
+            lockedEro: true
         };
 
     }
@@ -142,8 +142,10 @@ class Transformer {
                     id: dp.a + ' -- ' + dp.z,
                     a: dp.a,
                     z: dp.z,
-                    azBw: p.azBandwidth,
-                    zaBw: p.zaBandwidth,
+                    azBw: dp.azBandwidth,
+                    zaBw: dp.zaBandwidth,
+                    bwPreviouslySet: true,
+                    ero: []
 
                 };
                 result.pipes.push(entry);

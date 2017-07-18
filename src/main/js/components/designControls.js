@@ -18,7 +18,11 @@ export default class DesignControls extends Component {
     constructor(props) {
         super(props);
     }
-
+    handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            this.saveDesign();
+        }
+    };
     componentDidMount() {
         // new design id
         if (this.props.controlsStore.editDesign.designId.length === 0) {
@@ -26,7 +30,6 @@ export default class DesignControls extends Component {
             myClient.submitWithToken('GET', '/protected/designs/generateId', '')
                 .then(
                     action((response) => {
-                        console.log(response);
                         let params = {
                             designId: response
                         };
@@ -41,6 +44,7 @@ export default class DesignControls extends Component {
 
 
     saveDesign = () => {
+
         let editDesign = this.props.controlsStore.editDesign;
         let username = this.props.accountStore.loggedin.username;
         let cmp = Transformer.toBackend(this.props.designStore.design);
@@ -51,11 +55,18 @@ export default class DesignControls extends Component {
             cmp: cmp
         };
 
+        if (newDesign.description === '') {
+            return;
+        }
         console.log(newDesign);
         myClient.submitWithToken('POST', '/protected/designs/' + editDesign.designId, newDesign)
             .then(
                 action((response) => {
-                    console.log(response);
+                    const params = {
+                        disabledSaveButton: true
+                    };
+                    this.props.controlsStore.setParamsForEditDesign(params);
+
                 }));
     };
 
@@ -78,8 +89,10 @@ export default class DesignControls extends Component {
 
 
     onDescriptionChange = (e) => {
+        let disabled = (e.target.value.length === 0);
         const params = {
-            description: e.target.value
+            description: e.target.value,
+            disabledSaveButton: disabled
         };
         this.props.controlsStore.setParamsForEditDesign(params);
     };
@@ -122,13 +135,14 @@ export default class DesignControls extends Component {
                 }}>
                     <FormGroup>
                         <FormControl type='text' placeholder='description'
+                                     onKeyPress={this.handleKeyPress}
                                      defaultValue={editDesign.description}
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     {' '}
                     <FormGroup className='pull-right'>
                         <ToggleDisplay show={designOk}>
-                            <Button onClick={this.saveDesign}>Save</Button>
+                            <Button disabled={editDesign.disabledSaveButton} onClick={this.saveDesign}>Save</Button>
                         </ToggleDisplay>
                         <ToggleDisplay show={!designOk}>
                             <Button bsStyle='warning' onClick={() => {

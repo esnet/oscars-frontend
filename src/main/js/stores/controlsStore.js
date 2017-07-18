@@ -70,7 +70,10 @@ class ControlsStore {
         pipeId: '',
         azBw: '',
         zaBw: '',
-        showUpdateButton: false,
+        lockedEro: false,
+        ero: [],
+        nextHopsOrigin: '',
+
 
     };
 
@@ -83,6 +86,7 @@ class ControlsStore {
     };
 
     @observable editDesign = {
+        disabledSaveButton: true,
         designId: '',
         description: '',
         allDesigns: [],
@@ -98,6 +102,7 @@ class ControlsStore {
         console.log('clearing design params');
         this.editDesign.designId = '';
         this.editDesign.description = '';
+        this.editDesign.disabledSaveButton = true;
     }
 
 
