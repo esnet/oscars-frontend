@@ -14,7 +14,7 @@ import validator from '../lib/validation';
 import {PrecheckButton, HoldButton, ReleaseButton, CommitButton} from './controlButtons';
 
 
-@inject('controlsStore', 'stateStore', 'sandboxStore')
+@inject('controlsStore', 'stateStore', 'designStore')
 @observer
 export default class SandboxControls extends Component {
     constructor(props) {
@@ -36,8 +36,10 @@ export default class SandboxControls extends Component {
                     let params = {
                         startAt: startAt,
                         startAtInput: 'in 5 minutes',
+                        startAtValidation: 'success',
                         endAt: endAt,
                         endAtInput: 'in 20 minutes',
+                        endAtValidation: 'success',
                         description: '',
                         connectionId: connId
                     };
@@ -71,11 +73,11 @@ export default class SandboxControls extends Component {
     disposeOfValidate = autorunAsync('validate', () => {
         let validationParams = {
             connection: this.props.controlsStore.connection,
-            junctions: this.props.sandboxStore.sandbox.junctions,
-            fixtures: this.props.sandboxStore.sandbox.fixtures,
-            pipes: this.props.sandboxStore.sandbox.pipes,
+            junctions: this.props.designStore.design.junctions,
+            pipes: this.props.designStore.design.pipes,
+            fixtures: this.props.designStore.design.fixtures,
         };
-        const result = validator.validatePrecheck(validationParams);
+        const result = validator.validateConnection(validationParams);
         setTimeout(() => {
             this.props.stateStore.validate();
             this.props.stateStore.postValidate(result.ok, result.errors);
@@ -103,7 +105,8 @@ export default class SandboxControls extends Component {
             startAtValidation: 'error',
             startAtValidationText: 'Set new value',
             endAtValidationText: ''
-        }
+        };
+
         if (parsed !== null) {
             params.startAtInput = expr;
             params.endAtInput = toJS(this.props.controlsStore.connection.endAtInput);
@@ -178,7 +181,7 @@ export default class SandboxControls extends Component {
 
         return (
             <Panel header={header}>
-                <Form inline={true}>
+                <Form>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
                         <FormControl type='text' placeholder='description'
@@ -186,51 +189,52 @@ export default class SandboxControls extends Component {
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     {' '}
-                    <FormGroup className='pull-right'>
-                        <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
-                            <Button bsStyle='warning' className='pull-right'
-                                    onClick={() => {
-                                        this.props.controlsStore.openModal('displayErrors');
-                                    }}>Display errors</Button>{' '}
-                        </ToggleDisplay>
-
-                        <ToggleDisplay show={!this.isDisabled('precheck')}>
-                            <PrecheckButton />{' '}
-                        </ToggleDisplay>
-
-                        <ToggleDisplay show={!this.isDisabled('hold')}>
-                            <HoldButton />{' '}
-                        </ToggleDisplay>
-
-                        <ToggleDisplay show={!this.isDisabled('release')}>
-                            <ReleaseButton />{' '}
-                        </ToggleDisplay>
-
-                        <ToggleDisplay show={!this.isDisabled('commit')}>
-                            <CommitButton />{' '}
-                        </ToggleDisplay>
-                    </FormGroup>
-                </Form>
-                {'  '}
-
-                <Form>
-                    <FormGroup className='pull-left' validationState={conn.startAtValidation}>
+                    <FormGroup validationState={conn.startAtValidation}>
                         <ControlLabel>Start:</ControlLabel>
                         <FormControl type='text'
                                      defaultValue='in 5 minutes'
                                      onChange={this.onStartDateChange}/>
 
-                        <HelpBlock><p>{Moment(conn.startAt).format(format)}</p><p>{conn.startAtValidationText}</p></HelpBlock>
+                        <HelpBlock><p>{Moment(conn.startAt).format(format)}</p><p>{conn.startAtValidationText}</p>
+                        </HelpBlock>
                     </FormGroup>
-                    <FormGroup className='pull-right' validationState={conn.endAtValidation}>
+                    {' '}
+                    <FormGroup validationState={conn.endAtValidation}>
                         <ControlLabel>End:</ControlLabel>
                         <FormControl type='text'
                                      defaultValue='in 20 minutes'
                                      onChange={this.onEndDateChange}/>
-                        <HelpBlock><p>{Moment(conn.endAt).format(format)}</p><p>{conn.endAtValidationText}</p></HelpBlock>
+                        <HelpBlock><p>{Moment(conn.endAt).format(format)}</p><p>{conn.endAtValidationText}</p>
+                        </HelpBlock>
                     </FormGroup>
+                    {' '}
+                    <FormGroup className='pull-right'>
+                        <ToggleDisplay show={this.props.stateStore.st.errors.length > 0}>
+                            <Button bsStyle='warning' className='pull-right'
+                                    onClick={() => {
+                                        this.props.controlsStore.openModal('connectionErrors');
+                                    }}>Display errors</Button>{' '}
+                        </ToggleDisplay>
+                        <ToggleDisplay show={!this.isDisabled('precheck')}>
+                            <PrecheckButton/>{' '}
+                        </ToggleDisplay>
+
+                        <ToggleDisplay show={!this.isDisabled('hold')}>
+                            <HoldButton/>{' '}
+                        </ToggleDisplay>
+
+                        <ToggleDisplay show={!this.isDisabled('release')}>
+                            <ReleaseButton/>{' '}
+                        </ToggleDisplay>
+
+                        <ToggleDisplay show={!this.isDisabled('commit')}>
+                            <CommitButton/>{' '}
+                        </ToggleDisplay>
+                    </FormGroup>
+
+
                 </Form>
-            </ Panel >
+            </ Panel>
         );
     }
 }

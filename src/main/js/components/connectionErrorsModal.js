@@ -7,11 +7,11 @@ import {
     ListGroup,
 } from 'react-bootstrap';
 
-const modalName = 'displayErrors';
+const modalName = 'connectionErrors';
 
 @inject('stateStore', 'controlsStore')
 @observer
-export default class DisplayErrorsModal extends Component {
+export default class ConnectionErrorsModal extends Component {
     constructor(props) {
         super(props);
     }
@@ -27,7 +27,7 @@ export default class DisplayErrorsModal extends Component {
         return (
             <Modal show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Errors:</Modal.Title>
+                    <Modal.Title>Connection parameter errors:</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Panel>

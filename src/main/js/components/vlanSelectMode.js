@@ -4,7 +4,7 @@ import {toJS, action} from 'mobx';
 import {FormControl} from 'react-bootstrap';
 
 
-@inject('sandboxStore', 'controlsStore')
+@inject('designStore', 'controlsStore')
 @observer
 export default class VlanSelectMode extends Component {
 

@@ -31,14 +31,6 @@ class Validator {
         return null;
     }
 
-    fixtureVlanLabel(fixture) {
-        return this.label(fixture.vlan !== null);
-    }
-
-    fixtureBwLabel(fixture) {
-        return this.label(fixture.bwPreviouslySet);
-    }
-
 
     fixtureState(fixture) {
         if (fixture.vlan === null || !fixture.bwPreviouslySet) {
@@ -70,14 +62,94 @@ class Validator {
         return this.label(this.pipeState(pipe));
     }
 
-    validatePrecheck(params) {
+    validateDesign(cmp) {
         let result = {
             ok: true,
             errors: [],
         };
-        const junctions = params.junctions;
-        const pipes = params.pipes;
-        const fixtures = params.fixtures;
+
+        const junctions = cmp.junctions;
+        const pipes = cmp.pipes;
+        const fixtures = cmp.fixtures;
+
+        if (typeof junctions === 'undefined') {
+            console.log('undefined junctions ');
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='nej'>Not enough junctions - at least 1 required.
+                Add more fixtures.</ListGroupItem>);
+
+        } else if (junctions.length < 1) {
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='nej'>Not enough junctions - at least 1 required.
+                Add more fixtures.</ListGroupItem>);
+        }
+
+        if (typeof fixtures === 'undefined') {
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='nef'>Not enough fixtures - at least 2 required.
+                Add more fixtures.</ListGroupItem>);
+        } else if (fixtures.length < 2) {
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='nef'>Not enough fixtures - at least 2 required.
+                Add more fixtures.</ListGroupItem>);
+        }
+
+        if (typeof fixtures !== 'undefined') {
+
+            for (let f of fixtures) {
+                let onClick = () => {
+                    const params = transformer.existingFixtureToEditParams(f);
+                    controlsStore.setParamsForEditFixture(params);
+                    controlsStore.openModal('editFixture');
+                };
+
+                if (f.vlan === null) {
+                    result.ok = false;
+                    result.errors.push(<ListGroupItem key={f.id + 'vlan'}>Fixture {f.label}: VLAN not set.
+                        <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
+                                key={f.id + ' vlanfix'}
+                                className='pull-right'>Fix</Button></ListGroupItem>);
+                }
+                if (!f.bwPreviouslySet) {
+                    result.ok = false;
+                    result.errors.push(<ListGroupItem key={f.id + 'bw'}>Fixture {f.label}: Bandwidth not set.
+                        <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
+                                key={f.id + ' bwfix'}
+                                className='pull-right'>Fix</Button></ListGroupItem>);
+                }
+            }
+        } else {
+            console.log('undefined fixtures');
+
+        }
+        if (typeof pipes !== 'undefined') {
+            for (let p of pipes) {
+                if (!p.bwPreviouslySet) {
+                    result.ok = false;
+                    let onClick = () => {
+                        const params = transformer.existingPipeToEditParams(p);
+                        controlsStore.setParamsForEditPipe(params);
+                        controlsStore.openModal('editPipe');
+                    };
+
+                    result.errors.push(<ListGroupItem key={p.id + 'bw'}>Pipe {p.id}: Bandwidth not set.
+                        <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
+                                key={p.id + ' bwfix'}
+                                className='pull-right'>Fix</Button></ListGroupItem>);
+                }
+            }
+        } else {
+            console.log('undefined pipes');
+        }
+        return result;
+
+    }
+
+    validateConnection(params) {
+        let result = {
+            ok: true,
+            errors: [],
+        };
         const connection = params.connection;
 
         if (connection.description === '') {
@@ -98,56 +170,13 @@ class Validator {
             result.errors.push(<ListGroupItem key='inv'>End time set before start time.</ListGroupItem>);
         }
 
-        if (junctions.length < 1) {
+        let designErrors = this.validateDesign(params);
+        if (!designErrors.ok) {
             result.ok = false;
-            result.errors.push(<ListGroupItem key='nej'>Not enough junctions - need at least 1. Add more
-                fixtures.</ListGroupItem>);
+            designErrors.errors.map( (err) => {
+                result.errors.push(err);
+            });
         }
-
-        if (fixtures.length < 2) {
-            result.ok = false;
-            result.errors.push(<ListGroupItem key='nef'>Not enough fixtures - need at least 2. Add more
-                fixtures.</ListGroupItem>);
-        }
-
-        for (let f of fixtures) {
-            let onClick = () => {
-                const params = transformer.existingFixtureToEditParams(f);
-                controlsStore.setParamsForEditFixture(params);
-                controlsStore.openModal('editFixture');
-            };
-
-            if (f.vlan === null) {
-                result.ok = false;
-                result.errors.push(<ListGroupItem key={f.id+'vlan'}>Fixture {f.label}: VLAN not set.
-                    <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
-                            key={f.id+' vlanfix'}
-                            className='pull-right'>Fix</Button></ListGroupItem>);
-            }
-            if (!f.bwPreviouslySet) {
-                result.ok = false;
-                result.errors.push(<ListGroupItem key={f.id+'bw'}>Fixture {f.label}: Bandwidth not set.
-                    <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
-                            key={f.id+' bwfix'}
-                            className='pull-right'>Fix</Button></ListGroupItem>);
-            }
-        }
-        for (let p of pipes) {
-            if (!p.bwPreviouslySet) {
-                result.ok = false;
-                let onClick = () => {
-                    const params = transformer.existingPipeToEditParams(p);
-                    controlsStore.setParamsForEditPipe(params);
-                    controlsStore.openModal('editPipe');
-                };
-
-                result.errors.push(<ListGroupItem key={p.id+'bw'}>Pipe {p.id}: Bandwidth not set.
-                    <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
-                            key={p.id+' bwfix'}
-                            className='pull-right'>Fix</Button></ListGroupItem>);
-            }
-        }
-
         return result;
 
     }
@@ -160,4 +189,5 @@ class Validator {
     }
 
 }
+
 export default new Validator();

@@ -1,18 +1,20 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
-import {Panel, FormGroup, Button, FormControl, ControlLabel, HelpBlock, Well} from 'react-bootstrap';
+import {
+    OverlayTrigger, Glyphicon, Popover, Panel, FormGroup, Label,
+    Button, FormControl, ControlLabel, HelpBlock, Well
+} from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 import myClient from '../agents/client';
-import validator from '../lib/validation'
 
 import FixtureSelect from './fixtureSelect';
 import VlanSelectMode from './vlanSelectMode';
 import picker from '../lib/picking';
 
 
-@inject('sandboxStore', 'controlsStore')
+@inject('designStore', 'controlsStore')
 @observer
 export default class VlanSelect extends Component {
 
@@ -21,7 +23,7 @@ export default class VlanSelect extends Component {
     };
 
     onReleaseClick = () => {
-       picker.release();
+        picker.release();
 
     };
 
@@ -36,7 +38,7 @@ export default class VlanSelect extends Component {
 
         const port = ef.port;
         const device = ef.device;
-        this.props.sandboxStore.sandbox.fixtures.map((f) => {
+        this.props.designStore.design.fixtures.map((f) => {
             let maybeAdd = false;
             if (f.id !== ef.fixtureId && f.vlan !== null) {
                 if (f.device !== device) {
@@ -68,7 +70,7 @@ export default class VlanSelect extends Component {
     vlanUpdateDispose = autorun('availVlanUpdate', () => {
         const controlsStore = this.props.controlsStore;
         const ef = this.props.controlsStore.editFixture;
-        let foo = ef.fixtureId + ef.bwSelectionMode + ef.vlan +  + ef.bwBeingEdited;
+        let foo = ef.fixtureId + ef.bwSelectionMode + ef.vlan + +ef.bwBeingEdited;
 
 
         this.props.controlsStore.setParamsForEditFixture({
@@ -163,18 +165,46 @@ export default class VlanSelect extends Component {
 
     render() {
         const ef = this.props.controlsStore.editFixture;
-        const validationLabel = validator.fixtureVlanLabel(ef);
-        const header = <span>VLAN selection <span className='pull-right'>{validationLabel}</span></span>;
+
+        let helpPopover = <Popover id='help-vlanSelect' title='Help'>
+            <p>Select the VLAN for this fixture. In a valid design, all fixtures
+                must have a locked in VLAN id.</p>
+            <p>In the default "Any from available" mode, you can just click the "Pick" button and
+                the lowest VLAN available will be selected and locked in.</p>
+            <p>In the "From text input" mode, you can type in a VLAN expression.
+                Then, click the "Pick" button and the lowest VLAN available and matching
+                your expression will be selected and locked in.</p>
+            <p>If the design contains another fixture where a VLAN has been picked and is
+                also available on this fixture, then the "Same as..."
+                selection mode will be made available.</p>
+            <p>When the "Same as..." mode is selected, a second dropdown
+                will appear allowing you to select the fixture to copy the VLAN value from.
+                Click the "Pick" button to lock in your selection</p>
+
+
+        </Popover>;
+
+
+        let header = <p>VLAN selection
+            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+        </p>;
 
 
         return (
             <Panel header={header}>
+                <ToggleDisplay show={!ef.showVlanReleaseControls}>
+                    <h3><Label bsStyle='warning'>Vlan not picked!</Label></h3>
+                </ToggleDisplay>
 
                 <ToggleDisplay show={ef.showVlanPickControls}>
                     <VlanSelectMode selectModeChanged={this.selectModeChanged}/>
                     {' '}
                     <ToggleDisplay show={ef.vlanSelectionMode === 'sameAs'}>
-                        <FixtureSelect onRef={ref => {this.fixtureSelect = ref}} mode='vlan' onChange={this.fixtureSelected}/>
+                        <FixtureSelect onRef={ref => {
+                            this.fixtureSelect = ref
+                        }} mode='vlan' onChange={this.fixtureSelected}/>
                     </ToggleDisplay>
                     {' '}
                     <ToggleDisplay show={ef.vlanSelectionMode === 'typeIn'}>

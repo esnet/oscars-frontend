@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorunAsync, toJS} from 'mobx';
-import {Panel, Glyphicon} from 'react-bootstrap';
+import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import vis from 'vis';
 import validator from '../lib/validation'
 
 
-@inject('controlsStore', 'sandboxStore')
+@inject('controlsStore', 'designStore')
 @observer
-export default class SandboxMap extends Component {
+export default class DesignDrawing extends Component {
     constructor(props) {
         super(props);
 
@@ -36,6 +36,7 @@ export default class SandboxMap extends Component {
         this.props.controlsStore.setParamsForEditJunction({junction: junction.id});
         this.props.controlsStore.openModal('editJunction');
     };
+
     onPipeClicked = (pipe) => {
         const params = transformer.existingPipeToEditParams(pipe);
         this.props.controlsStore.setParamsForEditPipe(params);
@@ -108,10 +109,10 @@ export default class SandboxMap extends Component {
     disposeOfMapUpdate = autorunAsync(() => {
 
 
-        let {sandbox} = this.props.sandboxStore;
-        let junctions = toJS(sandbox.junctions);
-        let fixtures = toJS(sandbox.fixtures);
-        let pipes = toJS(sandbox.pipes);
+        let {design} = this.props.designStore;
+        let junctions = toJS(design.junctions);
+        let fixtures = toJS(design.fixtures);
+        let pipes = toJS(design.pipes);
 
 
         this.datasource.nodes.clear();
@@ -173,9 +174,30 @@ export default class SandboxMap extends Component {
 
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
-        let header = <div>Sandbox
+
+
+        let myHelp = <Popover id='help-designMap' title='Help'>
+            This drawing will auto-update to reflect changes to
+            the design components as they are added, deleted, or updated.
+            Junctions are represented by larger circles, and pipes
+            are drawn as lines between junctions. Fixtures are drawn as smaller circles.
+            Any component drawn in orange color needs attention from the user.
+            Click on any component to bring up its edit form. You may also click on the
+            magnifying glass icon to the right to readjust the map, or the chevron icon
+            to hide / show the map.
+
+        </Popover>;
+
+
+        let header = <div>Design drawing
             <div className='pull-right'>
-                <Glyphicon onClick={ () => { this.network.fit({animation: true}) }} glyph='zoom-out'/>
+                <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
+                    <Glyphicon glyph='question-sign'/>
+                </OverlayTrigger>
+                {' '}
+                <Glyphicon onClick={ () => {
+                    this.network.fit({animation: true})
+                }} glyph='zoom-out'/>
                 {' '}
                 <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
             </div>
@@ -185,7 +207,7 @@ export default class SandboxMap extends Component {
             <Panel collapsible expanded={this.state.showMap} header={header}>
                 <div ref={(ref) => {
                     this.mapRef = ref;
-                }}><p>sandbox map</p></div>
+                }}><p>design map</p></div>
             </Panel>
 
         );

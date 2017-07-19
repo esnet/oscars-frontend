@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {FormGroup, FormControl, Checkbox, ControlLabel, Panel, Button, Well} from 'react-bootstrap';
+import {
+    FormGroup, Label, Glyphicon, FormControl, Checkbox, ControlLabel,
+    Panel, Button, Well, Popover, OverlayTrigger
+} from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 import FixtureSelect from './fixtureSelect';
 import validator from '../lib/validation'
 
 
-@inject('controlsStore', 'sandboxStore')
+@inject('controlsStore', 'designStore')
 @observer
 export default class BwSelect extends Component {
     constructor(props) {
@@ -76,7 +79,7 @@ export default class BwSelect extends Component {
 
         // can only choose to have the same / different bandwidth with some other fixture
         let result = {};
-        this.props.sandboxStore.sandbox.fixtures.map((f) => {
+        this.props.designStore.design.fixtures.map((f) => {
             if (f.id !== ef.fixtureId && f.bwPreviouslySet) {
                 result[f.id] = {
                     id: f.id,
@@ -104,7 +107,7 @@ export default class BwSelect extends Component {
             egress: newEgress,
         };
 
-        this.props.sandboxStore.setFixtureBandwidth(ef.fixtureId, sbParams);
+        this.props.designStore.setFixtureBandwidth(ef.fixtureId, sbParams);
         let efParams = {
             ingress: newIngress,
             egress: newEgress,
@@ -118,7 +121,7 @@ export default class BwSelect extends Component {
 
     unsetFixtureBw = () => {
         const fixtureId = this.props.controlsStore.editFixture.fixtureId;
-        this.props.sandboxStore.unsetFixtureBandwidth(fixtureId);
+        this.props.designStore.unsetFixtureBandwidth(fixtureId);
         this.props.controlsStore.setParamsForEditFixture({
             showBwSetButton: true,
             bwBeingEdited: true,
@@ -162,11 +165,35 @@ export default class BwSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
         let showFixtureSelect = ef.bwSelectionMode === 'sameAs' || ef.bwSelectionMode === 'oppositeOf';
 
-        const validationLabel = validator.fixtureBwLabel(ef);
-        const header = <span>Bandwidth <span className='pull-right'>{validationLabel}</span></span>;
+        let helpPopover = <Popover id='help-bwSelect' title='Help'>
+            <p>Select the bandwidth for this fixture. In a valid design, all fixtures
+                must have set ingress and egress bandwith values.</p>
+            <p>In the default "From text input" mode, you can just type in the bandwidth that you want.
+                If the Symmetrical checkbox is unchecked, the Egress textbox will become enabled and
+                you will be able to enter different values for Ingress and Egress.</p>
+            <p>If the design contains another fixture, then the "Same as..." and "Opposite of..."
+                selection modes will be available, allowing you to copy Ingress and Egress
+                values to this one.</p>
+            <p>When either "Same as..." or "Opposite from..." are selected, a second dropdown
+                will appear allowing you to select the fixture to copy values from.</p>
+            <p>Finally, click "Set" to lock in the values. Once set, click the "Release" button
+                to edit again</p>
+
+        </Popover>;
+
+
+        let header = <p>Bandwidth selection
+            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+        </p>;
+
 
         return (
             <Panel header={header}>
+                <ToggleDisplay show={ef.showBwSetButton}>
+                    <h3><Label bsStyle='warning'>Bandwidth not set!</Label></h3>
+                </ToggleDisplay>
                 <ToggleDisplay show={ef.bwBeingEdited}>
                     <BwSelectModeOptions onSelectModeChange={this.onSelectModeChange}/>
                     { ' ' }

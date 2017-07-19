@@ -70,9 +70,55 @@ class ControlsStore {
         pipeId: '',
         azBw: '',
         zaBw: '',
-        showUpdateButton: false,
+        lockedEro: false,
+        ero: [],
+
 
     };
+
+    @observable
+    editUser = {
+        allUsers: [],
+        user: {},
+        password: '',
+        status: ''
+    };
+
+    @observable editDesign = {
+        disabledSaveButton: true,
+        designId: '',
+        description: '',
+        allDesigns: [],
+    };
+
+
+
+    @action setParamsForEditDesign(params) {
+        Object.assign(this.editDesign, params);
+    }
+
+    @action clearEditDesign() {
+        console.log('clearing design params');
+        this.editDesign.designId = '';
+        this.editDesign.description = '';
+        this.editDesign.disabledSaveButton = true;
+    }
+
+
+    @action
+    setParamsForEditUser(params) {
+        Object.assign(this.editUser, params);
+    }
+
+    @action
+    setParamsForOneUser(params) {
+        Object.assign(this.editUser.user, params);
+    }
+    @action setPassword(value) {
+        this.editUser.password = value;
+    }
+
+
 
 
     @action
@@ -100,13 +146,24 @@ class ControlsStore {
         Object.assign(this.connection, params);
     }
 
+
+    @action
+    clearEditConnection() {
+        this.connection.connectionId = '';
+        this.connection.description = '';
+    }
+
+
     @observable
     modals = observable.map({
         'editFixture': false,
         'editJunction': false,
         'editPipe': false,
         'addFixture': false,
-        'displayErrors': false
+        'designErrors': false,
+        'connectionErrors': false,
+        'connection': false,
+        'userAdmin': false,
     });
 
 

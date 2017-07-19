@@ -4,13 +4,13 @@ import {inject, observer} from 'mobx-react';
 import {autorun, autorunAsync, whyRun, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 
-import {Panel, Glyphicon} from 'react-bootstrap';
+import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 
-@inject('controlsStore', 'mapStore')
+@inject('mapStore')
 @observer
-export default class TopologyMap extends Component {
+export default class NetworkMap extends Component {
     constructor(props) {
         super(props);
     }
@@ -19,10 +19,6 @@ export default class TopologyMap extends Component {
         showMap: true
     };
 
-    selectDevice = (device) => {
-        this.props.controlsStore.setParamsForAddFixture({device: device});
-        this.props.controlsStore.openModal('addFixture');
-    };
 
     // this automagically updates the map;
     disposeOfMapUpdate = autorunAsync('map update', () => {
@@ -98,7 +94,7 @@ export default class TopologyMap extends Component {
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
-                    this.selectDevice(nodeId);
+                    this.props.selectDevice(nodeId);
                 }
             });
 
@@ -135,7 +131,6 @@ export default class TopologyMap extends Component {
         this.props.mapStore.network.coloredNodes.map((entry) => {
             nodeIds.push(entry.id);
         });
-        console.log(nodeIds);
 
         this.network.fit({nodes: nodeIds, animation: true});
     };
@@ -147,7 +142,7 @@ export default class TopologyMap extends Component {
 
     componentDidMount() {
 
-        myClient.loadJSON({method: 'GET', url: '/viz/topology/multilayer'})
+        myClient.loadJSON({method: 'GET', url: '/api/map'})
             .then(action((response) => {
                 let topology = JSON.parse(response);
                 this.props.mapStore.setNetwork(topology.nodes, topology.edges);
@@ -158,9 +153,30 @@ export default class TopologyMap extends Component {
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
+        let myHelp = <Popover id='help-networkMap' title='Help'>
+            <p>This is the map of the entire network managed by OSCARS. Devices are represented
+                by circles, and links between them by lines.
+            </p>
+            <p>The primary action is to click on a device to bring up a list of its ports that can be added as a
+                fixture.</p>
+            <p>Zoom in and out by mouse-wheel, click and drag the background to pan,
+                or click-and-drag a node to temporarily reposition.
+            </p>
+            <p>You may also click on the (-) magnifying glass icon to
+                adjust the map to fit the entire network. The (+) magnifying
+                glass will zoom to fit all the selected junctions. Click the chevron icon
+                to hide / show the map.</p>
+        </Popover>;
+
+
         let header =
             <span>Network Map
                 <span className='pull-right'>
+                    <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
+                        <Glyphicon glyph='question-sign'/>
+                    </OverlayTrigger>
+                    {' '}
+
                     <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
                         <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
                     </ToggleDisplay>

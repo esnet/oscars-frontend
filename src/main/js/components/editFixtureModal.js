@@ -10,7 +10,7 @@ import picker from '../lib/picking';
 
 const modalName = 'editFixture';
 
-@inject('controlsStore', 'sandboxStore')
+@inject('controlsStore', 'designStore', 'mapStore')
 @observer
 export default class EditFixtureModal extends Component {
     constructor(props) {
@@ -26,7 +26,15 @@ export default class EditFixtureModal extends Component {
         if (ef.vlan !== null) {
             picker.releaseDeleted(ef.port, ef.vlan);
         }
-        this.props.sandboxStore.deleteFixtureDeep(ef.fixtureId);
+
+        let device = this.props.designStore.deviceOf(ef.fixtureId);
+
+        this.props.designStore.deleteFixtureDeep(ef.fixtureId);
+
+        // check if the junction is completely gone; if so, uncolor the map
+        if (!this.props.designStore.junctionExists(device)) {
+            this.props.mapStore.deleteColoredNode(device);
+        }
         this.closeModal();
     };
 
