@@ -23,19 +23,28 @@ export default class EroTypeahead extends Component {
         options: []
     };
 
-    // this will automagically update the ERO options;
+    // this will keep updating the next -ERO options as the ERO changes;
     disposeOfEroOptionsUpdate = autorunAsync('ero options update', () => {
         let editPipe = this.props.controlsStore.editPipe;
-        let where = editPipe .nextHopsOrigin;
-        if (where === editPipe.z) {
+        let submitEro = toJS(editPipe.ero);
+
+
+        // keep track of the last hop; if we've reached Z we shouldn't keep going
+        let lastHop = editPipe.a;
+        if (editPipe.ero.length > 0) {
+            lastHop = editPipe.ero[editPipe.ero.length - 1];
+        } else {
+            // if there's _nothing_ in our ERO then ask for options from pipe.a
+            submitEro.push(editPipe.a);
+        }
+
+        // if this is the last hop, don't provide any options
+        if (lastHop  === editPipe.z) {
             this.setState({options: []});
             return;
         }
-        if (where.length === 0) {
-            return;
-        }
 
-        myClient.submit('GET', '/api/topo/nextHopsFrom/' + where, '')
+        myClient.submit('POST', '/api/topo/nextHopsForEro', submitEro)
             .then(
                 action((response) => {
                     let nextHops = JSON.parse(response);
@@ -44,22 +53,17 @@ export default class EroTypeahead extends Component {
                         nextHops.map(h => {
                             let entry = {
                                 id: h.urn,
-                                label: h.urn + ' to ' + h.to,
+                                label: h.urn + ' through ' + h.through + ' to ' + h.to,
+                                through: h.through,
                                 to: h.to
                             };
-                            if (!editPipe.ero.includes(h.urn)) {
-                                opts.push(entry);
-                            }
+                            opts.push(entry);
                         });
                         this.setState({options: opts});
                     }
 
                 }));
     }, 500);
-
-    componentWillMount() {
-        let editPipe = this.props.controlsStore.editPipe;
-    }
 
     componentWillUnmount() {
         this.disposeOfEroOptionsUpdate();
@@ -72,14 +76,15 @@ export default class EroTypeahead extends Component {
         }
 
         let wasAnOption = false;
-        let nextOrigin = '';
+        let through = '';
         let urn = '';
+        let to = '';
         this.state.options.map(opt => {
             if (opt.label === selection) {
                 wasAnOption = true;
-                nextOrigin = opt.to;
+                through = opt.through;
                 urn = opt.id;
-                console.log('next: '+nextOrigin);
+                to = opt.to;
             }
         });
 
@@ -89,11 +94,12 @@ export default class EroTypeahead extends Component {
             editPipe.ero.map(e => {
                 ero.push(e);
             });
+            ero.push(through);
             ero.push(urn);
+            ero.push(to);
 
             this.props.controlsStore.setParamsForEditPipe({
                 ero: ero,
-                nextHopsOrigin: nextOrigin
             });
 
             this.typeAhead.getInstance().clear();

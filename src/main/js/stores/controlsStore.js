@@ -72,7 +72,6 @@ class ControlsStore {
         zaBw: '',
         lockedEro: false,
         ero: [],
-        nextHopsOrigin: '',
 
 
     };

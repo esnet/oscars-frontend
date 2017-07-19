@@ -63,9 +63,8 @@ export default class PipeParamsModal extends Component {
 
     unlockEro = () => {
         this.props.controlsStore.setParamsForEditPipe({
-            nextHopsOrigin: this.props.controlsStore.editPipe.a,
+            ero: [this.props.controlsStore.editPipe.a],
             lockedEro: false,
-            ero: []
         });
     };
 
@@ -176,13 +175,11 @@ export default class PipeParamsModal extends Component {
                                     <Col>
                                         <h4>ERO</h4>
                                         <ListGroup>
-                                            <ListGroupItem>{editPipe.a}</ListGroupItem>
                                             {
                                                 editPipe.ero.map(urn => {
                                                     return <ListGroupItem key={urn}>{urn}</ListGroupItem>
                                                 })
                                             }
-                                            <ListGroupItem>{editPipe.z}</ListGroupItem>
                                         </ListGroup>
                                         <FormGroup>
                                             <ToggleDisplay show={!eroLocked}>
