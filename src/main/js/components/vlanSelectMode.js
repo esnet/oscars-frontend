@@ -11,7 +11,7 @@ export default class VlanSelectMode extends Component {
 
 
     render() {
-        let vlanSelectModeOpts = [{value: 'fromAvailable', label    : 'Any from available'}];
+        let vlanSelectModeOpts = [{value: 'fromAvailable', label    : 'Auto (lowest available)'}];
         let fixtures = this.props.controlsStore.editFixture.vlanCopyFromOptions;
 
         if (Object.keys(fixtures).length > 0) {

@@ -9,10 +9,13 @@ class ControlsStore {
         endAt: '',
         startAtInput: '',
         endAtInput: '',
+        startAtReadable: '',
+        endAtReadable: '',
         startAtValidation: 'success',
         endAtValidation: 'success',
         startAtValidationText: '',
-        endAtValidationText: ''
+        endAtValidationText: '',
+        scheduleLocked: false,
     };
 
     @observable editFixture = {
@@ -20,32 +23,44 @@ class ControlsStore {
         label: '',
         port: '',
 
-        vlan: '',
-        availableVlans: '',
-        availableVlanRanges: [],
-        vlanExpression: '',
 
+        vlan: '',
+        vlanChoice: '',
+        vlanChoiceValidationState: '',
+        vlanChoiceValidationText: '',
         vlanSelectionMode: '',
-        vlanCopyFromOptions: [],
+
+        showCopiedVlan: false,
+        vlanLocked: false,
+        vlanLockText: 'Lock',
+        showVlanLockButton: false,
 
         copiedVlan: '',
-        showCopiedVlan: false,
-
-        showVlanPickButton: false,
-        showVlanPickControls: false,
-        showVlanReleaseControls: false,
-        retrievingAvailVlans: false,
-
+        vlanCopyFromOptions: [],
+        availableVlans: '',
+        availableVlanRanges: [],
+        baselineVlans: '',
+        baselineVlanRanges: [],
+        lockedVlans: '',
 
         ingress: 0,
         egress: 0,
         symmetrical: true,
 
-        bwBeingEdited: false,
-        bwPreviouslySet: false,
+        bwLocked: false,
         bwSelectionMode: '',
         bwSelectionModeOptions: [],
-        showBwSetButton: true,
+        showBwLockButton: true,
+        baselineIngressBw: 0,
+        baselineEgressBw: 0,
+        availableIngressBw: 0,
+        availableEgressBw: 0,
+        ingressValidationState: '',
+        ingressValidationText: '',
+        egressValidationState: '',
+        egressValidationText: '',
+        lockedIngressBw: 0,
+        lockedEgressBw: 0,
 
         showCopiedBw: false,
         copiedIngress: 0,
@@ -98,7 +113,6 @@ class ControlsStore {
     }
 
     @action clearEditDesign() {
-        console.log('clearing design params');
         this.editDesign.designId = '';
         this.editDesign.description = '';
         this.editDesign.disabledSaveButton = true;

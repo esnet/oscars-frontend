@@ -8,7 +8,6 @@ import {Button} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import reservation from '../lib/reservation';
-import picker from '../lib/picking';
 
 @inject('stateStore', 'mapStore')
 export class PrecheckButton extends Component {
@@ -20,8 +19,6 @@ export class PrecheckButton extends Component {
         this.props.stateStore.check();
 
 
-        // release all temporary holds
-        picker.releaseAll();
 
         myClient.submit('POST', '/resv/advanced_precheck', reservation.reservation)
             .then(action((response) => {
@@ -43,7 +40,7 @@ export class PrecheckButton extends Component {
                     })
                 });
 
-                picker.reserveAll();
+
 
                 this.props.mapStore.setColoredEdges(coloredEdges);
                 this.props.mapStore.setColoredNodes(coloredNodes);
@@ -70,8 +67,6 @@ export class HoldButton extends Component {
     hold = () => {
         this.props.stateStore.hold();
 
-        // release all temporary holds; won't need them from now on
-        picker.releaseAll();
 
 
         myClient.submit('POST', '/resv/advanced_hold', reservation.reservation)

@@ -33,14 +33,14 @@ class Validator {
 
 
     fixtureState(fixture) {
-        if (fixture.vlan === null || !fixture.bwPreviouslySet) {
+        if (fixture.vlan === null || !fixture.bwLocked || !fixture.vlanLocked) {
             return false;
         }
         return true;
     }
 
     pipeState(pipe) {
-        if (!pipe.bwPreviouslySet) {
+        if (!pipe.bwLocked) {
             return false;
         }
         return true;
@@ -103,14 +103,14 @@ class Validator {
                     controlsStore.openModal('editFixture');
                 };
 
-                if (f.vlan === null) {
+                if (!f.vlanLocked) {
                     result.ok = false;
-                    result.errors.push(<ListGroupItem key={f.id + 'vlan'}>Fixture {f.label}: VLAN not set.
+                    result.errors.push(<ListGroupItem key={f.id + 'vlan'}>Fixture {f.label}: VLAN not locked.
                         <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
                                 key={f.id + ' vlanfix'}
                                 className='pull-right'>Fix</Button></ListGroupItem>);
                 }
-                if (!f.bwPreviouslySet) {
+                if (!f.bwLocked) {
                     result.ok = false;
                     result.errors.push(<ListGroupItem key={f.id + 'bw'}>Fixture {f.label}: Bandwidth not set.
                         <Button bsSize='xsmall' bsStyle='warning' onClick={onClick}
@@ -124,7 +124,7 @@ class Validator {
         }
         if (typeof pipes !== 'undefined') {
             for (let p of pipes) {
-                if (!p.bwPreviouslySet) {
+                if (!p.bwLocked) {
                     result.ok = false;
                     let onClick = () => {
                         const params = transformer.existingPipeToEditParams(p);
@@ -160,6 +160,12 @@ class Validator {
             result.ok = false;
             result.errors.push(<ListGroupItem key='badconn'>Connection id missing!</ListGroupItem>);
         }
+
+        if (!connection.scheduleLocked) {
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='lck'>Schedule not locked.</ListGroupItem>);
+        }
+
         const now = Date.now();
         if (connection.startAt < now || connection.endAt < now) {
             result.ok = false;

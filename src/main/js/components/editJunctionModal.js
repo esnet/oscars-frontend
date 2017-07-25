@@ -17,7 +17,6 @@ import {
 
 import ToggleDisplay from 'react-toggle-display';
 
-import picker from '../lib/picking';
 
 const modalName = 'editJunction';
 
@@ -47,13 +46,6 @@ export default class EditJunctionModal extends Component {
 
     deleteJunction = () => {
         let junction = this.props.controlsStore.editJunction.junction;
-        let fixtureIds = this.props.designStore.fixturesOf(junction);
-        fixtureIds.map((id) => {
-            let f = this.props.designStore.findFixture(id);
-            if (f.vlan !== null) {
-                picker.releaseDeleted(f.port, f.vlan);
-            }
-        });
 
         this.props.designStore.deleteJunctionDeep(junction);
 

@@ -7,26 +7,14 @@ import {
 } from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 
-import myClient from '../agents/client';
 
 import FixtureSelect from './fixtureSelect';
 import VlanSelectMode from './vlanSelectMode';
-import picker from '../lib/picking';
 
 
-@inject('designStore', 'controlsStore')
+@inject('designStore', 'controlsStore', 'topologyStore')
 @observer
 export default class VlanSelect extends Component {
-
-    onPickClick = () => {
-        picker.pick();
-    };
-
-    onReleaseClick = () => {
-        picker.release();
-
-    };
-
 
     fixturesAllowingSameVlan() {
         let result = {};
@@ -35,8 +23,12 @@ export default class VlanSelect extends Component {
         // I can only choose to have the same VLAN if another fixture exists that is
         //    - either on a DIFFERENT device
         //    - or, if it is on the SAME device, NOT on the same port
+        // and it can't be a vlan locked by another fixture on this port
 
         const port = ef.port;
+        const portVlans = this.props.designStore.vlansLockedOnPort(port);
+
+
         const device = ef.device;
         this.props.designStore.design.fixtures.map((f) => {
             let maybeAdd = false;
@@ -47,6 +39,11 @@ export default class VlanSelect extends Component {
                     maybeAdd = true;
                 }
             }
+
+            if (portVlans.indexOf(f.vlan) !== -1) {
+                maybeAdd = false;
+            }
+
             let add = false;
             if (maybeAdd) {
                 ef.availableVlanRanges.map((r) => {
@@ -67,38 +64,30 @@ export default class VlanSelect extends Component {
         return result;
     }
 
-    vlanUpdateDispose = autorun('availVlanUpdate', () => {
-        const controlsStore = this.props.controlsStore;
+    vlanUpdateDispose = autorun('vlanUpdate', () => {
         const ef = this.props.controlsStore.editFixture;
-        let foo = ef.fixtureId + ef.bwSelectionMode + ef.vlan + +ef.bwBeingEdited;
 
+
+        const baseline = this.props.topologyStore.baseline[ef.port];
+        const baselineVlanExpression = baseline.vlanExpression;
+        const baselineVlanRanges = baseline.vlanRanges;
+        const available = this.props.topologyStore.available[ef.port];
+        const availableVlanExpression = available.vlanExpression;
+        const availableVlanRanges = available.vlanRanges;
+
+        const portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
+
+        const lockedVlans = portVlans.join(',');
 
         this.props.controlsStore.setParamsForEditFixture({
-            retrievingAvailVlans: true
+            baselineVlanExpression: baselineVlanExpression,
+            baselineVlanRanges: baselineVlanRanges,
+            availableVlanExpression: availableVlanExpression,
+            availableVlanRanges: availableVlanRanges,
+            lockedVlans: lockedVlans,
+            vlanCopyFromOptions: this.fixturesAllowingSameVlan()
         });
 
-        let request = {
-            'urns': [ef.port],
-            'startDate': controlsStore.connection.startAt,
-            'endDate': controlsStore.connection.endAt,
-        };
-
-        myClient.submit('POST', '/vlan/port', request)
-            .then(
-                action((response) => {
-                    let parsed = JSON.parse(response);
-                    let availableVlans = parsed['portVlans'][ef.port]['vlanExpression'];
-                    let availableVlanRanges = parsed['portVlans'][ef.port]['vlanRanges'];
-//                    console.log(response);
-
-                    this.props.controlsStore.setParamsForEditFixture({
-                        retrievingAvailVlans: false,
-                        availableVlans: availableVlans,
-                        availableVlanRanges: availableVlanRanges,
-                        vlanCopyFromOptions: this.fixturesAllowingSameVlan()
-                    });
-
-                }));
 
     });
 
@@ -111,25 +100,22 @@ export default class VlanSelect extends Component {
         const mode = e.target.value;
 
         let params = {
+            showCopiedVlan: false,
+            showVlanLockButton: false,
             vlanSelectionMode: mode,
         };
 
         if (mode === 'sameAs') {
-            params.showCopiedVlan = false;
-            params.showVlanPickButton = false;
             this.fixtureSelect.clearSelection()
         }
 
         if (mode === 'typeIn') {
-            params.showCopiedVlan = false;
-            params.vlanExpression = '';
-            params.showVlanPickButton = true;
+            params.showVlanLockButton = false;
         }
 
         if (mode === 'fromAvailable') {
-            params.showCopiedVlan = false;
-            params.vlanExpression = '';
-            params.showVlanPickButton = true;
+            params.showVlanLockButton = true;
+            params.vlanLockText = 'Choose and lock.';
         }
 
         this.props.controlsStore.setParamsForEditFixture(params);
@@ -138,28 +124,119 @@ export default class VlanSelect extends Component {
 
     fixtureSelected = (e) => {
 
-        let copiedVlan = '';
-        let showCopiedVlan = false;
-        let showVlanPickButton = false;
+        let params = {
+            copiedVlan: '',
+            showCopiedVlan: false,
+            showVlanLockButton: false,
+        };
 
         if (e.target.value !== 'choose') {
-            copiedVlan = JSON.parse(e.target.value).vlan;
-            showCopiedVlan = true;
-            showVlanPickButton = true;
+            params.copiedVlan = JSON.parse(e.target.value).vlan;
+            params.showCopiedVlan = true;
+            params.showVlanLockButton = true;
+            params.vlanLockText = 'Copy VLAN and lock.';
         }
 
+        this.props.controlsStore.setParamsForEditFixture(params);
+    };
+
+    setVlanChoice = (e) => {
+        const vlanId = e.target.value;
+        const ef = this.props.controlsStore.editFixture;
+
+        let valText = '';
+        let valState = 'success';
+        let hasError = false;
+
+        let inBaseline = false;
+        ef.baselineVlanRanges.map((rng) => {
+            if (rng.floor <= vlanId && rng.ceiling >= vlanId) {
+                inBaseline = true;
+            }
+        });
+        if (!inBaseline) {
+            hasError = true;
+            valText = 'VLAN not available in baseline.';
+        } else {
+
+            let inAvailable = false;
+            ef.availableVlanRanges.map((rng) => {
+                if (rng.floor <= vlanId && rng.ceiling >= vlanId) {
+                    inAvailable = true;
+                }
+            });
+            if (!inAvailable) {
+                hasError = true;
+                valText = 'VLAN being used by another connection.';
+            } else {
+                let portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
+                if (portVlans.includes(vlanId)) {
+                    hasError = true;
+                    valText = 'VLAN being used by another fixture on the same port.';
+                }
+            }
+        }
+
+        if (hasError) {
+            valState = 'error';
+        }
+
+
         this.props.controlsStore.setParamsForEditFixture({
-            vlanExpression: copiedVlan,
-            copiedVlan: copiedVlan,
-            showCopiedVlan: showCopiedVlan,
-            showVlanPickButton: showVlanPickButton,
+            vlanChoice: e.target.value,
+            vlanChoiceValidationState: valState,
+            vlanChoiceValidationText: valText,
+            vlanLockText: 'Lock',
+            showVlanLockButton: !hasError
         });
     };
 
-    setVlanExpression = (e) => {
-        this.props.controlsStore.setParamsForEditFixture({
-            vlanExpression: e.target.value
-        });
+    onLock = () => {
+        const ef = this.props.controlsStore.editFixture;
+
+        let vlan = ef.vlanChoice;
+        let portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
+
+
+        if (ef.vlanSelectionMode === 'fromAvailable') {
+            vlan = 99999;
+            ef.availableVlanRanges.map((rng) => {
+                if (vlan > rng.floor) {
+                    vlan = rng.floor;
+                    while (portVlans.indexOf(vlan) !== -1 && vlan < rng.ceiling) {
+                        vlan = vlan + 1;
+                    }
+                }
+            });
+        } else if (ef.vlanSelectionMode === 'sameAs') {
+            vlan = ef.copiedVlan;
+        }
+
+        let label = this.props.designStore.lockFixtureVlan(ef.fixtureId, vlan);
+
+        const params = {
+            vlan: vlan,
+            showVlanLockButton: false,
+            vlanLocked: true,
+            label: label
+        };
+
+        this.props.controlsStore.setParamsForEditFixture(params);
+    };
+
+    onUnlock = () => {
+        const ef = this.props.controlsStore.editFixture;
+        let label = this.props.designStore.unlockFixtureVlan(ef.fixtureId);
+
+        const params = {
+            vlan: null,
+            showVlanLockButton: true,
+            vlanSelectionMode: 'fromAvailable',
+            vlanLockText: 'Choose and lock',
+            vlanLocked: false,
+            label: label
+        };
+        this.props.controlsStore.setParamsForEditFixture(params);
     };
 
 
@@ -168,18 +245,18 @@ export default class VlanSelect extends Component {
 
         let helpPopover = <Popover id='help-vlanSelect' title='Help'>
             <p>Select the VLAN for this fixture. In a valid design, all fixtures
-                must have a locked in VLAN id.</p>
-            <p>In the default "Any from available" mode, you can just click the "Pick" button and
+                must have a locked VLAN id.</p>
+            <p>In the default "Auto (lowest from available)" mode, click the "Choose and lock," button and
                 the lowest VLAN available will be selected and locked in.</p>
-            <p>In the "From text input" mode, you can type in a VLAN expression.
-                Then, click the "Pick" button and the lowest VLAN available and matching
-                your expression will be selected and locked in.</p>
-            <p>If the design contains another fixture where a VLAN has been picked and is
+            <p>In the "From text input" mode, you can type in a VLAN id. If it is available, the
+                Lock button will allow you to lock it. Otherwise, you will
+                receive feedback regarding why the input is not acceptable.</p>
+            <p>If the design contains another fixture, where a VLAN has already been locked and that VLAN is
                 also available on this fixture, then the "Same as..."
                 selection mode will be made available.</p>
             <p>When the "Same as..." mode is selected, a second dropdown
                 will appear allowing you to select the fixture to copy the VLAN value from.
-                Click the "Pick" button to lock in your selection</p>
+                Click the "Copy VLAN and lock." button to lock in your selection.</p>
 
 
         </Popover>;
@@ -194,53 +271,48 @@ export default class VlanSelect extends Component {
 
         return (
             <Panel header={header}>
-                <ToggleDisplay show={!ef.showVlanReleaseControls}>
-                    <h3><Label bsStyle='warning'>Vlan not picked!</Label></h3>
-                </ToggleDisplay>
+                <ToggleDisplay show={!ef.vlanLocked}>
+                    <h3><Label bsStyle='warning'>Vlan not locked!</Label></h3>
 
-                <ToggleDisplay show={ef.showVlanPickControls}>
-                    <VlanSelectMode selectModeChanged={this.selectModeChanged}/>
+                    <FormGroup controlId="vlanExpression">
+                        <VlanSelectMode selectModeChanged={this.selectModeChanged}/>
+
+                        <HelpBlock>Available for your schedule: {ef.availableVlanExpression}</HelpBlock>
+                        <HelpBlock>Baseline: {ef.baselineVlanExpression}</HelpBlock>
+                        <HelpBlock>Locked by other fixtures: {ef.lockedVlans}</HelpBlock>
+                    </FormGroup>
+
                     {' '}
                     <ToggleDisplay show={ef.vlanSelectionMode === 'sameAs'}>
-                        <FixtureSelect onRef={ref => {
-                            this.fixtureSelect = ref
-                        }} mode='vlan' onChange={this.fixtureSelected}/>
+                        <FixtureSelect onRef={ref => { this.fixtureSelect = ref }} mode='vlan' onChange={this.fixtureSelected}/>
                     </ToggleDisplay>
+
                     {' '}
                     <ToggleDisplay show={ef.vlanSelectionMode === 'typeIn'}>
-                        <FormGroup controlId="vlanExpression">
-                            <ControlLabel>VLAN expression:</ControlLabel>
+                        <FormGroup controlId="vlanChoice"  validationState={ef.vlanChoiceValidationState}>
+                            <ControlLabel>VLAN choice:</ControlLabel>
                             {' '}
-                            <FormControl defaultValue={ef.vlanExpression}
-                                         placeholder='1:2,4,6:10,14'
-                                         type="text"
-                                         onChange={this.setVlanExpression}/>
+                            <FormControl defaultValue={ef.vlanChoice} type="text"  onChange={this.setVlanChoice}/>
+                            <HelpBlock><p>{ef.vlanChoiceValidationText}</p></HelpBlock>
                             {' '}
-                            <HelpBlock>Available: {ef.availableVlans}</HelpBlock>
                         </FormGroup>
                     </ToggleDisplay>
                     {' '}
 
                     <ToggleDisplay show={ef.showCopiedVlan}>
-                        <Well>Copied VLAN id {ef.copiedVlan}</Well>
-                    </ToggleDisplay>
-
-                    {' '}
-                    <ToggleDisplay show={ef.vlanSelectionMode === 'fromAvailable'}>
-                        <Well>Available for your schedule: <b>{ef.availableVlans}</b></Well>
+                        <Well>Copied VLAN id: {ef.copiedVlan}</Well>
                     </ToggleDisplay>
                     {' '}
+                    <ToggleDisplay show={ef.showVlanLockButton}>
+                        <Button bsStyle='primary' className='pull-right' onClick={this.onLock}>{ef.vlanLockText}</Button>
+                    </ToggleDisplay>
 
                 </ToggleDisplay>
                 {' '}
-                <ToggleDisplay show={ef.showVlanReleaseControls}>
-                    <Well>Picked VLAN: {ef.vlan}</Well>
+                <ToggleDisplay show={ef.vlanLocked}>
+                    <Well>Locked VLAN: {ef.vlan}</Well>
                     {' '}
-                    <Button bsStyle='warning' className='pull-right' onClick={this.onReleaseClick}>Release</Button>
-                </ToggleDisplay>
-                {' '}
-                <ToggleDisplay show={ef.showVlanPickButton && !ef.retrievingAvailVlans}>
-                    <Button bsStyle='primary' className='pull-right' onClick={this.onPickClick}>Pick</Button>
+                    <Button bsStyle='warning' className='pull-right' onClick={this.onUnlock}>Unlock</Button>
                 </ToggleDisplay>
             </Panel>
 

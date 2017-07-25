@@ -2,20 +2,50 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
     FormGroup, Label, Glyphicon, FormControl, Checkbox, ControlLabel,
-    Panel, Button, Well, Popover, OverlayTrigger
+    Panel, Button, Well, Popover, OverlayTrigger, HelpBlock
 } from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 import FixtureSelect from './fixtureSelect';
-import validator from '../lib/validation'
+
+import {toJS, autorun, whyRun} from 'mobx';
 
 
-@inject('controlsStore', 'designStore')
+@inject('controlsStore', 'designStore', 'topologyStore')
 @observer
 export default class BwSelect extends Component {
     constructor(props) {
         super(props);
     }
 
+
+    bwUpdateDispose = autorun('bwUpdate', () => {
+        const ef = this.props.controlsStore.editFixture;
+
+        const baseline = this.props.topologyStore.baseline[ef.port];
+        const baselineIngressBw = baseline.ingressBandwidth;
+        const baselineEgressBw = baseline.egressBandwidth;
+        const available = this.props.topologyStore.available[ef.port];
+        const availableIngressBw = available.ingressBandwidth;
+        const availableEgressBw = available.egressBandwidth;
+        const locked = this.props.designStore.bwLockedOnPort(ef.port);
+
+
+        this.props.controlsStore.setParamsForEditFixture({
+            baselineIngressBw: baselineIngressBw,
+            baselineEgressBw: baselineEgressBw,
+            availableIngressBw: availableIngressBw,
+            availableEgressBw: availableEgressBw,
+            lockedIngressBw: locked.ingress,
+            lockedEgressBw: locked.egress,
+
+        });
+
+    });
+
+
+    componentWillUnmount() {
+        this.bwUpdateDispose();
+    }
 
     symmetricalCheckboxClicked = (e) => {
         const ef = this.props.controlsStore.editFixture;
@@ -33,22 +63,128 @@ export default class BwSelect extends Component {
     };
 
     onIngressBwChange = (e) => {
-        const newIngress = e.target.value;
-        let params = {
-            ingress: newIngress,
-        };
-        if (this.props.controlsStore.editFixture.symmetrical) {
-            params.egress = newIngress;
-            this.egressControl.value = newIngress;
+        const newIngress = Number(e.target.value);
+        const ef = this.props.controlsStore.editFixture;
+        if (isNaN(newIngress)) {
+            this.props.controlsStore.setParamsForEditFixture({
+                ingressValidationState: 'error',
+                ingressValidationText: 'Not a number',
+                showBwLockButton: false
+            });
+            return;
         }
-        this.props.controlsStore.setParamsForEditFixture(params);
+
+        let overInBaseline = newIngress + ef.lockedIngressBw > ef.baselineIngressBw;
+        let overEgBaseline = newIngress + ef.lockedEgressBw > ef.baselineEgressBw;
+        let overInAvailable = newIngress + ef.lockedIngressBw > ef.availableIngressBw;
+        let overEgAvailable = newIngress + ef.lockedEgressBw > ef.availableEgressBw;
+
+        if (ef.symmetrical) {
+            let ingressValidationState = 'success';
+            let egressValidationState = 'success';
+            let ingressValidationText = '';
+            let egressValidationText = '';
+            let error = false;
+
+            this.egressControl.value = newIngress;
+
+            if (overInBaseline) {
+                ingressValidationState = 'error';
+                egressValidationState = 'error';
+                ingressValidationText = 'Ingress exceeds baseline';
+                error = true;
+
+            } else if (overInAvailable) {
+                ingressValidationState = 'error';
+                egressValidationState = 'error';
+                ingressValidationText = 'Ingress exceeds available';
+                error = true;
+            }
+            if (overEgBaseline) {
+                ingressValidationState = 'error';
+                egressValidationState = 'error';
+                egressValidationText = 'Egress exceeds baseline';
+                error = true;
+
+            } else if (overEgAvailable) {
+                ingressValidationState = 'error';
+                egressValidationState = 'error';
+                egressValidationText = 'Egress exceeds available';
+                error = true;
+            }
+
+            this.props.controlsStore.setParamsForEditFixture({
+                ingressValidationState: ingressValidationState,
+                ingressValidationText: ingressValidationText,
+                egressValidationState: egressValidationState,
+                egressValidationText: egressValidationText,
+                showBwLockButton: !error
+            });
+            if (!error) {
+                this.props.controlsStore.setParamsForEditFixture({
+                    ingress: newIngress,
+                    egress: newIngress,
+                });
+            }
+        } else {
+
+            if (overInBaseline) {
+                this.props.controlsStore.setParamsForEditFixture({
+                    ingressValidationText: 'Ingress exceeds baseline',
+                    showBwLockButton: false
+                });
+
+            } else if (overInAvailable) {
+                this.props.controlsStore.setParamsForEditFixture({
+                    ingressValidationState: 'error',
+                    ingressValidationText: 'Ingress exceeds available',
+                    showBwLockButton: false
+                });
+            } else {
+                this.props.controlsStore.setParamsForEditFixture({
+                    ingressValidationState: 'success',
+                    ingressValidationText: '',
+                    showBwLockButton: true,
+                    ingress: newIngress
+                });
+            }
+        }
     };
 
     onEgressBwChange = (e) => {
-        const newEgress = e.target.value;
-        this.props.controlsStore.setParamsForEditFixture({
-            egress: newEgress,
-        });
+        const newEgress = Number(e.target.value);
+
+        if (isNaN(newEgress)) {
+            this.props.controlsStore.setParamsForEditFixture({
+                egressValidationState: 'error',
+                egressValidationText: 'Not a number',
+                showBwLockButton: false
+            });
+            return;
+        }
+
+        const ef = this.props.controlsStore.editFixture;
+
+        if (newEgress + ef.lockedEgressBw > ef.baselineEgressBw) {
+            this.props.controlsStore.setParamsForEditFixture({
+                egressValidationState: 'error',
+                egressValidationText: 'Egress exceeds baseline',
+                showBwLockButton: false
+            });
+        } else if (newEgress + ef.lockedEgressBw > ef.availableEgressBw) {
+            this.props.controlsStore.setParamsForEditFixture({
+                egressValidationState: 'error',
+                egressValidationText: 'Egress exceeds available',
+                showBwLockButton: false
+            });
+        } else {
+            this.props.controlsStore.setParamsForEditFixture({
+                egressValidationState: 'success',
+                egressValidationText: '',
+                showBwLockButton: true,
+                egress: newEgress
+            });
+        }
     };
 
     otherFixtureSelected = (e) => {
@@ -63,11 +199,11 @@ export default class BwSelect extends Component {
                 params.copiedIngress = otherFixture.egress;
                 params.copiedEgress = otherFixture.ingress;
             }
-            params.showBwSetButton = true;
+            params.showBwLockButton = true;
         } else {
             params.copiedEgress = '-';
             params.copiedIngress = '-';
-            params.showBwSetButton = false;
+            params.showBwLockButton = false;
         }
 
 
@@ -80,7 +216,7 @@ export default class BwSelect extends Component {
         // can only choose to have the same / different bandwidth with some other fixture
         let result = {};
         this.props.designStore.design.fixtures.map((f) => {
-            if (f.id !== ef.fixtureId && f.bwPreviouslySet) {
+            if (f.id !== ef.fixtureId && f.bwLocked) {
                 result[f.id] = {
                     id: f.id,
                     label: f.label,
@@ -94,7 +230,7 @@ export default class BwSelect extends Component {
     }
 
 
-    setFixtureBw = () => {
+    lockBw = () => {
         const ef = this.props.controlsStore.editFixture;
         let newIngress = ef.ingress;
         let newEgress = ef.egress;
@@ -107,25 +243,23 @@ export default class BwSelect extends Component {
             egress: newEgress,
         };
 
-        this.props.designStore.setFixtureBandwidth(ef.fixtureId, sbParams);
+        this.props.designStore.lockFixtureBandwidth(ef.fixtureId, sbParams);
         let efParams = {
             ingress: newIngress,
             egress: newEgress,
             showBwSetButton: false,
-            bwBeingEdited: false,
-            bwPreviouslySet: true,
+            bwLocked: true,
         };
 
         this.props.controlsStore.setParamsForEditFixture(efParams);
     };
 
-    unsetFixtureBw = () => {
+    unlockBw = () => {
         const fixtureId = this.props.controlsStore.editFixture.fixtureId;
-        this.props.designStore.unsetFixtureBandwidth(fixtureId);
+        this.props.designStore.unlockFixtureBandwidth(fixtureId);
         this.props.controlsStore.setParamsForEditFixture({
             showBwSetButton: true,
-            bwBeingEdited: true,
-            bwPreviouslySet: false,
+            bwLocked: false,
 
         });
 
@@ -191,12 +325,10 @@ export default class BwSelect extends Component {
 
         return (
             <Panel header={header}>
-                <ToggleDisplay show={ef.showBwSetButton}>
-                    <h3><Label bsStyle='warning'>Bandwidth not set!</Label></h3>
-                </ToggleDisplay>
-                <ToggleDisplay show={ef.bwBeingEdited}>
+                <ToggleDisplay show={!ef.bwLocked}>
+                    <h3><Label bsStyle='warning'>Bandwidth not locked!</Label></h3>
                     <BwSelectModeOptions onSelectModeChange={this.onSelectModeChange}/>
-                    { ' ' }
+                    {' '}
                     <ToggleDisplay show={showFixtureSelect}>
                         <FixtureSelect mode='bw' onRef={ref => {
                             this.fixtureSelect = ref
@@ -208,13 +340,18 @@ export default class BwSelect extends Component {
                         </ToggleDisplay>
                     </ToggleDisplay>
                     <ToggleDisplay show={!showFixtureSelect}>
-                        <FormGroup controlId="ingress">
+                        <FormGroup controlId="ingress" validationState={ef.ingressValidationState}>
                             <ControlLabel>Ingress:</ControlLabel>
                             <FormControl defaultValue={ef.ingress}
                                          type="text" placeholder="0-100000"
                                          onChange={this.onIngressBwChange}/>
+                            <HelpBlock><p>{ef.ingressValidationText}</p></HelpBlock>
+                            <HelpBlock>Available for your schedule: {ef.availableIngressBw}</HelpBlock>
+                            <HelpBlock>Baseline: {ef.baselineIngressBw}</HelpBlock>
+                            <HelpBlock>Locked by other fixtures: {ef.lockedIngressBw}</HelpBlock>
+
                         </FormGroup>
-                        <FormGroup controlId="egress">
+                        <FormGroup controlId="egress" validationState={ef.egressValidationState}>
                             <ControlLabel>Egress:</ControlLabel>
                             <FormControl defaultValue={ef.egress}
                                          disabled={ef.symmetrical}
@@ -223,26 +360,28 @@ export default class BwSelect extends Component {
                                          }}
                                          onChange={this.onEgressBwChange}
                                          type="text" placeholder="0-10000"/>
+                            <HelpBlock><p>{ef.egressValidationText}</p></HelpBlock>
+                            <HelpBlock>Available for your schedule: {ef.availableEgressBw}</HelpBlock>
+                            <HelpBlock>Baseline: {ef.baselineEgressBw}</HelpBlock>
+                            <HelpBlock>Locked by other fixtures: {ef.lockedEgressBw}</HelpBlock>
                         </FormGroup>
                         <FormGroup controlId="symmetrical">
                             <Checkbox defaultChecked={ef.symmetrical} inline
                                       onChange={this.symmetricalCheckboxClicked}>Symmetrical
                             </Checkbox>
-
                         </FormGroup>
                     </ToggleDisplay>
+
+                    <ToggleDisplay show={ef.showBwLockButton}>
+                        <Button bsStyle='primary' className='pull-right' onClick={this.lockBw}>Lock bandwidth</Button>
+                    </ToggleDisplay>
                 </ToggleDisplay>
-                <ToggleDisplay show={!ef.bwBeingEdited}>
-                    <Well>Set ingress: {ef.ingress}</Well>
-                    <Well>Set egress: {ef.egress}</Well>
+                <ToggleDisplay show={ef.bwLocked}>
+                    <Well>Locked ingress: {ef.ingress}</Well>
+                    <Well>Locked egress: {ef.egress}</Well>
+                    <Button bsStyle='warning' className='pull-right' onClick={this.unlockBw}>Unlock</Button>
                 </ToggleDisplay>
 
-                <ToggleDisplay show={ef.showBwSetButton}>
-                    <Button bsStyle='primary' className='pull-right' onClick={this.setFixtureBw}>Set bandwidth</Button>
-                </ToggleDisplay>
-                <ToggleDisplay show={!ef.bwBeingEdited}>
-                    <Button bsStyle='warning' className='pull-right' onClick={this.unsetFixtureBw}>Edit</Button>
-                </ToggleDisplay>
             </Panel>);
     }
 }

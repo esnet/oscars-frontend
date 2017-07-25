@@ -9,7 +9,8 @@ const modalName = 'addFixture';
 @observer
 export default class AddFixtureModal extends Component {
     componentWillMount() {
-        this.props.topologyStore.loadAvailablePorts();
+        this.props.topologyStore.loadEthernetPorts();
+        this.props.topologyStore.loadBaseline();
     }
 
     closeModal = () => {
@@ -33,7 +34,7 @@ export default class AddFixtureModal extends Component {
 
     render() {
         const device = this.props.controlsStore.addFixture.device;
-        const devicePorts = this.props.topologyStore.availPortsByDevice;
+        const devicePorts = this.props.topologyStore.ethPortsByDevice;
 
         let ports = [];
         if (typeof device !== 'undefined' && device !== '' && device !== null) {
