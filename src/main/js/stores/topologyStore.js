@@ -11,19 +11,41 @@ class TopologyStore {
      device2: ['port3],
      }
      */
-    @observable availPortsByDevice = observable.map({});
+    @observable ethPortsByDevice = observable.map({});
 
-    /* format :
+
+    @action loadEthernetPorts() {
+
+        if (this.ethPortsByDevice.size === 0) {
+            myClient.loadJSON({method: 'GET', url: '/api/topo/ethernetPortsByDevice'})
+                .then(action((response) => {
+                    let parsed = JSON.parse(response);
+                    this.ethPortsByDevice = observable.map({});
+
+                    let devices = [];
+                    for (let key in parsed) {
+                        if (parsed.hasOwnProperty(key)) {
+                            devices.push(key);
+                        }
+                    }
+                    devices.sort().map((d) => {
+                        this.ethPortsByDevice.set(d, parsed[d]);
+                    });
+                }));
+        }
+    }
+
+    /* format (for typeahead control):
      [
      { id: port1, label: port1, device: device1 },
      { id: port2, label: port2, device: device1 },
      { id: port3, label: port3, device: device2 },
      ]
      */
-    @computed
-    get availPorts() {
+
+    @computed get ethPorts() {
         let byPort = [];
-        this.availPortsByDevice.forEach((ports, device) => {
+        this.ethPortsByDevice.forEach((ports, device) => {
             ports.map(
                 (port) => {
                     byPort.push(
@@ -40,31 +62,45 @@ class TopologyStore {
         return byPort;
     }
 
+    /* format: {
+           "port urn": {
+              "vlanRanges": [{
+                  "floor" : 2000,
+                  "ceiling" : 2999
+                }
+              ],
+              "vlanExpression": "2000-2999",
+              "ingressBandwidth" : 10000,
+              "egressBandwidth" : 10000
 
-    @observable isLoading = false;
+           }
+       }
+     */
+    @observable baseline = observable.map({});
+    @observable available = observable.map({});
 
 
-    @action loadAvailablePorts() {
-
-        if (this.availPortsByDevice.size === 0) {
-            this.isLoading = true;
-            myClient.loadJSON({method: 'GET', url: '/topology/portsForFixtures'})
+    @action loadBaseline() {
+        if (this.baseline.size === 0) {
+            myClient.loadJSON({method: 'GET', url: '/api/topo/baseline'})
                 .then(action((response) => {
-                    let parsed = JSON.parse(response);
-                    this.availPortsByDevice = observable.map([]);
-                    let devices = [];
-                    for (let key in parsed) {
-                        if (parsed.hasOwnProperty(key)) {
-                            devices.push(key);
-                        }
-                    }
-                    devices.sort().map((d) => {
-                        this.availPortsByDevice.set(d, parsed[d]);
-
-                    });
+                    this.baseline = JSON.parse(response);
                 }));
+
         }
     }
+    @action loadAvailable(b, e) {
+        let params = {
+            beginning: b,
+            ending: e
+        };
+        myClient.loadJSON({method: 'POST', url: '/api/topo/available', params})
+            .then(action((response) => {
+                this.available = JSON.parse(response);
+            }));
+
+    }
+
 }
 
 export default new TopologyStore();

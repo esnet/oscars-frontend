@@ -10,7 +10,7 @@ import {Well, FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'r
 @observer
 export default class SelectPortTypeahead extends Component {
     componentWillMount() {
-        this.props.topologyStore.loadAvailablePorts();
+        this.props.topologyStore.loadEthernetPorts();
     }
 
     constructor(props) {
@@ -18,16 +18,16 @@ export default class SelectPortTypeahead extends Component {
     }
 
     onTypeaheadSelection = (port) => {
-        const {availPorts} = this.props.topologyStore;
-        let isInAvailPorts = false;
+        const {ethPorts} = this.props.topologyStore;
+        let isInEthPorts = false;
         let device = '';
-        availPorts.map((entry) => {
+        ethPorts.map((entry) => {
             if (entry.id === port) {
-                isInAvailPorts = true;
+                isInEthPorts = true;
                 device = entry.device;
             }
         });
-        if (isInAvailPorts) {
+        if (isInEthPorts) {
             let params = {
                 'port': port,
                 'device': device,
@@ -51,11 +51,11 @@ export default class SelectPortTypeahead extends Component {
     };
 
     render() {
-        const {availPorts} = this.props.topologyStore;
+        const {ethPorts} = this.props.topologyStore;
 
         let options = [];
-        if (typeof availPorts !== 'undefined') {
-            options = toJS(availPorts);
+        if (typeof ethPorts !== 'undefined') {
+            options = toJS(ethPorts);
         }
 
         let myHelp = <Popover id='help-selectPortTypeahead' title='Help'>

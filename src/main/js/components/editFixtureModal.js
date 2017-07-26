@@ -6,7 +6,6 @@ import {toJS, action, autorun, computed, whyRun} from 'mobx';
 
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
-import picker from '../lib/picking';
 
 const modalName = 'editFixture';
 
@@ -23,9 +22,6 @@ export default class EditFixtureModal extends Component {
 
     deleteFixture = () => {
         const ef = this.props.controlsStore.editFixture;
-        if (ef.vlan !== null) {
-            picker.releaseDeleted(ef.port, ef.vlan);
-        }
 
         let device = this.props.designStore.deviceOf(ef.fixtureId);
 

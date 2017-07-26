@@ -43,7 +43,7 @@ export default class PipeParamsModal extends Component {
     unlockBw = () => {
         let editPipe = this.props.controlsStore.editPipe;
         let params = {
-            bwPreviouslySet: false,
+            bwLocked: false,
         };
         let pipeId = editPipe.pipeId;
         this.props.designStore.updatePipe(pipeId, params);
@@ -55,7 +55,7 @@ export default class PipeParamsModal extends Component {
             azBw: editPipe.azBw,
             zaBw: editPipe.zaBw,
             ero: editPipe.ero,
-            bwPreviouslySet: true,
+            bwLocked: true,
         };
         let pipeId = editPipe.pipeId;
         this.props.designStore.updatePipe(pipeId, params);
@@ -93,7 +93,7 @@ export default class PipeParamsModal extends Component {
 
         if (pipe !== null) {
             pipeExists = true;
-            bwLocked = pipe.bwPreviouslySet;
+            bwLocked = pipe.bwLocked;
             pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
             azLabel = 'From ' + pipe.a + ' to ' + pipe.z;
             zaLabel = 'From ' + pipe.z + ' to ' + pipe.a;

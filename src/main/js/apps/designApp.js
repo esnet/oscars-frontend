@@ -12,7 +12,8 @@ import DesignErrorsModal from '../components/designErrorsModal';
 import ConnectionErrorsModal from '../components/connectionErrorsModal';
 import DesignDrawing from '../components/designDrawing';
 import DesignComponents from '../components/designComponents';
-import SandboxControls from '../components/sandboxControls';
+import ScheduleControls from '../components/scheduleControls';
+import ConnectionControls from '../components/connectionControls';
 import DesignControls from '../components/designControls';
 import SelectPortTypeahead from '../components/selectPortTypeahead';
 
@@ -45,7 +46,8 @@ export default class DesignApp extends Component {
             <Row>
                 <Col md={3} sm={3}>
                     <SelectPortTypeahead/>
-                    <SandboxControls />
+                    <ScheduleControls />
+                    <ConnectionControls />
                     <DesignControls />
                 </Col>
                 <Col md={6} sm={6}>

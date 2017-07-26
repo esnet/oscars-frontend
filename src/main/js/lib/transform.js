@@ -1,9 +1,12 @@
 import React from 'react';
+import {toJS} from 'mobx';
 
 
 
 class Transformer {
     existingFixtureToEditParams(fixture) {
+//        console.log('existing fixture');
+//        console.log(toJS(fixture));
         let editParams = {
             fixtureId: fixture.id,
             label: fixture.label,
@@ -12,42 +15,46 @@ class Transformer {
             vlan: fixture.vlan,
             ingress: fixture.ingress,
             egress: fixture.egress,
-            bwPreviouslySet: fixture.bwPreviouslySet,
+            bwLocked: fixture.bwLocked,
 
             availableVlans: '',
             vlanExpression: '',
-            retrievingAvailVlans: false,
+            vlanLocked: fixture.vlanLocked,
 
             copiedVlan: '',
             showCopiedVlan: false,
             vlanSelectionMode: 'fromAvailable',
             vlanSelectionModeOptions: [],
             vlanCopyFromOptions: [],
+            vlanChoice: fixture.vlan,
+            vlanChoiceValidationState: 'success',
+            vlanChoiceValidationText: '',
 
+
+            bwLocked: fixture.bwLocked,
             bwSelectionMode: 'typeIn',
             bwSelectionModeOptions: [],
             showCopiedBw: false,
             copiedIngress: 0,
             copiedEgress: 0,
+            ingressValidationState: 'success',
+            ingressValidationText: '',
+            egressValidationState: 'success',
+            egressValidationText: '',
 
         };
 
-        if (fixture.vlan !== null) {
-            editParams.showVlanReleaseControls = true;
-            editParams.showVlanPickButton = false;
-            editParams.showVlanPickControls = false;
+        if (fixture.vlanLocked) {
+            editParams.showVlanLockButton = false;
         } else {
-            editParams.showVlanReleaseControls = false;
-            editParams.showVlanPickButton = true;
-            editParams.showVlanPickControls = true;
+            editParams.vlanLockText = 'Choose and lock';
+            editParams.showVlanLockButton = true;
         }
 
-        if (fixture.bwPreviouslySet) {
-            editParams.bwBeingEdited = false;
-            editParams.showBwSetButton = false;
+        if (fixture.bwLocked) {
+            editParams.showBwLockButton = false;
         } else {
-            editParams.bwBeingEdited = true;
-            editParams.showBwSetButton = true;
+            editParams.showBwLockButton = true;
 
         }
 
@@ -61,30 +68,34 @@ class Transformer {
             label: fixture.label,
             port: fixture.port,
             device: fixture.device,
-            vlan: fixture.vlan,
+
+            vlan: null,
+            vlanChoice: '',
+            vlanLocked: false,
+            showVlanLockButton: true,
+            vlanLockText: 'Choose and lock',
+            vlanSelectionMode: 'fromAvailable',
+            vlanChoiceValidationState: 'error',
+            vlanChoiceValidationText: 'empty input',
+
+
+
             ingress: 0,
             egress: 0,
-            bwPreviouslySet: false,
-
-            vlanExpression: '',
-            showVlanExpression: true,
-
-            vlanSelectionMode: 'fromAvailable',
-            copiedVlan: '',
-            showCopiedVlan: false,
-
-            showVlanReleaseControls: false,
-            showVlanPickButton: true,
-            showVlanPickControls: true,
-            retrievingAvailVlans: false,
-
+            bwLocked: false,
             bwSelectionMode: 'typeIn',
             bwSelectionModeOptions: [],
             showCopiedBw: false,
             copiedIngress: 0,
             copiedEgress: 0,
-            bwBeingEdited: true,
-            showBwSetButton: true,
+
+            showBwLockButton: true,
+            ingressValidationState: 'success',
+            ingressValidationText: '',
+            egressValidationState: 'success',
+            egressValidationText: '',
+
+
         };
 
 
@@ -131,7 +142,8 @@ class Transformer {
                     egress: df.egressBandwidth,
                     vlan: df.vlan.vlanId,
                     label: df.portUrn + ':' + df.vlan.vlanId,
-                    bwPreviouslySet: true
+                    bwLocked: true,
+                    vlanLocked: true
                 };
                 result.fixtures.push(entry);
             });
@@ -144,7 +156,7 @@ class Transformer {
                     z: dp.z,
                     azBw: dp.azBandwidth,
                     zaBw: dp.zaBandwidth,
-                    bwPreviouslySet: true,
+                    bwLocked: true,
                     ero: []
 
                 };

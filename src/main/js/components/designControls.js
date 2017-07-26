@@ -58,7 +58,6 @@ export default class DesignControls extends Component {
         if (newDesign.description === '') {
             return;
         }
-        console.log(newDesign);
         myClient.submitWithToken('POST', '/protected/designs/' + editDesign.designId, newDesign)
             .then(
                 action((response) => {

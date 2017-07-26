@@ -12,13 +12,14 @@ class DesignStore {
             vlan: int,
             ingress: int,
             egress: int,
-            bwPreviouslySet: bool,
+            bwLocked: bool,
+            vlanLocked: bool,
     }
     pipe: {
            id: some id,
            azBw: int
            zaBW: int,
-           bwPreviouslySet: bool,
+           bwLocked: bool,
            ero: []
     }
 
@@ -80,6 +81,33 @@ class DesignStore {
         return fixturesOf;
     }
 
+    vlansLockedOnPort(portUrn) {
+        let vlans = [];
+        this.design.fixtures.map((f) => {
+            if (f.port === portUrn && f.vlanLocked) {
+                vlans.push(f.vlan);
+            }
+        });
+        return vlans;
+    }
+
+
+    bwLockedOnPort(portUrn) {
+        let ingress = 0;
+        let egress = 0;
+        this.design.fixtures.map((f) => {
+            if (f.port === portUrn && f.bwLocked) {
+                ingress += f.ingress;
+                egress += f.egress;
+            }
+        });
+        return {
+            ingress: ingress,
+            egress: egress
+        }
+
+
+    }
     deviceOf(fixtureId) {
         return this.findFixture(fixtureId).device;
     }
@@ -172,7 +200,8 @@ class DesignStore {
             vlan: null,
             ingress: 0,
             egress: 0,
-            bwPreviouslySet: false,
+            bwLocked: false,
+            vlanLocked: false,
 
         };
 
@@ -182,21 +211,21 @@ class DesignStore {
     }
 
     @action
-    setFixtureBandwidth(id, params) {
+    lockFixtureBandwidth(id, params) {
         this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 entry.ingress = params.ingress;
                 entry.egress = params.egress;
-                entry.bwPreviouslySet = true;
+                entry.bwLocked = true;
             }
         });
     }
 
     @action
-    unsetFixtureBandwidth(id) {
+    unlockFixtureBandwidth(id) {
         this.design.fixtures.map((entry) => {
             if (entry.id === id) {
-                entry.bwPreviouslySet = false;
+                entry.bwLocked = false;
                 entry.bwSelectMode = 'typeIn';
 
             }
@@ -218,7 +247,7 @@ class DesignStore {
     }
 
     @action
-    setFixtureVlan(id, vlan) {
+    lockFixtureVlan(id, vlan) {
 
         let outLabel = null;
         this.design.fixtures.map((entry) => {
@@ -226,6 +255,7 @@ class DesignStore {
                 const label = entry.port.split(':')[1] + ':' + vlan;
 
                 entry.vlan = vlan;
+                entry.vlanLocked = true;
                 entry.label = label;
                 outLabel = label;
             }
@@ -234,7 +264,7 @@ class DesignStore {
     }
 
     @action
-    unsetFixtureVlan(id) {
+    unlockFixtureVlan(id) {
         let outLabel = null;
 
         this.design.fixtures.map((entry) => {
@@ -242,9 +272,8 @@ class DesignStore {
                 const label = entry.port.split(':')[1] + ':' + entry.id.split(':')[2];
 
                 entry.vlan = null;
+                entry.vlanLocked = false;
                 entry.label = label;
-
-
                 outLabel = label;
 
             }
@@ -318,7 +347,7 @@ class DesignStore {
     @action
     addPipe(pipe) {
         pipe.id = this.makePipeId(pipe);
-        pipe.bwPreviouslySet = false;
+        pipe.bwLocked = false;
 
         this.design.pipes.push(pipe);
         return pipe.id;

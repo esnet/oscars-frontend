@@ -40,7 +40,8 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: PATHS.templates + '/template_index.html',
-            inject: 'body'
+            inject: 'body',
+            favicon: PATHS.templates + '/favicon.ico',
         }),
         /*
         new LodashModuleReplacementPlugin,
