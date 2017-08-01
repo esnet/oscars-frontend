@@ -4,7 +4,17 @@ import {observer, inject} from 'mobx-react';
 import {action, autorunAsync, toJS} from 'mobx';
 
 
-import {Button, Popover, Form, Glyphicon, Panel, FormGroup, FormControl, OverlayTrigger} from 'react-bootstrap';
+import {
+    ListGroupItem,
+    Button,
+    Popover,
+    Form,
+    Glyphicon,
+    Panel,
+    FormGroup,
+    FormControl,
+    OverlayTrigger
+} from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 import Transformer from '../lib/transform';
@@ -12,17 +22,19 @@ import myClient from '../agents/client';
 import validator from '../lib/validation';
 
 
-@inject('controlsStore', 'designStore', 'accountStore')
+@inject('controlsStore', 'designStore', 'accountStore', 'modalStore')
 @observer
 export default class DesignControls extends Component {
     constructor(props) {
         super(props);
     }
+
     handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             this.saveDesign();
         }
     };
+
     componentDidMount() {
         // new design id
         if (this.props.controlsStore.editDesign.designId.length === 0) {
@@ -37,11 +49,6 @@ export default class DesignControls extends Component {
                     }));
         }
     }
-
-    componentWillUnmount() {
-        this.props.controlsStore.clearEditDesign();
-    }
-
 
     saveDesign = () => {
 
@@ -60,7 +67,7 @@ export default class DesignControls extends Component {
         }
         myClient.submitWithToken('POST', '/protected/designs/' + editDesign.designId, newDesign)
             .then(
-                action((response) => {
+                action(() => {
                     const params = {
                         disabledSaveButton: true
                     };
@@ -70,6 +77,7 @@ export default class DesignControls extends Component {
     };
 
     disposeOfValidate = autorunAsync('validate', () => {
+        let editDesign = this.props.controlsStore.editDesign;
         let cmp = {
             junctions: this.props.designStore.design.junctions,
             pipes: this.props.designStore.design.pipes,
@@ -77,12 +85,17 @@ export default class DesignControls extends Component {
         };
 
         const result = validator.validateDesign(cmp);
+        if (editDesign.description === '') {
+            result.ok = false;
+            result.errors.push(<ListGroupItem key='desc'>No description / short name for the design.</ListGroupItem>);
+        }
         this.props.designStore.setErrors(result.errors);
 
     }, 1000);
 
 
     componentWillUnmount() {
+        this.props.controlsStore.clearEditDesign();
         this.disposeOfValidate();
     }
 
@@ -104,23 +117,20 @@ export default class DesignControls extends Component {
         let designOk = validator.validateDesign(cmp).ok;
 
 
-        let helpPopover = <Popover id='help-designMap' title='Help'>
-            <p>These are the controls for this design; a design comprises of
-                all the components of a connection request except for the
-                scheduling.</p>
-            <p>A design is considered valid if it could potentially be reserved on the
-                network with no other reservations present. The validity of the design
-                is automatically checked when any change is made. </p>
+        let helpPopover = <Popover id='help-designMap' title='Design controls'>
+            <p>Here you can save your design for future re-use. Your design comprises of
+                all the components of a connection request (fixtures, pipes, junction),
+                except for the scheduling.</p>
             <p>If there are problems with the design, they will be flagged
                 with red color on the design map and the component list, and will
                 be listed through the "Display Design Issues" button.</p>
-            <p>When a design is valid and a description is provided, then the
+            <p>When a design is valid, and a short name is provided in the text box, then the
                 "Save" button will be activated. A saved design can be loaded
                 again in the future through the "Copy" link in the navigation menu.</p>
         </Popover>;
 
 
-        let header = <div>Design controls
+        let header = <div>Save design
             <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
                 <Glyphicon className='pull-right' glyph='question-sign'/>
             </OverlayTrigger>
@@ -133,7 +143,7 @@ export default class DesignControls extends Component {
                     e.preventDefault()
                 }}>
                     <FormGroup>
-                        <FormControl type='text' placeholder='description'
+                        <FormControl type='text' placeholder='short name'
                                      onKeyPress={this.handleKeyPress}
                                      defaultValue={editDesign.description}
                                      onChange={this.onDescriptionChange}/>
@@ -145,7 +155,7 @@ export default class DesignControls extends Component {
                         </ToggleDisplay>
                         <ToggleDisplay show={!designOk}>
                             <Button bsStyle='warning' onClick={() => {
-                                this.props.controlsStore.openModal('designErrors');
+                                this.props.modalStore.openModal('designErrors');
                             }}>Design issues</Button>
                         </ToggleDisplay>
                     </FormGroup>

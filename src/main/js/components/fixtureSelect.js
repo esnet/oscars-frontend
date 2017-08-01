@@ -25,9 +25,13 @@ export default class FixtureSelect extends Component {
     render() {
         const ef = this.props.controlsStore.editFixture;
 
-        let fixtures = ef.vlanCopyFromOptions;
+        let fixtures = ef.vlan.copyFrom.options;
         if (this.props.mode === 'bw') {
-            fixtures = ef.bwCopyFromOptions;
+            if (ef.bwSelectionMode === 'sameAs') {
+                fixtures = ef.bw.copyFrom.sameAsOptions;
+            } else if (ef.bwSelectionMode === 'oppositeOf') {
+                fixtures = ef.bw.copyFrom.oppositeOfOptions;
+            }
         }
 
 

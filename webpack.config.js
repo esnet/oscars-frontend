@@ -80,23 +80,6 @@ module.exports = {
                 secure: false,
                 changeOrigin: true,
                 target: 'https://localhost:8201/'
-            },
-
-
-            '/topology/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
-            },
-            '/resv/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
-            },
-            '/vlan/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
             }
 
         }

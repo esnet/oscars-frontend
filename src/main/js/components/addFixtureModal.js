@@ -5,7 +5,7 @@ import transformer from '../lib/transform';
 
 const modalName = 'addFixture';
 
-@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore')
+@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
 @observer
 export default class AddFixtureModal extends Component {
     componentWillMount() {
@@ -14,7 +14,7 @@ export default class AddFixtureModal extends Component {
     }
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
     addFixture = (device, port) => {
@@ -29,7 +29,7 @@ export default class AddFixtureModal extends Component {
         this.props.mapStore.addColoredNode({id: device, color:'green'});
         this.props.mapStore.setZoomOnColored(true);
 
-        this.props.controlsStore.openModal('editFixture');
+        this.props.modalStore.openModal('editFixture');
     };
 
     render() {
@@ -47,7 +47,7 @@ export default class AddFixtureModal extends Component {
             );
         }
 
-        let showModal = this.props.controlsStore.modals.get(modalName);
+        let showModal = this.props.modalStore.modals.get(modalName);
         return (
             <Modal show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>

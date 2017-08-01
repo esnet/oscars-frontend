@@ -1,164 +1,225 @@
-import {observable, action} from 'mobx';
+import {observable, action, toJS} from 'mobx';
+
+import {merge, isArray, mergeWith} from 'lodash';
 
 class ControlsStore {
 
     @observable connection = {
         connectionId: '',
         description: '',
-        startAt: '',
-        endAt: '',
-        startAtInput: '',
-        endAtInput: '',
-        startAtReadable: '',
-        endAtReadable: '',
-        startAtValidation: 'success',
-        endAtValidation: 'success',
-        startAtValidationText: '',
-        endAtValidationText: '',
-        scheduleLocked: false,
+        schedule: {
+            locked: false,
+            acceptable: false,
+            adviceText: '',
+            start: {
+                at: '',
+                choice: '',
+                readable: '',
+                validationState: 'success',
+                validationText: '',
+            },
+            end: {
+                at: '',
+                choice: '',
+                readable: '',
+                validationState: 'success',
+                validationText: '',
+            }
+        },
+        held: {
+            until: '',
+            remaining: '',
+        },
+        validation: {
+            errors: [],
+            acceptable: false,
+        }
     };
+
+    @observable
+    editJunction = {
+        junction: '',
+        showAddPipeButton: '',
+        otherJunction: '',
+    };
+
 
     @observable editFixture = {
         fixtureId: '',
         label: '',
         port: '',
 
+        locked: false,
 
-        vlan: '',
-        vlanChoice: '',
-        vlanChoiceValidationState: '',
-        vlanChoiceValidationText: '',
-        vlanSelectionMode: '',
+        vlan: {
+            vlanId: null,
+            acceptable: false,
+            adviceText: '',
 
-        showCopiedVlan: false,
-        vlanLocked: false,
-        vlanLockText: 'Lock',
-        showVlanLockButton: false,
+            mode: '',
+            modeOptions: [],
+            typeIn: {
+                choice: '',
+                validationState: '',
+                validationText: '',
+            },
+            copyFrom: {
+                choice: '',
+                options: [],
+            },
+            copied: {
+                show: false,
+                vlanId: '',
+            },
+            available: {
+                lowest: '',
+                expression: '',
+                ranges: [],
+            },
+            baseline: {
+                expression: '',
+                ranges: [],
+            },
+        },
+        bw: {
+            ingress: 0,
+            egress: 0,
+            acceptable: false,
+            adviceText: '',
 
-        copiedVlan: '',
-        vlanCopyFromOptions: [],
-        availableVlans: '',
-        availableVlanRanges: [],
-        baselineVlans: '',
-        baselineVlanRanges: [],
-        lockedVlans: '',
+            mode: '',
+            modeOptions: [],
+            baseline: {
+                ingress: 0,
+                egress: 0,
+            },
+            available: {
+                ingress: 0,
+                egress: 0,
+            },
 
-        ingress: 0,
-        egress: 0,
-        symmetrical: true,
+            typeIn: {
+                symmetrical: true,
+                ingress: {
+                    choice: 0,
+                    acceptable: false,
+                    validationText: '',
+                    validationState: 'error',
+                },
+                egress: {
+                    choice: 0,
+                    acceptable: false,
+                    validationText: '',
+                    validationState: 'error',
+                },
+            },
 
-        bwLocked: false,
-        bwSelectionMode: '',
-        bwSelectionModeOptions: [],
-        showBwLockButton: true,
-        baselineIngressBw: 0,
-        baselineEgressBw: 0,
-        availableIngressBw: 0,
-        availableEgressBw: 0,
-        ingressValidationState: '',
-        ingressValidationText: '',
-        egressValidationState: '',
-        egressValidationText: '',
-        lockedIngressBw: 0,
-        lockedEgressBw: 0,
-
-        showCopiedBw: false,
-        copiedIngress: 0,
-        copiedEgress: 0,
-        bwCopyFromOptions: [],
-    }
-    ;
-    @observable
-    addFixture = {
-        device: ''
+            copyFrom: {
+                sameAsOptions: [],
+                oppositeOfOptions: [],
+                ingress: 0,
+                egress: 0,
+            },
+            copied: {
+                show: false,
+                ingress: 0,
+                egress: 0,
+            }
+        }
     };
-    @observable
-    editJunction = {
-        junction: '',
-        showAddPipeButton: '',
-        azBw: '',
-        zaBw: '',
-        otherJunction: '',
-    };
+
     @observable
     editPipe = {
+        a: '',
+        z: '',
         pipeId: '',
-        azBw: '',
-        zaBw: '',
-        lockedEro: false,
-        ero: [],
+        locked: false,
+        loading: false,
+
+        A_TO_Z: {
+            bw: '',
+            acceptable: false,
+            validationText: '',
+            validationState: 'error',
+            available: 0,
+            baseline: 0,
+        },
+
+        Z_TO_A: {
+            bw: '',
+            acceptable: false,
+            validationText: '',
+            validationState: 'error',
+            available: 0,
+            baseline: 0,
+        },
+        shortest: {
+            ero: [],
+            azBaseline: 0,
+            zaBaseline: 0,
+            zaAvailable: 0,
+            azAvailable: 0,
+        },
+        fits: {
+            ero: [],
+            azBaseline: 0,
+            zaBaseline: 0,
+            zaAvailable: 0,
+            azAvailable: 0,
+        },
+        manual: {
+            ero: []
+        },
 
 
+        ero: {
+            message: '',
+            acceptable: false,
+            validationText: '',
+            validationState: 'error',
+            hops: [],
+            mode: 'shortest',
+        },
     };
 
-    @observable
-    editUser = {
-        allUsers: [],
-        user: {},
-        password: '',
-        status: ''
-    };
-
-    @observable editDesign = {
-        disabledSaveButton: true,
-        designId: '',
-        description: '',
-        allDesigns: [],
-    };
 
 
-
-    @action setParamsForEditDesign(params) {
-        Object.assign(this.editDesign, params);
-    }
-
-    @action clearEditDesign() {
-        this.editDesign.designId = '';
-        this.editDesign.description = '';
-        this.editDesign.disabledSaveButton = true;
-    }
-
-
-    @action
-    setParamsForEditUser(params) {
-        Object.assign(this.editUser, params);
-    }
-
-    @action
-    setParamsForOneUser(params) {
-        Object.assign(this.editUser.user, params);
-    }
-    @action setPassword(value) {
-        this.editUser.password = value;
-    }
 
 
 
 
     @action
     setParamsForEditPipe(params) {
-        Object.assign(this.editPipe, params);
+        function customizer(objValue, srcValue) {
+            if (isArray(srcValue)) {
+                return srcValue;
+            }
+        }
+        mergeWith(this.editPipe, params,customizer);
     }
 
     @action
     setParamsForEditJunction(params) {
-        Object.assign(this.editJunction, params);
+        merge(this.editJunction, params);
     }
 
     @action
     setParamsForEditFixture(params) {
-        Object.assign(this.editFixture, params);
-    }
-
-    @action
-    setParamsForAddFixture(params) {
-        Object.assign(this.addFixture, params);
+        merge(this.editFixture, params);
     }
 
     @action
     setParamsForConnection(params) {
-        Object.assign(this.connection, params);
+        function customizer(objValue, srcValue) {
+            if (isArray(srcValue)) {
+                return srcValue;
+            }
+        }
+        mergeWith(this.connection, params, customizer);
     }
+
+
+
 
 
     @action
@@ -168,36 +229,41 @@ class ControlsStore {
     }
 
 
+
+    // adding a fixture by selecting a device (through the map)
+
     @observable
-    modals = observable.map({
-        'editFixture': false,
-        'editJunction': false,
-        'editPipe': false,
-        'addFixture': false,
-        'designErrors': false,
-        'connectionErrors': false,
-        'connection': false,
-        'userAdmin': false,
-    });
-
+    addFixture = {
+        device: ''
+    };
 
     @action
-    openModal(type) {
-        this.closeModals();
-        this.modals.set(type, true);
+    setParamsForAddFixture(params) {
+        merge(this.addFixture, params);
     }
 
-    @action
-    closeModal(type) {
-        this.modals.set(type, false);
+
+
+    // Design editing
+
+    @observable editDesign = {
+        disabledSaveButton: true,
+        designId: '',
+        description: '',
+        allDesigns: [],
+    };
+
+    @action setParamsForEditDesign(params) {
+        merge(this.editDesign, params);
     }
 
-    @action
-    closeModals() {
-        this.modals.forEach((value, key) => {
-            this.modals.set(key, false);
-        });
+    @action clearEditDesign() {
+        this.editDesign.designId = '';
+        this.editDesign.description = '';
+        this.editDesign.disabledSaveButton = true;
     }
+
+
 
 
 }

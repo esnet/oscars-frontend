@@ -7,7 +7,7 @@ import VisUtils from '../lib/vis';
 
 import myClient from '../agents/client';
 
-@inject('controlsStore', 'connsStore', 'mapStore')
+@inject('controlsStore', 'connsStore', 'mapStore', 'modalStore')
 @observer
 export default class ConnectionsList extends Component {
 
@@ -94,7 +94,7 @@ export default class ConnectionsList extends Component {
 
 
         this.props.connsStore.setCurrent(c);
-        this.props.controlsStore.openModal('connection');
+        this.props.modalStore.openModal('connection');
     };
 
 

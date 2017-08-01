@@ -40,10 +40,12 @@ export default class NavBar extends Component {
                 <LinkContainer to='/pages/newDesign'>
                     <NavItem eventKey='newDesign'>New</NavItem>
                 </LinkContainer>
+
+{/*
                 <LinkContainer to='/pages/selectDesign'>
                     <NavItem eventKey='selectDesign'>Copy</NavItem>
                 </LinkContainer>
-
+*/}
                 {admin}
             </Nav>;
 

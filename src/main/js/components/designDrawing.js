@@ -7,7 +7,7 @@ import vis from 'vis';
 import validator from '../lib/validation'
 
 
-@inject('controlsStore', 'designStore')
+@inject('controlsStore', 'designStore', 'modalStore')
 @observer
 export default class DesignDrawing extends Component {
     constructor(props) {
@@ -29,18 +29,18 @@ export default class DesignDrawing extends Component {
     onFixtureClicked = (fixture) => {
         const params = transformer.existingFixtureToEditParams(fixture);
         this.props.controlsStore.setParamsForEditFixture(params);
-        this.props.controlsStore.openModal('editFixture');
+        this.props.modalStore.openModal('editFixture');
     };
 
     onJunctionClicked = (junction) => {
         this.props.controlsStore.setParamsForEditJunction({junction: junction.id});
-        this.props.controlsStore.openModal('editJunction');
+        this.props.modalStore.openModal('editJunction');
     };
 
     onPipeClicked = (pipe) => {
         const params = transformer.existingPipeToEditParams(pipe);
         this.props.controlsStore.setParamsForEditPipe(params);
-        this.props.controlsStore.openModal('editPipe');
+        this.props.modalStore.openModal('editPipe');
     };
 
     componentDidMount() {

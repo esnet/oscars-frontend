@@ -16,8 +16,9 @@ import ScheduleControls from '../components/scheduleControls';
 import ConnectionControls from '../components/connectionControls';
 import DesignControls from '../components/designControls';
 import SelectPortTypeahead from '../components/selectPortTypeahead';
+import HoldTimer from '../components/holdTimer';
 
-@inject('controlsStore', 'mapStore', 'designStore', 'commonStore')
+@inject('controlsStore', 'mapStore', 'designStore', 'commonStore', 'modalStore')
 export default class DesignApp extends Component {
 
     constructor(props) {
@@ -38,23 +39,25 @@ export default class DesignApp extends Component {
 
     selectDevice = (device) => {
         this.props.controlsStore.setParamsForAddFixture({device: device});
-        this.props.controlsStore.openModal('addFixture');
+        this.props.modalStore.openModal('addFixture');
     };
 
     render() {
         return (
             <Row>
                 <Col md={3} sm={3}>
-                    <SelectPortTypeahead/>
+
                     <ScheduleControls />
                     <ConnectionControls />
-                    <DesignControls />
+                    { /* <DesignControls /> */}
                 </Col>
                 <Col md={6} sm={6}>
                     <NetworkMap selectDevice={this.selectDevice}/>
                     <DesignDrawing />
                 </Col>
                 <Col md={3} sm={3}>
+                    <SelectPortTypeahead/>
+                    <HoldTimer/>
                     <DesignComponents />
                 </Col>
                 <AddFixtureModal />
@@ -62,7 +65,7 @@ export default class DesignApp extends Component {
                 <EditJunctionModal />
                 <EditPipeModal />
                 <ConnectionErrorsModal />
-                <DesignErrorsModal />
+                { /*<DesignErrorsModal /> */}
             </Row>
         );
     }

@@ -25,26 +25,26 @@ export default class EroTypeahead extends Component {
 
     // this will keep updating the next -ERO options as the ERO changes;
     disposeOfEroOptionsUpdate = autorunAsync('ero options update', () => {
-        let editPipe = this.props.controlsStore.editPipe;
-        let submitEro = toJS(editPipe.ero);
+        let ep = this.props.controlsStore.editPipe;
+        let submitEro = toJS(ep.ero.hops);
 
 
         // keep track of the last hop; if we've reached Z we shouldn't keep going
-        let lastHop = editPipe.a;
-        if (editPipe.ero.length > 0) {
-            lastHop = editPipe.ero[editPipe.ero.length - 1];
+        let lastHop = ep.a;
+        if (ep.ero.hops.length > 0) {
+            lastHop = ep.ero.hops[ep.ero.hops.length - 1];
         } else {
             // if there's _nothing_ in our ERO then ask for options from pipe.a
-            submitEro.push(editPipe.a);
+            submitEro.push(ep.a);
         }
 
         // if this is the last hop, don't provide any options
-        if (lastHop  === editPipe.z) {
+        if (lastHop === ep.z) {
             this.setState({options: []});
             return;
         }
 
-        myClient.submit('POST', '/api/topo/nextHopsForEro', submitEro)
+        myClient.submit('POST', '/api/pce/nextHopsForEro', submitEro)
             .then(
                 action((response) => {
                     let nextHops = JSON.parse(response);
@@ -89,17 +89,20 @@ export default class EroTypeahead extends Component {
         });
 
         if (wasAnOption) {
-            let editPipe = this.props.controlsStore.editPipe;
+            let ep = this.props.controlsStore.editPipe;
             let ero = [];
-            editPipe.ero.map(e => {
+            ep.manual.ero.map(e => {
                 ero.push(e);
             });
             ero.push(through);
             ero.push(urn);
             ero.push(to);
 
-            this.props.controlsStore.setParamsForEditPipe({
-                ero: ero,
+            this.props.controlsStore.assignParamsForEditPipe({
+                ero: {
+                    hops: ero
+                },
+                manual: {ero: ero}
             });
 
             this.typeAhead.getInstance().clear();

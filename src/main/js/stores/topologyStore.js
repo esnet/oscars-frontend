@@ -96,6 +96,7 @@ class TopologyStore {
         };
         myClient.loadJSON({method: 'POST', url: '/api/topo/available', params})
             .then(action((response) => {
+//                console.log('loaded available');
                 this.available = JSON.parse(response);
             }));
 

@@ -24,9 +24,10 @@ import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
 import mapStore from './stores/mapStore';
 import designStore from './stores/designStore';
-import stateStore from './stores/stateStore';
 import topologyStore from './stores/topologyStore';
 import connsStore from './stores/connsStore';
+import userStore from './stores/userStore';
+import modalStore from './stores/modalStore';
 
 
 const PrivateRoute = ({component: Component, ...rest}) => (
@@ -69,8 +70,9 @@ const stores = {
     controlsStore,
     mapStore,
     designStore,
-    stateStore,
     topologyStore,
+    userStore,
+    modalStore
 };
 useStrict(true);
 
