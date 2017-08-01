@@ -15,7 +15,7 @@ module.exports = {
     cache: true,
     output: {
         path: PATHS.build,
-        publicPath: '/webjars/oscars-frontend/1.0.0/bundle.js',
+        publicPath: '/webjars/oscars-frontend/1.0.1/bundle.js',
         filename: 'bundle.js'
     },
     module: {
@@ -80,23 +80,6 @@ module.exports = {
                 secure: false,
                 changeOrigin: true,
                 target: 'https://localhost:8201/'
-            },
-
-
-            '/topology/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
-            },
-            '/resv/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
-            },
-            '/vlan/*': {
-                secure: false,
-                changeOrigin: true,
-                target: 'https://localhost:8001/'
             }
 
         }

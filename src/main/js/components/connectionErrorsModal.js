@@ -5,11 +5,12 @@ import {
     Button,
     Panel,
     ListGroup,
+    ListGroupItem
 } from 'react-bootstrap';
 
 const modalName = 'connectionErrors';
 
-@inject('stateStore', 'controlsStore')
+@inject('controlsStore', 'modalStore')
 @observer
 export default class ConnectionErrorsModal extends Component {
     constructor(props) {
@@ -17,12 +18,16 @@ export default class ConnectionErrorsModal extends Component {
     }
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
 
     render() {
-        let showModal = this.props.controlsStore.modals.get(modalName);
+
+        let showModal = this.props.modalStore.modals.get(modalName);
+        if (!showModal) {
+            return null;
+        }
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>
@@ -31,7 +36,13 @@ export default class ConnectionErrorsModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <Panel>
-                        <ListGroup>{this.props.stateStore.st.errors}</ListGroup>
+                        <ListGroup>
+            {
+                this.props.controlsStore.connection.validation.errors.map((e, idx) => {
+                    return <ListGroupItem key={idx}>{e}</ListGroupItem>;
+                } )
+            }
+                        </ListGroup>
                     </Panel>
                 </Modal.Body>
                 <Modal.Footer>

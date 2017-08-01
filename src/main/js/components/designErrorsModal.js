@@ -9,7 +9,7 @@ import {
 
 const modalName = 'designErrors';
 
-@inject('designStore', 'controlsStore')
+@inject('designStore', 'modalStore')
 @observer
 export default class DesignErrorsModal extends Component {
     constructor(props) {
@@ -17,12 +17,15 @@ export default class DesignErrorsModal extends Component {
     }
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
 
     render() {
-        let showModal = this.props.controlsStore.modals.get(modalName);
+        let showModal = this.props.modalStore.modals.get(modalName);
+        if (!showModal) {
+            return null;
+        }
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>

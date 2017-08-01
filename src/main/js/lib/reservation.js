@@ -1,7 +1,6 @@
 import Moment from 'moment';
-import sandboxStore from '../stores/designStore'
+import designStore from '../stores/designStore'
 import controlsStore from '../stores/controlsStore'
-import stateStore from '../stores/stateStore'
 import {computed} from 'mobx';
 
 class Reservation {
@@ -14,12 +13,11 @@ class Reservation {
             endAt: parseInt(Moment(controlsStore.connection.endAt).unix()),
             description: controlsStore.connection.description,
             connectionId: controlsStore.connection.connectionId,
-            status: stateStore.connState
         };
 
-        sandboxStore.design.junctions.map((sj) => {
+        designStore.design.junctions.map((sj) => {
             let resFixtures = {};
-            sandboxStore.design.fixtures.map((sf) => {
+            designStore.design.fixtures.map((sf) => {
                 if (sf.device === sj.id) {
                     resFixtures[sf.id] = {
                         port: sf.port,
@@ -37,7 +35,7 @@ class Reservation {
         });
 
         let resPipes = {};
-        sandboxStore.design.pipes.map((p) => {
+        designStore.design.pipes.map((p) => {
             resPipes[p.id] = {
                 a: p.a,
                 z: p.z,

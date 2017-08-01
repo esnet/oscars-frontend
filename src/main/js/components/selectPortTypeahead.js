@@ -6,7 +6,7 @@ import transformer from '../lib/transform';
 import {Well, FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 
 
-@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore')
+@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
 @observer
 export default class SelectPortTypeahead extends Component {
     componentWillMount() {
@@ -45,7 +45,7 @@ export default class SelectPortTypeahead extends Component {
             const editFixtureParams = transformer.newFixtureToEditParams(fixture);
             this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
 
-            this.props.controlsStore.openModal('editFixture');
+            this.props.modalStore.openModal('editFixture');
 
         }
     };
@@ -79,7 +79,7 @@ export default class SelectPortTypeahead extends Component {
                             onInputChange={this.onTypeaheadSelection}
                         />
                         <InputGroup.Addon>
-                            <OverlayTrigger trigger='click' rootClose placement='right' overlay={myHelp}>
+                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
                                 <Glyphicon className='pull-right' glyph='question-sign'/>
                             </OverlayTrigger>
 

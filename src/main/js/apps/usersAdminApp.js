@@ -21,7 +21,7 @@ import UserAdminModal from '../components/userAdminModal';
 import {size} from 'lodash'
 
 
-@inject('controlsStore', 'commonStore')
+@inject('controlsStore', 'commonStore', 'modalStore')
 @observer
 export default class UsersAdminApp extends Component {
 
@@ -55,7 +55,7 @@ export default class UsersAdminApp extends Component {
         this.props.controlsStore.editUser.allUsers.map((u) => {
             if (u.username === username) {
                 this.props.controlsStore.setParamsForEditUser({user: toJS(u)});
-                this.props.controlsStore.openModal('userAdmin');
+                this.props.modalStore.openModal('userAdmin');
             }
         });
     };
@@ -112,7 +112,7 @@ export default class UsersAdminApp extends Component {
             );
         this.refreshUserList();
 
-        this.props.controlsStore.openModal('userAdmin');
+        this.props.modalStore.openModal('userAdmin');
     };
 
 

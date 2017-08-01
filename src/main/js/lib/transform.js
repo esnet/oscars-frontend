@@ -5,58 +5,47 @@ import {toJS} from 'mobx';
 
 class Transformer {
     existingFixtureToEditParams(fixture) {
-//        console.log('existing fixture');
-//        console.log(toJS(fixture));
         let editParams = {
             fixtureId: fixture.id,
             label: fixture.label,
             port: fixture.port,
             device: fixture.device,
-            vlan: fixture.vlan,
-            ingress: fixture.ingress,
-            egress: fixture.egress,
-            bwLocked: fixture.bwLocked,
+            locked: fixture.locked,
+            vlan: {
+                vlanId: fixture.vlan,
+                mode: 'fromAvailable',
+                typeIn: {
+                    choice: fixture.vlanId,
+                    validationState: 'success',
+                    validationText: '',
+                }
+            },
+            bw: {
+                ingress: fixture.ingress,
+                egress: fixture.egress,
+                mode: 'typeIn',
+                modeOptions: [],
+                typeIn: {
+                    ingress: {
+                        choice: fixture.ingress,
+                        validationText: '',
+                        validationState: 'success',
+                    },
+                    egress: {
+                        choice: fixture.egress,
+                        validationText: '',
+                        validationState: 'success',
 
-            availableVlans: '',
-            vlanExpression: '',
-            vlanLocked: fixture.vlanLocked,
+                    }
+                },
+                copied: {
+                    show: false,
+                    ingress: fixture.ingress,
+                    egress: fixture.egress,
+                }
 
-            copiedVlan: '',
-            showCopiedVlan: false,
-            vlanSelectionMode: 'fromAvailable',
-            vlanSelectionModeOptions: [],
-            vlanCopyFromOptions: [],
-            vlanChoice: fixture.vlan,
-            vlanChoiceValidationState: 'success',
-            vlanChoiceValidationText: '',
-
-
-            bwLocked: fixture.bwLocked,
-            bwSelectionMode: 'typeIn',
-            bwSelectionModeOptions: [],
-            showCopiedBw: false,
-            copiedIngress: 0,
-            copiedEgress: 0,
-            ingressValidationState: 'success',
-            ingressValidationText: '',
-            egressValidationState: 'success',
-            egressValidationText: '',
-
+            }
         };
-
-        if (fixture.vlanLocked) {
-            editParams.showVlanLockButton = false;
-        } else {
-            editParams.vlanLockText = 'Choose and lock';
-            editParams.showVlanLockButton = true;
-        }
-
-        if (fixture.bwLocked) {
-            editParams.showBwLockButton = false;
-        } else {
-            editParams.showBwLockButton = true;
-
-        }
 
         return editParams;
 
@@ -68,39 +57,44 @@ class Transformer {
             label: fixture.label,
             port: fixture.port,
             device: fixture.device,
-
-            vlan: null,
-            vlanChoice: '',
-            vlanLocked: false,
-            showVlanLockButton: true,
-            vlanLockText: 'Choose and lock',
-            vlanSelectionMode: 'fromAvailable',
-            vlanChoiceValidationState: 'error',
-            vlanChoiceValidationText: 'empty input',
-
-
-
-            ingress: 0,
-            egress: 0,
-            bwLocked: false,
-            bwSelectionMode: 'typeIn',
-            bwSelectionModeOptions: [],
-            showCopiedBw: false,
-            copiedIngress: 0,
-            copiedEgress: 0,
-
-            showBwLockButton: true,
-            ingressValidationState: 'success',
-            ingressValidationText: '',
-            egressValidationState: 'success',
-            egressValidationText: '',
-
-
+            locked: false,
+            vlan: {
+                acceptable: true,
+                vlanId: null,
+                mode: 'fromAvailable',
+                typeIn: {
+                    choice: '',
+                    validationState: 'error',
+                    validationText: 'No input',
+                }
+            },
+            bw: {
+                acceptable: true,
+                ingress: 0,
+                egress: 0,
+                mode: 'typeIn',
+                modeOptions: [],
+                typeIn: {
+                    symmetrical: true,
+                    ingress: {
+                        choice: 0,
+                        validationState: 'success',
+                        validationText: '',
+                    },
+                    egress: {
+                        choice: 0,
+                        validationState: 'success',
+                        validationText: '',
+                    }
+                },
+                copied: {
+                    show: false,
+                    ingress: 0,
+                    egress: 0,
+                }
+            }
         };
-
-
         return editParams;
-
     }
 
     existingPipeToEditParams(pipe) {
@@ -108,9 +102,18 @@ class Transformer {
             pipeId: pipe.id,
             a: pipe.a,
             z: pipe.z,
-            azBw: pipe.azBw,
-            zaBw: pipe.zaBw,
-            lockedEro: true
+            locked: pipe.locked,
+
+            A_TO_Z: {
+                bw: pipe.azBw,
+            },
+            Z_TO_A: {
+                bw: pipe.zaBw
+            },
+            ero: {
+                hops: pipe.ero,
+                mode: pipe.mode
+            }
         };
 
     }
@@ -142,22 +145,25 @@ class Transformer {
                     egress: df.egressBandwidth,
                     vlan: df.vlan.vlanId,
                     label: df.portUrn + ':' + df.vlan.vlanId,
-                    bwLocked: true,
-                    vlanLocked: true
+                    locked: false,
                 };
                 result.fixtures.push(entry);
             });
         }
         if (typeof pipes !== 'undefined') {
             pipes.map((dp) => {
+                let ero = [];
+                dp.azERO.map((h) => {
+                    ero.push(h.urn);
+                });
                 let entry = {
                     id: dp.a + ' -- ' + dp.z,
                     a: dp.a,
                     z: dp.z,
                     azBw: dp.azBandwidth,
                     zaBw: dp.zaBandwidth,
-                    bwLocked: true,
-                    ero: []
+                    locked: false,
+                    ero: ero
 
                 };
                 result.pipes.push(entry);
@@ -167,7 +173,7 @@ class Transformer {
         return result;
     }
 
-    toBackend(design) {
+    toBackend(design, scheduleRef=null) {
         let { junctions, pipes, fixtures } = design;
         let cmp = {
             junctions: [],
@@ -183,14 +189,25 @@ class Transformer {
         });
         if (typeof pipes !== 'undefined') {
             pipes.map((p) => {
+                let azEro = [];
+                let zaEro = [];
+                p.ero.map((h) => {
+                    azEro.push({urn: h});
+                    zaEro.unshift({urn: h});
+                });
                 let entry = {
                     a: p.a,
                     z: p.z,
                     azBandwidth: p.azBw,
                     zaBandwidth: p.zaBw,
+                    schedule: scheduleRef,
+                    azERO: azEro,
+                    zaERO: zaEro
 
                 };
-                cmp.pipes.push(entry);
+                if (p.locked) {
+                    cmp.pipes.push(entry);
+                }
             });
         }
         fixtures.map((f) => {
@@ -199,11 +216,16 @@ class Transformer {
                 ingressBandwidth: f.ingress,
                 egressBandwidth: f.egress,
                 portUrn: f.port,
+                schedule: scheduleRef,
                 vlan: {
-                    vlanId: f.vlan
+                    urn: f.port,
+                    vlanId: f.vlan,
+                    schedule: scheduleRef
                 }
             };
-            cmp.fixtures.push(entry);
+            if (f.locked) {
+                cmp.fixtures.push(entry);
+            }
         });
         return cmp;
     }

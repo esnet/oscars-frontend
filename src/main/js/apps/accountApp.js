@@ -5,7 +5,7 @@ import myClient from '../agents/client';
 import EditUserForm from '../components/editUserForm';
 import {size} from 'lodash'
 
-@inject('controlsStore', 'commonStore')
+@inject('userStore', 'commonStore')
 @observer
 export default class AccountApp extends Component {
     constructor(props) {
@@ -15,12 +15,12 @@ export default class AccountApp extends Component {
     componentWillMount() {
         this.props.commonStore.setActiveNav('account');
 
-        this.props.controlsStore.setParamsForEditUser({user: {}});
+        this.props.userStore.setParamsForEditUser({user: {}});
         myClient.submitWithToken('GET', '/protected/account', '')
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.controlsStore.setParamsForEditUser({user: parsed});
+                    this.props.userStore.setParamsForEditUser({user: parsed});
                 }
                 ,
                 (failResponse) => {
@@ -31,23 +31,22 @@ export default class AccountApp extends Component {
 
 
     submitUpdate = () => {
-        let user = toJS(this.props.controlsStore.editUser.user);
+        let user = toJS(this.props.userStore.editUser.user);
         if (!size(user.username)) {
             console.log('username not set');
             return;
         }
-        this.props.controlsStore.setParamsForEditUser({status: 'updating..'});
+        this.props.userStore.setParamsForEditUser({status: 'updating..'});
 
         myClient.submitWithToken('POST', '/protected/account', user)
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.controlsStore.setParamsForEditUser({user: parsed});
-                    this.props.controlsStore.setParamsForEditUser({status: 'Updated!'});
+                    this.props.userStore.setParamsForEditUser({user: parsed, status: 'Updated!'});
                 }
                 ,
                 (failResponse) => {
-                    this.props.controlsStore.setParamsForEditUser({status: failResponse.statusText});
+                    this.props.userStore.setParamsForEditUser({status: failResponse.statusText});
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
@@ -55,7 +54,7 @@ export default class AccountApp extends Component {
 
 
     submitPassword = (controlRef) => {
-        let editUser = toJS(this.props.controlsStore.editUser);
+        let editUser = toJS(this.props.userStore.editUser);
 
         if (!size(editUser.password)) {
             console.log('password not set');
@@ -72,7 +71,7 @@ export default class AccountApp extends Component {
                 }
             );
         // clear it
-        this.props.controlsStore.setPassword('');
+        this.props.userStore.setPassword('');
         controlRef.value = '';
     };
 

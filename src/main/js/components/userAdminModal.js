@@ -7,7 +7,7 @@ import {size} from 'lodash'
 
 const modalName = 'userAdmin';
 
-@inject('controlsStore')
+@inject('modalStore', 'userStore')
 @observer
 export default class UserAdminModal extends Component {
     constructor(props) {
@@ -16,8 +16,8 @@ export default class UserAdminModal extends Component {
 
 
     submitPassword = (controlRef) => {
-        let password = this.props.controlsStore.editUser.password;
-        let user = this.props.controlsStore.editUser.user;
+        let password = this.props.userStore.editUser.password;
+        let user = this.props.userStore.editUser.user;
 
         if (!size(password)) {
             console.log('password not set');
@@ -35,18 +35,18 @@ export default class UserAdminModal extends Component {
                 }
             );
         // clear UI after setting
-        this.props.controlsStore.setPassword('');
+        this.props.userStore.setPassword('');
         controlRef.value = '';
     };
 
     submitUpdate = () => {
-        let user = this.props.controlsStore.editUser.user;
+        let user = this.props.userStore.editUser.user;
         // update the user
         myClient.submitWithToken('POST', '/admin/users/' + user.username, user)
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.controlsStore.setParamsForEditUser({user: parsed});
+                    this.props.userStore.setParamsForEditUser({user: parsed});
                     this.props.refresh();
                 }
                 ,
@@ -57,8 +57,8 @@ export default class UserAdminModal extends Component {
     };
 
     submitDelete = () => {
-        let user = this.props.controlsStore.editUser.user;
-        let allUsers = this.props.controlsStore.editUser.allUsers;
+        let user = this.props.userStore.editUser.user;
+        let allUsers = this.props.userStore.editUser.allUsers;
         if (size(allUsers <= 1)) {
             console.log('will not delete last user');
             return;
@@ -80,11 +80,11 @@ export default class UserAdminModal extends Component {
 
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
     render() {
-        let showModal = this.props.controlsStore.modals.get(modalName);
+        let showModal = this.props.modalStore.modals.get(modalName);
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>

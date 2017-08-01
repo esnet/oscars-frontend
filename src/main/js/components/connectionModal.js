@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import {Modal, Panel, Button} from 'react-bootstrap';
 
 import {observer, inject} from 'mobx-react';
-import TopologyMap from "./networkMap";
+import NetworkMap from "./networkMap";
 import {toJS} from 'mobx';
 
 const modalName = 'connection';
 
-@inject('controlsStore', 'connsStore')
+@inject('connsStore', 'modalStore')
 @observer
 export default class ConnectionModal extends Component {
 
@@ -16,12 +16,12 @@ export default class ConnectionModal extends Component {
     }
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
 
     render() {
-        let showModal = this.props.controlsStore.modals.get(modalName);
+        let showModal = this.props.modalStore.modals.get(modalName);
         if (!showModal) {
             return (<div />);
         }

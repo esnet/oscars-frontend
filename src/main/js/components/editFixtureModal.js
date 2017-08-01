@@ -3,13 +3,14 @@ import {observer, inject} from 'mobx-react';
 import {Modal, Button, Grid, Row, Col} from 'react-bootstrap';
 
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
+import ToggleDisplay from 'react-toggle-display';
 
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
 
 const modalName = 'editFixture';
 
-@inject('controlsStore', 'designStore', 'mapStore')
+@inject('controlsStore', 'designStore', 'mapStore', 'modalStore')
 @observer
 export default class EditFixtureModal extends Component {
     constructor(props) {
@@ -17,7 +18,7 @@ export default class EditFixtureModal extends Component {
     }
 
     closeModal = () => {
-        this.props.controlsStore.closeModal(modalName);
+        this.props.modalStore.closeModal(modalName);
     };
 
     deleteFixture = () => {
@@ -34,32 +35,102 @@ export default class EditFixtureModal extends Component {
         this.closeModal();
     };
 
+    lockFixture = () => {
+        const ef = this.props.controlsStore.editFixture;
+        let eParams = {locked: true};
+        let tParams = {locked: true};
+        if (ef.bw.mode === 'typeIn') {
+            tParams.ingress = ef.bw.typeIn.ingress.choice;
+            tParams.egress = ef.bw.typeIn.egress.choice;
+            eParams.bw = {
+                    ingress: ef.bw.typeIn.ingress.choice,
+                    egress: ef.bw.typeIn.egress.choice,
+                };
+        } else if (ef.bw.mode === 'sameAs' || ef.bw.mode === 'oppositeOf') {
+            tParams.ingress = ef.bw.typeIn.copied.ingress;
+            tParams.egress = ef.bw.typeIn.copied.egress;
+            eParams.bw = {
+                ingress: ef.bw.copied.ingress,
+                egress: ef.bw.copied.egress,
+            };
+
+        }
+
+        let vlanId = null;
+        if (ef.vlan.mode === 'typeIn') {
+            vlanId = ef.vlan.typeIn.choice;
+        } else if (ef.vlan.mode === 'sameAs') {
+            vlanId = ef.vlan.copied.vlanId;
+        } else if (ef.vlan.mode === 'fromAvailable') {
+            vlanId = ef.vlan.available.lowest;
+        }
+        tParams.vlan = vlanId;
+        eParams.vlan = {
+            vlanId: vlanId,
+        };
+        eParams.label = this.props.designStore.lockFixture(ef.fixtureId, tParams);
+
+
+        this.props.controlsStore.setParamsForEditFixture(eParams);
+
+
+    };
+    unlockFixture = () => {
+        const ef = this.props.controlsStore.editFixture;
+
+        const label = this.props.designStore.unlockFixture(ef.fixtureId);
+        this.props.controlsStore.setParamsForEditFixture({label: label, locked: false});
+
+    };
 
     render() {
-        let showModal = this.props.controlsStore.modals.get(modalName);
+        let showModal = this.props.modalStore.modals.get(modalName);
+        let conn = this.props.controlsStore.connection;
         let ef = this.props.controlsStore.editFixture;
 
-        let label = ef.device + ':' + ef.label;
-        let vlan = ef.vlan + '';
+
+        let title = ef.device + ':'+ ef.label;
+        const disableLockBtn = !ef.vlan.acceptable || !ef.bw.acceptable;
 
         return (
             <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{label}</Modal.Title>
+                    <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Grid fluid={true}>
-                        <Row>
-                            <Col md={6} sm={6}>
-                                <VlanSelect />
-                            </Col>
-                            <Col md={6} sm={6}>
-                                <BwSelect />
-                            </Col>
-                        </Row>
-                        <Button bsStyle='warning' className='pull-right'
-                                onClick={this.deleteFixture}>Delete</Button>
-                    </Grid>
+                    <ToggleDisplay show={conn.schedule.locked}>
+                        <Grid fluid={true}>
+                            <Row>
+                                <Col md={5} sm={5} lg={5}>
+                                    <VlanSelect />
+                                </Col>
+                                <Col md={7} sm={7} lg={7}>
+                                    <BwSelect />
+                                </Col>
+                            </Row>
+                            <Button bsStyle='warning' className='pull-right'
+                                    onClick={this.deleteFixture}>Delete</Button>
+                            {' '}
+                            <ToggleDisplay show={!ef.locked}>
+                                <Button bsStyle='primary'
+                                        disabled={disableLockBtn}
+                                        className='pull-right'
+                                        onClick={this.lockFixture}>Lock</Button>
+                                {' '}
+                            </ToggleDisplay>
+                            <ToggleDisplay show={ef.locked}>
+                                <Button bsStyle='warning'
+                                        className='pull-right'
+                                        onClick={this.unlockFixture}>Unlock</Button>
+                                {' '}
+                            </ToggleDisplay>
+                        </Grid>
+
+                    </ToggleDisplay>
+                    <ToggleDisplay show={!conn.schedule.locked}>
+                        <h3>Schedule must be locked to edit fixture parameters.</h3>
+                    </ToggleDisplay>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.closeModal}>Close</Button>

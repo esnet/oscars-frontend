@@ -6,7 +6,7 @@ import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-boo
 import transformer from '../lib/transform';
 import ToggleDisplay from 'react-toggle-display';
 
-@inject('designStore', 'controlsStore')
+@inject('designStore', 'controlsStore', 'modalStore')
 @observer
 export default class DesignComponents extends Component {
     constructor(props) {
@@ -50,7 +50,7 @@ export default class DesignComponents extends Component {
                                     return <NavItem key={key} onClick={() => {
                                         const params = transformer.existingFixtureToEditParams(fixture);
                                         this.props.controlsStore.setParamsForEditFixture(params);
-                                        this.props.controlsStore.openModal('editFixture');
+                                        this.props.modalStore.openModal('editFixture');
                                     }}>
                                         {validationLabel}
                                         {' '}
@@ -64,7 +64,7 @@ export default class DesignComponents extends Component {
                                 <Nav bsStyle='pills' stacked key={device + 'nav'}>
                                     <NavItem active={true} key={device} onClick={() => {
                                         this.props.controlsStore.setParamsForEditJunction({junction: device});
-                                        this.props.controlsStore.openModal('editJunction');
+                                        this.props.modalStore.openModal('editJunction');
                                     }}
                                     ><b><u>{device}</u></b></NavItem>
                                     {fixtureNodes}
@@ -86,7 +86,7 @@ export default class DesignComponents extends Component {
                                     const params = transformer.existingPipeToEditParams(pipe);
                                     this.props.controlsStore.setParamsForEditPipe(params);
 
-                                    this.props.controlsStore.openModal('editPipe');
+                                    this.props.modalStore.openModal('editPipe');
                                 }}>{validationLabel}
                                     {' '}
                                     {pipe.a} --- {pipe.z}
