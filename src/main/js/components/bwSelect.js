@@ -392,19 +392,20 @@ export default class BwSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
         let typeInMode = ef.bw.mode === 'typeIn';
 
-        let helpPopover = <Popover id='help-bwSelect' title='Help'>
-            <p>Select the bandwidth for this fixture. In a valid design, all fixtures
-                must have set ingress and egress bandwith values.</p>
-            <p>In the default "From text input" mode, you can just type in the bandwidth that you want.
-                If the Symmetrical checkbox is unchecked, the Egress textbox will become enabled and
-                you will be able to enter different values for Ingress and Egress.</p>
-            <p>If the design contains another fixture, then the "Same as..." and "Opposite of..."
-                selection modes will be available, allowing you to copy Ingress and Egress
-                values to this one.</p>
-            <p>When either "Same as..." or "Opposite from..." are selected, a second dropdown
+        let helpPopover = <Popover id='help-bwSelect' title='Ingress / egress bandwidth help'>
+            <p>Here you can set the allowed ingress and egress bandwith values for this fixture. There are
+                some different ways to choose:</p>
+            <p>In the default "From text input" mode, you can just type in the bandwidth that you want. The
+                input control will provide feedback. </p>
+            <p>If the Symmetrical checkbox is checked, any changes in the Ingress control input
+                are propagated to the Egress control. If the checkbox is unchecked,
+                both Ingress and Egress controls are editable and independent.</p>
+            <p>The "Same as..." and "Opposite of..." selection modes may be available, allowing you
+                to copy Ingress and Egress values from other fixtures to this one. </p>
+            <p>When either "Same as..." or "Opposite from..." are selected, an additional drop-down control
                 will appear allowing you to select the fixture to copy values from.</p>
-            <p>Finally, click "Set" to lock in the values. Once set, click the "Release" button
-                to edit again</p>
+            <p>In all modes, the "Lock Fixture" button will lock in your selections.
+                That button only appears when both the VLAN and bandwidth selections are valid/</p>
 
         </Popover>;
 

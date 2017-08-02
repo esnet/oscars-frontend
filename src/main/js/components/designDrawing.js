@@ -177,8 +177,8 @@ export default class DesignDrawing extends Component {
 
 
         let myHelp = <Popover id='help-designMap' title='Design drawing'>
-            <p>This drawing displays the fixtures, junctions and pipes of your design. It will auto-update
-                as they are added, deleted, or updated.</p>
+            <p>This drawing displays the fixtures, junctions and pipes of your design. It starts empty and
+                will auto-update as they are added, deleted, or updated.</p>
             <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
                 are drawn as lines between junctions.</p>
             <p>Unlocked components are drawn in orange color .</p>

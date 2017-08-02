@@ -19,8 +19,8 @@ export default class DesignComponents extends Component {
 
 
         let compHelp = <Popover id='help-designComponents' title='Component list'>
-            <p>This displays the current design's junctions, fixtures, and pipes.
-                It will auto-update as these are added, deleted, or updated.</p>
+            <p>This displays the fixtures, junctions, and pipes fot the current design.
+                It starts out emptu and will auto-update as these are added, deleted, or updated.</p>
 
             <p>An orange flag icon indicates an unlocked component; a green checkmark means it is locked.
                 All components must be locked before the connection can be committed.</p>

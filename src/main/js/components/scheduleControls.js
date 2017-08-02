@@ -262,8 +262,8 @@ export default class ScheduleControls extends Component {
             <p>Then, click "Lock schedule", so that the system can then
                 calculate resource availability.</p>
             <p>Relative time expressions such as "in 10 minutes" are accepted,
-                but they are evaluated when you click "Lock schedule", and the
-                resulting times do not change as time passes.</p>
+                but they are only evaluated when you type them in.
+                The resulting times will not change as time passes.</p>
             <p>Unlocking the schedule will also unlock all other resources.</p>
         </Popover>;
 
