@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
     Modal, Button, FormControl, ControlLabel, FormGroup, Form,
-    Label, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
+    Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
     ListGroup, ListGroupItem, HelpBlock
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -29,14 +29,13 @@ export default class PipeParamsModal extends Component {
 
         let pipe = this.props.designStore.findPipe(ep.pipeId);
 
-        if (pipe === null || !conn.schedule.locked) {
+        let mode = ep.ero.mode;
+        let modeNeedsPathUpdate = mode === 'shortest' || mode === 'fits'
+
+        if (pipe === null || !conn.schedule.locked || !modeNeedsPathUpdate) {
             return;
         }
 
-        if (ep.ero.mode === 'shortest' && ep.ero.hops.length > 0 && ep.shortest.azBaseline > 0) {
-            // we've already got a shortest path, no need to do anything.
-            return;
-        }
         this.props.controlsStore.setParamsForEditPipe({
             loading: true,
             ero: {
@@ -102,6 +101,13 @@ export default class PipeParamsModal extends Component {
                             message: 'No path found!',
                             hops: []
                         };
+                        params.fits = {
+                            azAvailable: 0,
+                            zaAvailable: 0,
+                            azBaseline: 0,
+                            zaBaseline: 0,
+                            ero: []
+                        }
                     } else {
                         params.ero = {
                             acceptable: true,
@@ -114,8 +120,8 @@ export default class PipeParamsModal extends Component {
                 }
                 this.props.controlsStore.setParamsForEditPipe(params);
             }).then(() => {
-                this.validate();
-            });
+            this.validate();
+        });
 
     }, 1000);
 
@@ -368,33 +374,41 @@ export default class PipeParamsModal extends Component {
                             </Row>
                             <Row>
                                 <Col md={6} lg={6} sm={6}>
-                                    <h4>Bandwidth</h4>
-                                    <FormGroup validationState={ep.A_TO_Z.validationState}>
-                                        <ControlLabel>{azLabel}</ControlLabel>
+                                    <ToggleDisplay show={!ep.locked}>
+                                        <h4>Bandwidth</h4>
+                                        <FormGroup validationState={ep.A_TO_Z.validationState}>
+                                            <ControlLabel>{azLabel}</ControlLabel>
+                                            {' '}
+                                            <FormControl type="text"
+                                                         placeholder="0-100000 (Mbps)"
+                                                         defaultValue={ep.A_TO_Z.bw}
+                                                         disabled={ep.locked}
+                                                         onChange={this.onAzBwChange}/>
+                                            <HelpBlock><p>{ep.A_TO_Z.validationText}</p></HelpBlock>
+                                            <HelpBlock>Reservable: {ep.A_TO_Z.available} Mbps</HelpBlock>
+                                            <HelpBlock>Baseline: {ep.A_TO_Z.baseline} Mbps</HelpBlock>
+                                        </FormGroup>
                                         {' '}
-                                        <FormControl type="text"
-                                                     placeholder="0-100000 (Mbps)"
-                                                     defaultValue={ep.A_TO_Z.bw}
-                                                     disabled={ep.locked}
-                                                     onChange={this.onAzBwChange}/>
-                                        <HelpBlock><p>{ep.A_TO_Z.validationText}</p></HelpBlock>
-                                        <HelpBlock>Reservable: {ep.A_TO_Z.available} Mbps</HelpBlock>
-                                        <HelpBlock>Baseline: {ep.A_TO_Z.baseline} Mbps</HelpBlock>
-                                    </FormGroup>
-                                    {' '}
-                                    <FormGroup validationState={ep.Z_TO_A.validationState}>
-                                        <ControlLabel>{zaLabel}</ControlLabel>
-                                        {' '}
-                                        <FormControl onChange={this.onZaBwChange}
-                                                     disabled={ep.locked}
-                                                     defaultValue={ep.Z_TO_A.bw}
-                                                     type="text"
-                                                     placeholder="0-10000 (Mbps)"/>
+                                        <FormGroup validationState={ep.Z_TO_A.validationState}>
+                                            <ControlLabel>{zaLabel}</ControlLabel>
+                                            {' '}
+                                            <FormControl onChange={this.onZaBwChange}
+                                                         disabled={ep.locked}
+                                                         defaultValue={ep.Z_TO_A.bw}
+                                                         type="text"
+                                                         placeholder="0-10000 (Mbps)"/>
 
-                                        <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
-                                        <HelpBlock>Available: {ep.Z_TO_A.available} Mbps</HelpBlock>
-                                        <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
-                                    </FormGroup>
+                                            <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
+                                            <HelpBlock>Available: {ep.Z_TO_A.available} Mbps</HelpBlock>
+                                            <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
+                                        </FormGroup>
+                                    </ToggleDisplay>
+                                    <ToggleDisplay show={ep.locked}>
+                                        <Well>A to Z bandwidth: {ep.A_TO_Z.bw} Mbps</Well>
+                                        {' '}
+                                        <Well>Z to A bandwidth: {ep.Z_TO_A.bw} Mbps</Well>
+                                    </ToggleDisplay>
+
                                 </Col>
 
                                 <Col md={6} lg={6} sm={6}>
@@ -407,7 +421,7 @@ export default class PipeParamsModal extends Component {
                                             })
                                         }
                                     </ListGroup>
-                                    <ToggleDisplay show={ep.ero.mode === 'manual'}>
+                                    <ToggleDisplay show={!ep.locked && ep.ero.mode === 'manual'}>
                                         <FormGroup>
                                             <ControlLabel>Select next hop</ControlLabel>
                                             <EroTypeahead/>
@@ -456,8 +470,8 @@ class PathSelectMode extends Component {
 
     render() {
         let pathSelectModeOpts = [
-            {value: 'shortest', label: 'Shortest path'},
             {value: 'fits', label: 'Fits bandwidth'},
+            {value: 'shortest', label: 'Shortest path'},
             //            {value: 'manual', label: 'Specify ERO'}
         ];
         return <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>

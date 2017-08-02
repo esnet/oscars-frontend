@@ -67,6 +67,14 @@ export default class VlanSelect extends Component {
 
     vlanUpdateDispose = autorun('vlanUpdate', () => {
         if (!this.props.controlsStore.connection.schedule.locked) {
+
+            this.props.controlsStore.setParamsForEditFixture({
+                vlan: {
+                    copyFrom: {
+                        options: []
+                    }
+                }
+            });
             return;
         }
 
@@ -280,7 +288,7 @@ export default class VlanSelect extends Component {
                     {Validator.label(ef.vlan.acceptable)}
 
                     <ToggleDisplay show={ef.vlan.copied.show}>
-                        <Well>Copied VLAN id: {ef.vlan.copied.vlanId}</Well>
+                        <Well>Copied VLAN id: {ef.vlan.copied.choice}</Well>
                     </ToggleDisplay>
 
                 </ToggleDisplay>

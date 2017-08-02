@@ -60,7 +60,7 @@ export default class EditFixtureModal extends Component {
         if (ef.vlan.mode === 'typeIn') {
             vlanId = ef.vlan.typeIn.choice;
         } else if (ef.vlan.mode === 'sameAs') {
-            vlanId = ef.vlan.copied.vlanId;
+            vlanId = ef.vlan.copied.choice;
         } else if (ef.vlan.mode === 'fromAvailable') {
             vlanId = ef.vlan.available.lowest;
         }
