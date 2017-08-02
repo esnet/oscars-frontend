@@ -58,7 +58,7 @@ export default class SelectPortTypeahead extends Component {
             options = toJS(ethPorts);
         }
 
-        let myHelp = <Popover id='help-selectPortTypeahead' title='Help'>
+        let myHelp = <Popover id='help-selectPortTypeahead' title='Text-based port selection.'>
             <p>Start typing in the text box to bring up an auto-complete list of ports
                 matching your input. Select with up and down arrow keys.
             </p>

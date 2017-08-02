@@ -256,7 +256,7 @@ export default class ScheduleControls extends Component {
         const sched = this.props.controlsStore.connection.schedule;
 
 
-        let help = <Popover id='help-schedule' title='Start here'>
+        let help = <Popover id='help-schedule' title='Schedule help'>
             <p>Type in the desired date / time for your connection to start and end.
                 A start time either in the past or after the end time is not accepted.</p>
             <p>Then, click "Lock schedule", so that the system can then

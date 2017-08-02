@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Button} from 'react-bootstrap';
 import {inject} from 'mobx-react';
 
 
@@ -9,6 +9,7 @@ import EditFixtureModal from '../components/editFixtureModal';
 import EditJunctionModal from '../components/editJunctionModal';
 import EditPipeModal from '../components/editPipeModal';
 import DesignErrorsModal from '../components/designErrorsModal';
+import DesignHelpModal from '../components/designHelpModal'
 import ConnectionErrorsModal from '../components/connectionErrorsModal';
 import DesignDrawing from '../components/designDrawing';
 import DesignComponents from '../components/designComponents';
@@ -46,9 +47,8 @@ export default class DesignApp extends Component {
         return (
             <Row>
                 <Col md={3} sm={3}>
-
-                    <ScheduleControls />
                     <ConnectionControls />
+                    <ScheduleControls />
                     { /* <DesignControls /> */}
                 </Col>
                 <Col md={6} sm={6}>
@@ -65,6 +65,7 @@ export default class DesignApp extends Component {
                 <EditJunctionModal />
                 <EditPipeModal />
                 <ConnectionErrorsModal />
+                <DesignHelpModal />
                 { /*<DesignErrorsModal /> */}
             </Row>
         );

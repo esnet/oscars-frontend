@@ -176,16 +176,17 @@ export default class DesignDrawing extends Component {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
 
-        let myHelp = <Popover id='help-designMap' title='Help'>
-            This drawing will auto-update to reflect changes to
-            the design components as they are added, deleted, or updated.
-            Junctions are represented by larger circles, and pipes
-            are drawn as lines between junctions. Fixtures are drawn as smaller circles.
-            Any component drawn in orange color needs attention from the user.
-            Click on any component to bring up its edit form. You may also click on the
-            magnifying glass icon to the right to readjust the map, or the chevron icon
-            to hide / show the map.
-
+        let myHelp = <Popover id='help-designMap' title='Design drawing'>
+            <p>This drawing displays the fixtures, junctions and pipes of your design. It will auto-update
+                as they are added, deleted, or updated.</p>
+            <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
+                are drawn as lines between junctions.</p>
+            <p>Unlocked components are drawn in orange color .</p>
+            <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
+                to temporarily reposition it.</p>
+            <p>Click on any component to bring up its edit form. You may also click on the
+                magnifying glass icon to the right to readjust the map, or the chevron icon
+                to hide / show the map.</p>
         </Popover>;
 
 
@@ -195,11 +196,11 @@ export default class DesignDrawing extends Component {
                     <Glyphicon glyph='question-sign'/>
                 </OverlayTrigger>
                 {' '}
-                <Glyphicon onClick={ () => {
+                <Glyphicon onClick={() => {
                     this.network.fit({animation: true})
                 }} glyph='zoom-out'/>
                 {' '}
-                <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
+                <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
             </div>
         </div>;
 

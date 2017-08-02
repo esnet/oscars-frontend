@@ -5,7 +5,7 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 
 import ToggleDisplay from 'react-toggle-display';
-import {Form, Button, Panel, FormGroup, FormControl } from 'react-bootstrap';
+import {Form, Glyphicon, Button, Panel, FormGroup, FormControl, Well } from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
@@ -68,11 +68,13 @@ export default class ConnectionControls extends Component {
 
     render() {
         const conn = this.props.controlsStore.connection;
-        const header = <span>Connection : {conn.connectionId}</span>;
 
         return (
-            <Panel header={header}>
+            <Panel>
                 <Form>
+                    <Well bsSize='small' onClick={() => { this.props.modalStore.openModal('designHelp')}}>
+                        <h3>Help me! <Glyphicon  className='pull-right' glyph='question-sign' /></h3>
+                    </Well>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
                         <FormControl type='text' placeholder='description'
