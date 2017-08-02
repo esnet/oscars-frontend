@@ -144,7 +144,7 @@ class DesignStore {
                     azBw: 0,
                     zaBw: 0,
                     locked: false,
-                    mode: 'shortest',
+                    mode: 'fits',
                     ero: []
                 };
                 this.addPipe(pipe);
@@ -322,7 +322,7 @@ class DesignStore {
         pipe.azBw = 0;
         pipe.zaBw = 0;
         pipe.locked = false;
-        pipe.mode = 'shortest';
+        pipe.mode = 'fits';
         pipe.ero = [];
 
 

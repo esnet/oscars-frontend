@@ -69,7 +69,7 @@ class ControlsStore {
             },
             copied: {
                 show: false,
-                vlanId: '',
+                choice: '',
             },
             available: {
                 lowest: '',
@@ -184,38 +184,33 @@ class ControlsStore {
 
 
 
-
+    customizer = (objValue, srcValue) => {
+        if (isArray(srcValue)) {
+            return srcValue;
+        }
+    }
 
 
 
     @action
     setParamsForEditPipe(params) {
-        function customizer(objValue, srcValue) {
-            if (isArray(srcValue)) {
-                return srcValue;
-            }
-        }
-        mergeWith(this.editPipe, params,customizer);
+
+        mergeWith(this.editPipe, params, this.customizer);
     }
 
     @action
     setParamsForEditJunction(params) {
-        merge(this.editJunction, params);
+        mergeWith(this.editJunction, params, this.customizer);
     }
 
     @action
     setParamsForEditFixture(params) {
-        merge(this.editFixture, params);
+        mergeWith(this.editFixture, params, this.customizer);
     }
 
     @action
     setParamsForConnection(params) {
-        function customizer(objValue, srcValue) {
-            if (isArray(srcValue)) {
-                return srcValue;
-            }
-        }
-        mergeWith(this.connection, params, customizer);
+        mergeWith(this.connection, params, this.customizer);
     }
 
 
