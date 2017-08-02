@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {Modal, Button, ListGroup, ListGroupItem, Glyphicon} from 'react-bootstrap';
 import transformer from '../lib/transform';
-
+import PropTypes from 'prop-types';
 const modalName = 'addFixture';
 
 @inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
@@ -100,6 +100,6 @@ class DevicePortList extends Component {
 
 
 DevicePortList.propTypes = {
-    onAddClicked: React.PropTypes.func.isRequired,
-    ports: React.PropTypes.array.isRequired,
+    onAddClicked: PropTypes.func.isRequired,
+    ports: PropTypes.array.isRequired,
 };

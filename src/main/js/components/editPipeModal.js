@@ -5,6 +5,7 @@ import {
     Label, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
     ListGroup, ListGroupItem, HelpBlock
 } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 import ToggleDisplay from 'react-toggle-display';
 import EroTypeahead from './eroTypeahead';
@@ -474,5 +475,5 @@ class PathSelectMode extends Component {
 }
 
 PathSelectMode.propTypes = {
-    onSelectModeChange: React.PropTypes.func.isRequired
+    onSelectModeChange: PropTypes.func.isRequired
 };
