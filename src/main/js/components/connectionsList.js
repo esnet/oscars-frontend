@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Panel, Table, Button} from 'react-bootstrap';
+import {Panel, Table} from 'react-bootstrap';
 import Moment from 'moment';
 import {toJS} from 'mobx';
 import {observer, inject} from 'mobx-react';

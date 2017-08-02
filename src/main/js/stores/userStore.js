@@ -1,13 +1,16 @@
 import {observable, action} from 'mobx';
 
-import {size} from 'lodash';
 
 class UserStore {
 
     @observable
     editUser = {
         allUsers: [],
-        user: {},
+        user: {
+            permissions: {
+                adminAllowed: false,
+            }
+        },
         password: '',
         status: ''
     };

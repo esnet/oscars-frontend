@@ -98,7 +98,7 @@ export default class EroTypeahead extends Component {
             ero.push(urn);
             ero.push(to);
 
-            this.props.controlsStore.assignParamsForEditPipe({
+            this.props.controlsStore.setParamsForEditPipe({
                 ero: {
                     hops: ero
                 },

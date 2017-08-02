@@ -3,7 +3,7 @@ import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import transformer from '../lib/transform';
-import {Well, FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+import {FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 
 
 @inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')

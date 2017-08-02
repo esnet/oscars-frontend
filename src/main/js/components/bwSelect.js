@@ -53,7 +53,7 @@ export default class BwSelect extends Component {
                 ingress: f.ingress,
                 egress: f.egress,
             };
-            if (f.id !== ef.fixtureId && f.bwLocked) {
+            if (f.id !== ef.fixtureId && f.locked) {
                 if (f.egress <= availableIngressBw && f.ingress <= availableEgressBw) {
                     oppositeOfBwOptions[f.id] = option;
                 }

@@ -9,7 +9,7 @@ import {Form, Button, Panel, FormGroup, FormControl } from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
-import {PrecheckButton, HoldButton, ReleaseButton, CommitButton} from './controlButtons';
+import {CommitButton} from './controlButtons';
 
 
 @inject('controlsStore', 'designStore', 'modalStore')

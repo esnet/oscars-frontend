@@ -306,11 +306,7 @@ export default class PipeParamsModal extends Component {
             params.ero.acceptable = true;
         } else if (mode === 'fits') {
             params.ero.hops = ep.fits.ero;
-            if (ep.fits.ero.length > 0) {
-                params.ero.acceptable = true;
-            } else {
-                params.ero.acceptable = false;
-            }
+            params.ero.acceptable = ep.fits.ero.length > 0;
         } else if (mode === 'manual') {
             params.ero.hops = [];
             params.ero.acceptable = false;

@@ -28,9 +28,9 @@ export default class FixtureSelect extends Component {
 
         let fixtures = ef.vlan.copyFrom.options;
         if (this.props.mode === 'bw') {
-            if (ef.bwSelectionMode === 'sameAs') {
+            if (ef.bw.mode === 'sameAs') {
                 fixtures = ef.bw.copyFrom.sameAsOptions;
-            } else if (ef.bwSelectionMode === 'oppositeOf') {
+            } else if (ef.bw.mode === 'oppositeOf') {
                 fixtures = ef.bw.copyFrom.oppositeOfOptions;
             }
         }

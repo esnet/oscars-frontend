@@ -58,7 +58,7 @@ export default class EditJunctionModal extends Component {
             let pipe = this.props.designStore.findPipe(pipeId);
             let params = transformer.existingPipeToEditParams(pipe);
 
-            this.props.controlsStore.mergeParamsForEditPipe(params);
+            this.props.controlsStore.setParamsForEditPipe(params);
             this.props.modalStore.openModal('editPipe');
         }
     };
