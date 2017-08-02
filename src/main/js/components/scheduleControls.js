@@ -204,10 +204,8 @@ export default class ScheduleControls extends Component {
             params.schedule.end.readable = endAtReadable;
             params.schedule.end.at = endAt;
         }
-        params.schedule.acceptable = true;
-        if (startError || endError) {
-            params.schedule.acceptable = false;
-        }
+
+        params.schedule.acceptable = !(startError || endError);
 
     }
 
@@ -273,7 +271,7 @@ export default class ScheduleControls extends Component {
             <OverlayTrigger defaultOverlayShown={false} trigger='click' rootClose placement='right' overlay={help}>
                 <Glyphicon className='pull-right' glyph='question-sign'/>
             </OverlayTrigger>
-        </span>
+        </span>;
 
 
         return (

@@ -5,6 +5,7 @@ import {
     Label, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
     ListGroup, ListGroupItem, HelpBlock
 } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 import ToggleDisplay from 'react-toggle-display';
 import EroTypeahead from './eroTypeahead';
@@ -305,11 +306,7 @@ export default class PipeParamsModal extends Component {
             params.ero.acceptable = true;
         } else if (mode === 'fits') {
             params.ero.hops = ep.fits.ero;
-            if (ep.fits.ero.length > 0) {
-                params.ero.acceptable = true;
-            } else {
-                params.ero.acceptable = false;
-            }
+            params.ero.acceptable = ep.fits.ero.length > 0;
         } else if (mode === 'manual') {
             params.ero.hops = [];
             params.ero.acceptable = false;
@@ -474,5 +471,5 @@ class PathSelectMode extends Component {
 }
 
 PathSelectMode.propTypes = {
-    onSelectModeChange: React.PropTypes.func.isRequired
+    onSelectModeChange: PropTypes.func.isRequired
 };

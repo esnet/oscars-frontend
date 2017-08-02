@@ -17,7 +17,7 @@ import {observer, inject} from 'mobx-react';
 import {toJS, whyRun} from 'mobx';
 import {size} from 'lodash'
 import ToggleDisplay from 'react-toggle-display';
-
+import PropTypes from 'prop-types';
 
 @inject('controlsStore')
 @observer
@@ -84,8 +84,7 @@ export default class EditUserForm extends Component {
             </div>
         </div>;
 
-        let out =
-            <div>
+        return <div>
                 <Row>
                     <Col xs={8} xsOffset={2} md={6} mdOffset={3} sm={6} smOffset={3} lg={6} lgOffset={3}>
                         <Panel header={detailsHeader}>
@@ -184,7 +183,13 @@ export default class EditUserForm extends Component {
                 </Row>
             </div>;
 
-        return out;
 
     }
 }
+
+EditUserForm.propTypes = {
+    submitPassword: PropTypes.func.isRequired,
+    submitUpdate: PropTypes.func.isRequired,
+    submitDelete: PropTypes.func.isRequired,
+    allowDelete: PropTypes.bool.isRequired,
+};

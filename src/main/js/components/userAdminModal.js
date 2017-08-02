@@ -26,7 +26,7 @@ export default class UserAdminModal extends Component {
         // set the password
         myClient.submitWithToken('POST', '/admin/users/' + user.username + '/password', password + '')
             .then(
-                (response) => {
+                () => {
                     this.props.refresh();
                 }
                 ,
@@ -65,7 +65,7 @@ export default class UserAdminModal extends Component {
         }
         myClient.submitWithToken('DELETE', '/admin/users/' + user.username, '')
             .then(
-                (response) => {
+                () => {
                     // delete
                     this.props.refresh();
                     this.closeModal();

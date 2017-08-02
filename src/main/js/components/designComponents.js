@@ -30,7 +30,7 @@ export default class DesignComponents extends Component {
             <OverlayTrigger trigger='click' rootClose placement='left' overlay={compHelp}>
                 <Glyphicon className='pull-right' glyph='question-sign'/>
             </OverlayTrigger>
-        </p>
+        </p>;
 
 
         return (

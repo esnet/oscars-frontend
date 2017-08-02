@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem}from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
 
-import {LinkContainer, IndexLinkContainer} from 'react-router-bootstrap';
+import {LinkContainer} from 'react-router-bootstrap';
 
 @inject('accountStore', 'commonStore')
 @observer

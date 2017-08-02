@@ -6,6 +6,7 @@ import {
     Panel, Well, Popover, OverlayTrigger, HelpBlock, Row, Col
 } from 'react-bootstrap';
 import ToggleDisplay from 'react-toggle-display';
+import PropTypes from 'prop-types';
 
 
 import Validator from '../lib/validation';
@@ -52,7 +53,7 @@ export default class BwSelect extends Component {
                 ingress: f.ingress,
                 egress: f.egress,
             };
-            if (f.id !== ef.fixtureId && f.bwLocked) {
+            if (f.id !== ef.fixtureId && f.locked) {
                 if (f.egress <= availableIngressBw && f.ingress <= availableEgressBw) {
                     oppositeOfBwOptions[f.id] = option;
                 }
@@ -519,5 +520,5 @@ class BwSelectModeOptions extends Component {
 }
 
 BwSelectModeOptions.propTypes = {
-    onSelectModeChange: React.PropTypes.func.isRequired
+    onSelectModeChange: PropTypes.func.isRequired
 };

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 
 import {action} from 'mobx';
-import {inject} from 'mobx-react';
 
 import {Button} from 'react-bootstrap';
 

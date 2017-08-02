@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
+import PropTypes from 'prop-types';
 
 
 @inject('controlsStore')
@@ -27,9 +28,9 @@ export default class FixtureSelect extends Component {
 
         let fixtures = ef.vlan.copyFrom.options;
         if (this.props.mode === 'bw') {
-            if (ef.bwSelectionMode === 'sameAs') {
+            if (ef.bw.mode === 'sameAs') {
                 fixtures = ef.bw.copyFrom.sameAsOptions;
-            } else if (ef.bwSelectionMode === 'oppositeOf') {
+            } else if (ef.bw.mode === 'oppositeOf') {
                 fixtures = ef.bw.copyFrom.oppositeOfOptions;
             }
         }
@@ -61,5 +62,5 @@ export default class FixtureSelect extends Component {
 }
 
 FixtureSelect.propTypes = {
-    onRef: React.PropTypes.func.isRequired,
+    onRef: PropTypes.func.isRequired,
 };
