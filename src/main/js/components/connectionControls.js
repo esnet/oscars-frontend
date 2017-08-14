@@ -9,7 +9,7 @@ import {Form, Glyphicon, Button, Panel, FormGroup, FormControl, Well } from 'rea
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
-import {CommitButton} from './controlButtons';
+import {CommitButton, UncommitButton} from './controlButtons';
 
 
 @inject('controlsStore', 'designStore', 'modalStore')
@@ -26,6 +26,7 @@ export default class ConnectionControls extends Component {
                 action((response) => {
                     let params = {
                         description: '',
+                        phase: 'HELD',
                         connectionId: response
                     };
                     this.props.controlsStore.setParamsForConnection(params);
@@ -82,14 +83,17 @@ export default class ConnectionControls extends Component {
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     <FormGroup className='pull-right'>
-                        <ToggleDisplay show={!conn.validation.acceptable}>
+                        <ToggleDisplay show={!conn.validation.acceptable} >
                             <Button bsStyle='warning' className='pull-right'
                                     onClick={() => {
                                         this.props.modalStore.openModal('connectionErrors');
                                     }}>Display errors</Button>{' '}
                         </ToggleDisplay>
+                        <ToggleDisplay show={conn.phase === 'RESERVED' && conn.schedule.start.at > new Date()}>
+                            <UncommitButton/>{' '}
+                        </ToggleDisplay>
 
-                        <ToggleDisplay show={conn.validation.acceptable}>
+                        <ToggleDisplay show={conn.validation.acceptable && conn.phase === 'HELD'}>
                             <CommitButton/>{' '}
                         </ToggleDisplay>
                     </FormGroup>

@@ -7,6 +7,7 @@ class Reservation {
     @computed get reservation() {
 
         let reservation = {
+            phase: controlsStore.connection.phase,
             junctions: {},
             pipes: {},
             startAt: parseInt(Moment(controlsStore.connection.startAt).unix()),

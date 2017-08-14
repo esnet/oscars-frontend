@@ -12,7 +12,7 @@ import {
     FormControl, ControlLabel, Popover, Glyphicon, OverlayTrigger
 } from 'react-bootstrap';
 
-const format = 'Y/MM/DD HH:mm';
+const format = 'Y/MM/DD HH:mm:ss';
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer
@@ -60,6 +60,24 @@ export default class ScheduleControls extends Component {
             const startSec = conn.schedule.start.at.getTime() / 1000;
             const endSec = conn.schedule.end.at.getTime() / 1000;
             this.props.topologyStore.loadAvailable(startSec, endSec);
+        }
+
+        if (!conn.schedule.locked) {
+            let params = {
+                schedule: {
+                    start: {
+                        choice: conn.schedule.start.choice
+                    },
+                    end: {
+                        choice: conn.schedule.end.choice
+                    }
+
+                }
+            };
+
+            this.validateStartEnd(params);
+            this.props.controlsStore.setParamsForConnection(params);
+
         }
 
         if (conn.schedule.start.at < new Date()) {
@@ -253,7 +271,8 @@ export default class ScheduleControls extends Component {
 
 
     render() {
-        const sched = this.props.controlsStore.connection.schedule;
+        const conn = this.props.controlsStore.connection;
+        const sched = conn.schedule;
 
 
         let help = <Popover id='help-schedule' title='Schedule help'>
@@ -299,11 +318,11 @@ export default class ScheduleControls extends Component {
                             <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
                         </HelpBlock>
                     </FormGroup>
-                    <ToggleDisplay show={!sched.locked && sched.acceptable}>
+                    <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
                         <Button className='pull-right' bsStyle='primary' onClick={this.lockSchedule}>Lock
                             schedule</Button>
                     </ToggleDisplay>
-                    <ToggleDisplay show={sched.locked}>
+                    <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
                         <Button className='pull-right' bsStyle='warning' onClick={this.unlockSchedule}>Unlock</Button>
                     </ToggleDisplay>
                 </Form>

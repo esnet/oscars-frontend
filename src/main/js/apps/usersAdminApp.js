@@ -21,7 +21,7 @@ import UserAdminModal from '../components/userAdminModal';
 import {size} from 'lodash'
 
 
-@inject('controlsStore', 'commonStore', 'modalStore')
+@inject('controlsStore', 'commonStore', 'modalStore', 'userStore')
 @observer
 export default class UsersAdminApp extends Component {
 
@@ -31,7 +31,7 @@ export default class UsersAdminApp extends Component {
 
     componentWillMount() {
         this.props.commonStore.setActiveNav('admin');
-        this.props.controlsStore.setParamsForEditUser({user: {username: ''}});
+        this.props.userStore.setParamsForEditUser({user: {username: ''}});
         this.refreshUserList();
     }
 
@@ -40,7 +40,7 @@ export default class UsersAdminApp extends Component {
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.controlsStore.setParamsForEditUser({allUsers: parsed});
+                    this.props.userStore.setParamsForEditUser({allUsers: parsed});
                 }
                 ,
                 (failResponse) => {
@@ -52,22 +52,22 @@ export default class UsersAdminApp extends Component {
 
     clickUsername = (username) => {
 
-        this.props.controlsStore.editUser.allUsers.map((u) => {
+        this.props.userStore.editUser.allUsers.map((u) => {
             if (u.username === username) {
-                this.props.controlsStore.setParamsForEditUser({user: toJS(u)});
+                this.props.userStore.setParamsForEditUser({user: toJS(u)});
                 this.props.modalStore.openModal('userAdmin');
             }
         });
     };
 
     addUser = () => {
-        let user = this.props.controlsStore.editUser.user;
+        let user = this.props.userStore.editUser.user;
         if (!size(user.username)) {
             console.log('empty username');
             return;
         }
         let existing = false;
-        this.props.controlsStore.editUser.allUsers.map((u) => {
+        this.props.userStore.editUser.allUsers.map((u) => {
             if (u.username === user.username) {
                 existing = true;
             }
@@ -78,7 +78,7 @@ export default class UsersAdminApp extends Component {
         }
 
 
-        this.props.controlsStore.setParamsForOneUser({
+        this.props.userStore.setParamsForOneUser({
             fullName: 'Joe D. Newuser',
             email: 'email@domain.com',
             institution: 'default',
@@ -92,7 +92,7 @@ export default class UsersAdminApp extends Component {
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.controlsStore.setParamsForEditUser({user: parsed});
+                    this.props.userStore.setParamsForEditUser({user: parsed});
 
                     // set a random password
                     myClient.submitWithToken('POST', '/admin/users/' + user.username + '/password', Math.random() + '')
@@ -117,18 +117,18 @@ export default class UsersAdminApp extends Component {
 
 
     onUsernameChange = (val) => {
-        this.props.controlsStore.setParamsForOneUser({username: val});
+        this.props.userStore.setParamsForOneUser({username: val});
     };
 
     // key presses
     handleAddUsernameKeyPress = (e) => {
-        if (e.key === 'Enter' && this.props.controlsStore.editUser.user.username.length > 0) {
+        if (e.key === 'Enter' && this.props.userStore.editUser.user.username.length > 0) {
             this.addUser();
         }
     };
 
     render() {
-        let editUser = this.props.controlsStore.editUser;
+        let editUser = this.props.userStore.editUser;
 
         let adminHelp = <Popover id='help-adminusers' title='Help'>
             <p>This is the users administration form. The list shows all the users registered in the system.</p>
