@@ -4,7 +4,6 @@ import {inject} from 'mobx-react';
 
 
 import ConnectionsList from '../components/connectionsList';
-import ConnectionModal from '../components/connectionModal';
 
 
 @inject('mapStore', 'commonStore')
@@ -24,7 +23,6 @@ export default class ListConnectionsApp extends Component {
         return (
             <Row>
                 <ConnectionsList/>
-                <ConnectionModal />
 
             </Row>
         );

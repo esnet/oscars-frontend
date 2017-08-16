@@ -14,7 +14,7 @@ import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
-import ConnectionDetails from './apps/connectionDetails';
+import ConnectionDetails from './apps/detailsApp';
 import Login from './apps/login';
 import Logout from './apps/logout';
 

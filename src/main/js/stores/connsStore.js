@@ -5,7 +5,8 @@ class ConnectionsStore {
 
     @observable store = {
         conns: [],
-        current: {}
+        current: {},
+        selected: {}
     };
 
     @observable filter = {
@@ -24,6 +25,9 @@ class ConnectionsStore {
 
     @action setCurrent(conn) {
         this.store.current = conn;
+    }
+    @action setSelected(component) {
+        this.store.selected = component;
     }
 
     @action updateList(resvs) {

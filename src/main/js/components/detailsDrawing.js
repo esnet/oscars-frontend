@@ -9,7 +9,7 @@ import validator from '../lib/validation'
 
 @inject('connsStore', 'modalStore')
 @observer
-export default class ConnectionDrawing extends Component {
+export default class DetailsDrawing extends Component {
     constructor(props) {
         super(props);
 
@@ -27,12 +27,24 @@ export default class ConnectionDrawing extends Component {
     };
 
     onFixtureClicked = (fixture) => {
+        this.props.connsStore.setSelected({
+            type: 'fixture',
+            data: fixture
+        });
     };
 
     onJunctionClicked = (junction) => {
+        this.props.connsStore.setSelected({
+            type: 'junction',
+            data: junction
+        });
     };
 
     onPipeClicked = (pipe) => {
+        this.props.connsStore.setSelected({
+            type: 'pipe',
+            data: pipe,
+        });
     };
 
     componentDidMount() {
@@ -101,7 +113,7 @@ export default class ConnectionDrawing extends Component {
     disposeOfMapUpdate = autorunAsync(() => {
 
 
-        let design = this.props.connsStore.store.current.reserved.cmp;
+        let design = this.props.connsStore.store.current.archived.cmp;
         let junctions = toJS(design.junctions);
         let fixtures = toJS(design.fixtures);
         let pipes = toJS(design.pipes);
@@ -125,38 +137,41 @@ export default class ConnectionDrawing extends Component {
         });
         fixtures.map((f) => {
             let fixtureNode = {
-                id: f.portUrn,
-                label: f.portUrn,
+                id: f.portUrn+':'+f.vlan.vlanId,
+                label: f.portUrn+':'+f.vlan.vlanId,
                 size: 8,
                 data: f,
                 onClick: this.onFixtureClicked
             };
             nodes.push(fixtureNode);
             let edge = {
-                id: f.portUrn,
+                id: f.portUrn+':'+f.vlan.vlanId,
                 from: f.junction,
-                to: f.portUrn,
+                to: f.portUrn+':'+f.vlan.vlanId,
                 length: 3,
                 width: 1.5,
                 onClick: null
             };
             edges.push(edge);
         });
-        pipes.map((p) => {
-            let edge = {
-                id: p.a + ' -- ' + p.z,
-                from: p.a,
-                to: p.z,
-                length: 10,
+        if (typeof pipes !== 'undefined') {
+            pipes.map((p) => {
+                let edge = {
+                    id: p.a + ' -- ' + p.z,
+                    from: p.a,
+                    to: p.z,
+                    length: 10,
 
-                width: 5,
-                data: p,
-                onClick: this.onPipeClicked
+                    width: 5,
+                    data: p,
+                    onClick: this.onPipeClicked
 
-            };
-            edges.push(edge);
+                };
+                edges.push(edge);
 
-        });
+            });
+        }
+
         this.datasource.edges.add(edges);
         this.datasource.nodes.add(nodes);
 
@@ -166,22 +181,21 @@ export default class ConnectionDrawing extends Component {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
 
-        let myHelp = <Popover id='help-connectionDrawing' title='Connection drawing'>
-            <p>This drawing displays the fixtures, junctions and pipes of your connection.</p>
+        let myHelp = <Popover id='help-connectionDrawing' title='Schematic'>
+            <p>This schematic displays the fixtures, junctions and pipes of your connection.</p>
             <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
                 are drawn as lines between junctions.</p>
-            <p>Unlocked components are drawn in orange color .</p>
             <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
                 to temporarily reposition it.</p>
-            <p>Click on any component to bring up its edit form. You may also click on the
-                magnifying glass icon to the right to readjust the map, or the chevron icon
+            <p>Click on any component to bring up information about it. You may also click on the
+                magnifying glass icon to the right to auto-zoom the map, or the chevron icon
                 to hide / show the map.</p>
         </Popover>;
 
 
-        let header = <div>Connection drawing
+        let header = <div>Schematic
             <div className='pull-right'>
-                <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
+                <OverlayTrigger trigger='click' rootClose placement='right' overlay={myHelp}>
                     <Glyphicon glyph='question-sign'/>
                 </OverlayTrigger>
                 {' '}

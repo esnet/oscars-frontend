@@ -9,8 +9,7 @@ import {Form, Glyphicon, Button, Panel, FormGroup, FormControl, Well } from 'rea
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
-import {CommitButton, UncommitButton} from './controlButtons';
-
+import CommitButton from './commitButton';
 
 @inject('controlsStore', 'designStore', 'modalStore')
 @observer
@@ -99,7 +98,7 @@ export default class ConnectionControls extends Component {
                         }
 
                         <ToggleDisplay show={conn.validation.acceptable && conn.phase === 'HELD'}>
-                            <CommitButton/>{' '}
+                            <CommitButton/>
                         </ToggleDisplay>
                     </FormGroup>
 

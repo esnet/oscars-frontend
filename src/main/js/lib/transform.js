@@ -229,43 +229,46 @@ class Transformer {
         return cmp;
     }
 
-    materializeScheduleRefs(conns) {
-        conns.map((conn) => {
-            let scheds = [];
-            let schedMap = {};
 
-            if (typeof conn.reserved !== 'undefined') {
-                scheds.push(conn.reserved.schedule);
-                this.collectSchedules(scheds, conn.reserved.cmp);
-            }
+    fixSerialization(conn) {
+        let scheds = [];
+        let schedMap = {};
 
-            if (typeof conn.archived !== 'undefined') {
-                scheds.push(conn.archived.schedule);
-                this.collectSchedules(scheds, conn.archived.cmp);
+        if (typeof conn.reserved !== 'undefined') {
+            scheds.push(conn.reserved.schedule);
+            this.collectSchedules(scheds, conn.reserved.cmp);
+        }
 
-            }
-            scheds.map((s) => {
-                if (typeof s === 'object') {
-                    schedMap[s.refId] = s;
-                }
-            });
-            if (typeof conn.reserved !== 'undefined' && typeof conn.reserved.schedule === 'string') {
-                conn.reserved.schedule = schedMap[conn.reserved.schedule];
-                this.materializeComponentScheduleRefs(schedMap, conn.reserved.cmp);
-            }
-            if (typeof conn.archived !== 'undefined' && typeof conn.archived.schedule === 'string') {
-                conn.archived.schedule = schedMap[conn.archived.schedule];
-                this.materializeComponentScheduleRefs(schedMap, conn.archived.cmp);
+        if (typeof conn.archived !== 'undefined') {
+            scheds.push(conn.archived.schedule);
+            this.collectSchedules(scheds, conn.archived.cmp);
+
+        }
+        scheds.map((s) => {
+            if (typeof s === 'object') {
+                schedMap[s.refId] = s;
             }
         });
+        if (typeof conn.reserved !== 'undefined' && typeof conn.reserved.schedule === 'string') {
+            conn.reserved.schedule = schedMap[conn.reserved.schedule];
+            this.materializeComponentScheduleRefs(schedMap, conn.reserved.cmp);
+        }
+        if (typeof conn.archived !== 'undefined' && typeof conn.archived.schedule === 'string') {
+            conn.archived.schedule = schedMap[conn.archived.schedule];
+            this.materializeComponentScheduleRefs(schedMap, conn.archived.cmp);
+        }
     }
 
     materializeComponentScheduleRefs(schedMap, cmp) {
-        cmp.pipes.map((p) => {
-            if (typeof p.schedule === 'string') {
-                p.schedule = schedMap[p.schedule];
-            }
-        });
+        if (typeof cmp.pipes !== 'undefined') {
+            cmp.pipes.map((p) => {
+                if (typeof p.schedule === 'string') {
+                    p.schedule = schedMap[p.schedule];
+                }
+            });
+        } else {
+            cmp.pipes = [];
+        }
         cmp.junctions.map((j) => {
             if (typeof j.schedule === 'string') {
                 j.schedule = schedMap[j.schedule];
@@ -282,9 +285,12 @@ class Transformer {
     }
 
     collectSchedules(scheds, cmp) {
-        cmp.pipes.map((p) => {
-            scheds.push(p.schedule)
-        });
+        // there might not be a pipe there
+        if (typeof cmp.pipes !== 'undefined') {
+            cmp.pipes.map((p) => {
+                scheds.push(p.schedule)
+            });
+        }
         cmp.junctions.map((j) => {
             scheds.push(j.schedule)
         });

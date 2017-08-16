@@ -39,7 +39,9 @@ class ConnectionsList extends Component {
             .then(
                 (successResponse) => {
                     let conns = JSON.parse(successResponse);
-                    transformer.materializeScheduleRefs(conns);
+                    conns.map((conn) => {
+                        transformer.fixSerialization(conn);
+                    });
                     this.props.connsStore.updateList(conns);
                 }
                 ,
@@ -61,8 +63,17 @@ class ConnectionsList extends Component {
 
 
     render() {
+        const format = 'Y/MM/DD HH:mm';
+
 
         let rows = this.props.connsStore.store.conns.map((c) => {
+            const beg = Moment(c.archived.schedule.beginning*1000);
+            const end = Moment(c.archived.schedule.ending*1000);
+
+            let beginning = beg.format(format)+' ('+beg.fromNow()+')';
+            let ending = end.format(format)+' ('+end.fromNow()+')';
+
+
             return (
                 <tr key={c.connectionId} onClick={(e) => {
                     this.showDetails(c.connectionId)
@@ -74,7 +85,7 @@ class ConnectionsList extends Component {
                     </td>
                     <td>
                         {
-                            c.reserved.cmp.fixtures.map((f) => {
+                            c.archived.cmp.fixtures.map((f) => {
                                 return <div key={f.portUrn+':'+f.vlan.vlanId}>{f.portUrn+':'+f.vlan.vlanId}</div>
                             })
                         }
@@ -84,8 +95,8 @@ class ConnectionsList extends Component {
                         <div>{c.state}</div>
                     </td>
                     <td>
-                        <div>Beginning: {new Moment(c.reserved.schedule.beginning * 1000).fromNow()}</div>
-                        <div>Ending: {new Moment(c.reserved.schedule.ending * 1000).fromNow()}</div>
+                        <div>Beginning: {beginning}</div>
+                        <div>Ending: {ending}</div>
                     </td>
                 </tr>);
         });
