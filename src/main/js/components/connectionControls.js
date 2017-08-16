@@ -35,6 +35,8 @@ export default class ConnectionControls extends Component {
     }
 
 
+    // TODO: make sure you can't uncommit past start time
+
 
     disposeOfValidate = autorunAsync('validate', () => {
         let validationParams = {
@@ -89,9 +91,12 @@ export default class ConnectionControls extends Component {
                                         this.props.modalStore.openModal('connectionErrors');
                                     }}>Display errors</Button>{' '}
                         </ToggleDisplay>
-                        <ToggleDisplay show={conn.phase === 'RESERVED' && conn.schedule.start.at > new Date()}>
-                            <UncommitButton/>{' '}
-                        </ToggleDisplay>
+                        {/*
+                            <ToggleDisplay show={conn.phase === 'RESERVED' && conn.schedule.start.at > new Date()}>
+                                <UncommitButton/>{' '}
+                            </ToggleDisplay>
+                            */
+                        }
 
                         <ToggleDisplay show={conn.validation.acceptable && conn.phase === 'HELD'}>
                             <CommitButton/>{' '}

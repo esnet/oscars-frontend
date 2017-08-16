@@ -101,7 +101,16 @@ export default class HoldTimer extends Component {
 //        console.log(held);
 //        whyRun();
 
-        myClient.submitWithToken('POST', "/protected/held/" + held.connectionId, held)
+        let connection = {
+            connectionId: conn.connectionId,
+            held: held,
+            description: conn.description,
+            username: '',
+            phase: 'HELD',
+            state: 'WAITING',
+        };
+
+        myClient.submitWithToken('POST', "/protected/held/" + conn.connectionId, connection)
             .then(
                 action((response) => {
 //                    console.log(response);

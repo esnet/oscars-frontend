@@ -1,4 +1,5 @@
 import { observable, action } from 'mobx';
+import {isArray, mergeWith} from 'lodash';
 
 class ConnectionsStore {
 
@@ -6,6 +7,20 @@ class ConnectionsStore {
         conns: [],
         current: {}
     };
+
+    @observable filter = {
+        criteria: [],
+        ports: [],
+        vlans: [],
+        username: '',
+        description: '',
+        phase: 'RESERVED',
+        state: 'ACTIVE',
+    };
+
+    @action setFilter(params) {
+        mergeWith(this.filter, params, this.customizer);
+    }
 
     @action setCurrent(conn) {
         this.store.current = conn;
@@ -23,6 +38,12 @@ class ConnectionsStore {
         }
     }
 
+
+    customizer = (objValue, srcValue) => {
+        if (isArray(srcValue)) {
+            return srcValue;
+        }
+    }
 
 }
 

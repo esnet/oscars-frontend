@@ -1,47 +1,45 @@
 import React, {Component} from 'react';
 import {Panel, Table} from 'react-bootstrap';
 import Moment from 'moment';
-import {toJS} from 'mobx';
+import {toJS, autorunAsync} from 'mobx';
 import {observer, inject} from 'mobx-react';
-import VisUtils from '../lib/vis';
+import transformer from '../lib/transform';
+import { withRouter } from 'react-router-dom'
 
 import myClient from '../agents/client';
 
 @inject('controlsStore', 'connsStore', 'mapStore', 'modalStore')
 @observer
-export default class ConnectionsList extends Component {
+class ConnectionsList extends Component {
 
     componentWillMount() {
-        this.startListRefresh();
+        this.props.connsStore.setFilter({
+            criteria: ['phase'],
+            phase: 'RESERVED'
+        });
+
+        this.updateList();
     }
 
     componentWillUnmount() {
-        clearTimeout(this.refreshTimeout);
+        this.disposeOfUpdateList();
     }
 
-    startListRefresh = () => {
+    disposeOfUpdateList = autorunAsync('updateList', () => {
         this.updateList();
-        this.refreshTimeout = setTimeout(this.startRefresh, 30000); // we will update every 30 seconds
-    };
+    }, 1000);
 
     updateList = () => {
-        let combinedFilter = {
-            numFilters: 0,
-            userNames: [],
-            connectionIds: [],
-            minBandwidths: [],
-            maxBandwidths: [],
-            startDates: [],
-            endDates: [],
-            resvStates: [],
-            provStates: [],
-            operStates: []
-        };
-        myClient.submit('POST', '/resv/list/filter', combinedFilter)
+        let filter = {};
+        this.props.connsStore.filter.criteria.map((c) => {
+            filter[c] = this.props.connsStore.filter[c];
+        });
+
+        myClient.submit('POST', '/api/conn/list', filter)
             .then(
                 (successResponse) => {
                     let conns = JSON.parse(successResponse);
-
+                    transformer.materializeScheduleRefs(conns);
                     this.props.connsStore.updateList(conns);
                 }
                 ,
@@ -56,45 +54,9 @@ export default class ConnectionsList extends Component {
 
         let c = this.props.connsStore.findConnection(connectionId);
 
-        let coloredNodes = [];
-        let coloredEdges = [];
-
-        for (let junction of c.reserved.vlanFlow.junctions) {
-            coloredNodes.push({
-                id: junction.deviceUrn,
-                color: 'green'
-            });
-
-        }
-        for (let pipe of c.reserved.vlanFlow.mplsPipes) {
-            let nodes = [pipe.aJunction.deviceUrn, pipe.zJunction.deviceUrn];
-            let az = VisUtils.visFromERO(pipe.azERO);
-            let za = VisUtils.visFromERO(pipe.zaERO);
-
-            let edges = az.edges.concat(za.edges);
-            nodes = nodes.concat(az.nodes).concat(za.nodes);
-
-            for (let edgeId of edges) {
-                coloredEdges.push({
-                    id: edgeId,
-                    color: 'green'
-                });
-            }
-            for (let nodeId of nodes) {
-                coloredNodes.push({
-                    id: nodeId,
-                    color: 'green'
-                });
-            }
-        }
-
-        this.props.mapStore.setColoredEdges(coloredEdges);
-        this.props.mapStore.setColoredNodes(coloredNodes);
-        this.props.mapStore.setZoomOnColored(true);
-
-
         this.props.connsStore.setCurrent(c);
-        this.props.modalStore.openModal('connection');
+        this.props.history.push('/pages/details');
+
     };
 
 
@@ -104,18 +66,26 @@ export default class ConnectionsList extends Component {
             return (
                 <tr key={c.connectionId} onClick={(e) => {
                     this.showDetails(c.connectionId)
-                } }>
+                }}>
                     <td>{c.connectionId}</td>
-                    <td>{c.specification.description}</td>
                     <td>
-                        <div>{c.states.resv}</div>
-                        <div>{c.states.prov}</div>
-                        <div>{c.states.oper}</div>
+                        <div>{c.description}</div>
+                        <div>{c.username}</div>
                     </td>
                     <td>
-                        <div>Submitted: {new Moment(c.schedule.submitted).fromNow()}</div>
-                        <div>Setup: {new Moment(c.schedule.setup).fromNow()}</div>
-                        <div>Teardown: {new Moment(c.schedule.teardown).fromNow()}</div>
+                        {
+                            c.reserved.cmp.fixtures.map((f) => {
+                                return <div key={f.portUrn+':'+f.vlan.vlanId}>{f.portUrn+':'+f.vlan.vlanId}</div>
+                            })
+                        }
+                    </td>
+                    <td>
+                        <div>{c.phase}</div>
+                        <div>{c.state}</div>
+                    </td>
+                    <td>
+                        <div>Beginning: {new Moment(c.reserved.schedule.beginning * 1000).fromNow()}</div>
+                        <div>Ending: {new Moment(c.reserved.schedule.ending * 1000).fromNow()}</div>
                     </td>
                 </tr>);
         });
@@ -126,7 +96,8 @@ export default class ConnectionsList extends Component {
                 <thead>
                 <tr>
                     <th>Connection Id</th>
-                    <th>Description</th>
+                    <th>Description / Username</th>
+                    <th>Fixtures</th>
                     <th>States</th>
                     <th>Schedule</th>
                 </tr>
@@ -141,3 +112,5 @@ export default class ConnectionsList extends Component {
 
     }
 }
+
+export default withRouter(ConnectionsList);

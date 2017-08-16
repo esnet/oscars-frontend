@@ -29,6 +29,7 @@ class MyXHRClient {
                 });
             }
             xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+            xhr.setRequestHeader('Accept', 'application/json');
             let params = opts.params;
             if (params) {
                 if (typeof params === 'object') {

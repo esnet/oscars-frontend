@@ -14,6 +14,7 @@ import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
+import ConnectionDetails from './apps/connectionDetails';
 import Login from './apps/login';
 import Logout from './apps/logout';
 
@@ -98,6 +99,7 @@ ReactDOM.render(
                     <Route exact path="/login" component={Login}/>
                     <Route exact path="/logout" component={Logout}/>
                     <PrivateRoute exact path="/pages/list" component={ListConnectionsApp}/>
+                    <PrivateRoute exact path="/pages/details" component={ConnectionDetails}/>
                     <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
                     <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
                     <PrivateRoute exact path="/pages/account" component={AccountApp}/>
