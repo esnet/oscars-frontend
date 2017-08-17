@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {Panel, Table} from 'react-bootstrap';
+import {Panel, Table, Form, FormControl, FormGroup, ControlLabel} from 'react-bootstrap';
 import Moment from 'moment';
 import {toJS, autorunAsync} from 'mobx';
 import {observer, inject} from 'mobx-react';
 import transformer from '../lib/transform';
-import { withRouter } from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
 
 import myClient from '../agents/client';
 
@@ -61,17 +61,25 @@ class ConnectionsList extends Component {
 
     };
 
+    selectedPhaseChanged = (e) => {
+        let phase = e.target.value;
+        this.props.connsStore.setFilter({
+            criteria: ['phase'],
+            phase: phase
+        });
+
+    };
 
     render() {
         const format = 'Y/MM/DD HH:mm';
 
 
         let rows = this.props.connsStore.store.conns.map((c) => {
-            const beg = Moment(c.archived.schedule.beginning*1000);
-            const end = Moment(c.archived.schedule.ending*1000);
+            const beg = Moment(c.archived.schedule.beginning * 1000);
+            const end = Moment(c.archived.schedule.ending * 1000);
 
-            let beginning = beg.format(format)+' ('+beg.fromNow()+')';
-            let ending = end.format(format)+' ('+end.fromNow()+')';
+            let beginning = beg.format(format) + ' (' + beg.fromNow() + ')';
+            let ending = end.format(format) + ' (' + end.fromNow() + ')';
 
 
             return (
@@ -86,7 +94,8 @@ class ConnectionsList extends Component {
                     <td>
                         {
                             c.archived.cmp.fixtures.map((f) => {
-                                return <div key={f.portUrn+':'+f.vlan.vlanId}>{f.portUrn+':'+f.vlan.vlanId}</div>
+                                return <div
+                                    key={f.portUrn + ':' + f.vlan.vlanId}>{f.portUrn + ':' + f.vlan.vlanId}</div>
                             })
                         }
                     </td>
@@ -103,6 +112,16 @@ class ConnectionsList extends Component {
 
 
         return <Panel>
+            <h3>Filters:</h3>
+            <FormGroup>
+                <ControlLabel>Phase:</ControlLabel>
+                <FormControl componentClass="select" onChange={this.selectedPhaseChanged}>
+                    <option key='RESERVED' value='RESERVED'>Reserved</option>
+                    <option key='ARCHIVED' value='ARCHIVED'>Archived</option>
+
+                </FormControl>
+            </FormGroup>
+            <h3>Connections</h3>
             <Table striped bordered condensed hover>
                 <thead>
                 <tr>

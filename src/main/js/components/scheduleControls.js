@@ -23,26 +23,26 @@ export default class ScheduleControls extends Component {
 
     componentWillMount() {
         let startAt = new Date();
-        startAt.setTime(startAt.getTime() + 10 * 60 * 1000);
+        startAt.setTime(startAt.getTime() + 15 * 60 * 1000);
 
         let endAt = new Date();
-        endAt.setDate(endAt.getDate());
-        endAt.setTime(endAt.getTime() + 40 * 60 * 1000);
+        endAt.setDate(endAt.getDate()+365);
+        endAt.setTime(endAt.getTime());
 
         let params = {
             schedule: {
                 acceptable: true,
-                locked: false,
+                locked: true,
                 start: {
                     at: startAt,
-                    choice: 'in 10 minutes',
+                    choice: 'in 15 minutes',
                     readable: Moment(startAt).format(format),
                     validationState: 'success',
                     validationText: '',
                 },
                 end: {
                     at: endAt,
-                    choice: 'in 40 minutes',
+                    choice: 'in 1 year',
                     readable: Moment(endAt).format(format),
                     validationState: 'success',
                     validationText: '',
@@ -300,7 +300,7 @@ export default class ScheduleControls extends Component {
                     <FormGroup validationState={sched.start.validationState}>
                         <ControlLabel>Start:</ControlLabel>
                         <FormControl type='text'
-                                     defaultValue='in 10 minutes'
+                                     defaultValue='in 15 minutes'
                                      disabled={sched.locked}
                                      onChange={this.onStartDateChange}/>
                         <HelpBlock>
@@ -312,7 +312,7 @@ export default class ScheduleControls extends Component {
                         <ControlLabel>End:</ControlLabel>
                         <FormControl type='text'
                                      disabled={sched.locked}
-                                     defaultValue='in 40 minutes'
+                                     defaultValue='in 1 year'
                                      onChange={this.onEndDateChange}/>
                         <HelpBlock>
                             <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>

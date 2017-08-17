@@ -4,7 +4,7 @@ import {observer, inject} from 'mobx-react';
 import {action, autorunAsync, toJS} from 'mobx';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import {Panel} from 'react-bootstrap';
+import {Panel, Tabs, Tab} from 'react-bootstrap';
 import DetailsGeneral from '../components/detailsGeneral';
 import PropTypes from 'prop-types';
 
@@ -24,10 +24,9 @@ export default class DetailsInfo extends Component {
         this.props.refresh();
 
 
-
         setTimeout(() => {
             this.periodicCheck()
-        }, 15000);
+        }, 60000);
 
     }
 
@@ -86,10 +85,22 @@ export default class DetailsInfo extends Component {
 
     junctionInfo() {
         const selected = this.props.connsStore.store.selected;
-        return <Panel header='Junction'>
-                        <pre>
-                        {JSON.stringify(toJS(selected.data), null, 2)}
-                        </pre>
+        let header = selected.data.deviceUrn;
+        return <Panel header={header}>
+            <div>
+                <Tabs id='junctionTabs' defaultActiveKey={1}>
+                    <Tab eventKey={1} title="Diagnostics">
+                        <Panel header='TODO'>
+                            <p>Coming soon!</p>
+                        </Panel>
+                    </Tab>
+                    <Tab eventKey={2} title="Router commands">
+                        <Panel header='TODO'>
+                            <p>Coming soon!</p>
+                        </Panel>
+                    </Tab>
+                </Tabs>
+            </div>
         </Panel>
 
     }
