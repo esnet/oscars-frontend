@@ -5,12 +5,11 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 
 import ToggleDisplay from 'react-toggle-display';
-import {Form, Button, Panel, FormGroup, FormControl } from 'react-bootstrap';
+import {Form, Glyphicon, Button, Panel, FormGroup, FormControl, Well } from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
-import {CommitButton} from './controlButtons';
-
+import CommitButton from './commitButton';
 
 @inject('controlsStore', 'designStore', 'modalStore')
 @observer
@@ -26,6 +25,7 @@ export default class ConnectionControls extends Component {
                 action((response) => {
                     let params = {
                         description: '',
+                        phase: 'HELD',
                         connectionId: response
                     };
                     this.props.controlsStore.setParamsForConnection(params);
@@ -33,6 +33,8 @@ export default class ConnectionControls extends Component {
 
     }
 
+
+    // TODO: make sure you can't uncommit past start time
 
 
     disposeOfValidate = autorunAsync('validate', () => {
@@ -68,11 +70,13 @@ export default class ConnectionControls extends Component {
 
     render() {
         const conn = this.props.controlsStore.connection;
-        const header = <span>Connection : {conn.connectionId}</span>;
 
         return (
-            <Panel header={header}>
+            <Panel>
                 <Form>
+                    <Well bsSize='small' onClick={() => { this.props.modalStore.openModal('designHelp')}}>
+                        <h3>Help me! <Glyphicon  className='pull-right' glyph='question-sign' /></h3>
+                    </Well>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
                         <FormControl type='text' placeholder='description'
@@ -80,15 +84,21 @@ export default class ConnectionControls extends Component {
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     <FormGroup className='pull-right'>
-                        <ToggleDisplay show={!conn.validation.acceptable}>
+                        <ToggleDisplay show={!conn.validation.acceptable} >
                             <Button bsStyle='warning' className='pull-right'
                                     onClick={() => {
                                         this.props.modalStore.openModal('connectionErrors');
                                     }}>Display errors</Button>{' '}
                         </ToggleDisplay>
+                        {/*
+                            <ToggleDisplay show={conn.phase === 'RESERVED' && conn.schedule.start.at > new Date()}>
+                                <UncommitButton/>{' '}
+                            </ToggleDisplay>
+                            */
+                        }
 
-                        <ToggleDisplay show={conn.validation.acceptable}>
-                            <CommitButton/>{' '}
+                        <ToggleDisplay show={conn.validation.acceptable && conn.phase === 'HELD'}>
+                            <CommitButton/>
                         </ToggleDisplay>
                     </FormGroup>
 

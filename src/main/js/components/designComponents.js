@@ -18,12 +18,13 @@ export default class DesignComponents extends Component {
         const design = this.props.designStore.design;
 
 
-        let compHelp = <Popover id='help-designComponents' title='Help'>
-            This list will auto-update to reflect changes to
-            the design junctions, fixtures, and pipes as they are
-            added, deleted, or updated.
-            Click on any component to bring up its edit form.
-            Any component with an orange flag needs attention from the user.
+        let compHelp = <Popover id='help-designComponents' title='Component list'>
+            <p>This displays the fixtures, junctions, and pipes for the current design.
+                It starts out emptu and will auto-update as these are added, deleted, or updated.</p>
+
+            <p>An orange flag icon indicates an unlocked component; a green checkmark means it is locked.
+                All components must be locked before the connection can be committed.</p>
+            <p>You may click on any component to bring up its edit form.</p>
         </Popover>;
 
         let header = <p>Components

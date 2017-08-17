@@ -232,22 +232,18 @@ export default class VlanSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
 
         let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
-            <p>In a valid design, all fixtures must have a VLAN id. That ID must
-                not be in use on this port, either by fixtures of other connections
-                that are overlapping the proposed schedule, or by other fixtures in this design.</p>
-            <p>In the default "Auto (lowest from available)" mode, the lowest VLAN available
-                will be selected and locked in when you click the "Lock Fixture" button.</p>
-            <p>In the "From text input" mode, you can type in a VLAN id. If it is available, the
-                "Lock Fixture" button will be activated. Otherwise, the button will not appear
-                and you will receive feedback regarding why the input is not acceptable.</p>
-            <p>If the design contains at least one more (locked) fixture, and its VLAN could
-                potentially be used on this fixture, then the "Same as..." selection mode
-                will be made available, allowing you to copy that VLAN to this.</p>
-            <p>When the "Same as..." mode is selected, a second dropdown
-                will appear allowing you to select the fixture to copy the VLAN value from.
-                Again, the "Lock Fixture" button will lock in your selection.</p>
-
-
+            <p>Here you can choose a VLAN id for the fixture. There are some different ways to choose:</p>
+            <p>With the default "Auto (lowest)" mode, the fixture will be assigned the lowest VLAN
+                available on the port.</p>
+            <p>In the "From text input" mode, you may type in a VLAN id. If it is not available
+                you will not be able to lock the fixture, and you will receive feedback
+                regarding why the input is not acceptable.</p>
+            <p>The "Same as..." selection mode may also be available, if your design contains any other
+                fixtures whose VLAN id could potentially be used for the current fixture.</p>
+            <p>When the "Same as..." mode is selected, a second selection box
+                will appear, allowing you to select another fixture to copy the VLAN id from.</p>
+            <p>In all modes, the "Lock Fixture" button will lock in your selections.
+                That button only appears when both the VLAN and bandwidth selections are valid/</p>
         </Popover>;
 
 

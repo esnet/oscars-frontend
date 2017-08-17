@@ -88,6 +88,9 @@ export default class HoldTimer extends Component {
         let cmp = Transformer.toBackend(this.props.designStore.design, scheduleRef);
 
         held.connectionId = conn.connectionId;
+        if (typeof connectionId === 'undefined' || connectionId === null) {
+            return;
+        }
         held.schedule = {
             beginning: conn.schedule.start.at.getTime() / 1000,
             ending: conn.schedule.end.at.getTime() / 1000,
@@ -101,7 +104,16 @@ export default class HoldTimer extends Component {
 //        console.log(held);
 //        whyRun();
 
-        myClient.submitWithToken('POST', "/protected/held/" + held.connectionId, held)
+        let connection = {
+            connectionId: conn.connectionId,
+            held: held,
+            description: conn.description,
+            username: '',
+            phase: 'HELD',
+            state: 'WAITING',
+        };
+
+        myClient.submitWithToken('POST', "/protected/held/" + conn.connectionId, connection)
             .then(
                 action((response) => {
 //                    console.log(response);

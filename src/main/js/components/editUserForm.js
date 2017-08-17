@@ -19,7 +19,7 @@ import {size} from 'lodash'
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
 
-@inject('controlsStore')
+@inject('controlsStore', 'userStore')
 @observer
 export default class EditUserForm extends Component {
     constructor(props) {
@@ -41,20 +41,20 @@ export default class EditUserForm extends Component {
     onParamChange = (key, val) => {
         let params = {};
         params[key] = val;
-        this.props.controlsStore.setParamsForOneUser(params);
+        this.props.userStore.setParamsForOneUser(params);
 
     };
 
     onPwdChange = (val) => {
-        this.props.controlsStore.setPassword(val);
+        this.props.userStore.setPassword(val);
     };
 
     render() {
-        let editUser = this.props.controlsStore.editUser;
+        let editUser = this.props.userStore.editUser;
 
-        let allUsers = this.props.controlsStore.editUser.allUsers;
+        let allUsers = this.props.userStore.editUser.allUsers;
 
-        if (Object.keys(this.props.controlsStore.editUser.user).length === 0) {
+        if (Object.keys(this.props.userStore.editUser.user).length === 0) {
             return <div>Waiting to load..</div>;
         }
 

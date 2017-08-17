@@ -6,6 +6,7 @@ class ModalStore {
         'editFixture': false,
         'editJunction': false,
         'editPipe': false,
+        'designHelp': false,
         'addFixture': false,
         'designErrors': false,
         'connectionErrors': false,

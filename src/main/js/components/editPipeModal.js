@@ -30,9 +30,9 @@ export default class PipeParamsModal extends Component {
         let pipe = this.props.designStore.findPipe(ep.pipeId);
 
         let mode = ep.ero.mode;
-        let modeNeedsPathUpdate = mode === 'shortest' || mode === 'fits'
+        let modeNeedsPathUpdate = mode === 'shortest' || mode === 'fits';
 
-        if (pipe === null || !conn.schedule.locked || !modeNeedsPathUpdate) {
+        if (pipe === null || pipe.locked || !conn.schedule.locked || !modeNeedsPathUpdate) {
             return;
         }
 
@@ -204,6 +204,7 @@ export default class PipeParamsModal extends Component {
     componentWillUnmount() {
         this.pathUpdateDispose();
         this.validationDispose();
+
     }
 
 
@@ -213,7 +214,7 @@ export default class PipeParamsModal extends Component {
 
         if (isNaN(newBw) || e.target.value.length === 0) {
             this.props.controlsStore.setParamsForEditPipe({
-                Z_TO_A: {
+                A_TO_Z: {
                     validationText: 'Not a number',
                     validationState: 'error',
                     acceptable: false
@@ -221,7 +222,7 @@ export default class PipeParamsModal extends Component {
             });
         } else if (newBw < 0) {
             this.props.controlsStore.setParamsForEditPipe({
-                Z_TO_A: {
+                A_TO_Z: {
                     validationText: 'Negative value',
                     validationState: 'error',
                     acceptable: false
@@ -296,6 +297,7 @@ export default class PipeParamsModal extends Component {
     };
 
     closeModal = () => {
+        this.props.controlsStore.setParamsForEditPipe({pipeId: null});
         this.props.modalStore.closeModal(modalName);
     };
 
@@ -433,6 +435,11 @@ export default class PipeParamsModal extends Component {
 
                             <Row>
                                 <Col>
+
+                                    <Button bsStyle='warning'
+                                            className='pull-right'
+                                            onClick={this.deletePipe}>Delete</Button>
+                                    {' '}
                                     <ToggleDisplay show={!ep.locked}>
                                         <Button bsStyle='primary'
                                                 disabled={disableLockBtn}
@@ -446,9 +453,7 @@ export default class PipeParamsModal extends Component {
                                                 onClick={this.unlockPipe}>Unlock</Button>
                                         {' '}
                                     </ToggleDisplay>
-                                    <Button bsStyle='warning'
-                                            className='pull-right'
-                                            onClick={this.deletePipe}>Delete pipe</Button>
+
                                 </Col>
                             </Row>
 

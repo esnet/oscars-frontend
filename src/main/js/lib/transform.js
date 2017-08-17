@@ -2,7 +2,6 @@ import React from 'react';
 import {toJS} from 'mobx';
 
 
-
 class Transformer {
     existingFixtureToEditParams(fixture) {
         let editParams = {
@@ -125,7 +124,7 @@ class Transformer {
             pipes: []
         };
 
-        let { junctions, fixtures, pipes} = cmp;
+        let {junctions, fixtures, pipes} = cmp;
 
         if (typeof junctions !== 'undefined') {
             junctions.map((dj) => {
@@ -173,8 +172,8 @@ class Transformer {
         return result;
     }
 
-    toBackend(design, scheduleRef=null) {
-        let { junctions, pipes, fixtures } = design;
+    toBackend(design, scheduleRef = null) {
+        let {junctions, pipes, fixtures} = design;
         let cmp = {
             junctions: [],
             pipes: [],
@@ -230,5 +229,77 @@ class Transformer {
         return cmp;
     }
 
+
+    fixSerialization(conn) {
+        let scheds = [];
+        let schedMap = {};
+
+        if (typeof conn.reserved !== 'undefined') {
+            scheds.push(conn.reserved.schedule);
+            this.collectSchedules(scheds, conn.reserved.cmp);
+        }
+
+        if (typeof conn.archived !== 'undefined') {
+            scheds.push(conn.archived.schedule);
+            this.collectSchedules(scheds, conn.archived.cmp);
+
+        }
+        scheds.map((s) => {
+            if (typeof s === 'object') {
+                schedMap[s.refId] = s;
+            }
+        });
+        if (typeof conn.reserved !== 'undefined' && typeof conn.reserved.schedule === 'string') {
+            conn.reserved.schedule = schedMap[conn.reserved.schedule];
+            this.materializeComponentScheduleRefs(schedMap, conn.reserved.cmp);
+        }
+        if (typeof conn.archived !== 'undefined' && typeof conn.archived.schedule === 'string') {
+            conn.archived.schedule = schedMap[conn.archived.schedule];
+            this.materializeComponentScheduleRefs(schedMap, conn.archived.cmp);
+        }
+    }
+
+    materializeComponentScheduleRefs(schedMap, cmp) {
+        if (typeof cmp.pipes !== 'undefined') {
+            cmp.pipes.map((p) => {
+                if (typeof p.schedule === 'string') {
+                    p.schedule = schedMap[p.schedule];
+                }
+            });
+        } else {
+            cmp.pipes = [];
+        }
+        cmp.junctions.map((j) => {
+            if (typeof j.schedule === 'string') {
+                j.schedule = schedMap[j.schedule];
+            }
+        });
+        cmp.fixtures.map((f) => {
+            if (typeof f.schedule === 'string') {
+                f.schedule = schedMap[f.schedule];
+            }
+            if (typeof f.vlan.schedule === 'string') {
+                f.vlan.schedule = schedMap[f.vlan.schedule];
+            }
+        });
+    }
+
+    collectSchedules(scheds, cmp) {
+        // there might not be a pipe there
+        if (typeof cmp.pipes !== 'undefined') {
+            cmp.pipes.map((p) => {
+                scheds.push(p.schedule)
+            });
+        }
+        cmp.junctions.map((j) => {
+            scheds.push(j.schedule)
+        });
+        cmp.fixtures.map((f) => {
+            scheds.push(f.schedule);
+            scheds.push(f.vlan.schedule);
+        });
+    }
+
 }
+
 export default new Transformer();

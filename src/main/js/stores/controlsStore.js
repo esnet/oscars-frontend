@@ -7,6 +7,7 @@ class ControlsStore {
     @observable connection = {
         connectionId: '',
         description: '',
+        phase: '',
         schedule: {
             locked: false,
             acceptable: false,

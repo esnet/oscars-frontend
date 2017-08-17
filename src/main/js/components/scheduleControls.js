@@ -12,7 +12,7 @@ import {
     FormControl, ControlLabel, Popover, Glyphicon, OverlayTrigger
 } from 'react-bootstrap';
 
-const format = 'Y/MM/DD HH:mm';
+const format = 'Y/MM/DD HH:mm:ss';
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer
@@ -23,26 +23,26 @@ export default class ScheduleControls extends Component {
 
     componentWillMount() {
         let startAt = new Date();
-        startAt.setTime(startAt.getTime() + 10 * 60 * 1000);
+        startAt.setTime(startAt.getTime() + 15 * 60 * 1000);
 
         let endAt = new Date();
-        endAt.setDate(endAt.getDate());
-        endAt.setTime(endAt.getTime() + 40 * 60 * 1000);
+        endAt.setDate(endAt.getDate()+365);
+        endAt.setTime(endAt.getTime());
 
         let params = {
             schedule: {
                 acceptable: true,
-                locked: false,
+                locked: true,
                 start: {
                     at: startAt,
-                    choice: 'in 10 minutes',
+                    choice: 'in 15 minutes',
                     readable: Moment(startAt).format(format),
                     validationState: 'success',
                     validationText: '',
                 },
                 end: {
                     at: endAt,
-                    choice: 'in 40 minutes',
+                    choice: 'in 1 year',
                     readable: Moment(endAt).format(format),
                     validationState: 'success',
                     validationText: '',
@@ -60,6 +60,24 @@ export default class ScheduleControls extends Component {
             const startSec = conn.schedule.start.at.getTime() / 1000;
             const endSec = conn.schedule.end.at.getTime() / 1000;
             this.props.topologyStore.loadAvailable(startSec, endSec);
+        }
+
+        if (!conn.schedule.locked) {
+            let params = {
+                schedule: {
+                    start: {
+                        choice: conn.schedule.start.choice
+                    },
+                    end: {
+                        choice: conn.schedule.end.choice
+                    }
+
+                }
+            };
+
+            this.validateStartEnd(params);
+            this.props.controlsStore.setParamsForConnection(params);
+
         }
 
         if (conn.schedule.start.at < new Date()) {
@@ -253,17 +271,18 @@ export default class ScheduleControls extends Component {
 
 
     render() {
-        const sched = this.props.controlsStore.connection.schedule;
+        const conn = this.props.controlsStore.connection;
+        const sched = conn.schedule;
 
 
-        let help = <Popover id='help-schedule' title='Start here'>
+        let help = <Popover id='help-schedule' title='Schedule help'>
             <p>Type in the desired date / time for your connection to start and end.
                 A start time either in the past or after the end time is not accepted.</p>
             <p>Then, click "Lock schedule", so that the system can then
                 calculate resource availability.</p>
             <p>Relative time expressions such as "in 10 minutes" are accepted,
-                but they are evaluated when you click "Lock schedule", and the
-                resulting times do not change as time passes.</p>
+                but they are only evaluated when you type them in.
+                The resulting times will not change as time passes.</p>
             <p>Unlocking the schedule will also unlock all other resources.</p>
         </Popover>;
 
@@ -281,7 +300,7 @@ export default class ScheduleControls extends Component {
                     <FormGroup validationState={sched.start.validationState}>
                         <ControlLabel>Start:</ControlLabel>
                         <FormControl type='text'
-                                     defaultValue='in 10 minutes'
+                                     defaultValue='in 15 minutes'
                                      disabled={sched.locked}
                                      onChange={this.onStartDateChange}/>
                         <HelpBlock>
@@ -293,17 +312,17 @@ export default class ScheduleControls extends Component {
                         <ControlLabel>End:</ControlLabel>
                         <FormControl type='text'
                                      disabled={sched.locked}
-                                     defaultValue='in 40 minutes'
+                                     defaultValue='in 1 year'
                                      onChange={this.onEndDateChange}/>
                         <HelpBlock>
                             <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
                         </HelpBlock>
                     </FormGroup>
-                    <ToggleDisplay show={!sched.locked && sched.acceptable}>
+                    <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
                         <Button className='pull-right' bsStyle='primary' onClick={this.lockSchedule}>Lock
                             schedule</Button>
                     </ToggleDisplay>
-                    <ToggleDisplay show={sched.locked}>
+                    <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
                         <Button className='pull-right' bsStyle='warning' onClick={this.unlockSchedule}>Unlock</Button>
                     </ToggleDisplay>
                 </Form>
