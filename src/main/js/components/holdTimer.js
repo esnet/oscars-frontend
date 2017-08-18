@@ -81,6 +81,10 @@ export default class HoldTimer extends Component {
         if (!conn.schedule.locked) {
             return;
         }
+        if (typeof conn.connectionId === 'undefined' || conn.connectionId === null) {
+            console.log('no connectionId!')
+            return;
+        }
 
         let held = {};
         let scheduleRef = conn.connectionId + '-HELD';
@@ -88,9 +92,7 @@ export default class HoldTimer extends Component {
         let cmp = Transformer.toBackend(this.props.designStore.design, scheduleRef);
 
         held.connectionId = conn.connectionId;
-        if (typeof connectionId === 'undefined' || connectionId === null) {
-            return;
-        }
+
         held.schedule = {
             beginning: conn.schedule.start.at.getTime() / 1000,
             ending: conn.schedule.end.at.getTime() / 1000,
