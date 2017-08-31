@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {toJS, action} from 'mobx';
+import {toJS, action, whyRun} from 'mobx';
 import {Row, Col} from 'react-bootstrap';
-import {Redirect} from 'react-router-dom';
 import DetailsControls from '../components/detailsControls';
 import DetailsDrawing from '../components/detailsDrawing';
 import DetailsComponents from '../components/detailsComponents';
@@ -19,32 +18,44 @@ export default class DetailsApp extends Component {
     }
 
     componentWillMount() {
-        this.props.commonStore.setActiveNav('list');
+
+        this.props.commonStore.setActiveNav('details');
+        const connectionId = this.props.match.params.connectionId;
+        this.refresh(connectionId);
     }
 
-    refresh = () => {
-        const current = this.props.connsStore.store.current;
+    refresh = (connectionId) => {
+        if (typeof connectionId === 'undefined') {
+            return;
+        }
 
-
-        myClient.submitWithToken('GET', '/api/conn/info/'+current.connectionId)
+        myClient.submitWithToken('GET', '/api/conn/info/' + connectionId)
             .then(action((response) => {
-
-                let conn = JSON.parse(response);
-                transformer.fixSerialization(conn);
-
-                this.props.connsStore.setCurrent(conn);
-
+                if (response !== null && response.length > 0) {
+                    let conn = JSON.parse(response);
+                    transformer.fixSerialization(conn);
+                    this.props.connsStore.setCurrent(conn);
+                }
             }));
     };
 
     render() {
-        let conn = this.props.connsStore.store.current;
-        if (typeof conn.archived === 'undefined') {
-            return <Redirect to='/pages/list'/>;
-        }
+        const connectionId = this.props.match.params.connectionId;
+        const conn = this.props.connsStore.store.current;
 
-        return (
-            <Row>
+        if (typeof connectionId === 'undefined') {
+            return (
+                <Row>
+                <Col >
+                    <DetailsControls refresh={this.refresh}/>
+                </Col>
+                </Row>
+
+            )
+        } else if (conn === null || typeof conn === 'undefined' || typeof conn.archived === 'undefined') {
+            return <div>Loading...</div>;
+        } else {
+            return <Row>
                 <Col sm={3} md={3} lg={3}>
                     <DetailsControls refresh={this.refresh}/>
                     <DetailsDrawing/>
@@ -53,10 +64,10 @@ export default class DetailsApp extends Component {
                     <DetailsInfo refresh={this.refresh}/>
                 </Col>
                 <Col sm={3} md={3} lg={3}>
-                    <DetailsComponents />
+                    <DetailsComponents/>
                 </Col>
             </Row>
-        );
+        }
     }
 
 }
