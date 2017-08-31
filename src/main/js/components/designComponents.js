@@ -5,6 +5,7 @@ import validator from '../lib/validation'
 import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import ToggleDisplay from 'react-toggle-display';
+import ClearAllButton from './clearAllButton';
 
 @inject('designStore', 'controlsStore', 'modalStore')
 @observer
@@ -20,7 +21,7 @@ export default class DesignComponents extends Component {
 
         let compHelp = <Popover id='help-designComponents' title='Component list'>
             <p>This displays the fixtures, junctions, and pipes for the current design.
-                It starts out emptu and will auto-update as these are added, deleted, or updated.</p>
+                It starts out empty and will auto-update as these are added, deleted, or updated.</p>
 
             <p>An orange flag icon indicates an unlocked component; a green checkmark means it is locked.
                 All components must be locked before the connection can be committed.</p>
@@ -36,7 +37,7 @@ export default class DesignComponents extends Component {
 
         return (
 
-            <Panel header={header} >
+            <Panel header={header}>
                 <ToggleDisplay show={design.junctions.length > 0}>
                     <h5><u>Junctions & fixtures</u></h5>
                     {
@@ -95,6 +96,10 @@ export default class DesignComponents extends Component {
                             })
                         }
                     </Nav>
+                </ToggleDisplay>
+                {' '}
+                <ToggleDisplay show={design.fixtures.length > 0}>
+                    <ClearAllButton/>
                 </ToggleDisplay>
             </Panel>
         )
