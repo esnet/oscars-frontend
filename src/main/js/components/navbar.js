@@ -37,6 +37,9 @@ export default class NavBar extends Component {
                 <LinkContainer to='/pages/list'>
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
+                <LinkContainer to='/pages/details'>
+                    <NavItem eventKey='details'>Details</NavItem>
+                </LinkContainer>
                 <LinkContainer to='/pages/newDesign'>
                     <NavItem eventKey='newDesign'>New</NavItem>
                 </LinkContainer>

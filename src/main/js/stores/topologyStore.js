@@ -1,4 +1,4 @@
-import {observable, action, computed} from 'mobx';
+import {toJS, observable, action, computed} from 'mobx';
 import myClient from '../agents/client';
 
 class TopologyStore {
@@ -7,7 +7,21 @@ class TopologyStore {
     /*
      format :
      {
-     device1: ['port1, '[port2'],
+     device1: ['port1': {
+        "urn" : "nersc-mr2:xe-7/1/0",
+        "id" : 389,
+        "tags" : [ "nersc-mr2->nersc(as2936):10ge(vlan):site_conn-b_secondary_v4:show:intercloud", "xe-7/1/0.303" ],
+        "reservableIngressBw" : 10000,
+        "reservableEgressBw" : 10000,
+        "reservableVlans" : [ {
+          "floor" : 304,
+          "ceiling" : 4094
+        }, {
+          "floor" : 2,
+          "ceiling" : 302
+        } ],
+        "capabilities" : [ "ETHERNET" ]
+     }, 'port2': {}],
      device2: ['port3],
      }
      */
@@ -50,8 +64,8 @@ class TopologyStore {
                 (port) => {
                     byPort.push(
                         {
-                            'id': port,
-                            'label': port,
+                            'id': port.urn,
+                            'label': port.urn,
                             'device': device
                         }
                     )

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, ListGroup, ListGroupItem, Glyphicon} from 'react-bootstrap';
+import {Modal, Button, ListGroup, ListGroupItem, Glyphicon, Popover, Panel, OverlayTrigger, Accordion} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import PropTypes from 'prop-types';
 const modalName = 'addFixture';
@@ -20,7 +20,7 @@ export default class AddFixtureModal extends Component {
     addFixture = (device, port) => {
         let params = {
             device: device,
-            port: port,
+            port: port.urn,
         };
         let fixture = this.props.designStore.addFixtureDeep(params);
 
@@ -46,12 +46,23 @@ export default class AddFixtureModal extends Component {
                 }
             );
         }
+        const help = <Popover id='help-addFixtureModal' title='Fixture selection'>
+            <p>Here you can see all the physical ports on the selected device that you
+                can use for fixtures.</p>
+            <p>You can click on the port name to expand details.</p>
+            <p>Click on the plus sign to close this form, add a fixture on that port, and start editing it.</p>
+        </Popover>;
+
+        const questionmark = <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
+            <Glyphicon className='pull-right' glyph='question-sign'/>
+        </OverlayTrigger>
+
 
         let showModal = this.props.modalStore.modals.get(modalName);
         return (
             <Modal show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{device}</Modal.Title>
+                    <Modal.Title>{device} {questionmark} </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <DevicePortList ports={ports} onAddClicked={this.addFixture}/>
@@ -70,31 +81,44 @@ class DevicePortList extends Component {
     }
 
     portSort = (a, b) => {
-        if (a.port < b.port)
+        if (a.port.urn < b.port.urn)
             return -1;
-        if (a.port > b.port)
+        if (a.port.urn > b.port.urn)
             return 1;
         return 0;
     };
 
     render() {
-        let portsNodes = this.props.ports.sort(this.portSort).map((entry) => {
+        let portsNodes = this.props.ports.sort(this.portSort).map((entry, portIdx) => {
             let port = entry.port;
             let device = entry.device;
-            let portLabel = port.split(':')[1];
+            let portLabel = port.urn.split(':')[1];
 
             let clickHandler = () => {
                 this.props.onAddClicked(device, port);
             };
+            const tags = port.tags.map((tag, idx) => {
+               return(
+                   <ListGroupItem key={idx}>{tag}</ListGroupItem>
+               )
+            });
+
+
+            const header = <div>{portLabel}
+                <Glyphicon className='pull-right' glyph='plus' onClick={clickHandler}/>
+            </div>;
+
             return (
-                <ListGroupItem key={port} onClick={clickHandler}>{portLabel}
-                    <Glyphicon className='pull-right' glyph='plus'/>
-                </ListGroupItem>
+                    <Panel key={port.urn} header={header} eventKey={portIdx}>
+                        <ListGroup>
+                            {tags}
+                        </ListGroup>
+                    </Panel>
             )
 
         });
 
-        return <ListGroup>{portsNodes}</ListGroup>
+        return <Accordion>{portsNodes}</Accordion>
     };
 }
 

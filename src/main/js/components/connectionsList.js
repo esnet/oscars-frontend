@@ -4,7 +4,7 @@ import Moment from 'moment';
 import {toJS, autorunAsync} from 'mobx';
 import {observer, inject} from 'mobx-react';
 import transformer from '../lib/transform';
-import {withRouter} from 'react-router-dom'
+import {withRouter, Link} from 'react-router-dom'
 
 import myClient from '../agents/client';
 
@@ -52,15 +52,6 @@ class ConnectionsList extends Component {
 
     };
 
-    showDetails = (connectionId) => {
-
-        let c = this.props.connsStore.findConnection(connectionId);
-
-        this.props.connsStore.setCurrent(c);
-        this.props.history.push('/pages/details');
-
-    };
-
     selectedPhaseChanged = (e) => {
         let phase = e.target.value;
         this.props.connsStore.setFilter({
@@ -81,12 +72,9 @@ class ConnectionsList extends Component {
             let beginning = beg.format(format) + ' (' + beg.fromNow() + ')';
             let ending = end.format(format) + ' (' + end.fromNow() + ')';
 
-
             return (
-                <tr key={c.connectionId} onClick={(e) => {
-                    this.showDetails(c.connectionId)
-                }}>
-                    <td>{c.connectionId}</td>
+                <tr key={c.connectionId}>
+                    <td><Link to={'/pages/details/'+c.connectionId}>{c.connectionId}</Link></td>
                     <td>
                         <div>{c.description}</div>
                         <div>{c.username}</div>

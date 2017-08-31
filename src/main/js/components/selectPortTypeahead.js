@@ -19,6 +19,7 @@ export default class SelectPortTypeahead extends Component {
 
     onTypeaheadSelection = (port) => {
         const {ethPorts} = this.props.topologyStore;
+
         let isInEthPorts = false;
         let device = '';
         ethPorts.map((entry) => {
@@ -38,8 +39,7 @@ export default class SelectPortTypeahead extends Component {
 
             let fixture = this.props.designStore.addFixtureDeep(params);
 
-            console.log(device);
-            this.props.mapStore.addColoredNode({id: device, color: 'red'});
+            this.props.mapStore.addColoredNode({id: device, color: 'green'});
             this.props.mapStore.setZoomOnColored(true);
 
             const editFixtureParams = transformer.newFixtureToEditParams(fixture);

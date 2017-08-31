@@ -3,16 +3,16 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {action, toJS} from 'mobx';
 
+import {withRouter} from 'react-router-dom'
 
-import {Button, Panel} from 'react-bootstrap';
+import {Button, Panel, FormGroup, ControlLabel, FormControl, HelpBlock} from 'react-bootstrap';
 import myClient from '../agents/client';
 import PropTypes from 'prop-types';
 
 
-
 @inject('connsStore')
 @observer
-export default class DetailsControls extends Component {
+class DetailsControls extends Component {
     constructor(props) {
         super(props);
     }
@@ -30,6 +30,22 @@ export default class DetailsControls extends Component {
         return false;
     };
 
+    onTypeIn = (e) => {
+
+        const connectionId = e.target.value;
+        if (typeof connectionId === 'undefined' || connectionId.length === 0) {
+            return false;
+        }
+
+        myClient.submitWithToken('GET', '/api/conn/info/' + connectionId)
+            .then(
+                action((response) => {
+                    if (response !== null  && response.length > 0) {
+                        this.props.history.push('/pages/details/' + connectionId);
+                        this.props.refresh(connectionId);
+                    }
+                }));
+    };
 
     render() {
         const conn = this.props.connsStore.store.current;
@@ -45,16 +61,25 @@ export default class DetailsControls extends Component {
                 <Button bsStyle='primary' className='pull-right'>Setup</Button>
                 <Button bsStyle='warning' className='pull-right'>Teardown</Button>
                 */}
-                <Button bsStyle='info' onClick={this.props.refresh} className='pull-left'>Refresh</Button>
+                <FormGroup controlId="connectionId">
+                    <ControlLabel>ConnectionId:</ControlLabel>
+                    {' '}
+                    <FormControl defaultValue={conn.connectionId} type="text" onChange={this.onTypeIn}/>
+                </FormGroup>
 
-                <Button bsStyle='danger' disabled={!cancelAllowed} onClick={this.cancel} className='pull-right'>Cancel</Button>
+                <Button bsStyle='info' onClick={() => {
+                    this.props.refresh(conn.connectionId)
+                }} className='pull-left'>Refresh</Button>
+
+                <Button bsStyle='danger' disabled={!cancelAllowed} onClick={this.cancel}
+                        className='pull-right'>Cancel</Button>
 
             </ Panel>
         );
     }
 }
 
-
+export default withRouter(DetailsControls);
 
 DetailsControls.propTypes = {
     refresh: PropTypes.func.isRequired,
