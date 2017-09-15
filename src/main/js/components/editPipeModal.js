@@ -343,7 +343,7 @@ export default class PipeParamsModal extends Component {
         let helpPopover = <Popover id='help-pipeControls' title='Pipe controls'>
             <p>Here you can edit the pipe parameters. Every pipe in a design
                 must have locked in A-Z and Z-A bandwidth quantities, as well as
-                an ERO.</p>
+                an Explicit Route Object (ERO).</p>
             <p>Use the textboxes to input the bandwidth you want, and click "Lock" to lock
                 the values in.</p>
             <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
