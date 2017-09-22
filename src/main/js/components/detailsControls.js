@@ -1,16 +1,14 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, toJS} from 'mobx';
+import {action, autorunAsync, toJS} from 'mobx';
 
 import {withRouter} from 'react-router-dom'
 
 import {Button, Panel, FormGroup, ControlLabel, FormControl, HelpBlock} from 'react-bootstrap';
-import myClient from '../agents/client';
 import PropTypes from 'prop-types';
 
-
-@inject('connsStore')
+@inject('connsStore', 'commonStore')
 @observer
 class DetailsControls extends Component {
     constructor(props) {
@@ -18,42 +16,28 @@ class DetailsControls extends Component {
     }
 
 
-    cancel = () => {
-        let current = this.props.connsStore.store.current;
 
-        myClient.submitWithToken('POST', '/protected/conn/cancel', current.connectionId)
-            .then(action((response) => {
-                current.phase = response.replace(/"/g, '');
-
-            }));
-
-        return false;
-    };
-
-    onTypeIn = (e) => {
-
-        const connectionId = e.target.value;
-        if (typeof connectionId === 'undefined' || connectionId.length === 0) {
-            return false;
+    handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            this.load();
         }
-
-        myClient.submitWithToken('GET', '/api/conn/info/' + connectionId)
-            .then(
-                action((response) => {
-                    if (response !== null  && response.length > 0) {
-                        this.props.history.push('/pages/details/' + connectionId);
-                        this.props.refresh(connectionId);
-                    }
-                }));
     };
+
+    load = () => {
+        let connectionId = this.connectionIdRef.value;
+        this.props.history.push('/pages/details/' + connectionId);
+        this.props.load(connectionId);
+    };
+
 
     render() {
-        const conn = this.props.connsStore.store.current;
-        let cancelAllowed = true;
-        if (conn.phase !== 'RESERVED') {
-            cancelAllowed = false;
+        const pathConnectionId = this.props.match.params.connectionId;
+
+        let connLoaded = false;
+        if (this.props.connsStore.store.foundCurrent) {
+            connLoaded = true;
         }
-        const header = <div>Controls</div>;
+        const header = <div>Search</div>;
 
         return (
             <Panel header={header}>
@@ -64,15 +48,25 @@ class DetailsControls extends Component {
                 <FormGroup controlId="connectionId">
                     <ControlLabel>ConnectionId:</ControlLabel>
                     {' '}
-                    <FormControl defaultValue={conn.connectionId} type="text" onChange={this.onTypeIn}/>
+                    <FormControl
+                        type='text'
+                        inputRef={(ref) => {
+                            this.connectionIdRef = ref
+                        }}
+                        defaultValue={pathConnectionId}
+                        onKeyPress={this.handleKeyPress}
+                        placeholder='Connection ID ("Z0K2")'
+                    />
                 </FormGroup>
 
-                <Button bsStyle='info' onClick={() => {
-                    this.props.refresh(conn.connectionId)
-                }} className='pull-left'>Refresh</Button>
+                <Button bsStyle='info'
+                        disabled={!connLoaded}
+                        onClick={() => {this.props.refresh()}}
+                        className='pull-left'>Refresh</Button>
 
-                <Button bsStyle='danger' disabled={!cancelAllowed} onClick={this.cancel}
-                        className='pull-right'>Cancel</Button>
+                <Button bsStyle='primary'
+                        onClick={() => {this.load()}}
+                        className='pull-right'>Load</Button>
 
             </ Panel>
         );
@@ -83,4 +77,5 @@ export default withRouter(DetailsControls);
 
 DetailsControls.propTypes = {
     refresh: PropTypes.func.isRequired,
+    load: PropTypes.func.isRequired,
 };

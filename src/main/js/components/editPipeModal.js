@@ -11,7 +11,6 @@ import ToggleDisplay from 'react-toggle-display';
 import EroTypeahead from './eroTypeahead';
 import {autorun, autorunAsync, whyRun, toJS} from 'mobx';
 
-
 import myClient from '../agents/client';
 
 const modalName = 'editPipe';
@@ -40,6 +39,7 @@ export default class PipeParamsModal extends Component {
             loading: true,
             ero: {
                 message: 'Updating path..',
+                acceptable: false,
                 hops: []
             }
         });
@@ -291,7 +291,7 @@ export default class PipeParamsModal extends Component {
     };
     unlockPipe = () => {
         const ep = this.props.controlsStore.editPipe;
-        this.props.controlsStore.setParamsForEditPipe({locked: false});
+        this.props.controlsStore.setParamsForEditPipe({locked: false, ero: {hops: [], acceptable: false}});
         this.props.designStore.unlockPipe(ep.pipeId);
 
     };
@@ -333,12 +333,12 @@ export default class PipeParamsModal extends Component {
         }
 
         const acceptable = ep.A_TO_Z.acceptable && ep.Z_TO_A.acceptable && ep.ero.acceptable;
-        let disableLockBtn = !acceptable;
+        const disableLockBtn = !acceptable;
 
         let showModal = this.props.modalStore.modals.get(modalName);
         let pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
-        let azLabel = 'From ' + pipe.a + ' to ' + pipe.z;
-        let zaLabel = 'From ' + pipe.z + ' to ' + pipe.a;
+        let azLabel = 'From ' + pipe.a + ' to ' + pipe.z + ' (Mbps)';
+        let zaLabel = 'From ' + pipe.z + ' to ' + pipe.a + ' (Mbps)';
 
         let helpPopover = <Popover id='help-pipeControls' title='Pipe controls'>
             <p>Here you can edit the pipe parameters. Every pipe in a design
@@ -382,7 +382,7 @@ export default class PipeParamsModal extends Component {
                                             <ControlLabel>{azLabel}</ControlLabel>
                                             {' '}
                                             <FormControl type="text"
-                                                         placeholder="0-100000 (Mbps)"
+                                                         placeholder="0-100000"
                                                          defaultValue={ep.A_TO_Z.bw}
                                                          disabled={ep.locked}
                                                          onChange={this.onAzBwChange}/>
@@ -398,7 +398,7 @@ export default class PipeParamsModal extends Component {
                                                          disabled={ep.locked}
                                                          defaultValue={ep.Z_TO_A.bw}
                                                          type="text"
-                                                         placeholder="0-10000 (Mbps)"/>
+                                                         placeholder="0-10000"/>
 
                                             <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
                                             <HelpBlock>Available: {ep.Z_TO_A.available} Mbps</HelpBlock>

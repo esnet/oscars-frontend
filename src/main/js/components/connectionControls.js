@@ -73,14 +73,16 @@ export default class ConnectionControls extends Component {
 
         return (
             <Panel>
-                <Form>
+                <Form onSubmit={e => { e.preventDefault(); }}>
                     <Well bsSize='small' onClick={() => { this.props.modalStore.openModal('designHelp')}}>
                         <h3>Help me! <Glyphicon  className='pull-right' glyph='question-sign' /></h3>
+                        <p>Connection id: {this.props.controlsStore.connection.connectionId}</p>
                     </Well>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
-                        <FormControl type='text' placeholder='description'
+                        <FormControl type='text' placeholder='Description'
                                      defaultValue={conn.description}
+
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     <FormGroup className='pull-right'>

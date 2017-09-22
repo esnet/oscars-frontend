@@ -7,10 +7,28 @@ class CommonStore {
         active: '',
     };
 
+    @observable alerts = [];
+
     @action setActiveNav(a) {
         this.nav.active = a;
     }
 
+    @action removeAlert(alert) {
+        let idxToRemove = -1;
+        this.alerts.map((entry, index) => {
+            if (entry.id === alert.id) {
+                idxToRemove = index;
+            }
+        });
+        if (idxToRemove > -1) {
+            this.alerts.splice(idxToRemove, 1);
+        }
+
+    }
+    @action addAlert(alert) {
+        this.alerts.push(alert);
+
+    }
 
 }
 export default new CommonStore();

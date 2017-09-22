@@ -1,5 +1,7 @@
 import React from 'react';
 
+
+import {Graph, alg} from 'graphlib';
 import {Glyphicon, Label} from 'react-bootstrap';
 
 class Validator {
@@ -89,7 +91,7 @@ class Validator {
             for (let f of fixtures) {
                 if (!f.locked) {
                     result.ok = false;
-                    result.errors.push('Fixture {f.label}: not locked.');
+                    result.errors.push('Fixture '+f.label+': not locked.');
                 }
             }
         }
@@ -97,15 +99,44 @@ class Validator {
             for (let p of pipes) {
                 if (!p.locked) {
                     result.ok = false;
-                    result.errors.push('Pipe {p.id}: not locked. ');
+                    result.errors.push('Pipe '+p.id+': not locked. ');
                 }
             }
         } else {
             result.ok = false;
             result.errors.push('Internal error - undefined pipes');
         }
+        if (!this.connectedGraph(cmp)) {
+            result.ok = false;
+            result.errors.push('Disjoint connection graph.');
+
+        }
+
         return result;
 
+    }
+
+    connectedGraph(cmp) {
+        let g = new Graph();
+
+        const junctions = cmp.junctions;
+        if (junctions.length === 0) {
+            return true;
+        }
+
+        const pipes = cmp.pipes;
+        junctions.map(j => {
+            g.setNode(j.id, j.id);
+        });
+        pipes.map(p => {
+            g.setEdge(p.a, p.z, p.a+' - '+p.z);
+
+        });
+        const connected = alg.components(g);
+        if (connected.length === 1) {
+            return true;
+        }
+        return false;
     }
 
     validateConnection(params) {

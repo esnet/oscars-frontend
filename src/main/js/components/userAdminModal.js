@@ -7,7 +7,7 @@ import {size} from 'lodash'
 
 const modalName = 'userAdmin';
 
-@inject('modalStore', 'userStore')
+@inject('modalStore', 'userStore', 'commonStore')
 @observer
 export default class UserAdminModal extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ export default class UserAdminModal extends Component {
     }
 
 
-    submitPassword = (controlRef) => {
+    submitPassword = (pwdControlRef, pwdAgainControlRef) => {
         let password = this.props.userStore.editUser.password;
         let user = this.props.userStore.editUser.user;
 
@@ -28,15 +28,31 @@ export default class UserAdminModal extends Component {
             .then(
                 () => {
                     this.props.refresh();
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'success',
+                        headline: 'Updated password',
+                        message: ''
+                    })
                 }
                 ,
                 (failResponse) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Could not update password',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
+
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
+
         // clear UI after setting
         this.props.userStore.setPassword('');
-        controlRef.value = '';
+        this.props.userStore.setPasswordAgain('');
+        pwdControlRef.value = '';
+        pwdAgainControlRef.value = '';
     };
 
     submitUpdate = () => {
@@ -47,10 +63,23 @@ export default class UserAdminModal extends Component {
                 (response) => {
                     let parsed = JSON.parse(response);
                     this.props.userStore.setParamsForEditUser({user: parsed});
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'success',
+                        headline: 'Updated user info',
+                        message: ''
+                    })
                     this.props.refresh();
                 }
                 ,
                 (failResponse) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Could not update user',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
+
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
@@ -69,9 +98,21 @@ export default class UserAdminModal extends Component {
                     // delete
                     this.props.refresh();
                     this.closeModal();
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'success',
+                        headline: 'Deleted user',
+                        message: ''
+                    })
                 }
                 ,
                 (failResponse) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Could not delete user',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
@@ -96,6 +137,7 @@ export default class UserAdminModal extends Component {
                                   submitUpdate={this.submitUpdate}
                                   submitDelete={this.submitDelete}
                                   allowDelete={true}
+                                  inModal={true}
                     />
 
 

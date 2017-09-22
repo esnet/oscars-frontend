@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorunAsync, toJS} from 'mobx';
 import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
-import transformer from '../lib/transform';
 import vis from 'vis';
-import validator from '../lib/validation'
+import VisUtils from '../lib/vis'
 
 
 @inject('connsStore', 'modalStore')
@@ -109,7 +108,7 @@ export default class DetailsDrawing extends Component {
 
 
     // this automagically updates the map;
-    // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
+    // TODO: maybe use a reaction and don't clear the whole graph, instead add/remove/update
     disposeOfMapUpdate = autorunAsync(() => {
 
 
@@ -119,8 +118,6 @@ export default class DetailsDrawing extends Component {
         let pipes = toJS(design.pipes);
 
 
-        this.datasource.nodes.clear();
-        this.datasource.edges.clear();
         let nodes = [];
         let edges = [];
 
@@ -137,17 +134,17 @@ export default class DetailsDrawing extends Component {
         });
         fixtures.map((f) => {
             let fixtureNode = {
-                id: f.portUrn+':'+f.vlan.vlanId,
-                label: f.portUrn+':'+f.vlan.vlanId,
+                id: f.portUrn + ':' + f.vlan.vlanId,
+                label: f.portUrn + ':' + f.vlan.vlanId,
                 size: 8,
                 data: f,
                 onClick: this.onFixtureClicked
             };
             nodes.push(fixtureNode);
             let edge = {
-                id: f.portUrn+':'+f.vlan.vlanId,
+                id: f.portUrn + ':' + f.vlan.vlanId,
                 from: f.junction,
-                to: f.portUrn+':'+f.vlan.vlanId,
+                to: f.portUrn + ':' + f.vlan.vlanId,
                 length: 3,
                 width: 1.5,
                 onClick: null
@@ -155,25 +152,52 @@ export default class DetailsDrawing extends Component {
             edges.push(edge);
         });
         if (typeof pipes !== 'undefined') {
-            pipes.map((p) => {
-                let edge = {
-                    id: p.a + ' -- ' + p.z,
-                    from: p.a,
-                    to: p.z,
-                    length: 10,
+            const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
 
-                    width: 5,
-                    data: p,
-                    onClick: this.onPipeClicked
+            pipes.map((p, pipe_idx) => {
+                let i = 0;
+                while (i < p.azERO.length - 1) {
+                    let a = p.azERO[i]['urn'];
+                    let b = p.azERO[i + 1]['urn'];
+                    let y = p.azERO[i + 2]['urn'];
+                    let z = p.azERO[i + 3]['urn'];
 
-                };
-                edges.push(edge);
+                    let foundZ = false;
+                    nodes.map((node) => {
+                        if (node.id === z) {
+                            foundZ = true;
+                        }
+                    });
+                    if (!foundZ) {
+                        let zNode = {
+                            id: z,
+                            label: z,
+                            onClick: null
+
+                        };
+                        nodes.push(zNode);
+                    }
+                    let edge = {
+                        id: pipe_idx + ' : ' + b + ' --- ' + y,
+                        from: a,
+                        color: colors[pipe_idx],
+                        to: z,
+                        length: 3,
+                        width: 1.5,
+                        onClick: null
+                    };
+                    edges.push(edge);
+
+
+                    i = i + 3;
+                }
 
             });
         }
+        VisUtils.mergeItems(nodes, this.datasource.nodes);
+        this.datasource.edges.clear();
 
         this.datasource.edges.add(edges);
-        this.datasource.nodes.add(nodes);
 
     }, 500);
 

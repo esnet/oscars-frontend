@@ -6,6 +6,7 @@ class ConnectionsStore {
     @observable store = {
         conns: [],
         current: {},
+        foundCurrent: false,
         selected: {}
     };
 
@@ -25,12 +26,19 @@ class ConnectionsStore {
 
     @action setCurrent(conn) {
         this.store.current = conn;
+        this.store.foundCurrent = true;
     }
+    @action clearCurrent() {
+        this.store.current = {};
+        this.store.foundCurrent = false;
+    }
+
     @action setSelected(component) {
         this.store.selected = component;
     }
 
     @action updateList(resvs) {
+        this.store.conns = [];
         this.store.conns = resvs;
     }
 

@@ -8,7 +8,7 @@ import {withRouter, Link} from 'react-router-dom'
 
 import myClient from '../agents/client';
 
-@inject('controlsStore', 'connsStore', 'mapStore', 'modalStore')
+@inject('controlsStore', 'connsStore', 'mapStore', 'modalStore', 'commonStore')
 @observer
 class ConnectionsList extends Component {
 
@@ -46,6 +46,13 @@ class ConnectionsList extends Component {
                 }
                 ,
                 (failResponse) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Error loading connection list',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
+
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );

@@ -16,20 +16,6 @@ export default class DetailsInfo extends Component {
         super(props);
     }
 
-    componentWillMount() {
-        this.periodicCheck();
-    }
-
-    periodicCheck() {
-        this.props.refresh();
-
-
-        setTimeout(() => {
-            this.periodicCheck()
-        }, 60000);
-
-    }
-
 
     render() {
         const selected = this.props.connsStore.store.selected;

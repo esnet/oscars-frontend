@@ -5,6 +5,7 @@ import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import vis from 'vis';
 import validator from '../lib/validation'
+import VisUtils from '../lib/vis'
 
 
 @inject('controlsStore', 'designStore', 'modalStore')
@@ -114,9 +115,6 @@ export default class DesignDrawing extends Component {
         let fixtures = toJS(design.fixtures);
         let pipes = toJS(design.pipes);
 
-
-        this.datasource.nodes.clear();
-        this.datasource.edges.clear();
         let nodes = [];
         let edges = [];
 
@@ -151,24 +149,69 @@ export default class DesignDrawing extends Component {
             };
             edges.push(edge);
         });
-        pipes.map((p) => {
-            let edge = {
-                id: p.id,
-                from: p.a,
-                to: p.z,
-                length: 10,
-                color: validator.pipeMapColor(p),
 
-                width: 5,
-                data: p,
-                onClick: this.onPipeClicked
+        const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
 
-            };
-            edges.push(edge);
+        pipes.map((p, pipe_idx) => {
+            if (p.locked) {
+                let i = 0;
+                while (i < p.ero.length - 1) {
+                    let a = p.ero[i];
+                    let b = p.ero[i + 1];
+                    let y = p.ero[i + 2];
+                    let z = p.ero[i + 3];
 
+                    let foundZ = false;
+                    nodes.map((node) => {
+                        if (node.id === z) {
+                            foundZ = true;
+                        }
+                    });
+                    if (!foundZ) {
+                        let zNode = {
+                            id: z,
+                            label: z,
+                            onClick: null
+
+                        };
+                        nodes.push(zNode);
+                    }
+                    let edge = {
+                        id: pipe_idx + ' : ' + b + ' --- ' + y,
+                        from: a,
+                        color: colors[pipe_idx],
+                        to: z,
+                        length: 3,
+                        width: 1.5,
+                        onClick: null
+                    };
+                    edges.push(edge);
+
+
+                    i = i + 3;
+                }
+
+
+            } else {
+                let edge = {
+                    id: p.id,
+                    from: p.a,
+                    to: p.z,
+                    length: 10,
+                    color: colors[pipe_idx],
+                    width: 5,
+                    data: p,
+                    onClick: this.onPipeClicked
+
+                };
+                edges.push(edge);
+            }
         });
+        VisUtils.mergeItems(nodes, this.datasource.nodes);
+
+        this.datasource.edges.clear();
         this.datasource.edges.add(edges);
-        this.datasource.nodes.add(nodes);
+
 
     }, 500);
 

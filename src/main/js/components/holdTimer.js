@@ -19,14 +19,7 @@ export default class HoldTimer extends Component {
     }
 
     componentWillMount() {
-        let untilDt = new Date();
-        untilDt.setTime(untilDt.getTime() + 15 * 60 * 1000);
-        let until = Moment(untilDt);
-
-        this.props.controlsStore.setParamsForConnection({
-            held: { until: until }
-        });
-
+        this.setToFifteenMins();
         this.refreshTimer();
     }
 
@@ -35,9 +28,29 @@ export default class HoldTimer extends Component {
         clearTimeout(this.refreshTimeout);
     }
 
+    setToFifteenMins() {
+        const untilDt = new Date();
+        untilDt.setTime(untilDt.getTime() + 15 * 60 * 1000);
+        const until = Moment(untilDt);
+        this.props.controlsStore.setParamsForConnection({
+            held: {
+                remaining: '15:00',
+                until: until
+            }
+        });
+    }
+
 
     refreshTimer = () => {
         const conn = this.props.controlsStore.connection;
+
+        if (this.props.designStore.design.junctions.length === 0) {
+            this.setToFifteenMins();
+            this.refreshTimeout = setTimeout(this.refreshTimer, 1000); // we will update every second
+            return;
+        }
+
+
         let now = Moment();
         let until = conn.held.until;
         let remaining = Moment.duration(until.diff(now));
@@ -105,6 +118,9 @@ export default class HoldTimer extends Component {
         held.cmp = cmp;
 //        console.log(held);
 //        whyRun();
+        if (conn.connectionId === null || conn.connectionId === '') {
+            return
+        }
 
         let connection = {
             connectionId: conn.connectionId,
@@ -145,7 +161,7 @@ export default class HoldTimer extends Component {
 
         return (
             <Panel>
-                <span>Held for: {conn.held.remaining}
+                <span>Resources held for: {conn.held.remaining}
                     <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
                         <Glyphicon className='pull-right' glyph='question-sign'/>
                     </OverlayTrigger>

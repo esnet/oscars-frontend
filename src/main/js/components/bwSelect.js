@@ -123,7 +123,7 @@ export default class BwSelect extends Component {
                 }
             });
             return;
-        } else if (newIngress < 0 ) {
+        } else if (newIngress < 0) {
             this.props.controlsStore.setParamsForEditFixture({
                 bw: {
                     acceptable: false,
@@ -275,7 +275,7 @@ export default class BwSelect extends Component {
                 }
             });
             return;
-        } else if (newEgress < 0 ) {
+        } else if (newEgress < 0) {
             this.props.controlsStore.setParamsForEditFixture({
                 bw: {
                     acceptable: false,
@@ -343,7 +343,7 @@ export default class BwSelect extends Component {
 
     otherFixtureSelected = (e) => {
         const ef = this.props.controlsStore.editFixture;
-        let params = {};
+        let params = {bw: {copied: {}}};
         if (e.target.value !== 'choose') {
             let otherFixture = JSON.parse(e.target.value);
 
@@ -355,6 +355,7 @@ export default class BwSelect extends Component {
             }
             params.bw.acceptable = true;
         } else {
+            params.bw.copied = {};
             params.bw.copied.ingress = '-';
             params.bw.copied.egress = '-';
             params.bw.acceptable = false;
@@ -373,11 +374,13 @@ export default class BwSelect extends Component {
                 mode: mode,
                 copied: {
                     show: (mode === 'sameAs' || mode === 'oppositeOf')
-                }
+                },
+                copyFrom: {}
             },
         };
 
         if (mode === 'oppositeOf' || mode === 'sameAs') {
+
             params.bw.copyFrom.ingress = '-';
             params.bw.copyFrom.egress = '-';
             this.fixtureSelect.clearSelection()
@@ -427,7 +430,8 @@ export default class BwSelect extends Component {
                                 {' '}
                                 <ToggleDisplay show={typeInMode}>
                                     <FormGroup controlId="symmetrical">
-                                        <Checkbox className='pull-right' defaultChecked={ef.bw.typeIn.symmetrical} inline
+                                        <Checkbox className='pull-right' defaultChecked={ef.bw.typeIn.symmetrical}
+                                                  inline
                                                   onChange={this.symmetricalCheckboxClicked}>Symmetrical
                                         </Checkbox>
                                     </FormGroup>
@@ -451,9 +455,9 @@ export default class BwSelect extends Component {
                         <Row>
                             <Col sm={6} md={6} lg={6}>
                                 <FormGroup controlId="ingress" validationState={ef.bw.typeIn.ingress.validationState}>
-                                    <ControlLabel>Ingress:</ControlLabel>
+                                    <ControlLabel>Ingress (Mbps):</ControlLabel>
                                     <FormControl defaultValue={ef.bw.typeIn.ingress.choice}
-                                                 type="text" placeholder="0-100000 (Mbps)"
+                                                 type="text" placeholder="0-100000"
                                                  onChange={this.onIngressBwChange}/>
                                     <HelpBlock><p>{ef.bw.typeIn.ingress.validationText}</p></HelpBlock>
                                     <HelpBlock>Reservable: {ef.bw.available.ingress} Mbps</HelpBlock>
@@ -463,14 +467,14 @@ export default class BwSelect extends Component {
                             </Col>
                             <Col sm={6} md={6} lg={6}>
                                 <FormGroup controlId="egress" validationState={ef.bw.typeIn.egress.validationState}>
-                                    <ControlLabel>Egress:</ControlLabel>
+                                    <ControlLabel>Egress (Mbps):</ControlLabel>
                                     <FormControl defaultValue={ef.bw.typeIn.egress.choice}
                                                  disabled={ef.bw.typeIn.symmetrical}
                                                  inputRef={ref => {
                                                      this.egressControl = ref;
                                                  }}
                                                  onChange={this.onEgressBwChange}
-                                                 type="text" placeholder="0-10000 (Mbps)"/>
+                                                 type="text" placeholder="0-10000"/>
                                     <HelpBlock><p>{ef.bw.typeIn.egress.validationText}</p></HelpBlock>
                                     <HelpBlock>Reservable: {ef.bw.available.egress} Mbps</HelpBlock>
                                     <HelpBlock>Baseline: {ef.bw.baseline.egress} Mbps</HelpBlock>
