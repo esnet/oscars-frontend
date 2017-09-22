@@ -6,6 +6,7 @@ import ToggleDisplay from 'react-toggle-display';
 
 import chrono from 'chrono-node';
 import Moment from 'moment';
+import jstz from 'jstz';
 
 import {
     HelpBlock, Form, Button, Panel, FormGroup,
@@ -91,8 +92,9 @@ export default class ScheduleControls extends Component {
                     }
                 }
             });
-
+            this.props.designStore.unlockAll();
         }
+
         if (conn.schedule.end.at < new Date()) {
             this.props.controlsStore.setParamsForConnection({
                 schedule: {
@@ -104,9 +106,10 @@ export default class ScheduleControls extends Component {
                     }
                 }
             });
+            this.props.designStore.unlockAll();
         }
 
-        setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
             this.periodicCheck()
         }, 5000);
 
@@ -122,8 +125,10 @@ export default class ScheduleControls extends Component {
 
     }, 1000);
 
+
     componentWillUnmount() {
         this.disposeOfUpdateAvailable();
+        clearTimeout(this.timeoutId);
         this.props.controlsStore.setParamsForConnection({schedule: {locked: false}});
     }
 
@@ -273,6 +278,7 @@ export default class ScheduleControls extends Component {
     render() {
         const conn = this.props.controlsStore.connection;
         const sched = conn.schedule;
+        const timezone = jstz.determine();
 
 
         let help = <Popover id='help-schedule' title='Schedule help'>
@@ -296,6 +302,7 @@ export default class ScheduleControls extends Component {
         return (
             <Panel header={header}>
                 <Form>
+                    <p>Timezone: {timezone.name()}</p>
 
                     <FormGroup validationState={sched.start.validationState}>
                         <ControlLabel>Start:</ControlLabel>
@@ -326,7 +333,6 @@ export default class ScheduleControls extends Component {
                         <Button className='pull-right' bsStyle='warning' onClick={this.unlockSchedule}>Unlock</Button>
                     </ToggleDisplay>
                 </Form>
-
 
             </Panel>
         );

@@ -97,11 +97,14 @@ class DevicePortList extends Component {
             let clickHandler = () => {
                 this.props.onAddClicked(device, port);
             };
-            const tags = port.tags.map((tag, idx) => {
-               return(
-                   <ListGroupItem key={idx}>{tag}</ListGroupItem>
-               )
-            });
+            let tags = null;
+            if ('tags' in port) {
+                tags = port.tags.map((tag, idx) => {
+                    return(
+                        <ListGroupItem key={idx}>{tag}</ListGroupItem>
+                    )
+                });
+            }
 
 
             const header = <div>{portLabel}

@@ -3,9 +3,10 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {action, autorunAsync, toJS} from 'mobx';
 import Moment from 'moment';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import {Panel } from 'react-bootstrap';
+import {Panel, Button} from 'react-bootstrap';
+import myClient from '../agents/client';
 
 
 @inject('connsStore')
@@ -15,6 +16,17 @@ export default class DetailsGeneral extends Component {
         super(props);
     }
 
+
+    cancel = () => {
+        let current = this.props.connsStore.store.current;
+        myClient.submitWithToken('POST', '/protected/conn/cancel', current.connectionId)
+            .then(action((response) => {
+                current.phase = response.replace(/"/g, '');
+
+            }));
+
+        return false;
+    };
 
     render() {
         const conn = this.props.connsStore.store.current;
@@ -50,13 +62,20 @@ export default class DetailsGeneral extends Component {
                 'v': ending
             },
         ];
+        let cancelAllowed = false;
+
+        if (conn.connectionId !== '' && conn.phase === 'RESERVED') {
+            cancelAllowed = true;
+        }
 
         return (
             <Panel header={header}>
-                <BootstrapTable tableHeaderClass={'hidden'} data={ info } bordered={ false }>
+                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
                     <TableHeaderColumn dataField='k' isKey={true}/>
                     <TableHeaderColumn dataField='v'/>
                 </BootstrapTable>
+                <Button bsStyle='danger' disabled={!cancelAllowed} onClick={this.cancel}
+                        className='pull-right'>Cancel</Button>
 
             </Panel>);
 

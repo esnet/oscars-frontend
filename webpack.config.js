@@ -15,7 +15,7 @@ module.exports = {
     cache: true,
     output: {
         path: PATHS.build,
-        publicPath: '/webjars/oscars-frontend/1.0.2/bundle.js',
+        publicPath: '/webjars/oscars-frontend/1.0.3/bundle.js',
         filename: 'bundle.js'
     },
     module: {

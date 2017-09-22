@@ -15,15 +15,25 @@ export default class AccountApp extends Component {
     componentWillMount() {
         this.props.commonStore.setActiveNav('account');
 
-        this.props.userStore.setParamsForEditUser({user: {}});
+        this.props.userStore.setParamsForEditUser({
+            user: {},
+            status: 'Loading..'
+        });
+
         myClient.submitWithToken('GET', '/protected/account', '')
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
-                    this.props.userStore.setParamsForEditUser({user: parsed});
+                    this.props.userStore.setParamsForEditUser({user: parsed, status: ''});
                 }
                 ,
                 (failResponse) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Error loading user info',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
@@ -43,42 +53,74 @@ export default class AccountApp extends Component {
                 (response) => {
                     let parsed = JSON.parse(response);
                     this.props.userStore.setParamsForEditUser({user: parsed, status: 'Updated!'});
+
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'success',
+                        headline: 'Updated user info',
+                        message: ''
+                    })
                 }
                 ,
                 (failResponse) => {
                     this.props.userStore.setParamsForEditUser({status: failResponse.statusText});
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Could not update user info',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
     };
 
 
-    submitPassword = (controlRef) => {
+    submitPassword = (pwdControlRef, pwdAgainControlRef) => {
         let editUser = toJS(this.props.userStore.editUser);
 
-        if (!size(editUser.password)) {
-            console.log('password not set');
+        if (!editUser.passwordOk) {
+            this.props.commonStore.addAlert({
+                id: (new Date()).getTime(),
+                type: 'danger',
+                headline: 'Password not ok',
+                message: 'Did not submit invalid password.'
+            });
             return;
         }
 
         myClient.submitWithToken('POST', '/protected/account_password', editUser.password)
             .then(
                 (response) => {
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'success',
+                        headline: 'Updated password',
+                        message: ''
+                    })
                 }
                 ,
                 (failResponse) => {
-                    console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
+                    this.props.commonStore.addAlert({
+                        id: (new Date()).getTime(),
+                        type: 'danger',
+                        headline: 'Could not update password',
+                        message: failResponse.status + ' ' +failResponse.statusText
+                    });
                 }
             );
         // clear it
         this.props.userStore.setPassword('');
-        controlRef.value = '';
+        this.props.userStore.setPasswordAgain('');
+        pwdControlRef.value = '';
+        pwdAgainControlRef.value = '';
     };
 
     render() {
         return <EditUserForm submitPassword={this.submitPassword}
                              submitUpdate={this.submitUpdate}
                              submitDelete={() => {}}
+                             inModal={false}
                              allowDelete={false} />
     }
 }

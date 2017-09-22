@@ -73,7 +73,7 @@ export default class SelectPortTypeahead extends Component {
                             ref={(ref) => {
                                 this.typeAhead = ref;
                             }}
-                            placeholder='type to add a fixture'
+                            placeholder='Search fixtures'
                             minLength={2}
                             options={options}
                             onInputChange={this.onTypeaheadSelection}

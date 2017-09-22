@@ -4,6 +4,8 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem}from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
 
 import {LinkContainer} from 'react-router-bootstrap';
+import { AlertList } from 'react-bs-notifier';
+import {toJS} from 'mobx';
 
 @inject('accountStore', 'commonStore')
 @observer
@@ -67,6 +69,14 @@ export default class NavBar extends Component {
 
         return (
             <Navbar collapseOnSelect>
+                <AlertList
+                    position='top-right'
+                    alerts={toJS(this.props.commonStore.alerts)}
+                    timeout={1000}
+                    dismissTitle="Dismiss"
+                    onDismiss={(alert) => {this.props.commonStore.removeAlert(alert)}}
+                />
+
                 <Navbar.Header>
                     <Navbar.Brand>
                         OSCARS

@@ -19,6 +19,42 @@ export default class VisUtils {
             nodes: nodes
         }
     }
+
+    static mergeItems(incoming, datasource) {
+
+        let itemsToRemove = [];
+        let itemsToAdd = [];
+        let itemsToUpdate = [];
+
+        datasource.getIds().map( d_id => {
+            let found = false;
+            incoming.map(item => {
+                if (d_id === item.id) {
+                    itemsToUpdate.push(item);
+                    found = true;
+                }
+            });
+            if (!found) {
+                itemsToRemove.push(d_id);
+            }
+        });
+
+        incoming.map( (item) => {
+            let found = false;
+            datasource.getIds().map( d_id => {
+                if (d_id === item.id) {
+                    found = true;
+                }
+            });
+            if (!found) {
+                itemsToAdd.push(item);
+            }
+        });
+        datasource.remove(itemsToRemove);
+        datasource.add(itemsToAdd);
+        datasource.update(itemsToUpdate);
+
+    }
 }
 
 
