@@ -46,7 +46,7 @@ class DetailsControls extends Component {
                 <Button bsStyle='warning' className='pull-right'>Teardown</Button>
                 */}
                 <FormGroup controlId="connectionId">
-                    <ControlLabel>ConnectionId:</ControlLabel>
+                    <ControlLabel>Connection ID:</ControlLabel>
                     {' '}
                     <FormControl
                         type='text'

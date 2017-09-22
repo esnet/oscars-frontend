@@ -408,7 +408,7 @@ export default class BwSelect extends Component {
             <p>When either "Same as..." or "Opposite from..." are selected, an additional drop-down control
                 will appear allowing you to select the fixture to copy values from.</p>
             <p>In all modes, the "Lock Fixture" button will lock in your selections.
-                That button only appears when both the VLAN and bandwidth selections are valid/</p>
+                That button only appears when both the VLAN and bandwidth selections are valid.</p>
 
         </Popover>;
 
