@@ -124,6 +124,7 @@ export default class HoldTimer extends Component {
 
         let connection = {
             connectionId: conn.connectionId,
+            mode: conn.mode,
             held: held,
             description: conn.description,
             username: '',
