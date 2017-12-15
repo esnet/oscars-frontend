@@ -7,7 +7,39 @@ class ConnectionsStore {
         conns: [],
         current: {},
         foundCurrent: false,
-        selected: {}
+        selected: {},
+        commands: new Map(),
+        statuses: new Map(),
+    };
+
+    @observable controls = {
+        general: {
+            build: {
+                display: false,
+                enable: false,
+                clicked: false
+            },
+            dismantle: {
+                display: false,
+                enable: false,
+                clicked: false
+            },
+            auto: {
+                display: false,
+                enable: false,
+                clicked: false
+            },
+            manual: {
+                display: false,
+                enable: false,
+                clicked: false
+            },
+            cancel: {
+                display: false,
+                enable: false,
+                clicked: false
+            }
+        }
     };
 
     @observable filter = {
@@ -19,6 +51,20 @@ class ConnectionsStore {
         phase: 'RESERVED',
         state: 'ACTIVE',
     };
+
+    @action setCommands(commands) {
+        this.store.commands = commands;
+    }
+
+    @action setControl(unit, control, params) {
+        this.controls[unit][control] = params;
+    }
+
+
+    @action setStatuses(device, statuses) {
+        this.store.statuses[device] = statuses;
+    }
+
 
     @action setFilter(params) {
         mergeWith(this.filter, params, this.customizer);

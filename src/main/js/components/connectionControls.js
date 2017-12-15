@@ -5,7 +5,7 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 
 import ToggleDisplay from 'react-toggle-display';
-import {Form, Glyphicon, Button, Panel, FormGroup, FormControl, Well } from 'react-bootstrap';
+import {Form, Glyphicon, ControlLabel, Button, Panel, FormGroup, FormControl, Well } from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
@@ -26,7 +26,8 @@ export default class ConnectionControls extends Component {
                     let params = {
                         description: '',
                         phase: 'HELD',
-                        connectionId: response
+                        connectionId: response,
+                        mode: 'MANUAL'
                     };
                     this.props.controlsStore.setParamsForConnection(params);
                 }));
@@ -68,6 +69,14 @@ export default class ConnectionControls extends Component {
         this.props.controlsStore.setParamsForConnection(params);
     };
 
+    onBuildModeChange = (e) => {
+        const params = {
+            mode: e.target.value
+        };
+        this.props.controlsStore.setParamsForConnection(params);
+
+    };
+
     render() {
         const conn = this.props.controlsStore.connection;
 
@@ -85,6 +94,17 @@ export default class ConnectionControls extends Component {
 
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Build Mode:</ControlLabel>
+                        {' '}
+                        <FormControl componentClass="select"
+                                     onChange={this.onBuildModeChange} >
+                            <option value='MANUAL'>Manual</option>
+                            <option value='AUTOMATIC'>Auto</option>
+                        </FormControl>
+                    </FormGroup>
+
+
                     <FormGroup className='pull-right'>
                         <ToggleDisplay show={!conn.validation.acceptable} >
                             <Button bsStyle='warning' className='pull-right'

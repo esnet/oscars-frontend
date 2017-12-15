@@ -152,6 +152,12 @@ class Validator {
             result.ok = false;
             result.errors.push('Connection id missing!');
         }
+        if (connection.mode === 'MANUAL' || connection.mode === 'AUTOMATIC') {
+            // ok
+        } else {
+            result.ok = false;
+            result.errors.push('Mode is invalid '+connection.mode);
+        }
 
         if (!connection.schedule.locked) {
             result.ok = false;

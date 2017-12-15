@@ -8,6 +8,7 @@ class ControlsStore {
         connectionId: '',
         description: '',
         phase: '',
+        mode: 'MANUAL',
         schedule: {
             locked: false,
             acceptable: false,

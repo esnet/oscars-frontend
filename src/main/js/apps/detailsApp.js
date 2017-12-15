@@ -32,10 +32,9 @@ export default class DetailsApp extends Component {
 
     periodicCheck() {
         this.timeoutId = setTimeout(() => {
-            console.log('periodic check')
             this.refresh();
             this.periodicCheck();
-        }, 5000);
+        }, 10000);
     }
 
     load = (connectionId) => {
@@ -60,12 +59,23 @@ export default class DetailsApp extends Component {
                         transformer.fixSerialization(conn);
                         this.props.history.push('/pages/details/' + connectionId);
                         this.props.connsStore.setCurrent(conn);
+                        /*
                         this.props.commonStore.addAlert({
                             id: (new Date()).getTime(),
                             type: 'success',
                             headline: 'Retrieved connection ' + connectionId,
                             message: ''
                         })
+                        */
+
+                        myClient.submitWithToken('GET', '/protected/pss/commands/'+connectionId)
+                            .then(action(
+                                (response) => {
+                                    let commands = JSON.parse(response);
+                                    this.props.connsStore.setCommands(commands);
+                                })
+                            );
+
 
                     } else {
                         this.props.connsStore.clearCurrent();
@@ -80,6 +90,7 @@ export default class DetailsApp extends Component {
                     }
                 })
             );
+
     };
 
 
