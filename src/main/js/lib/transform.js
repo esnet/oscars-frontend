@@ -11,38 +11,22 @@ class Transformer {
             device: fixture.device,
             locked: fixture.locked,
             vlan: {
-                vlanId: fixture.vlan,
-                mode: 'fromAvailable',
-                typeIn: {
-                    choice: fixture.vlanId,
-                    validationState: 'success',
-                    validationText: '',
-                }
+                vlanId: fixture.vlanId,
+                validationState: 'success',
+                validationText: '',
             },
             bw: {
-                ingress: fixture.ingress,
-                egress: fixture.egress,
-                mode: 'typeIn',
-                modeOptions: [],
-                typeIn: {
-                    ingress: {
-                        choice: fixture.ingress,
-                        validationText: '',
-                        validationState: 'success',
-                    },
-                    egress: {
-                        choice: fixture.egress,
-                        validationText: '',
-                        validationState: 'success',
-
-                    }
+                ingress: {
+                    mbps: fixture.ingress,
+                    validationText: '',
+                    validationState: 'success',
                 },
-                copied: {
-                    show: false,
-                    ingress: fixture.ingress,
-                    egress: fixture.egress,
-                }
+                egress: {
+                    mbps: fixture.egress,
+                    validationText: '',
+                    validationState: 'success',
 
+                }
             }
         };
 
@@ -60,36 +44,19 @@ class Transformer {
             vlan: {
                 acceptable: true,
                 vlanId: null,
-                mode: 'fromAvailable',
-                typeIn: {
-                    choice: '',
-                    validationState: 'error',
-                    validationText: 'No input',
-                }
             },
             bw: {
                 acceptable: true,
-                ingress: 0,
-                egress: 0,
-                mode: 'typeIn',
-                modeOptions: [],
-                typeIn: {
-                    symmetrical: true,
-                    ingress: {
-                        choice: 0,
-                        validationState: 'success',
-                        validationText: '',
-                    },
-                    egress: {
-                        choice: 0,
-                        validationState: 'success',
-                        validationText: '',
-                    }
+                symmetrical: true,
+                ingress: {
+                    mbps: 0,
+                    validationState: 'success',
+                    validationText: '',
                 },
-                copied: {
-                    show: false,
-                    ingress: 0,
-                    egress: 0,
+                egress: {
+                    mbps: 0,
+                    validationState: 'success',
+                    validationText: '',
                 }
             }
         };

@@ -58,21 +58,9 @@ class ControlsStore {
             acceptable: false,
             adviceText: '',
 
-            mode: '',
-            modeOptions: [],
-            typeIn: {
-                choice: '',
-                validationState: '',
-                validationText: '',
-            },
-            copyFrom: {
-                choice: '',
-                options: [],
-            },
-            copied: {
-                show: false,
-                choice: '',
-            },
+            validationState: null,
+            validationText: '',
+
             available: {
                 lowest: '',
                 expression: '',
@@ -84,13 +72,10 @@ class ControlsStore {
             },
         },
         bw: {
-            ingress: 0,
-            egress: 0,
+
             acceptable: false,
             adviceText: '',
 
-            mode: '',
-            modeOptions: [],
             baseline: {
                 ingress: 0,
                 egress: 0,
@@ -99,34 +84,22 @@ class ControlsStore {
                 ingress: 0,
                 egress: 0,
             },
+            symmetrical: true,
 
-            typeIn: {
-                symmetrical: true,
-                ingress: {
-                    choice: 0,
-                    acceptable: false,
-                    validationText: '',
-                    validationState: 'error',
-                },
-                egress: {
-                    choice: 0,
-                    acceptable: false,
-                    validationText: '',
-                    validationState: 'error',
-                },
+            ingress: {
+                mbps: 0,
+                acceptable: false,
+                validationText: '',
+                validationState: 'error',
+            },
+            egress: {
+                mbps: 0,
+                acceptable: false,
+                validationText: '',
+                validationState: 'error',
             },
 
-            copyFrom: {
-                sameAsOptions: [],
-                oppositeOfOptions: [],
-                ingress: 0,
-                egress: 0,
-            },
-            copied: {
-                show: false,
-                ingress: 0,
-                egress: 0,
-            }
+
         }
     };
 

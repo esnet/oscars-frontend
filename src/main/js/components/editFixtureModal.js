@@ -39,42 +39,19 @@ export default class EditFixtureModal extends Component {
         const ef = this.props.controlsStore.editFixture;
         let eParams = {locked: true};
         let tParams = {locked: true};
-        if (ef.bw.mode === 'typeIn') {
-            tParams.ingress = ef.bw.typeIn.ingress.choice;
-            tParams.egress = ef.bw.typeIn.egress.choice;
-            eParams.bw = {
-                    ingress: ef.bw.typeIn.ingress.choice,
-                    egress: ef.bw.typeIn.egress.choice,
-                };
-        } else if (ef.bw.mode === 'sameAs' || ef.bw.mode === 'oppositeOf') {
-            tParams.ingress = ef.bw.typeIn.copied.ingress;
-            tParams.egress = ef.bw.typeIn.copied.egress;
-            eParams.bw = {
-                ingress: ef.bw.copied.ingress,
-                egress: ef.bw.copied.egress,
-            };
 
-        }
+        tParams.ingress = ef.bw.ingress.mbps;
+        tParams.egress = ef.bw.egress.mbps;
 
-        let vlanId = null;
-        if (ef.vlan.mode === 'typeIn') {
-            vlanId = ef.vlan.typeIn.choice;
-        } else if (ef.vlan.mode === 'sameAs') {
-            vlanId = ef.vlan.copied.choice;
-        } else if (ef.vlan.mode === 'fromAvailable') {
-            vlanId = ef.vlan.available.lowest;
-        }
-        tParams.vlan = vlanId;
-        eParams.vlan = {
-            vlanId: vlanId,
-        };
+
+        tParams.vlan = ef.vlan.vlanId;
+
         eParams.label = this.props.designStore.lockFixture(ef.fixtureId, tParams);
 
 
         this.props.controlsStore.setParamsForEditFixture(eParams);
-
-
     };
+
     unlockFixture = () => {
         const ef = this.props.controlsStore.editFixture;
 
