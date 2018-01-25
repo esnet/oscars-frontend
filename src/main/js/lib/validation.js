@@ -19,7 +19,7 @@ class Validator {
         if (!state) {
             return 'orange';
         }
-        return null;
+        return 'lightblue';
     }
 
     mapEdgeColor(state) {
@@ -36,6 +36,7 @@ class Validator {
         }
         return true;
     }
+
 
     pipeState(pipe) {
         if (!pipe.locked) {

@@ -317,18 +317,26 @@ export default class BwSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
 
         let helpPopover = <Popover id='help-bwSelect' title='Ingress / egress bandwidth help'>
-            <p>Here you can set the allowed ingress and egress bandwidth values for this fixture. </p>
-            <p>If the Symmetrical checkbox is checked, the Egress value will be automatically changed
-                to match the Ingress value. If the checkbox is unchecked,
-                both Ingress and Egress controls are editable and independent.</p>
-            <p>Use the "Lock Fixture" button will lock in your selections.
-                That button is only available when both the VLAN and bandwidth selections are valid.</p>
+
+            <p>In 'unlocked' mode, when the dialog opens the values will be editable and set to zero, with the
+                'symmetrical' option enabled.</p>
+            <p>You can type in the number you want (in Mbps units) in the bandwidth controls. There will be feedback to
+                indicate whether the bandwidth is available. </p>
+            <p>You will also see 'baseline' and 'available' ranges displayed.</p>
+            <p>The <u>baseline</u> range is what would be available if there were no other reservations, and generally
+                does not change.</p>
+            <p>The <u>available</u> range is calculated by taking the baseline and removing any bandwidth used by other
+                reservations overlapping the selected schedule.</p>
+            <p>If the symmetrical option is set, changes to the ingress control will also update the egress control to match.
+                Disable the checkbox to allow the values to be edited separately.</p>
+
+            <p>When the fixture is locked, this will display the selected ingress and egress values, and will not be editable. Unlock the fixture to edit.</p>
 
         </Popover>;
 
 
         let header = <p>Bandwidth selection
-            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+            <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
                 <Glyphicon className='pull-right' glyph='question-sign'/>
             </OverlayTrigger>
         </p>;

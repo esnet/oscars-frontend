@@ -109,7 +109,7 @@ class ControlsStore {
         z: '',
         pipeId: '',
         locked: false,
-        loading: false,
+
 
         A_TO_Z: {
             bw: '',
@@ -128,23 +128,6 @@ class ControlsStore {
             available: 0,
             baseline: 0,
         },
-        shortest: {
-            ero: [],
-            azBaseline: 0,
-            zaBaseline: 0,
-            zaAvailable: 0,
-            azAvailable: 0,
-        },
-        fits: {
-            ero: [],
-            azBaseline: 0,
-            zaBaseline: 0,
-            zaAvailable: 0,
-            azAvailable: 0,
-        },
-        manual: {
-            ero: []
-        },
 
 
         ero: {
@@ -155,8 +138,67 @@ class ControlsStore {
             hops: [],
             mode: 'shortest',
         },
-    };
 
+        paths: {
+            sync: {
+                loading: false,
+                initialized: false
+            },
+
+            fits: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+            },
+            manual: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+            },
+
+            shortest: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+            },
+
+            widestSum: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+
+            },
+            widestAZ: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+
+            },
+            widestZA: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+            },
+        },
+    };
 
 
     customizer = (objValue, srcValue) => {

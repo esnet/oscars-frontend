@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, Grid, Row, Col} from 'react-bootstrap';
+import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, Glyphicon} from 'react-bootstrap';
 
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
@@ -48,8 +48,9 @@ export default class EditFixtureModal extends Component {
 
         eParams.label = this.props.designStore.lockFixture(ef.fixtureId, tParams);
 
-
         this.props.controlsStore.setParamsForEditFixture(eParams);
+
+
     };
 
     unlockFixture = () => {
@@ -65,24 +66,45 @@ export default class EditFixtureModal extends Component {
         let conn = this.props.controlsStore.connection;
         let ef = this.props.controlsStore.editFixture;
 
+        let helpPopover = <Popover id='help-editFixture' title='Edit fixture help'>
+            <p>Here you can edit / view parameters for this fixture. </p>
 
-        let title = ef.device + ':'+ ef.label;
+            <p>In the initial 'unlocked' mode, when the dialog opens the bandwidth and VLAN controls will be editable
+                and reset to default values.
+                If all values are within acceptable ranges the 'Lock Fixture' button will be available.</p>
+            <p>You will need to lock all fixtures (and pipes) to commit the connection request.</p>
+            <p>In 'locked' mode, you will only be able to view previous selection. The 'Unlock' button will be available
+                to switch back.</p>
+
+        </Popover>;
+
+        let title = ef.device + ':' + ef.label;
+
+
+        let header = <p>{title}
+            <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
+                <Glyphicon className='pull-right' glyph='question-sign'/>
+            </OverlayTrigger>
+            {' '}
+        </p>;
+
+
         const disableLockBtn = !ef.vlan.acceptable || !ef.bw.acceptable;
 
         return (
             <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{title}</Modal.Title>
+                    <Modal.Title>{header}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <ToggleDisplay show={conn.schedule.locked}>
                         <Grid fluid={true}>
                             <Row>
                                 <Col md={5} sm={5} lg={5}>
-                                    <VlanSelect />
+                                    <VlanSelect/>
                                 </Col>
                                 <Col md={7} sm={7} lg={7}>
-                                    <BwSelect />
+                                    <BwSelect/>
                                 </Col>
                             </Row>
                             <Button bsStyle='warning' className='pull-right'

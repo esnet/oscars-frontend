@@ -109,7 +109,6 @@ export default class DesignDrawing extends Component {
     // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
     disposeOfMapUpdate = autorunAsync(() => {
 
-
         let {design} = this.props.designStore;
         let junctions = toJS(design.junctions);
         let fixtures = toJS(design.fixtures);

@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import {
     Modal, Button, FormControl, ControlLabel, FormGroup, Form,
     Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
-    ListGroup, ListGroupItem, HelpBlock
+    ListGroup, ListGroupItem, HelpBlock, InputGroup
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -22,6 +22,7 @@ export default class PipeParamsModal extends Component {
         super(props);
     }
 
+
     pathUpdateDispose = autorunAsync('pathUpdate', () => {
         let conn = this.props.controlsStore.connection;
         let ep = this.props.controlsStore.editPipe;
@@ -29,14 +30,30 @@ export default class PipeParamsModal extends Component {
         let pipe = this.props.designStore.findPipe(ep.pipeId);
 
         let mode = ep.ero.mode;
-        let modeNeedsPathUpdate = mode === 'shortest' || mode === 'fits';
 
-        if (pipe === null || pipe.locked || !conn.schedule.locked || !modeNeedsPathUpdate) {
+        if (pipe === null || pipe.locked || !conn.schedule.locked) {
             return;
         }
 
+        let modeNeedsPathUpdate = false;
+
+        if (!ep.paths.sync.initialized) {
+            modeNeedsPathUpdate = true;
+        }
+        if (mode === 'fits') {
+            modeNeedsPathUpdate = true;
+        }
+        if (!modeNeedsPathUpdate) {
+            return;
+        }
+
+        // clear ERO, show loading state
         this.props.controlsStore.setParamsForEditPipe({
-            loading: true,
+            paths: {
+                sync: {
+                    loading: true
+                }
+            },
             ero: {
                 message: 'Updating path..',
                 acceptable: false,
@@ -54,74 +71,76 @@ export default class PipeParamsModal extends Component {
             azBw: ep.A_TO_Z.bw,
             zaBw: ep.Z_TO_A.bw,
         };
+        console.log(params);
 
 
         myClient.loadJSON({method: 'POST', url: '/api/pce/paths', params})
             .then((response) => {
                 let parsed = JSON.parse(response);
-
-                let shortestEro = [];
-                parsed['shortest']['azEro'].map((e) => {
-                    shortestEro.push(e['urn']);
-                });
-                let fitsEro = [];
-                parsed['fits']['azEro'].map((e) => {
-                    fitsEro.push(e['urn']);
-                });
-
-                let params = {
-                    loading: false,
-                    fits: {
-                        azAvailable: parsed.fits.azAvailable,
-                        zaAvailable: parsed.fits.zaAvailable,
-                        azBaseline: parsed.fits.azBaseline,
-                        zaBaseline: parsed.fits.zaBaseline,
-                        ero: shortestEro
-
-                    },
-                    shortest: {
-                        azAvailable: parsed.shortest.azAvailable,
-                        zaAvailable: parsed.shortest.zaAvailable,
-                        azBaseline: parsed.shortest.azBaseline,
-                        zaBaseline: parsed.shortest.zaBaseline,
-                        ero: fitsEro
+                let uiParams = {
+                    paths: {
+                        sync: {
+                            loading: false,
+                            initialized: true
+                        },
+                        fits: {},
+                        shortest: {},
+                        widestSum: {},
+                        widestAZ: {},
+                        widestZA: {}
                     }
                 };
-                if (ep.ero.mode === 'shortest') {
-                    params.ero = {
-                        acceptable: true,
-                        message: 'Shortest path:',
-                        hops: shortestEro
-                    };
 
-                } else if (ep.ero.mode === 'fits') {
-                    if (fitsEro.length === 0) {
-                        params.ero = {
+                let syncedModes = ['fits', 'shortest', 'widestSum', 'widestAZ', 'widestZA'];
+                syncedModes.map( mode => {
+                    let ero = [];
+                    parsed[mode]['azEro'].map((e) => {
+                        ero.push(e['urn']);
+                    });
+                    uiParams.paths[mode].ero = ero;
+                    if (ero.length > 0) {
+                        uiParams.paths[mode].acceptable = true;
+                        uiParams.paths[mode].azAvailable = parsed[mode].azAvailable;
+                        uiParams.paths[mode].zaAvailable = parsed[mode].zaAvailable;
+                        uiParams.paths[mode].azBaseline = parsed[mode].azBaseline;
+                        uiParams.paths[mode].zaBaseline = parsed[mode].zaBaseline;
+                    } else {
+                        uiParams.paths[mode].acceptable = false;
+                        uiParams.paths[mode].azAvailable = -1;
+                        uiParams.paths[mode].zaAvailable = -1;
+                        uiParams.paths[mode].azBaseline = -1;
+                        uiParams.paths[mode].zaBaseline = -1;
+                    }
+                });
+
+                if (ep.ero.mode === 'manual') {
+                    // if the selected mode is manual, TODO
+                } else {
+                    // otherwise, the selected mode was just synced from the server; update the ERO.
+                    // the validate() call that comes later will take care of the bandwidth validation
+
+                    if (uiParams.paths[ep.ero.mode].acceptable) {
+                        uiParams.ero = {
+                            acceptable: true,
+                            message: 'Calculated ERO:',
+                            hops: uiParams.paths[ep.ero.mode].ero
+                        }
+
+                    } else {
+                        uiParams.ero = {
                             acceptable: false,
                             message: 'No path found!',
                             hops: []
                         };
-                        params.fits = {
-                            azAvailable: 0,
-                            zaAvailable: 0,
-                            azBaseline: 0,
-                            zaBaseline: 0,
-                            ero: []
-                        }
-                    } else {
-                        params.ero = {
-                            acceptable: true,
-                            message: 'Fitting bandwidth:',
-                            hops: fitsEro
-                        };
 
                     }
-
                 }
-                this.props.controlsStore.setParamsForEditPipe(params);
+
+
+                this.props.controlsStore.setParamsForEditPipe(uiParams);
             }).then(() => {
-            this.validate();
-        });
+                this.validate();
+            });
 
     }, 1000);
 
@@ -134,26 +153,13 @@ export default class PipeParamsModal extends Component {
     validate() {
 
         const ep = this.props.controlsStore.editPipe;
-        if (ep.loading) {
+        if (ep.paths.sync.loading || !ep.paths.sync.initialized) {
             return;
         }
-        let azAvailable = 0;
-        let zaAvailable = 0;
-        let azBaseline = 0;
-        let zaBaseline = 0;
-        if (ep.ero.mode === 'shortest') {
-            azAvailable = ep.shortest.azAvailable;
-            zaAvailable = ep.shortest.zaAvailable;
-            azBaseline = ep.shortest.azBaseline;
-            zaBaseline = ep.shortest.zaBaseline;
-        } else if (ep.ero.mode === 'fits') {
-            azAvailable = ep.fits.azAvailable;
-            zaAvailable = ep.fits.zaAvailable;
-            azBaseline = ep.fits.azBaseline;
-            zaBaseline = ep.fits.zaBaseline;
-        } else {
-            return;
-        }
+        let azAvailable = ep.paths[ep.ero.mode].azAvailable;
+        let zaAvailable = ep.paths[ep.ero.mode].zaAvailable;
+        let azBaseline = ep.paths[ep.ero.mode].azBaseline;
+        let zaBaseline = ep.paths[ep.ero.mode].zaBaseline;
 
         let params = {
             A_TO_Z: {
@@ -306,19 +312,28 @@ export default class PipeParamsModal extends Component {
         const ep = this.props.controlsStore.editPipe;
         let params = {
             ero: {
-                mode: mode
+                mode: mode,
+                acceptable: false,
+                message: '',
+                hops: []
             }
         };
-        if (mode === 'shortest') {
-            params.ero.hops = ep.shortest.ero;
-            params.ero.acceptable = true;
-        } else if (mode === 'fits') {
-            params.ero.hops = ep.fits.ero;
-            params.ero.acceptable = ep.fits.ero.length > 0;
-        } else if (mode === 'manual') {
+
+
+        if (mode === 'manual') {
+            // it was just changed, so clear everything
             params.ero.hops = [];
             params.ero.acceptable = false;
+        } else {
+            params.ero.hops = ep.paths[mode].ero;
+            params.ero.acceptable = ep.paths[mode].acceptable;
+            if (!params.ero.acceptable) {
+                params.ero.message = 'No path found';
+            } else {
+                params.ero.message = '';
+            }
         }
+
         this.props.controlsStore.setParamsForEditPipe(params);
 
     };
@@ -327,6 +342,7 @@ export default class PipeParamsModal extends Component {
         let ep = this.props.controlsStore.editPipe;
         let conn = this.props.controlsStore.connection;
         let pipe = this.props.designStore.findPipe(ep.pipeId);
+        let design = this.props.designStore.design;
 
         if (pipe === null) {
             return null;
@@ -337,8 +353,18 @@ export default class PipeParamsModal extends Component {
 
         let showModal = this.props.modalStore.modals.get(modalName);
         let pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
-        let azLabel = 'From ' + pipe.a + ' to ' + pipe.z + ' (Mbps)';
-        let zaLabel = 'From ' + pipe.z + ' to ' + pipe.a + ' (Mbps)';
+        let aFixtures = [];
+        let zFixtures = [];
+
+        design.fixtures.map(f => {
+            if (f.device === pipe.a) {
+                aFixtures.push(f)
+            }
+            if (f.device === pipe.z) {
+                zFixtures.push(f)
+            }
+        });
+
 
         let helpPopover = <Popover id='help-pipeControls' title='Pipe controls'>
             <p>Here you can edit the pipe parameters. Every pipe in a design
@@ -368,51 +394,84 @@ export default class PipeParamsModal extends Component {
                             <h2>Schedule must be locked to edit pipe parameters.</h2>
                         </ToggleDisplay>
 
-                        <ToggleDisplay show={conn.schedule.locked}>
-                            <Row>
-                                <Col md={12} lg={12} sm={12}>
-                                    <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col md={6} lg={6} sm={6}>
+                        <Row>
+                            <Col md={4} lg={4} sm={4}>
+                                <h4>{pipe.a}</h4>
+                                <ListGroup>
+                                    {
+                                        aFixtures.map(f => {
+                                            return <ListGroupItem key={f.label}>{f.label}</ListGroupItem>
+                                        })
+                                    }
+                                </ListGroup>
+                            </Col>
+                            <Col md={4} lg={4} sm={4}>
+                                <Row>
                                     <ToggleDisplay show={!ep.locked}>
-                                        <h4>Bandwidth</h4>
                                         <FormGroup validationState={ep.A_TO_Z.validationState}>
-                                            <ControlLabel>{azLabel}</ControlLabel>
-                                            {' '}
-                                            <FormControl type="text"
-                                                         placeholder="0-100000"
-                                                         defaultValue={ep.A_TO_Z.bw}
-                                                         disabled={ep.locked}
-                                                         onChange={this.onAzBwChange}/>
+                                            <InputGroup bsSize='large'>
+                                                <InputGroup.Addon>
+                                                    <Glyphicon glyph='arrow-right'/>
+                                                </InputGroup.Addon>
+
+                                                <FormControl type="text"
+                                                             placeholder="0-100000"
+                                                             defaultValue={ep.A_TO_Z.bw}
+                                                             disabled={ep.locked}
+                                                             onChange={this.onAzBwChange}/>
+                                            </InputGroup>
                                             <HelpBlock><p>{ep.A_TO_Z.validationText}</p></HelpBlock>
                                             <HelpBlock>Reservable: {ep.A_TO_Z.available} Mbps</HelpBlock>
                                             <HelpBlock>Baseline: {ep.A_TO_Z.baseline} Mbps</HelpBlock>
-                                        </FormGroup>
-                                        {' '}
-                                        <FormGroup validationState={ep.Z_TO_A.validationState}>
-                                            <ControlLabel>{zaLabel}</ControlLabel>
-                                            {' '}
-                                            <FormControl onChange={this.onZaBwChange}
-                                                         disabled={ep.locked}
-                                                         defaultValue={ep.Z_TO_A.bw}
-                                                         type="text"
-                                                         placeholder="0-10000"/>
 
-                                            <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
-                                            <HelpBlock>Available: {ep.Z_TO_A.available} Mbps</HelpBlock>
-                                            <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
                                         </FormGroup>
                                     </ToggleDisplay>
                                     <ToggleDisplay show={ep.locked}>
-                                        <Well>A to Z bandwidth: {ep.A_TO_Z.bw} Mbps</Well>
-                                        {' '}
-                                        <Well>Z to A bandwidth: {ep.Z_TO_A.bw} Mbps</Well>
+                                        <Well>{ep.A_TO_Z.bw} Mbps</Well>
                                     </ToggleDisplay>
 
-                                </Col>
+                                </Row>
+                                <Row>
+                                    <ToggleDisplay show={!ep.locked}>
+                                        <FormGroup validationState={ep.Z_TO_A.validationState}>
+                                            <InputGroup bsSize='large'>
+                                                <FormControl type="text"
+                                                             placeholder="0-100000"
+                                                             defaultValue={ep.Z_TO_A.bw}
+                                                             disabled={ep.locked}
+                                                             onChange={this.onZaBwChange}/>
+                                                <InputGroup.Addon>
+                                                    <Glyphicon glyph='arrow-left'/>
+                                                </InputGroup.Addon>
+                                            </InputGroup>
 
+                                            <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
+                                            <HelpBlock>Reservable: {ep.Z_TO_A.available} Mbps</HelpBlock>
+                                            <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
+                                        </FormGroup>
+
+                                    </ToggleDisplay>
+                                    <ToggleDisplay show={ep.locked}>
+                                        <Well>{ep.Z_TO_A.bw} Mbps</Well>
+                                    </ToggleDisplay>
+                                </Row>
+                            </Col>
+                            <Col md={4} lg={4} sm={4}>
+                                <h4>{pipe.z}</h4>
+                                <ListGroup>
+                                    {
+                                        zFixtures.map(f => {
+                                            return <ListGroupItem key={f.label}>{f.label}</ListGroupItem>
+                                        })
+                                    }
+                                </ListGroup>
+                            </Col>
+                        </Row>
+
+
+                        <ToggleDisplay show={conn.schedule.locked}>
+                            <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                            <Row>
                                 <Col md={6} lg={6} sm={6}>
                                     <h4>ERO</h4>
                                     <p>{ep.ero.message}</p>
@@ -474,18 +533,29 @@ export default class PipeParamsModal extends Component {
 class PathSelectMode extends Component {
 
     render() {
+
         let pathSelectModeOpts = [
-            {value: 'fits', label: 'Fits bandwidth'},
-            {value: 'shortest', label: 'Shortest path'},
-            //            {value: 'manual', label: 'Specify ERO'}
+            {value: 'fits', label: 'Fit to bandwidth'},
+            {value: 'shortest', label: 'Shortest'},
+            {value: 'widestSum', label: 'Widest overall'},
+            {value: 'widestAZ', label: 'Widest, priority =>'},
+            {value: 'widestZA', label: 'Widest, priority <='},
+// TODO            {value: 'manual', label: 'Manual mode'}
         ];
-        return <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>
-            {
-                pathSelectModeOpts.map((option, index) => {
-                    return <option key={index} value={option.value}>{option.label}</option>
-                })
-            }
-        </FormControl>;
+        return <Form horizontal>
+            <FormGroup>
+                <Col sm={3} componentClass={ControlLabel}>Path mode:</Col>
+                <Col sm={6}>
+                    <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>
+                        {
+                            pathSelectModeOpts.map((option, index) => {
+                                return <option key={index} value={option.value}>{option.label}</option>
+                            })
+                        }
+                    </FormControl>
+                </Col>
+            </FormGroup>
+        </Form>;
     }
 }
 

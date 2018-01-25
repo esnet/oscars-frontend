@@ -15,7 +15,6 @@ import Validator from '../lib/validation';
 export default class VlanSelect extends Component {
 
 
-
     updateForm = () => {
         if (!this.props.controlsStore.connection.schedule.locked) {
             return;
@@ -130,13 +129,18 @@ export default class VlanSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
 
         let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
-            <p>Here you can choose a VLAN id for this fixture. </p>
+            <p>Here you can set the VLAN id for this fixture. </p>
 
-            <p>If the fixture is not locked, when the dialog opens the value will be set to the
-                lowest available VLAN. You may type in a different value; if it is not available,
-                you will receive feedback regarding why .</p>
-            <p>The "Lock Fixture" button will lock in your selection.
-                That button only appears when both the VLAN and bandwidth selections are valid/</p>
+            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the
+                <u>lowest available</u> VLAN id. You may type in a different value; if it is not available,
+                you will receive feedback explaining why.</p>
+            <p>You will also see 'baseline' and 'available' ranges displayed.</p>
+            <p>The <u>baseline</u> range is what would be available if there were no other reservations, and generally
+                does not change.</p>
+            <p>The <u>available</u> range is calculated by taking the baseline and removing any resources used by other
+                reservations overlapping the selected schedule.</p>
+            <p>When the fixture is locked, this control will display the selected value, and will not be editable.
+                Unlock the fixture to edit.</p>
         </Popover>;
 
 
