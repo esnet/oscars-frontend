@@ -118,6 +118,7 @@ class ControlsStore {
             validationState: 'error',
             available: 0,
             baseline: 0,
+            widest: 0
         },
 
         Z_TO_A: {
@@ -127,6 +128,7 @@ class ControlsStore {
             validationState: 'error',
             available: 0,
             baseline: 0,
+            widest: 0
         },
 
 

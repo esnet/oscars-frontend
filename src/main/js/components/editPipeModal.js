@@ -71,8 +71,6 @@ export default class PipeParamsModal extends Component {
             azBw: ep.A_TO_Z.bw,
             zaBw: ep.Z_TO_A.bw,
         };
-        console.log(params);
-
 
         myClient.loadJSON({method: 'POST', url: '/api/pce/paths', params})
             .then((response) => {
@@ -88,7 +86,9 @@ export default class PipeParamsModal extends Component {
                         widestSum: {},
                         widestAZ: {},
                         widestZA: {}
-                    }
+                    },
+                    A_TO_Z: {},
+                    Z_TO_A: {}
                 };
 
                 let syncedModes = ['fits', 'shortest', 'widestSum', 'widestAZ', 'widestZA'];
@@ -110,6 +110,12 @@ export default class PipeParamsModal extends Component {
                         uiParams.paths[mode].zaAvailable = -1;
                         uiParams.paths[mode].azBaseline = -1;
                         uiParams.paths[mode].zaBaseline = -1;
+                    }
+                    if (mode === 'widestAZ') {
+                        uiParams.A_TO_Z.widest = uiParams.paths[mode].azAvailable;
+                    }
+                    if (mode === 'widestZA') {
+                        uiParams.Z_TO_A.widest = uiParams.paths[mode].zaAvailable;
                     }
                 });
 
@@ -416,6 +422,7 @@ export default class PipeParamsModal extends Component {
                                 <p>Total egress: <b>{aEgress} Mbps</b></p>
                             </Col>
                             <Col md={4} lg={4} sm={4}>
+                                <hr />
                                 <Row>
                                     <ToggleDisplay show={!ep.locked}>
                                         <FormGroup validationState={ep.A_TO_Z.validationState}>
@@ -431,7 +438,10 @@ export default class PipeParamsModal extends Component {
                                                              onChange={this.onAzBwChange}/>
                                             </InputGroup>
                                             <HelpBlock><p>{ep.A_TO_Z.validationText}</p></HelpBlock>
-                                            <HelpBlock>Reservable: {ep.A_TO_Z.available} Mbps</HelpBlock>
+                                            <HelpBlock>Reservable on this ERO: {ep.A_TO_Z.available} Mbps</HelpBlock>
+                                            <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                <HelpBlock>Widest: {ep.A_TO_Z.widest} Mbps</HelpBlock>
+                                            </ToggleDisplay>
                                             <HelpBlock>Baseline: {ep.A_TO_Z.baseline} Mbps</HelpBlock>
 
                                         </FormGroup>
@@ -441,6 +451,7 @@ export default class PipeParamsModal extends Component {
                                     </ToggleDisplay>
 
                                 </Row>
+                                <hr />
                                 <Row>
                                     <ToggleDisplay show={!ep.locked}>
                                         <FormGroup validationState={ep.Z_TO_A.validationState}>
@@ -456,8 +467,12 @@ export default class PipeParamsModal extends Component {
                                             </InputGroup>
 
                                             <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
-                                            <HelpBlock>Reservable: {ep.Z_TO_A.available} Mbps</HelpBlock>
+                                            <HelpBlock>Reservable on this ERO: {ep.Z_TO_A.available} Mbps</HelpBlock>
+                                            <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                <HelpBlock>Widest: {ep.Z_TO_A.widest} Mbps</HelpBlock>
+                                            </ToggleDisplay>
                                             <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
+
                                         </FormGroup>
 
                                     </ToggleDisplay>
