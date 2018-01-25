@@ -92,7 +92,7 @@ export default class PipeParamsModal extends Component {
                 };
 
                 let syncedModes = ['fits', 'shortest', 'widestSum', 'widestAZ', 'widestZA'];
-                syncedModes.map( mode => {
+                syncedModes.map(mode => {
                     let ero = [];
                     parsed[mode]['azEro'].map((e) => {
                         ero.push(e['urn']);
@@ -139,8 +139,8 @@ export default class PipeParamsModal extends Component {
 
                 this.props.controlsStore.setParamsForEditPipe(uiParams);
             }).then(() => {
-                this.validate();
-            });
+            this.validate();
+        });
 
     }, 1000);
 
@@ -355,13 +355,21 @@ export default class PipeParamsModal extends Component {
         let pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
         let aFixtures = [];
         let zFixtures = [];
+        let aIngress = 0;
+        let aEgress = 0;
+        let zIngress = 0;
+        let zEgress = 0;
 
         design.fixtures.map(f => {
             if (f.device === pipe.a) {
                 aFixtures.push(f)
+                aIngress = aIngress + f.ingress;
+                aEgress = aEgress + f.egress;
             }
             if (f.device === pipe.z) {
                 zFixtures.push(f)
+                zIngress = zIngress + f.ingress;
+                zEgress = zEgress + f.egress;
             }
         });
 
@@ -400,10 +408,12 @@ export default class PipeParamsModal extends Component {
                                 <ListGroup>
                                     {
                                         aFixtures.map(f => {
-                                            return <ListGroupItem key={f.label}>{f.label}</ListGroupItem>
+                                            return <ListGroupItem key={f.label}>{f.label} ({f.ingress} / {f.egress})</ListGroupItem>
                                         })
                                     }
                                 </ListGroup>
+                                <p>Total ingress: <b>{aIngress} Mbps</b></p>
+                                <p>Total egress: <b>{aEgress} Mbps</b></p>
                             </Col>
                             <Col md={4} lg={4} sm={4}>
                                 <Row>
@@ -461,10 +471,12 @@ export default class PipeParamsModal extends Component {
                                 <ListGroup>
                                     {
                                         zFixtures.map(f => {
-                                            return <ListGroupItem key={f.label}>{f.label}</ListGroupItem>
+                                            return <ListGroupItem key={f.label}>{f.label} ({f.ingress} / {f.egress})</ListGroupItem>
                                         })
                                     }
                                 </ListGroup>
+                                <p>Total ingress: <b>{zIngress} Mbps</b></p>
+                                <p>Total egress: <b>{zEgress} Mbps</b></p>
                             </Col>
                         </Row>
 
