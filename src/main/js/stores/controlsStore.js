@@ -173,6 +173,15 @@ class ControlsStore {
                 azAvailable: 0,
             },
 
+            leastHops: {
+                acceptable: false,
+                ero: [],
+                azBaseline: 0,
+                zaBaseline: 0,
+                zaAvailable: 0,
+                azAvailable: 0,
+            },
+
             widestSum: {
                 acceptable: false,
                 ero: [],

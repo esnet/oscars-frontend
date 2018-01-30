@@ -83,6 +83,7 @@ export default class PipeParamsModal extends Component {
                         },
                         fits: {},
                         shortest: {},
+                        leastHops: {},
                         widestSum: {},
                         widestAZ: {},
                         widestZA: {}
@@ -91,7 +92,7 @@ export default class PipeParamsModal extends Component {
                     Z_TO_A: {}
                 };
 
-                let syncedModes = ['fits', 'shortest', 'widestSum', 'widestAZ', 'widestZA'];
+                let syncedModes = ['fits', 'shortest', 'leastHops', 'widestSum', 'widestAZ', 'widestZA'];
                 syncedModes.map(mode => {
                     let ero = [];
                     parsed[mode]['azEro'].map((e) => {
@@ -563,7 +564,8 @@ class PathSelectMode extends Component {
 
         let pathSelectModeOpts = [
             {value: 'fits', label: 'Fit to bandwidth'},
-            {value: 'shortest', label: 'Shortest'},
+            {value: 'shortest', label: 'Shortest (by metric)'},
+            {value: 'leastHops', label: 'Least hops'},
             {value: 'widestSum', label: 'Widest overall'},
             {value: 'widestAZ', label: 'Widest, priority =>'},
             {value: 'widestZA', label: 'Widest, priority <='},
