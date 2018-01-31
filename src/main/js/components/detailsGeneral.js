@@ -5,6 +5,7 @@ import {action, autorun, autorunAsync, toJS} from 'mobx';
 import Moment from 'moment';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ToggleDisplay from 'react-toggle-display';
+import Confirm from 'react-confirm-bootstrap';
 
 import {Panel, Button} from 'react-bootstrap';
 import myClient from '../agents/client';
@@ -239,8 +240,18 @@ export default class DetailsGeneral extends Component {
                 </ToggleDisplay>
 
                 <ToggleDisplay show={controls.general.cancel.display}>
-                    <Button bsStyle='danger' disabled={!controls.general.cancel.enabled} onClick={this.cancel}
-                            className='pull-right'>Cancel</Button>
+                    <Confirm
+                        onConfirm={this.cancel}
+                        body="Cancelling will release all resources and dismantle the reservation if it is built."
+                        confirmText="Confirm cancellation"
+                        cancelText="Never mind"
+                        title="Cancel connection">
+                        <Button bsStyle='danger'
+                                disabled={!controls.general.cancel.enabled}  className='pull-right'>Cancel</Button>
+
+                    </Confirm>
+
+
                 </ToggleDisplay>
 
 
