@@ -12,6 +12,7 @@ import EroTypeahead from './eroTypeahead';
 import {autorun, autorunAsync, whyRun, toJS} from 'mobx';
 
 import myClient from '../agents/client';
+import Confirm from 'react-confirm-bootstrap';
 
 const modalName = 'editPipe';
 
@@ -523,9 +524,15 @@ export default class PipeParamsModal extends Component {
                             <Row>
                                 <Col>
 
-                                    <Button bsStyle='warning'
-                                            className='pull-right'
-                                            onClick={this.deletePipe}>Delete</Button>
+                                    <Confirm
+                                        onConfirm={this.deletePipe}
+                                        body="Are yous sure you want to delete?"
+                                        confirmText="Confirm"
+                                        title="Delete pipe">
+                                        <Button bsStyle='warning' className='pull-right'>Delete</Button>
+
+                                    </Confirm>
+
                                     {' '}
                                     <ToggleDisplay show={!ep.locked}>
                                         <Button bsStyle='primary'

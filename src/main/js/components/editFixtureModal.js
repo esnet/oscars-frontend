@@ -4,6 +4,7 @@ import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, Glyphicon} from 
 
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+import Confirm from 'react-confirm-bootstrap';
 
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
@@ -107,22 +108,30 @@ export default class EditFixtureModal extends Component {
                                     <BwSelect/>
                                 </Col>
                             </Row>
-                            <Button bsStyle='warning' className='pull-right'
-                                    onClick={this.deleteFixture}>Delete</Button>
+
+                            <Confirm
+                                onConfirm={this.deleteFixture}
+                                body="Are yous sure you want to delete?"
+                                confirmText="Confirm"
+                                title="Delete fixture">
+                                <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                            </Confirm>
+
+
                             {' '}
                             <ToggleDisplay show={!ef.locked}>
                                 <Button bsStyle='primary'
                                         disabled={disableLockBtn}
                                         className='pull-right'
                                         onClick={this.lockFixture}>Lock</Button>
-                                {' '}
                             </ToggleDisplay>
+                            {' '}
                             <ToggleDisplay show={ef.locked}>
                                 <Button bsStyle='warning'
                                         className='pull-right'
                                         onClick={this.unlockFixture}>Unlock</Button>
-                                {' '}
                             </ToggleDisplay>
+                            {' '}
                         </Grid>
 
                     </ToggleDisplay>

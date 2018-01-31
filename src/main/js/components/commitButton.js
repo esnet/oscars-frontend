@@ -7,6 +7,7 @@ import {Button} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 
 import myClient from '../agents/client';
+import Confirm from 'react-confirm-bootstrap';
 
 @inject('controlsStore')
 class CommitButton extends Component {
@@ -32,7 +33,16 @@ class CommitButton extends Component {
 
 
     render() {
-        return <Button bsStyle='success' className='pull-right' onClick={this.commit}>Commit</Button>
+        return <Confirm
+            onConfirm={this.commit}
+            body="Are you sure you want to commit this connection?"
+            confirmText="Confirm"
+            title="Commit connection">
+            <Button bsStyle='success' className='pull-right'>Commit</Button>
+        </Confirm>
+
+
+
     }
 }
 

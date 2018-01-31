@@ -2,10 +2,10 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import validator from '../lib/validation'
-import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-bootstrap';
+import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover, Button} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import ToggleDisplay from 'react-toggle-display';
-import ClearAllButton from './clearAllButton';
+import Confirm from 'react-confirm-bootstrap';
 
 @inject('designStore', 'controlsStore', 'modalStore')
 @observer
@@ -99,7 +99,16 @@ export default class DesignComponents extends Component {
                 </ToggleDisplay>
                 {' '}
                 <ToggleDisplay show={design.fixtures.length > 0}>
-                    <ClearAllButton/>
+
+                    <Confirm
+                        onConfirm={() => this.props.designStore.clear()}
+                        body="Are you sure you want to delete all components and start over?"
+                        confirmText="Confirm"
+                        title="Clear components">
+                        <Button bsStyle='warning' className='pull-right'>Clear all</Button>
+
+
+                    </Confirm>
                 </ToggleDisplay>
             </Panel>
         )
