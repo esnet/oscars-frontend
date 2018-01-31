@@ -7,11 +7,21 @@ class CommonStore {
         active: '',
     };
 
+    @observable version = {
+        frontend: '1.0.4',
+        backend: 'unknown'
+    };
+
     @observable alerts = [];
 
     @action setActiveNav(a) {
         this.nav.active = a;
     }
+
+    @action setVersion(key, val) {
+        this.version[key] = val;
+    }
+
 
     @action removeAlert(alert) {
         let idxToRemove = -1;

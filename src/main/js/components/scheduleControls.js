@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {action, autorunAsync, toJS, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+import Confirm from 'react-confirm-bootstrap';
 
 import chrono from 'chrono-node';
 import Moment from 'moment';
@@ -156,6 +157,7 @@ export default class ScheduleControls extends Component {
             this.validateStartEnd(params);
         } else {
             params.schedule.start.validationText = 'Invalid date';
+            params.schedule.acceptable = false;
         }
         this.props.controlsStore.setParamsForConnection(params);
 
@@ -184,6 +186,7 @@ export default class ScheduleControls extends Component {
             this.validateStartEnd(params);
         } else {
             params.schedule.end.validationText = 'Invalid date';
+            params.schedule.acceptable = false;
         }
         this.props.controlsStore.setParamsForConnection(params);
     };
@@ -229,6 +232,7 @@ export default class ScheduleControls extends Component {
         }
 
         params.schedule.acceptable = !(startError || endError);
+        console.log(toJS(params));
 
     }
 
@@ -326,11 +330,19 @@ export default class ScheduleControls extends Component {
                         </HelpBlock>
                     </FormGroup>
                     <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
-                        <Button className='pull-right' bsStyle='primary' onClick={this.lockSchedule}>Lock
-                            schedule</Button>
+
+                        <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
                     </ToggleDisplay>
                     <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
-                        <Button className='pull-right' bsStyle='warning' onClick={this.unlockSchedule}>Unlock</Button>
+                        <Confirm
+                            onConfirm={this.unlockSchedule}
+                            body="Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs."
+                            confirmText="Confirm"
+                            title="Unlock Schedule">
+                            <Button className='pull-right' bsStyle='warning'>Unlock</Button>
+                        </Confirm>
+
+
                     </ToggleDisplay>
                 </Form>
 

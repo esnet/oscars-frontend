@@ -48,14 +48,14 @@ export default class Login extends React.Component {
                     <Panel>
                         <h4>Welcome to OSCARS. Please log in:</h4>
                         <Form onSubmit={this.handleLogin}>
-                            <FormGroup controlId="vlanExpression">
+                            <FormGroup controlId="username">
 
                                 <ControlLabel>Username:</ControlLabel>
                                 {' '}
                                 <FormControl type="text"
                                              onChange={this.handleChangeUsername}/>
                             </FormGroup>
-                            <FormGroup controlId="vlanExpression">
+                            <FormGroup controlId="password">
 
                                 <ControlLabel>Password:</ControlLabel>
                                 {' '}

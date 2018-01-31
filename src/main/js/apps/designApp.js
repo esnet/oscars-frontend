@@ -8,14 +8,12 @@ import AddFixtureModal from '../components/addFixtureModal';
 import EditFixtureModal from '../components/editFixtureModal';
 import EditJunctionModal from '../components/editJunctionModal';
 import EditPipeModal from '../components/editPipeModal';
-import DesignErrorsModal from '../components/designErrorsModal';
 import DesignHelpModal from '../components/designHelpModal'
 import ConnectionErrorsModal from '../components/connectionErrorsModal';
 import DesignDrawing from '../components/designDrawing';
 import DesignComponents from '../components/designComponents';
 import ScheduleControls from '../components/scheduleControls';
 import ConnectionControls from '../components/connectionControls';
-import DesignControls from '../components/designControls';
 import SelectPortTypeahead from '../components/selectPortTypeahead';
 import HoldTimer from '../components/holdTimer';
 

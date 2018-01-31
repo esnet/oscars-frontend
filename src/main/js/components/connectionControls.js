@@ -5,7 +5,18 @@ import {action, autorunAsync, toJS} from 'mobx';
 
 
 import ToggleDisplay from 'react-toggle-display';
-import {Form, Glyphicon, ControlLabel, Button, Panel, FormGroup, FormControl, Well } from 'react-bootstrap';
+import {
+    Form,
+    Glyphicon,
+    ControlLabel,
+    Button,
+    Panel,
+    FormGroup,
+    FormControl,
+    Well,
+    Popover,
+    OverlayTrigger
+} from 'react-bootstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
@@ -80,33 +91,55 @@ export default class ConnectionControls extends Component {
     render() {
         const conn = this.props.controlsStore.connection;
 
+
+        let helpPopover = <Popover id='help-buildMode' title='Build Mode Help'>
+            <p>Auto: The connection will be configured on network devices ("built") on schedule at start time. No further action needed.</p>
+            <p>Manual: The connection will <b>not</b> be built at start time. Once the connection has been committed, you can
+                use the controls in the connection details page to build / dismantle it.</p>
+            <p>Mode seleciton is not final. In the connection details page, you can switch between modes, as long as
+                end time has not been reached.</p>
+            <p>In either mode, once end time is reached the connection will be dismantled.</p>
+        </Popover>;
+
         return (
             <Panel>
-                <Form onSubmit={e => { e.preventDefault(); }}>
-                    <Well bsSize='small' onClick={() => { this.props.modalStore.openModal('designHelp')}}>
-                        <h3>Help me! <Glyphicon  className='pull-right' glyph='question-sign' /></h3>
+                <Form onSubmit={e => {
+                    e.preventDefault();
+                }}>
+                    <Well bsSize='small' onClick={() => {
+                        this.props.modalStore.openModal('designHelp')
+                    }}>
+                        <h3>Help me! <Glyphicon className='pull-right' glyph='question-sign'/></h3>
                         <p>Connection id: {this.props.controlsStore.connection.connectionId}</p>
                     </Well>
                     <FormGroup validationState={validator.descriptionControl(conn.description)}>
                         {' '}
-                        <FormControl type='text' placeholder='Description'
+                        <ControlLabel>
+                            Description:
+                        </ControlLabel>
+                        <FormControl type='text' placeholder='Type a description'
                                      defaultValue={conn.description}
 
                                      onChange={this.onDescriptionChange}/>
                     </FormGroup>
                     <FormGroup>
-                        <ControlLabel>Build Mode:</ControlLabel>
+                        <ControlLabel>
+                            Build Mode:
+                        </ControlLabel>
+                        <OverlayTrigger trigger='click' rootClose placement='right' overlay={helpPopover}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
                         {' '}
                         <FormControl componentClass="select"
-                                     onChange={this.onBuildModeChange} >
-                            <option value='MANUAL'>Manual</option>
+                                     onChange={this.onBuildModeChange}>
                             <option value='AUTOMATIC'>Auto</option>
+                            <option value='MANUAL'>Manual</option>
                         </FormControl>
                     </FormGroup>
 
 
                     <FormGroup className='pull-right'>
-                        <ToggleDisplay show={!conn.validation.acceptable} >
+                        <ToggleDisplay show={!conn.validation.acceptable}>
                             <Button bsStyle='warning' className='pull-right'
                                     onClick={() => {
                                         this.props.modalStore.openModal('connectionErrors');

@@ -12,6 +12,8 @@ import ListConnectionsApp from './apps/listConnections';
 import SelectDesignApp from './apps/selectDesign';
 import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
+import AboutApp from './apps/about';
+
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
 import ConnectionDetails from './apps/detailsApp';
@@ -96,6 +98,7 @@ ReactDOM.render(
                 </Row>
                 <Switch>
                     <Route exact path="/" component={WelcomeApp}/>
+                    <Route exact path="/pages/about" component={AboutApp}/>
                     <Route exact path="/login" component={Login}/>
                     <Route exact path="/logout" component={Logout}/>
                     <PrivateRoute exact path="/pages/list" component={ListConnectionsApp}/>

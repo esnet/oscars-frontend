@@ -4,6 +4,7 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem}from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
 
 import {LinkContainer} from 'react-router-bootstrap';
+import {Link } from 'react-router-dom';
 import { AlertList } from 'react-bs-notifier';
 import {toJS} from 'mobx';
 
@@ -42,6 +43,7 @@ export default class NavBar extends Component {
                 <LinkContainer to='/pages/details'>
                     <NavItem eventKey='details'>Details</NavItem>
                 </LinkContainer>
+
                 <LinkContainer to='/pages/newDesign'>
                     <NavItem eventKey='newDesign'>New</NavItem>
                 </LinkContainer>
@@ -53,6 +55,7 @@ export default class NavBar extends Component {
 */}
                 {admin}
             </Nav>;
+
 
 
             rightNav =
@@ -79,7 +82,7 @@ export default class NavBar extends Component {
 
                 <Navbar.Header>
                     <Navbar.Brand>
-                        OSCARS
+                        <Link to='pages/about'>OSCARS</Link>
                     </Navbar.Brand>
                 </Navbar.Header>
                 <Navbar.Collapse>

@@ -131,8 +131,8 @@ export default class VlanSelect extends Component {
         let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
             <p>Here you can set the VLAN id for this fixture. </p>
 
-            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the
-                <u>lowest available</u> VLAN id. You may type in a different value; if it is not available,
+            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the <u>lowest available</u> VLAN
+                id. You may type in a different value; if it is not available,
                 you will receive feedback explaining why.</p>
             <p>You will also see 'baseline' and 'available' ranges displayed.</p>
             <p>The <u>baseline</u> range is what would be available if there were no other reservations, and generally

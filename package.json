@@ -30,6 +30,7 @@
     "react-bootstrap-table": "^4.0.1",
     "react-bootstrap-typeahead": "^1.4.2",
     "react-bs-notifier": "^4.3.2",
+    "react-confirm-bootstrap": "^5.1.1",
     "react-dates": "^12.2.4",
     "react-dom": "^15.6.1",
     "react-dropdown": "^1.2.0",
