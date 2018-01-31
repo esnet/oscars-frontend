@@ -170,7 +170,7 @@ export default class NetworkMap extends Component {
 
 
         let header =
-            <span>Network Map
+            <span><span onClick={ () => this.setState({showMap: !this.state.showMap})}>Network Map</span>
                 <span className='pull-right'>
                     <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
                         <Glyphicon glyph='question-sign'/>

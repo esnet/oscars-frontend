@@ -227,12 +227,13 @@ export default class DesignDrawing extends Component {
             <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
                 to temporarily reposition it.</p>
             <p>Click on any component to bring up its edit form. You may also click on the
-                magnifying glass icon to the right to readjust the map, or the chevron icon
-                to hide / show the map.</p>
+                magnifying glass icon to the right to auto-adjust the zoom level to fit in the displayed window,
+                or the chevron icon to hide / show the map.</p>
+            <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
         </Popover>;
 
 
-        let header = <div>Design drawing
+        let header = <div><span onClick={ () => this.setState({showMap: !this.state.showMap})}>Design drawing</span>
             <div className='pull-right'>
                 <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
                     <Glyphicon glyph='question-sign'/>
