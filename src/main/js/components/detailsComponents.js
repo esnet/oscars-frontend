@@ -61,13 +61,13 @@ export default class DetailsComponents extends Component {
         return (
 
             <Panel header={header}>
-                <h5><u>General connection info</u></h5>
+                <h5><b>General connection info</b></h5>
                 <Nav bsStyle='pills' stacked>
                     <NavItem onClick={this.onConnectionClicked}>ID: {connId}</NavItem>
                 </Nav>
 
                 <ToggleDisplay show={cmp.junctions.length > 0}>
-                    <h5><u>Junctions & fixtures</u></h5>
+                    <h5><b>Junctions & fixtures</b></h5>
                     {
                         cmp.junctions.map((junction) => {
                             let fixtureNodes = cmp.fixtures.map((fixture) => {
@@ -102,7 +102,7 @@ export default class DetailsComponents extends Component {
 
 
                 <ToggleDisplay show={cmp.pipes.length > 0}>
-                    <h5><u>Pipes</u></h5>
+                    <h5><b>Pipes</b></h5>
                     <Nav bsStyle='pills' stacked>
                         {
                             cmp.pipes.map((pipe) => {

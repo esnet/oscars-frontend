@@ -39,7 +39,7 @@ export default class DesignComponents extends Component {
 
             <Panel header={header}>
                 <ToggleDisplay show={design.junctions.length > 0}>
-                    <h5><u>Junctions & fixtures</u></h5>
+                    <h5><b>Junctions & fixtures</b></h5>
                     {
                         design.junctions.map((junction) => {
                             let device = junction.id;
@@ -78,7 +78,7 @@ export default class DesignComponents extends Component {
                     }
                 </ToggleDisplay>
                 <ToggleDisplay show={design.pipes.length > 0}>
-                    <h5><u>Pipes</u></h5>
+                    <h5><b>Pipes</b></h5>
                     <Nav bsStyle='pills' stacked>
                         {
                             design.pipes.map((pipe) => {
