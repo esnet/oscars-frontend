@@ -19,6 +19,7 @@ import {toJS, whyRun, autorunAsync} from 'mobx';
 import {size} from 'lodash'
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
+import Confirm from 'react-confirm-bootstrap';
 
 @inject('controlsStore', 'userStore')
 @observer
@@ -51,6 +52,10 @@ export default class EditUserForm extends Component {
 
     };
 
+    changePwd = () => {
+        this.props.userStore.setParamsForEditUser({changingPwd: true});
+    };
+
     onPwdChange = (val) => {
         this.props.userStore.setPassword(val);
     };
@@ -62,6 +67,7 @@ export default class EditUserForm extends Component {
 
     componentWillUnmount() {
         this.disposeOfPwdValidate();
+        this.props.userStore.setParamsForEditUser({changingPwd: false});
         clearTimeout(this.refreshTimeout);
     }
 
@@ -118,8 +124,10 @@ export default class EditUserForm extends Component {
         </div>;
 
         let passwordHelp = <Popover id='help-password' title='Help'>
-            Type in the new password then press Enter or click Set to apply.
+            <p>Click "Change" to show the password input form.</p>
+            <p>Type in the new password then click Set to apply.</p>
         </Popover>;
+
 
         let passwordHeader = <div>Password
             <div className='pull-right'>
@@ -190,10 +198,17 @@ export default class EditUserForm extends Component {
                                         disabled={!size(editUser.user.username)}
                                         onClick={this.props.submitUpdate}>Update</Button>
 
+
+
+
                                 <ToggleDisplay show={this.props.allowDelete && size(allUsers) >= 2}>
-                                    <Button bsStyle='warning'
-                                            disabled={!size(editUser.user.username)}
-                                            onClick={this.props.submitDelete}>Delete</Button>
+                                    <Confirm
+                                        onConfirm={this.props.submitDelete}
+                                        body="Are you sure you want to delete this user?"
+                                        confirmText="Confirm"
+                                        title="Delete user">
+                                        <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                                    </Confirm>
                                 </ToggleDisplay>
                             </div>
                         </div>
@@ -207,41 +222,46 @@ export default class EditUserForm extends Component {
                         <Form onSubmit={(e) => {
                             e.preventDefault()
                         }}>
-                            <FormGroup validationState={editUser.passwordValidationState}>
-                                <ControlLabel>Password</ControlLabel>
+                            <ToggleDisplay show={!editUser.changingPwd}>
+                                <Button onClick={this.changePwd}>Change</Button>
+                            </ToggleDisplay>
+                            <ToggleDisplay show={editUser.changingPwd}>
+                                <FormGroup validationState={editUser.passwordValidationState}>
+                                    <ControlLabel>Password</ControlLabel>
+                                    {' '}
+                                    <FormControl type='password'
+                                                 inputRef={(ref) => {
+                                                     this.passwordRef = ref
+                                                 }}
+                                                 placeholder='password'
+                                                 onKeyPress={this.handlePasswordKeyPress}
+                                                 onChange={(e) => this.onPwdChange(e.target.value)}/>
+                                    <HelpBlock>
+                                        <p>{editUser.passwordHelpText}</p>
+                                    </HelpBlock>
+                                </FormGroup>
                                 {' '}
-                                <FormControl type='password'
-                                             inputRef={(ref) => {
-                                                 this.passwordRef = ref
-                                             }}
-                                             placeholder='password'
-                                             onKeyPress={this.handlePasswordKeyPress}
-                                             onChange={(e) => this.onPwdChange(e.target.value)}/>
-                                <HelpBlock>
-                                    <p>{editUser.passwordHelpText}</p>
-                                </HelpBlock>
-                            </FormGroup>
-                            {' '}
-                            <FormGroup validationState={editUser.passwordValidationState}>
-                                <ControlLabel>Confirm</ControlLabel>
-                                {' '}
-                                <FormControl type='password'
-                                             inputRef={(ref) => {
-                                                 this.passwordAgainRef = ref
-                                             }}
-                                             placeholder='password (again)'
-                                             onKeyPress={this.handlePasswordKeyPress}
-                                             onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
+                                <FormGroup validationState={editUser.passwordValidationState}>
+                                    <ControlLabel>Confirm</ControlLabel>
+                                    {' '}
+                                    <FormControl type='password'
+                                                 inputRef={(ref) => {
+                                                     this.passwordAgainRef = ref
+                                                 }}
+                                                 placeholder='password (again)'
+                                                 onKeyPress={this.handlePasswordKeyPress}
+                                                 onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
 
-                            </FormGroup>
-                            <div className='pull-right'>
-                                <Button
-                                    bsStyle={editUser.passwordOk ? 'primary' : 'default'}
-                                    disabled={!editUser.passwordOk || !size(editUser.user.username)}
-                                    onClick={() => {
-                                        this.props.submitPassword(this.passwordRef, this.passwordAgainRef)
-                                    }}>Set</Button>
-                            </div>
+                                </FormGroup>
+                                <div className='pull-right'>
+                                    <Button
+                                        bsStyle={editUser.passwordOk ? 'primary' : 'default'}
+                                        disabled={!editUser.passwordOk || !size(editUser.user.username)}
+                                        onClick={() => {
+                                            this.props.submitPassword(this.passwordRef, this.passwordAgainRef)
+                                        }}>Set</Button>
+                                </div>
+                            </ToggleDisplay>
 
                         </Form>
                     </Panel>

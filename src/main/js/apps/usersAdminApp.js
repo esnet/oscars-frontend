@@ -104,13 +104,13 @@ export default class UsersAdminApp extends Component {
                                 console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                             }
                         );
+                    this.refreshUserList();
                 }
                 ,
                 (failResponse) => {
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
             );
-        this.refreshUserList();
 
         this.props.modalStore.openModal('userAdmin');
     };

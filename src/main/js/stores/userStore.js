@@ -16,7 +16,8 @@ class UserStore {
         passwordOk: false,
         passwordValidationState: 'error',
         passwordHelpText: 'Password too short',
-        status: ''
+        status: '',
+        changingPwd: false
     };
 
     @action

@@ -499,7 +499,9 @@ export default class PipeParamsModal extends Component {
 
 
                         <ToggleDisplay show={conn.schedule.locked}>
-                            <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                            <ToggleDisplay show={!ep.locked}>
+                                <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                            </ToggleDisplay>
                             <Row>
                                 <Col md={6} lg={6} sm={6}>
                                     <h4>ERO</h4>

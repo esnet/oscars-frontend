@@ -30,7 +30,7 @@ export default class AboutApp extends Component {
                 <Col>
                     <Panel header={header}>
                         <div>
-                            Frontend version: <u>1.0.4</u>
+                            Frontend version: <u>{this.props.commonStore.version.frontend}</u>
                         </div>
                         <div>
                             Backend version: <u>{this.props.commonStore.version.backend}</u>

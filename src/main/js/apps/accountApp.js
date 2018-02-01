@@ -112,6 +112,7 @@ export default class AccountApp extends Component {
         // clear it
         this.props.userStore.setPassword('');
         this.props.userStore.setPasswordAgain('');
+        this.props.userStore.setParamsForEditUser({changingPwd: false});
         pwdControlRef.value = '';
         pwdAgainControlRef.value = '';
     };
