@@ -13,6 +13,7 @@ import {autorun, autorunAsync, whyRun, toJS} from 'mobx';
 
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';
+import Validator from "../lib/validation";
 
 const modalName = 'editPipe';
 
@@ -96,6 +97,16 @@ export default class PipeParamsModal extends Component {
                 let syncedModes = ['fits', 'shortest', 'leastHops', 'widestSum', 'widestAZ', 'widestZA'];
                 syncedModes.map(mode => {
                     let ero = [];
+                    if (parsed[mode] === null) {
+                        uiParams.paths[mode].acceptable = false;
+                        uiParams.paths[mode].azAvailable = -1;
+                        uiParams.paths[mode].zaAvailable = -1;
+                        uiParams.paths[mode].azBaseline = -1;
+                        uiParams.paths[mode].zaBaseline = -1;
+                        uiParams.paths[mode].ero = [];
+                        return;
+                    }
+
                     parsed[mode]['azEro'].map((e) => {
                         ero.push(e['urn']);
                     });
@@ -223,8 +234,8 @@ export default class PipeParamsModal extends Component {
 
 
     onAzBwChange = (e) => {
-        let newBw = e.target.value;
-
+        let inputStr = Validator.cleanBandwidth(e.target.value, this.azBwControl);
+        const newBw = Number(inputStr);
 
         if (isNaN(newBw) || e.target.value.length === 0) {
             this.props.controlsStore.setParamsForEditPipe({
@@ -254,8 +265,8 @@ export default class PipeParamsModal extends Component {
 
 
     onZaBwChange = (e) => {
-        const newBw = Number(e.target.value);
-
+        let inputStr = Validator.cleanBandwidth(e.target.value, this.zaBwControl);
+        const newBw = Number(inputStr);
 
         if (isNaN(newBw) || e.target.value.length === 0) {
             this.props.controlsStore.setParamsForEditPipe({
@@ -388,6 +399,8 @@ export default class PipeParamsModal extends Component {
                 an Explicit Route Object (ERO).</p>
             <p>Use the textboxes to input the bandwidth you want, and click "Lock" to lock
                 the values in.</p>
+            <p>As a convenience feature, if you type 'g' or 'G' in the bandwidth controls,
+                that character will be replaced by '000'.</p>
             <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
         </Popover>;
 
@@ -436,6 +449,10 @@ export default class PipeParamsModal extends Component {
                                                 <FormControl type="text"
                                                              placeholder="0-100000"
                                                              defaultValue={ep.A_TO_Z.bw}
+                                                             inputRef={ref => {
+                                                                 this.azBwControl = ref;
+                                                             }}
+
                                                              disabled={ep.locked}
                                                              onChange={this.onAzBwChange}/>
                                             </InputGroup>
@@ -461,6 +478,10 @@ export default class PipeParamsModal extends Component {
                                                 <FormControl type="text"
                                                              placeholder="0-100000"
                                                              defaultValue={ep.Z_TO_A.bw}
+                                                             inputRef={ref => {
+                                                                 this.zaBwControl = ref;
+                                                             }}
+
                                                              disabled={ep.locked}
                                                              onChange={this.onZaBwChange}/>
                                                 <InputGroup.Addon>

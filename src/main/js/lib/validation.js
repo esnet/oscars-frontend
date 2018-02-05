@@ -184,6 +184,30 @@ class Validator {
         return 'success';
     }
 
+    cleanBandwidth(inputStr, control){
+
+        let cleanedUp = false;
+        let ws_re = /\s+/;
+        let ws_idx = inputStr.search(ws_re);
+        let g_re = /g/i;
+        let g_idx = inputStr.search(g_re);
+
+        if (ws_idx >= 0 ) {
+            inputStr = inputStr.replace(ws_re, '');
+            cleanedUp = true;
+        }
+        if (g_idx >= 0 ) {
+            inputStr = inputStr.replace(g_re, '000');
+            cleanedUp = true;
+        }
+
+        if (cleanedUp) {
+            control.value = inputStr;
+        }
+        return inputStr;
+
+    }
+
 }
 
 export default new Validator();

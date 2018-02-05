@@ -109,7 +109,9 @@ export default class BwSelect extends Component {
     };
 
     onIngressBwChange = (e) => {
-        const newIngress = Number(e.target.value);
+        let inputStr = Validator.cleanBandwidth(e.target.value, this.ingressControl);
+
+        const newIngress = Number(inputStr);
         const ef = this.props.controlsStore.editFixture;
         if (isNaN(newIngress) || e.target.value.length === 0) {
             this.props.controlsStore.setParamsForEditFixture({
@@ -243,7 +245,8 @@ export default class BwSelect extends Component {
     };
 
     onEgressBwChange = (e) => {
-        const newEgress = Number(e.target.value);
+        let inputStr = Validator.cleanBandwidth(e.target.value, this.egressControl);
+        const newEgress = Number(inputStr);
 
         if (isNaN(newEgress) || e.target.value.length === 0) {
             this.props.controlsStore.setParamsForEditFixture({
@@ -320,8 +323,9 @@ export default class BwSelect extends Component {
 
             <p>In 'unlocked' mode, when the dialog opens the values will be editable and set to zero, with the
                 'symmetrical' option enabled.</p>
-            <p>You can type in the number you want (in Mbps units) in the bandwidth controls. There will be feedback to
+            <p>You can type in the number you want (in Mbps) in the bandwidth controls. There will be feedback to
                 indicate whether the bandwidth is available. </p>
+            <p>As a convenience feature, if you type 'g' or 'G', that character will be replaced by '000'.</p>
             <p>You will also see 'baseline' and 'available' ranges displayed.</p>
             <p>The <u>baseline</u> range is what would be available if there were no other reservations, and generally
                 does not change.</p>
@@ -352,6 +356,9 @@ export default class BwSelect extends Component {
                             <FormGroup controlId="ingress" validationState={ef.bw.ingress.validationState}>
                                 <ControlLabel>Ingress (Mbps):</ControlLabel>
                                 <FormControl defaultValue='0'
+                                             inputRef={ref => {
+                                                 this.ingressControl = ref;
+                                             }}
                                              type="text" placeholder="0-100000"
                                              onChange={this.onIngressBwChange}/>
                                 <HelpBlock><p>{ef.bw.ingress.validationText}</p></HelpBlock>
