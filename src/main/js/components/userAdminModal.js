@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import {Modal, Button} from 'react-bootstrap';
 import EditUserForm from './editUserForm';
 import myClient from '../agents/client';
-import {size} from 'lodash'
+import {size} from 'lodash-es'
 
 const modalName = 'userAdmin';
 

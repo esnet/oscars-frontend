@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import {isArray, mergeWith} from 'lodash';
+import {isArray, mergeWith} from 'lodash-es';
 
 class ConnectionsStore {
 

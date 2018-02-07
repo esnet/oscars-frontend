@@ -1,6 +1,6 @@
 import {observable, action} from 'mobx';
 
-import {size} from 'lodash'
+import {size} from 'lodash-es'
 import myClient from '../agents/client'
 
 class AccountStore {
@@ -18,7 +18,7 @@ class AccountStore {
     };
 
     isLoggedIn() {
-        return size(this.loggedin.username)
+        return size(this.loggedin.username) > 0;
     }
 
     isAdmin() {
@@ -80,6 +80,9 @@ class AccountStore {
 
                 },
                 (failure) => {
+                    this.setLoggedinUsername('');
+                    this.setLoggedinToken('');
+                    this.setLoggedinAdmin(false);
                     console.log(failure);
                     this.setAttemptError(failure.statusText);
                 }
