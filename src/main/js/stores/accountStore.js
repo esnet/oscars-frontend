@@ -78,10 +78,13 @@ class AccountStore {
                     this.setLoggedinAdmin(parsed.admin);
                     this.setLoggedinToken(parsed.token);
 
+                    if (!this.isLoggedIn()) {
+                        this.setAttemptError('User not found or wrong password.');
+                    }
                 },
                 (failure) => {
                     console.log(failure);
-                    this.setAttemptError(failure.statusText);
+                    this.setAttemptError('User not found or wrong password.');
                 }
             )
     }
