@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import {toJS} from 'mobx';
 import myClient from '../agents/client';
 import EditUserForm from '../components/editUserForm';
-import {size} from 'lodash'
+import {size} from 'lodash-es'
 
 @inject('userStore', 'commonStore')
 @observer

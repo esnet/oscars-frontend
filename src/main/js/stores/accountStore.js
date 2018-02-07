@@ -80,8 +80,8 @@ class AccountStore {
 
                 },
                 (failure) => {
-                    // console.log(failure);
-                    this.setAttemptError('User not found or wrong password.');
+                    console.log(failure);
+                    this.setAttemptError(failure.statusText);
                 }
             )
     }

@@ -1,6 +1,6 @@
 import {observable, action, toJS} from 'mobx';
 
-import {merge, isArray, mergeWith} from 'lodash';
+import {merge, isArray, mergeWith} from 'lodash-es';
 
 class ControlsStore {
 

@@ -18,7 +18,7 @@ import {toJS} from 'mobx';
 import myClient from '../agents/client';
 import {observer, inject} from 'mobx-react';
 import UserAdminModal from '../components/userAdminModal';
-import {size} from 'lodash'
+import {size} from 'lodash-es'
 
 
 @inject('controlsStore', 'commonStore', 'modalStore', 'userStore')
