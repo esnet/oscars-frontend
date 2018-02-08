@@ -50,7 +50,7 @@ class ConnectionsList extends Component {
                         id: (new Date()).getTime(),
                         type: 'danger',
                         headline: 'Error loading connection list',
-                        message: failResponse.status + ' ' +failResponse.statusText
+                        message: failResponse.status + ' ' + failResponse.statusText
                     });
 
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
@@ -81,7 +81,7 @@ class ConnectionsList extends Component {
 
             return (
                 <tr key={c.connectionId}>
-                    <td><Link to={'/pages/details/'+c.connectionId}>{c.connectionId}</Link></td>
+                    <td><Link to={'/pages/details/' + c.connectionId}>{c.connectionId}</Link></td>
                     <td>
                         <div>{c.description}</div>
                         <div>{c.username}</div>
@@ -107,30 +107,33 @@ class ConnectionsList extends Component {
 
 
         return <Panel>
-            <h3>Filters:</h3>
-            <FormGroup>
-                <ControlLabel>Phase:</ControlLabel>
-                <FormControl componentClass="select" onChange={this.selectedPhaseChanged}>
-                    <option key='RESERVED' value='RESERVED'>Reserved</option>
-                    <option key='ARCHIVED' value='ARCHIVED'>Archived</option>
+            <Panel.Body>
+                <h3>Filters:</h3>
+                <FormGroup>
+                    <ControlLabel>Phase:</ControlLabel>
+                    <FormControl componentClass="select" onChange={this.selectedPhaseChanged}>
+                        <option key='RESERVED' value='RESERVED'>Reserved</option>
+                        <option key='ARCHIVED' value='ARCHIVED'>Archived</option>
 
-                </FormControl>
-            </FormGroup>
-            <h3>Connections</h3>
-            <Table striped bordered condensed hover>
-                <thead>
-                <tr>
-                    <th>Connection Id</th>
-                    <th>Description / Username</th>
-                    <th>Fixtures</th>
-                    <th>States</th>
-                    <th>Schedule</th>
-                </tr>
-                </thead>
-                <tbody>
-                {rows}
-                </tbody>
-            </Table>
+                    </FormControl>
+                </FormGroup>
+                <h3>Connections</h3>
+                <Table striped bordered condensed hover>
+                    <thead>
+                    <tr>
+                        <th>Connection Id</th>
+                        <th>Description / Username</th>
+                        <th>Fixtures</th>
+                        <th>States</th>
+                        <th>Schedule</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {rows}
+                    </tbody>
+                </Table>
+            </Panel.Body>
+
 
         </Panel>
 

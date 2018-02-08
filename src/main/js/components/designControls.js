@@ -130,36 +130,39 @@ export default class DesignControls extends Component {
         </Popover>;
 
 
-        let header = <div>Save design
-            <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </div>;
-
-
         return (
-            <Panel header={header}>
-                <Form inline onSubmit={(e) => {
-                    e.preventDefault()
-                }}>
-                    <FormGroup>
-                        <FormControl type='text' placeholder='short name'
-                                     onKeyPress={this.handleKeyPress}
-                                     defaultValue={editDesign.description}
-                                     onChange={this.onDescriptionChange}/>
-                    </FormGroup>
-                    {' '}
-                    <FormGroup className='pull-right'>
-                        <ToggleDisplay show={designOk}>
-                            <Button disabled={editDesign.disabledSaveButton} onClick={this.saveDesign}>Save</Button>
-                        </ToggleDisplay>
-                        <ToggleDisplay show={!designOk}>
-                            <Button bsStyle='warning' onClick={() => {
-                                this.props.modalStore.openModal('designErrors');
-                            }}>Design issues</Button>
-                        </ToggleDisplay>
-                    </FormGroup>
-                </Form>
+            <Panel>
+                <Panel.Heading>
+                    <div>Save design
+                        <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </div>
+                </Panel.Heading>
+                <Panel.Body>
+                    <Form inline onSubmit={(e) => {
+                        e.preventDefault()
+                    }}>
+                        <FormGroup>
+                            <FormControl type='text' placeholder='short name'
+                                         onKeyPress={this.handleKeyPress}
+                                         defaultValue={editDesign.description}
+                                         onChange={this.onDescriptionChange}/>
+                        </FormGroup>
+                        {' '}
+                        <FormGroup className='pull-right'>
+                            <ToggleDisplay show={designOk}>
+                                <Button disabled={editDesign.disabledSaveButton} onClick={this.saveDesign}>Save</Button>
+                            </ToggleDisplay>
+                            <ToggleDisplay show={!designOk}>
+                                <Button bsStyle='warning' onClick={() => {
+                                    this.props.modalStore.openModal('designErrors');
+                                }}>Design issues</Button>
+                            </ToggleDisplay>
+                        </FormGroup>
+                    </Form>
+                </Panel.Body>
+
 
             </ Panel>
         );

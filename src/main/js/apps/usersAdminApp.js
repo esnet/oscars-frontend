@@ -132,49 +132,52 @@ export default class UsersAdminApp extends Component {
 
         let adminHelp = <Popover id='help-adminusers' title='Help'>
             <p>This is the users administration form. The list shows all the users registered in the system.</p>
-                <p>Click on a username on the list to edit user details.</p>
-                <p>To add a new user, type a username in the box then click "Add new user" or press Enter.</p>
+            <p>Click on a username on the list to edit user details.</p>
+            <p>To add a new user, type a username in the box then click "Add new user" or press Enter.</p>
         </Popover>;
-
-        let header = <div>Users administration
-            <div className='pull-right'>
-                <OverlayTrigger trigger="click" rootClose placement="left" overlay={adminHelp}>
-                    <Glyphicon glyph='question-sign'/>
-                </OverlayTrigger>
-            </div>
-        </div>;
 
         return (
             <Row>
                 <Col xs={8} xsOffset={2} md={6} mdOffset={3} sm={6} smOffset={3} lg={6} lgOffset={3}>
-                    <Panel header={header}>
-                        <ListGroup>
-                            {
-                                editUser.allUsers.map((u) => {
-                                    return <ListGroupItem onClick={
-                                        () => {
-                                            this.clickUsername(u.username)
-                                        }
-                                    } key={u.username}>
-                                        {u.fullName + ' : ' + u.username}
-                                    </ListGroupItem>
-                                })
-                            }
-                        </ListGroup>
-                        <Form onSubmit={(e) => {
-                            e.preventDefault()
-                        }}>
-                            <FormGroup>
-                                <ControlLabel>Username</ControlLabel>
-                                {' '}
-                                <FormControl type='text'
-                                             onKeyPress={this.handleAddUsernameKeyPress}
-                                             onChange={(e) => this.onUsernameChange(e.target.value)}/>
-                            </FormGroup>
-                            <Button className='pull-right'
-                                    disabled={!size(editUser.user.username)}
-                                    onClick={this.addUser}>Add new user</Button>
-                        </Form>
+                    <Panel>
+                        <Panel.Heading>
+                            <div>Users administration
+                                <div className='pull-right'>
+                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={adminHelp}>
+                                        <Glyphicon glyph='question-sign'/>
+                                    </OverlayTrigger>
+                                </div>
+                            </div>
+                        </Panel.Heading>
+                        <Panel.Body>
+                            <ListGroup>
+                                {
+                                    editUser.allUsers.map((u) => {
+                                        return <ListGroupItem onClick={
+                                            () => {
+                                                this.clickUsername(u.username)
+                                            }
+                                        } key={u.username}>
+                                            {u.fullName + ' : ' + u.username}
+                                        </ListGroupItem>
+                                    })
+                                }
+                            </ListGroup>
+                            <Form onSubmit={(e) => {
+                                e.preventDefault()
+                            }}>
+                                <FormGroup>
+                                    <ControlLabel>Username</ControlLabel>
+                                    {' '}
+                                    <FormControl type='text'
+                                                 onKeyPress={this.handleAddUsernameKeyPress}
+                                                 onChange={(e) => this.onUsernameChange(e.target.value)}/>
+                                </FormGroup>
+                                <Button className='pull-right'
+                                        disabled={!size(editUser.user.username)}
+                                        onClick={this.addUser}>Add new user</Button>
+                            </Form>
+                        </Panel.Body>
 
                     </Panel>
 

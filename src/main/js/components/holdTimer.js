@@ -95,7 +95,7 @@ export default class HoldTimer extends Component {
             return;
         }
         if (typeof conn.connectionId === 'undefined' || conn.connectionId === null) {
-            console.log('no connectionId!')
+            console.log('no connectionId!');
             return;
         }
 
@@ -146,7 +146,6 @@ export default class HoldTimer extends Component {
                 }));
 
 
-
     }, 1000);
 
 
@@ -162,11 +161,15 @@ export default class HoldTimer extends Component {
 
         return (
             <Panel>
-                <span>Resources held for: {conn.held.remaining}
-                    <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
-                        <Glyphicon className='pull-right' glyph='question-sign'/>
-                    </OverlayTrigger>
-                </span>
+                <Panel.Body>
+
+                    <span>Resources held for: {conn.held.remaining}
+                        <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </span>
+                </Panel.Body>
+
             </Panel>
         );
     }

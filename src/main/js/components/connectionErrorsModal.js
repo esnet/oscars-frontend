@@ -36,13 +36,15 @@ export default class ConnectionErrorsModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <Panel>
-                        <ListGroup>
-            {
-                this.props.controlsStore.connection.validation.errors.map((e, idx) => {
-                    return <ListGroupItem key={idx}>{e}</ListGroupItem>;
-                } )
-            }
-                        </ListGroup>
+                        <Panel.Body>
+                            <ListGroup>
+                                {
+                                    this.props.controlsStore.connection.validation.errors.map((e, idx) => {
+                                        return <ListGroupItem key={idx}>{e}</ListGroupItem>;
+                                    })
+                                }
+                            </ListGroup>
+                        </Panel.Body>
                     </Panel>
                 </Modal.Body>
                 <Modal.Footer>

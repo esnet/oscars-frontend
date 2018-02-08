@@ -331,76 +331,81 @@ export default class BwSelect extends Component {
                 does not change.</p>
             <p>The <u>available</u> range is calculated by taking the baseline and removing any bandwidth used by other
                 reservations overlapping the selected schedule.</p>
-            <p>If the symmetrical option is set, changes to the ingress control will also update the egress control to match.
+            <p>If the symmetrical option is set, changes to the ingress control will also update the egress control to
+                match.
                 Disable the checkbox to allow the values to be edited separately.</p>
 
-            <p>When the fixture is locked, this will display the selected ingress and egress values, and will not be editable. Unlock the fixture to edit.</p>
+            <p>When the fixture is locked, this will display the selected ingress and egress values, and will not be
+                editable. Unlock the fixture to edit.</p>
 
         </Popover>;
 
 
-        let header = <p>Bandwidth selection
-            <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </p>;
-
-
         return (
-            <Panel header={header}>
-                <ToggleDisplay show={!ef.locked}>
+            <Panel>
+                <Panel.Heading>
+                    <p>Bandwidth selection
+                        <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </p>
+                </Panel.Heading>
+                <Panel.Body>
 
-                    <Row>
-                        <Col sm={6} md={6} lg={6}>
+                    <ToggleDisplay show={!ef.locked}>
 
-                            <FormGroup controlId="ingress" validationState={ef.bw.ingress.validationState}>
-                                <ControlLabel>Ingress (Mbps):</ControlLabel>
-                                <FormControl defaultValue='0'
-                                             inputRef={ref => {
-                                                 this.ingressControl = ref;
-                                             }}
-                                             type="text" placeholder="0-100000"
-                                             onChange={this.onIngressBwChange}/>
-                                <HelpBlock><p>{ef.bw.ingress.validationText}</p></HelpBlock>
-                                <HelpBlock>Reservable: {ef.bw.available.ingress} Mbps</HelpBlock>
-                                <HelpBlock>Baseline: {ef.bw.baseline.ingress} Mbps</HelpBlock>
+                        <Row>
+                            <Col sm={6} md={6} lg={6}>
 
-                            </FormGroup>
-                        </Col>
-                        <Col sm={6} md={6} lg={6}>
-                            <FormGroup controlId="egress" validationState={ef.bw.egress.validationState}>
-                                <ControlLabel>Egress (Mbps):</ControlLabel>
-                                <FormControl defaultValue='0'
-                                             disabled={ef.bw.symmetrical}
-                                             inputRef={ref => {
-                                                 this.egressControl = ref;
-                                             }}
-                                             onChange={this.onEgressBwChange}
-                                             type="text" placeholder="0-10000"/>
-                                <HelpBlock><p>{ef.bw.egress.validationText}</p></HelpBlock>
-                                <HelpBlock>Reservable: {ef.bw.available.egress} Mbps</HelpBlock>
-                                <HelpBlock>Baseline: {ef.bw.baseline.egress} Mbps</HelpBlock>
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm={6} md={6} lg={6}>
-                            <FormGroup controlId="symmetrical">
-                                <Checkbox defaultChecked={ef.bw.symmetrical}
-                                          inline
-                                          onChange={this.symmetricalCheckboxClicked}>Symmetrical
-                                </Checkbox>
-                            </FormGroup>
-                        </Col>
-                    </Row>
+                                <FormGroup controlId="ingress" validationState={ef.bw.ingress.validationState}>
+                                    <ControlLabel>Ingress (Mbps):</ControlLabel>
+                                    <FormControl defaultValue='0'
+                                                 inputRef={ref => {
+                                                     this.ingressControl = ref;
+                                                 }}
+                                                 type="text" placeholder="0-100000"
+                                                 onChange={this.onIngressBwChange}/>
+                                    <HelpBlock><p>{ef.bw.ingress.validationText}</p></HelpBlock>
+                                    <HelpBlock>Reservable: {ef.bw.available.ingress} Mbps</HelpBlock>
+                                    <HelpBlock>Baseline: {ef.bw.baseline.ingress} Mbps</HelpBlock>
 
-                    {' '}
-                    {Validator.label(ef.bw.acceptable)}
-                </ToggleDisplay>
-                <ToggleDisplay show={ef.locked}>
-                    <Well>Locked ingress: {ef.bw.ingress.mbps}</Well>
-                    <Well>Locked egress: {ef.bw.egress.mbps}</Well>
-                </ToggleDisplay>
+                                </FormGroup>
+                            </Col>
+                            <Col sm={6} md={6} lg={6}>
+                                <FormGroup controlId="egress" validationState={ef.bw.egress.validationState}>
+                                    <ControlLabel>Egress (Mbps):</ControlLabel>
+                                    <FormControl defaultValue='0'
+                                                 disabled={ef.bw.symmetrical}
+                                                 inputRef={ref => {
+                                                     this.egressControl = ref;
+                                                 }}
+                                                 onChange={this.onEgressBwChange}
+                                                 type="text" placeholder="0-10000"/>
+                                    <HelpBlock><p>{ef.bw.egress.validationText}</p></HelpBlock>
+                                    <HelpBlock>Reservable: {ef.bw.available.egress} Mbps</HelpBlock>
+                                    <HelpBlock>Baseline: {ef.bw.baseline.egress} Mbps</HelpBlock>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={6} md={6} lg={6}>
+                                <FormGroup controlId="symmetrical">
+                                    <Checkbox defaultChecked={ef.bw.symmetrical}
+                                              inline
+                                              onChange={this.symmetricalCheckboxClicked}>Symmetrical
+                                    </Checkbox>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+
+                        {' '}
+                        {Validator.label(ef.bw.acceptable)}
+                    </ToggleDisplay>
+                    <ToggleDisplay show={ef.locked}>
+                        <Well>Locked ingress: {ef.bw.ingress.mbps}</Well>
+                        <Well>Locked egress: {ef.bw.egress.mbps}</Well>
+                    </ToggleDisplay>
+                </Panel.Body>
 
             </Panel>);
     }

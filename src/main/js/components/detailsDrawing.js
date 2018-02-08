@@ -201,6 +201,11 @@ export default class DetailsDrawing extends Component {
 
     }, 500);
 
+    flipMapState = () => {
+        this.setState({showMap: !this.state.showMap});
+    };
+
+
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
@@ -212,31 +217,35 @@ export default class DetailsDrawing extends Component {
             <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
                 to temporarily reposition it.</p>
             <p>Click on any component to bring up information about it. You may also click on the
-                magnifying glass icon to the right to auto-zoom the map to fit in the displayed window, or the chevron icon
+                magnifying glass icon to the right to auto-zoom the map to fit in the displayed window, or the chevron
+                icon
                 to hide / show the map.</p>
             <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
         </Popover>;
 
-
-        let header = <div><span onClick={ () => this.setState({showMap: !this.state.showMap})}>Schematic</span>
-            <div className='pull-right'>
-                <OverlayTrigger trigger='click' rootClose placement='right' overlay={myHelp}>
-                    <Glyphicon glyph='question-sign'/>
-                </OverlayTrigger>
-                {' '}
-                <Glyphicon onClick={() => {
-                    this.network.fit({animation: true})
-                }} glyph='zoom-out'/>
-                {' '}
-                <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
-            </div>
-        </div>;
-
         return (
-            <Panel collapsible expanded={this.state.showMap} header={header}>
-                <div ref={(ref) => {
-                    this.mapRef = ref;
-                }}><p>connection map</p></div>
+            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
+                <Panel.Heading>
+                    <div><span onClick={this.flipMapState}>Schematic</span>
+                        <div className='pull-right'>
+                            <OverlayTrigger trigger='click' rootClose placement='right' overlay={myHelp}>
+                                <Glyphicon glyph='question-sign'/>
+                            </OverlayTrigger>
+                            {' '}
+                            <Glyphicon onClick={() => {
+                                this.network.fit({animation: true})
+                            }} glyph='zoom-out'/>
+                            {' '}
+                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})}
+                                       glyph={toggleIcon}/>
+                        </div>
+                    </div>
+                </Panel.Heading>
+                <Panel.Collapse>
+                    <div ref={(ref) => {
+                        this.mapRef = ref;
+                    }}><p>connection map</p></div>
+                </Panel.Collapse>
             </Panel>
 
         );

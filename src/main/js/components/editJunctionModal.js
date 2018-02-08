@@ -140,11 +140,6 @@ export default class EditJunctionModal extends Component {
                 well as all the fixtures belonging to it and pipes connecting to here. </p>
         </Popover>;
 
-        let header = <p>Junction controls
-            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </p>;
 
         return (
             <Modal show={showModal} onHide={this.closeModal}>
@@ -152,42 +147,54 @@ export default class EditJunctionModal extends Component {
                     <Modal.Title>{junction}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Panel header={header}>
-                        <ListGroup> {
-                            connectedPipes.map((pipe) => {
-                                return <ListGroupItem key={pipe.id + '-connected'} onClick={() => {
-                                    this.props.controlsStore.setParamsForEditPipe({
-                                        pipeId: pipe.id
-                                    });
-                                    this.props.modalStore.openModal('editPipe');
-                                }}>Pipe: {pipe.a} -- {pipe.z}</ListGroupItem>
-                            })
-                        }
-                        </ListGroup>
-                        {' '}
-                        <ToggleDisplay show={showAddPipeControls}>
-                            <Form>
-                                <FormGroup controlId="pipe">
-                                    <ControlLabel>New pipe to:</ControlLabel>
-                                    {' '}
-                                    <FormControl componentClass="select" defaultValue='choose'
-                                                 onChange={this.selectOtherJunction}>
-                                        {
-                                            unconnectedJunctions.map((option, index) => {
-                                                return <option key={index} value={option.value}>{option.label}</option>
-                                            })
-                                        }
-                                    </FormControl>
-                                </FormGroup>
-                                {addPipeButton}
+                    <Panel>
+                        <Panel.Heading>
+                            <p>Junction controls
+                                <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                                    <Glyphicon className='pull-right' glyph='question-sign'/>
+                                </OverlayTrigger>
+                            </p>
+                        </Panel.Heading>
+                        <Panel.Body>
 
-                            </Form>
-                        </ToggleDisplay>
+                            <ListGroup> {
+                                connectedPipes.map((pipe) => {
+                                    return <ListGroupItem key={pipe.id + '-connected'} onClick={() => {
+                                        this.props.controlsStore.setParamsForEditPipe({
+                                            pipeId: pipe.id
+                                        });
+                                        this.props.modalStore.openModal('editPipe');
+                                    }}>Pipe: {pipe.a} -- {pipe.z}</ListGroupItem>
+                                })
+                            }
+                            </ListGroup>
+                            {' '}
+                            <ToggleDisplay show={showAddPipeControls}>
+                                <Form>
+                                    <FormGroup controlId="pipe">
+                                        <ControlLabel>New pipe to:</ControlLabel>
+                                        {' '}
+                                        <FormControl componentClass="select" defaultValue='choose'
+                                                     onChange={this.selectOtherJunction}>
+                                            {
+                                                unconnectedJunctions.map((option, index) => {
+                                                    return <option key={index}
+                                                                   value={option.value}>{option.label}</option>
+                                                })
+                                            }
+                                        </FormControl>
+                                    </FormGroup>
+                                    {addPipeButton}
 
-                        {noPipesText}
+                                </Form>
+                            </ToggleDisplay>
 
-                        <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
-                            junction</Button>
+                            {noPipesText}
+
+                            <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
+                                junction</Button>
+                        </Panel.Body>
+
                     </Panel>
 
                 </Modal.Body>

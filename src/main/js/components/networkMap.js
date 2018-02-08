@@ -150,6 +150,10 @@ export default class NetworkMap extends Component {
 
     }
 
+    flipMapState = () => {
+        this.setState({showMap: !this.state.showMap});
+    };
+
     render() {
         let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
@@ -168,31 +172,34 @@ export default class NetworkMap extends Component {
                 to hide / show the map.</p>
         </Popover>;
 
-
-        let header =
-            <span><span onClick={ () => this.setState({showMap: !this.state.showMap})}>Network Map</span>
-                <span className='pull-right'>
-                    <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
-                        <Glyphicon glyph='question-sign'/>
-                    </OverlayTrigger>
-                    {' '}
-
-                    <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                        <Glyphicon onClick={ this.zoomOnColored} glyph='zoom-in'/>
-                    </ToggleDisplay>
-                    {' '}
-                    <Glyphicon onClick={ () => {
-                        this.network.fit({animation: true})
-                    }} glyph='zoom-out'/>
-                    {' '}
-                    <Glyphicon onClick={ () => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
-                </span>
-            </span>;
         return (
-            <Panel collapsible expanded={this.state.showMap} header={header}>
-                <div ref={(ref) => {
-                    this.mapRef = ref;
-                }}><p>Topology</p></div>
+            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
+                <Panel.Heading>
+                    <span>
+                        <span onClick={this.flipMapState}>Network Map</span>
+                        <span className='pull-right'>
+                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
+                                <Glyphicon glyph='question-sign'/>
+                            </OverlayTrigger>
+                            {' '}
+
+                            <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
+                                <Glyphicon onClick={this.zoomOnColored} glyph='zoom-in'/>
+                            </ToggleDisplay>
+                            {' '}
+                            <Glyphicon onClick={() => {
+                                this.network.fit({animation: true})
+                            }} glyph='zoom-out'/>
+                            {' '}
+                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
+                        </span>
+                    </span>
+                </Panel.Heading>
+                <Panel.Collapse >
+                    <div ref={(ref) => {
+                        this.mapRef = ref;
+                    }}><p>Topology</p></div>
+                </Panel.Collapse>
             </Panel>
 
         );

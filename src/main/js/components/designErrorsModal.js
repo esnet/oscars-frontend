@@ -34,7 +34,9 @@ export default class DesignErrorsModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <Panel>
-                        <ListGroup>{this.props.designStore.design.errors}</ListGroup>
+                        <Panel.Body>
+                            <ListGroup>{this.props.designStore.design.errors}</ListGroup>
+                        </Panel.Body>
                     </Panel>
                 </Modal.Body>
                 <Modal.Footer>

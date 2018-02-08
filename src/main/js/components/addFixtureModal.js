@@ -1,13 +1,25 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, ListGroup, ListGroupItem, Glyphicon, Popover, Panel, OverlayTrigger, Accordion} from 'react-bootstrap';
+import DevicePortList from './devicePortList';
+import {
+    Modal,
+    Button,
+    Glyphicon,
+    Popover,
+    OverlayTrigger,
+} from 'react-bootstrap';
+
 import transformer from '../lib/transform';
-import PropTypes from 'prop-types';
+
 const modalName = 'addFixture';
 
 @inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
 @observer
 export default class AddFixtureModal extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     componentWillMount() {
         this.props.topologyStore.loadEthernetPorts();
         this.props.topologyStore.loadBaseline();
@@ -26,7 +38,7 @@ export default class AddFixtureModal extends Component {
 
         const editFixtureParams = transformer.newFixtureToEditParams(fixture);
         this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
-        this.props.mapStore.addColoredNode({id: device, color:'green'});
+        this.props.mapStore.addColoredNode({id: device, color: 'green'});
         this.props.mapStore.setZoomOnColored(true);
 
         this.props.modalStore.openModal('editFixture');
@@ -55,7 +67,7 @@ export default class AddFixtureModal extends Component {
 
         const questionmark = <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
             <Glyphicon className='pull-right' glyph='question-sign'/>
-        </OverlayTrigger>
+        </OverlayTrigger>;
 
 
         let showModal = this.props.modalStore.modals.get(modalName);
@@ -74,59 +86,3 @@ export default class AddFixtureModal extends Component {
         );
     }
 }
-
-class DevicePortList extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    portSort = (a, b) => {
-        if (a.port.urn < b.port.urn)
-            return -1;
-        if (a.port.urn > b.port.urn)
-            return 1;
-        return 0;
-    };
-
-    render() {
-        let portsNodes = this.props.ports.sort(this.portSort).map((entry, portIdx) => {
-            let port = entry.port;
-            let device = entry.device;
-            let portLabel = port.urn.split(':')[1];
-
-            let clickHandler = () => {
-                this.props.onAddClicked(device, port);
-            };
-            let tags = null;
-            if ('tags' in port) {
-                tags = port.tags.map((tag, idx) => {
-                    return(
-                        <ListGroupItem key={idx}>{tag}</ListGroupItem>
-                    )
-                });
-            }
-
-
-            const header = <div>{portLabel}
-                <Glyphicon className='pull-right' glyph='plus' onClick={clickHandler}/>
-            </div>;
-
-            return (
-                    <Panel key={port.urn} header={header} eventKey={portIdx}>
-                        <ListGroup>
-                            {tags}
-                        </ListGroup>
-                    </Panel>
-            )
-
-        });
-
-        return <Accordion>{portsNodes}</Accordion>
-    };
-}
-
-
-DevicePortList.propTypes = {
-    onAddClicked: PropTypes.func.isRequired,
-    ports: PropTypes.array.isRequired,
-};

@@ -51,71 +51,75 @@ export default class DetailsComponents extends Component {
             <p>You may click on any component to bring up information about it.</p>
         </Popover>;
 
-        let header = <p>Components
-            <OverlayTrigger trigger='click' rootClose placement='left' overlay={compHelp}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </p>;
-
 
         return (
 
-            <Panel header={header}>
-                <h5><b>General connection info</b></h5>
-                <Nav bsStyle='pills' stacked>
-                    <NavItem onClick={this.onConnectionClicked}>ID: {connId}</NavItem>
-                </Nav>
-
-                <ToggleDisplay show={cmp.junctions.length > 0}>
-                    <h5><b>Junctions & fixtures</b></h5>
-                    {
-                        cmp.junctions.map((junction) => {
-                            let fixtureNodes = cmp.fixtures.map((fixture) => {
-                                if (fixture.junction === junction.refId) {
-                                    const label = fixture.portUrn + ':' + fixture.vlan.vlanId;
-
-                                    return <NavItem key={label} onClick={() => {
-                                        this.onFixtureClicked(fixture)
-                                    }}>
-                                        {label}
-                                    </NavItem>
-
-                                }
-                            });
-
-                            return (
-                                <Nav bsStyle='pills' stacked key={junction.refId + 'nav'}>
-                                    <NavItem active={true}
-                                             key={junction.refId}
-                                             onClick={() => {
-                                                 this.onJunctionClicked(junction)
-                                             }}>
-                                        <b><u>{junction.refId}</u></b>
-                                    </NavItem>
-                                    {fixtureNodes}
-
-                                </Nav>
-                            )
-                        })
-                    }
-                </ToggleDisplay>
-
-
-                <ToggleDisplay show={cmp.pipes.length > 0}>
-                    <h5><b>Pipes</b></h5>
+            <Panel>
+                <Panel.Heading>
+                    <p>Components
+                        <OverlayTrigger trigger='click' rootClose placement='left' overlay={compHelp}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </p>
+                </Panel.Heading>
+                <Panel.Body>
+                    <h5><b>General connection info</b></h5>
                     <Nav bsStyle='pills' stacked>
+                        <NavItem onClick={this.onConnectionClicked}>ID: {connId}</NavItem>
+                    </Nav>
+
+                    <ToggleDisplay show={cmp.junctions.length > 0}>
+                        <h5><b>Junctions & fixtures</b></h5>
                         {
-                            cmp.pipes.map((pipe) => {
-                                return <NavItem key={pipe.a + ' --' + pipe.z}
-                                                onClick={() => {
-                                                    this.onPipeClicked(pipe)
-                                                }}>
-                                    {pipe.a} -- {pipe.z}
-                                </NavItem>
+                            cmp.junctions.map((junction) => {
+                                let fixtureNodes = cmp.fixtures.map((fixture) => {
+                                    if (fixture.junction === junction.refId) {
+                                        const label = fixture.portUrn + ':' + fixture.vlan.vlanId;
+
+                                        return <NavItem key={label} onClick={() => {
+                                            this.onFixtureClicked(fixture)
+                                        }}>
+                                            {label}
+                                        </NavItem>
+
+                                    }
+                                });
+
+                                return (
+                                    <Nav bsStyle='pills' stacked key={junction.refId + 'nav'}>
+                                        <NavItem active={true}
+                                                 key={junction.refId}
+                                                 onClick={() => {
+                                                     this.onJunctionClicked(junction)
+                                                 }}>
+                                            <b><u>{junction.refId}</u></b>
+                                        </NavItem>
+                                        {fixtureNodes}
+
+                                    </Nav>
+                                )
                             })
                         }
-                    </Nav>
-                </ToggleDisplay>
+                    </ToggleDisplay>
+
+
+                    <ToggleDisplay show={cmp.pipes.length > 0}>
+                        <h5><b>Pipes</b></h5>
+                        <Nav bsStyle='pills' stacked>
+                            {
+                                cmp.pipes.map((pipe) => {
+                                    return <NavItem key={pipe.a + ' --' + pipe.z}
+                                                    onClick={() => {
+                                                        this.onPipeClicked(pipe)
+                                                    }}>
+                                        {pipe.a} -- {pipe.z}
+                                    </NavItem>
+                                })
+                            }
+                        </Nav>
+                    </ToggleDisplay>
+                </Panel.Body>
+
             </Panel>
         )
     };

@@ -12,7 +12,6 @@ import Moment from 'moment';
 
 const format = 'Y/MM/DD HH:mm:ss';
 
-
 @inject('connsStore')
 @observer
 export default class DetailsInfo extends Component {
@@ -37,7 +36,7 @@ export default class DetailsInfo extends Component {
         } else if (selected.type === 'junction') {
             const deviceUrn = selected.data.deviceUrn;
 
-            myClient.submitWithToken('GET', '/protected/pss/controlPlaneStatus/'+deviceUrn, '')
+            myClient.submitWithToken('GET', '/protected/pss/controlPlaneStatus/' + deviceUrn, '')
                 .then(
                     action((response) => {
                         let status = JSON.parse(response);
@@ -54,7 +53,7 @@ export default class DetailsInfo extends Component {
         const selected = this.props.connsStore.store.selected;
         let deviceUrn = selected.data.deviceUrn;
         // console.log("initiating cp check "+deviceUrn);
-        myClient.submitWithToken('GET', '/protected/pss/checkControlPlane/'+deviceUrn, '')
+        myClient.submitWithToken('GET', '/protected/pss/checkControlPlane/' + deviceUrn, '')
             .then(
                 action((response) => {
                 })
@@ -106,11 +105,16 @@ export default class DetailsInfo extends Component {
             },
         ];
 
-        return <Panel header='Fixture'>
-            <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                <TableHeaderColumn dataField='k' isKey={true}/>
-                <TableHeaderColumn dataField='v'/>
-            </BootstrapTable>
+        return <Panel>
+            <Panel.Heading>
+                <p>Fixture</p>
+            </Panel.Heading>
+            <Panel.Body>
+                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
+                    <TableHeaderColumn dataField='k' isKey={true}/>
+                    <TableHeaderColumn dataField='v'/>
+                </BootstrapTable>
+            </Panel.Body>
         </Panel>
 
     }
@@ -119,7 +123,6 @@ export default class DetailsInfo extends Component {
 
         const selected = this.props.connsStore.store.selected;
         let deviceUrn = selected.data.deviceUrn;
-        let header = deviceUrn;
         let cpStatus = <b>Status not loaded yet..</b>;
         if (deviceUrn in this.props.connsStore.store.statuses) {
             let statuses = this.props.connsStore.store.statuses[deviceUrn];
@@ -129,17 +132,24 @@ export default class DetailsInfo extends Component {
                 <p>Output: {statuses['output']}</p>
             </div>;
         }
-        return <Panel header={header}>
-            <div>
-                <Tabs id='junctionTabs' defaultActiveKey={1}>
-                    <Tab eventKey={1} title="Router commands">
+        return <Panel>
+            <Panel.Heading>
+                <p>{deviceUrn}</p>
+            </Panel.Heading>
+            <Panel.Body>
+                <div>
+                    <Tabs id='junctionTabs' defaultActiveKey={1}>
+                        <Tab eventKey={1} title="Router commands">
                             {
-                                this.props.connsStore.store.commands.map( c => {
+                                this.props.connsStore.store.commands.map(c => {
                                     if (c.deviceUrn === selected.data.deviceUrn) {
-                                        return <Panel collapsible
-                                            key={c.type}
-                                            header={c.type}>
-                                            <pre>{c.contents}</pre>
+                                        return <Panel key={c.type} defaultExpanded={false}>
+                                            <Panel.Heading>
+                                                <Panel.Title toggle>{c.type}</Panel.Title>
+                                            </Panel.Heading>
+                                            <Panel.Body collapsible>
+                                                <pre>{c.contents}</pre>
+                                            </Panel.Body>
 
                                         </Panel>
                                     } else {
@@ -148,18 +158,25 @@ export default class DetailsInfo extends Component {
 
                                 })
                             }
-                    </Tab>
-                    <Tab eventKey={2} title='Diagnostics'>
-                        <Panel collapsible header='Control plane status'>
-                            <div>
-                            {cpStatus}
-                            </div>
-                            <Button bsStyle='info'
-                                    onClick={this.initControlPlaneCheck}>Initiate new check</Button>
-                        </Panel>
-                    </Tab>
-                </Tabs>
-            </div>
+                        </Tab>
+                        <Tab eventKey={2} title='Diagnostics'>
+                            <Panel>
+                                <Panel.Heading>
+                                    <p>Control plane status</p>
+                                </Panel.Heading>
+                                <Panel.Collapse>
+                                    <div>
+                                        {cpStatus}
+                                    </div>
+                                    <Button bsStyle='info'
+                                            onClick={this.initControlPlaneCheck}>Initiate new check</Button>
+                                </Panel.Collapse>
+                            </Panel>
+                        </Tab>
+                    </Tabs>
+                </div>
+            </Panel.Body>
+
         </Panel>
 
     }
@@ -189,11 +206,16 @@ export default class DetailsInfo extends Component {
         }
 
 
-        return <Panel header='Pipe'>
-            <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                <TableHeaderColumn dataField='k' isKey={true}/>
-                <TableHeaderColumn dataField='v'/>
-            </BootstrapTable>
+        return <Panel>
+            <Panel.Heading>
+                <p>Pipes</p>
+            </Panel.Heading>
+            <Panel.Body>
+                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
+                    <TableHeaderColumn dataField='k' isKey={true}/>
+                    <TableHeaderColumn dataField='v'/>
+                </BootstrapTable>
+            </Panel.Body>
         </Panel>
 
     }

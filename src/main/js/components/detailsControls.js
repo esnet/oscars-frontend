@@ -16,7 +16,6 @@ class DetailsControls extends Component {
     }
 
 
-
     handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             this.load();
@@ -37,36 +36,46 @@ class DetailsControls extends Component {
         if (this.props.connsStore.store.foundCurrent) {
             connLoaded = true;
         }
-        const header = <div>Search</div>;
 
         return (
-            <Panel header={header}>
-                {/*
+            <Panel>
+                <Panel.Heading>
+                    <div>Search</div>
+                </Panel.Heading>
+                <Panel.Body>
+
+                    {/*
                 <Button bsStyle='primary' className='pull-right'>Setup</Button>
                 <Button bsStyle='warning' className='pull-right'>Teardown</Button>
                 */}
-                <FormGroup controlId="connectionId">
-                    <ControlLabel>Connection ID:</ControlLabel>
-                    {' '}
-                    <FormControl
-                        type='text'
-                        inputRef={(ref) => {
-                            this.connectionIdRef = ref
-                        }}
-                        defaultValue={pathConnectionId}
-                        onKeyPress={this.handleKeyPress}
-                        placeholder='Connection ID ("Z0K2")'
-                    />
-                </FormGroup>
+                    <FormGroup controlId="connectionId">
+                        <ControlLabel>Connection ID:</ControlLabel>
+                        {' '}
+                        <FormControl
+                            type='text'
+                            inputRef={(ref) => {
+                                this.connectionIdRef = ref
+                            }}
+                            defaultValue={pathConnectionId}
+                            onKeyPress={this.handleKeyPress}
+                            placeholder='Connection ID ("Z0K2")'
+                        />
+                    </FormGroup>
 
-                <Button bsStyle='info'
-                        disabled={!connLoaded}
-                        onClick={() => {this.props.refresh()}}
-                        className='pull-left'>Refresh</Button>
+                    <Button bsStyle='info'
+                            disabled={!connLoaded}
+                            onClick={() => {
+                                this.props.refresh()
+                            }}
+                            className='pull-left'>Refresh</Button>
 
-                <Button bsStyle='primary'
-                        onClick={() => {this.load()}}
-                        className='pull-right'>Load</Button>
+                    <Button bsStyle='primary'
+                            onClick={() => {
+                                this.load()
+                            }}
+                            className='pull-right'>Load</Button>
+
+                </Panel.Body>
 
             </ Panel>
         );

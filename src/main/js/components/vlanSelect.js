@@ -131,7 +131,8 @@ export default class VlanSelect extends Component {
         let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
             <p>Here you can set the VLAN id for this fixture. </p>
 
-            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the <u>lowest available</u> VLAN
+            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the <u>lowest
+                available</u> VLAN
                 id. You may type in a different value; if it is not available,
                 you will receive feedback explaining why.</p>
             <p>You will also see 'baseline' and 'available' ranges displayed.</p>
@@ -144,38 +145,41 @@ export default class VlanSelect extends Component {
         </Popover>;
 
 
-        let header = <p>VLAN selection
-            <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </p>;
-
-
         return (
-            <Panel header={header}>
-                <ToggleDisplay show={!ef.locked}>
-                    <FormGroup controlId="vlanExpression">
-                        <HelpBlock>Available for your schedule: {ef.vlan.available.expression}</HelpBlock>
-                        <HelpBlock>Baseline: {ef.vlan.baseline.expression}</HelpBlock>
-                    </FormGroup>
+            <Panel>
+                <Panel.Heading>
+                    <p>VLAN selection
+                        <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </p>
+                </Panel.Heading>
+                <Panel.Body>
+                    <ToggleDisplay show={!ef.locked}>
+                        <FormGroup controlId="vlanExpression">
+                            <HelpBlock>Available for your schedule: {ef.vlan.available.expression}</HelpBlock>
+                            <HelpBlock>Baseline: {ef.vlan.baseline.expression}</HelpBlock>
+                        </FormGroup>
 
 
-                    {' '}
-                    <FormGroup controlId="vlanChoice" validationState={ef.vlan.validationState}>
-                        <ControlLabel>VLAN choice:</ControlLabel>
                         {' '}
-                        <FormControl defaultValue={ef.vlan.available.lowest} type="text" onChange={this.onTypeIn}/>
-                        <HelpBlock><p>{ef.vlan.validationText}</p></HelpBlock>
+                        <FormGroup controlId="vlanChoice" validationState={ef.vlan.validationState}>
+                            <ControlLabel>VLAN choice:</ControlLabel>
+                            {' '}
+                            <FormControl defaultValue={ef.vlan.available.lowest} type="text" onChange={this.onTypeIn}/>
+                            <HelpBlock><p>{ef.vlan.validationText}</p></HelpBlock>
+                            {' '}
+                        </FormGroup>
                         {' '}
-                    </FormGroup>
-                    {' '}
-                    {Validator.label(ef.vlan.acceptable)}
+                        {Validator.label(ef.vlan.acceptable)}
 
-                </ToggleDisplay>
-                {' '}
-                <ToggleDisplay show={ef.locked}>
-                    <Well>Locked VLAN: {ef.vlan.vlanId}</Well>
-                </ToggleDisplay>
+                    </ToggleDisplay>
+                    {' '}
+                    <ToggleDisplay show={ef.locked}>
+                        <Well>Locked VLAN: {ef.vlan.vlanId}</Well>
+                    </ToggleDisplay>
+                </Panel.Body>
+
             </Panel>
 
         );

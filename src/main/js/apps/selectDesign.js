@@ -70,11 +70,6 @@ export default class SelectDesign extends Component {
             This list only includes designs you have previously saved.
         </Popover>;
 
-        let myHeader = <h3>My designs
-            <OverlayTrigger trigger="click" rootClose placement="left" overlay={myHelp}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </h3>;
 
         let otherHelp = <Popover id='help-otherDesigns' title='Help'>
             Click on a design from the list to copy its parameters into
@@ -83,46 +78,61 @@ export default class SelectDesign extends Component {
         </Popover>;
 
 
-        let otherHeader = <h3>Other designs
-            <OverlayTrigger trigger="click" rootClose placement="left" overlay={otherHelp}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </h3>;
 
         return (
             <Row>
                 <Col xs={5} md={5} mdOffset={1} sm={5} smOffset={1} lg={5} lgOffset={1}>
-                    <Panel header={myHeader}>
-                        <ListGroup>
-                            {
-                                myDesigns.map((d) => {
-                                    return <Link key={d.designId}
-                                                 onClick={(e) => {
-                                                     this.selectDesign(d)
-                                                 }}
-                                                 to='/pages/newDesign'>
-                                        <ListGroupItem>{d.description}</ListGroupItem>
-                                    </Link>
-                                })
-                            }
-                        </ListGroup>
+                    <Panel>
+                        <Panel.Heading>
+                            <h3>My designs
+                                <OverlayTrigger trigger="click" rootClose placement="left" overlay={myHelp}>
+                                    <Glyphicon className='pull-right' glyph='question-sign'/>
+                                </OverlayTrigger>
+                            </h3>
+                        </Panel.Heading>
+                        <Panel.Body>
+
+                            <ListGroup>
+                                {
+                                    myDesigns.map((d) => {
+                                        return <Link key={d.designId}
+                                                     onClick={(e) => {
+                                                         this.selectDesign(d)
+                                                     }}
+                                                     to='/pages/newDesign'>
+                                            <ListGroupItem>{d.description}</ListGroupItem>
+                                        </Link>
+                                    })
+                                }
+                            </ListGroup>
+                        </Panel.Body>
                     </Panel>
                 </Col>
                 <Col xs={5} md={5} sm={5} lg={5}>
-                    <Panel header={otherHeader}>
-                        <ListGroup>
-                            {
-                                otherDesigns.map((d) => {
-                                    return <Link key={d.designId}
-                                                 onClick={(e) => {
-                                                     this.selectDesign(d)
-                                                 }}
-                                                 to='/pages/newDesign'>
-                                        <ListGroupItem>{d.description}</ListGroupItem>
-                                    </Link>
-                                })
-                            }
-                        </ListGroup>
+                    <Panel>
+                        <Panel.Heading>
+                            <h3>Other designs
+                                <OverlayTrigger trigger="click" rootClose placement="left" overlay={otherHelp}>
+                                    <Glyphicon className='pull-right' glyph='question-sign'/>
+                                </OverlayTrigger>
+                            </h3>
+                        </Panel.Heading>
+                        <Panel.Body>
+                            <ListGroup>
+                                {
+                                    otherDesigns.map((d) => {
+                                        return <Link key={d.designId}
+                                                     onClick={(e) => {
+                                                         this.selectDesign(d)
+                                                     }}
+                                                     to='/pages/newDesign'>
+                                            <ListGroupItem>{d.description}</ListGroupItem>
+                                        </Link>
+                                    })
+                                }
+                            </ListGroup>
+                        </Panel.Body>
+
                     </Panel>
 
                 </Col>

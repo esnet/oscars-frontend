@@ -68,7 +68,7 @@ export default class UserAdminModal extends Component {
                         type: 'success',
                         headline: 'Updated user info',
                         message: ''
-                    })
+                    });
                     this.props.refresh();
                 }
                 ,

@@ -175,7 +175,6 @@ export default class DetailsGeneral extends Component {
     render() {
         const conn = this.props.connsStore.store.current;
         const controls = this.props.connsStore.controls;
-        const header = <div>Info</div>;
         const format = 'Y/MM/DD HH:mm';
         const beg = Moment(conn.archived.schedule.beginning * 1000);
         const end = Moment(conn.archived.schedule.ending * 1000);
@@ -214,45 +213,52 @@ export default class DetailsGeneral extends Component {
 
 
         return (
-            <Panel header={header}>
-                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                    <TableHeaderColumn dataField='k' isKey={true}/>
-                    <TableHeaderColumn dataField='v'/>
-                </BootstrapTable>
-                <ToggleDisplay show={controls.general.manual.display}>
-                    <Button bsStyle='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
-                            className='pull-left'>Set mode to MANUAL</Button>
-                </ToggleDisplay>
-
-                <ToggleDisplay show={controls.general.auto.display}>
-                    <Button bsStyle='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
-                            className='pull-left'>Set mode to AUTO</Button>
-                </ToggleDisplay>
-
-                <ToggleDisplay show={controls.general.build.display}>
-                    <Button bsStyle='info' disabled={!controls.general.build.enabled} onClick={this.build}
-                            className='pull-left'>Build</Button>
-                </ToggleDisplay>
-
-                <ToggleDisplay show={controls.general.dismantle.display}>
-                    <Button bsStyle='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
-                            className='pull-left'>Dismantle</Button>
-                </ToggleDisplay>
-
-                <ToggleDisplay show={controls.general.cancel.display}>
-                    <Confirm
-                        onConfirm={this.cancel}
-                        body="Cancelling will release all resources and dismantle the reservation if it is built."
-                        confirmText="Confirm cancellation"
-                        cancelText="Never mind"
-                        title="Cancel connection">
-                        <Button bsStyle='danger'
-                                disabled={!controls.general.cancel.enabled}  className='pull-right'>Cancel</Button>
-
-                    </Confirm>
+            <Panel>
+                <Panel.Heading>
+                    <div>Info</div>
+                </Panel.Heading>
 
 
-                </ToggleDisplay>
+                <Panel.Body>
+                    <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
+                        <TableHeaderColumn dataField='k' isKey={true}/>
+                        <TableHeaderColumn dataField='v'/>
+                    </BootstrapTable>
+                    <ToggleDisplay show={controls.general.manual.display}>
+                        <Button bsStyle='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
+                                className='pull-left'>Set mode to MANUAL</Button>
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={controls.general.auto.display}>
+                        <Button bsStyle='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
+                                className='pull-left'>Set mode to AUTO</Button>
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={controls.general.build.display}>
+                        <Button bsStyle='info' disabled={!controls.general.build.enabled} onClick={this.build}
+                                className='pull-left'>Build</Button>
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={controls.general.dismantle.display}>
+                        <Button bsStyle='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
+                                className='pull-left'>Dismantle</Button>
+                    </ToggleDisplay>
+
+                    <ToggleDisplay show={controls.general.cancel.display}>
+                        <Confirm
+                            onConfirm={this.cancel}
+                            body="Cancelling will release all resources and dismantle the reservation if it is built."
+                            confirmText="Confirm cancellation"
+                            cancelText="Never mind"
+                            title="Cancel connection">
+                            <Button bsStyle='danger'
+                                    disabled={!controls.general.cancel.enabled} className='pull-right'>Cancel</Button>
+
+                        </Confirm>
+
+
+                    </ToggleDisplay>
+                </Panel.Body>
 
 
             </Panel>);

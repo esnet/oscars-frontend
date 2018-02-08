@@ -28,7 +28,7 @@ export default class ScheduleControls extends Component {
         startAt.setTime(startAt.getTime() + 15 * 60 * 1000);
 
         let endAt = new Date();
-        endAt.setDate(endAt.getDate()+365);
+        endAt.setDate(endAt.getDate() + 365);
         endAt.setTime(endAt.getTime());
 
         let params = {
@@ -296,55 +296,59 @@ export default class ScheduleControls extends Component {
             <p>Unlocking the schedule will also unlock all other resources.</p>
         </Popover>;
 
-        const header = <span>Schedule
-            <OverlayTrigger defaultOverlayShown={false} trigger='click' rootClose placement='right' overlay={help}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-        </span>;
-
 
         return (
-            <Panel header={header}>
-                <Form>
-                    <p>Timezone: {timezone.name()}</p>
+            <Panel>
+                <Panel.Heading>
+                    <span>Schedule
+                        <OverlayTrigger
+                            defaultOverlayShown={false} trigger='click' rootClose placement='right' overlay={help}>
+                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                        </OverlayTrigger>
+                    </span>
+                </Panel.Heading>
+                <Panel.Body>
+                    <Form>
+                        <p>Timezone: {timezone.name()}</p>
 
-                    <FormGroup validationState={sched.start.validationState}>
-                        <ControlLabel>Start:</ControlLabel>
-                        <FormControl type='text'
-                                     defaultValue='in 15 minutes'
-                                     disabled={sched.locked}
-                                     onChange={this.onStartDateChange}/>
-                        <HelpBlock>
-                            <p>{sched.start.readable}</p><p>{sched.start.validationText}</p>
-                        </HelpBlock>
-                    </FormGroup>
-                    {' '}
-                    <FormGroup validationState={sched.end.validationState}>
-                        <ControlLabel>End:</ControlLabel>
-                        <FormControl type='text'
-                                     disabled={sched.locked}
-                                     defaultValue='in 1 year'
-                                     onChange={this.onEndDateChange}/>
-                        <HelpBlock>
-                            <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
-                        </HelpBlock>
-                    </FormGroup>
-                    <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
+                        <FormGroup validationState={sched.start.validationState}>
+                            <ControlLabel>Start:</ControlLabel>
+                            <FormControl type='text'
+                                         defaultValue='in 15 minutes'
+                                         disabled={sched.locked}
+                                         onChange={this.onStartDateChange}/>
+                            <HelpBlock>
+                                <p>{sched.start.readable}</p><p>{sched.start.validationText}</p>
+                            </HelpBlock>
+                        </FormGroup>
+                        {' '}
+                        <FormGroup validationState={sched.end.validationState}>
+                            <ControlLabel>End:</ControlLabel>
+                            <FormControl type='text'
+                                         disabled={sched.locked}
+                                         defaultValue='in 1 year'
+                                         onChange={this.onEndDateChange}/>
+                            <HelpBlock>
+                                <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
+                            </HelpBlock>
+                        </FormGroup>
+                        <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
 
-                        <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
-                    </ToggleDisplay>
-                    <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
-                        <Confirm
-                            onConfirm={this.unlockSchedule}
-                            body="Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs."
-                            confirmText="Confirm"
-                            title="Unlock Schedule">
-                            <Button className='pull-right' bsStyle='warning'>Unlock</Button>
-                        </Confirm>
+                            <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
+                        </ToggleDisplay>
+                        <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
+                            <Confirm
+                                onConfirm={this.unlockSchedule}
+                                body="Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs."
+                                confirmText="Confirm"
+                                title="Unlock Schedule">
+                                <Button className='pull-right' bsStyle='warning'>Unlock</Button>
+                            </Confirm>
 
 
-                    </ToggleDisplay>
-                </Form>
+                        </ToggleDisplay>
+                    </Form>
+                </Panel.Body>
 
             </Panel>
         );

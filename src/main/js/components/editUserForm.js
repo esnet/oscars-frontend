@@ -115,13 +115,6 @@ export default class EditUserForm extends Component {
 
         </Popover>;
 
-        let detailsHeader = <div>Edit user details
-            <div className='pull-right'>
-                <OverlayTrigger trigger="click" rootClose placement="left" overlay={detailsHelp}>
-                    <Glyphicon glyph='question-sign'/>
-                </OverlayTrigger>
-            </div>
-        </div>;
 
         let passwordHelp = <Popover id='help-password' title='Help'>
             <p>Click "Change" to show the password input form.</p>
@@ -129,13 +122,6 @@ export default class EditUserForm extends Component {
         </Popover>;
 
 
-        let passwordHeader = <div>Password
-            <div className='pull-right'>
-                <OverlayTrigger trigger="click" rootClose placement="left" overlay={passwordHelp}>
-                    <Glyphicon glyph='question-sign'/>
-                </OverlayTrigger>
-            </div>
-        </div>;
 
         return <div>
             <Row>
@@ -143,127 +129,154 @@ export default class EditUserForm extends Component {
                      md={colWidth} mdOffset={colOffset}
                      sm={colWidth} smOffset={colOffset}
                      lg={colWidth} lgOffset={colOffset}>
-                    <Panel header={detailsHeader}>
-
-                        <Form>
-                            <FormGroup>
-                                <ControlLabel>Username</ControlLabel>
-                                {' '}
-                                <FormControl type='text'
-                                             disabled={true}
-                                             defaultValue={size(editUser.user.username) ? editUser.user.username : ''}
-                                             onKeyPress={this.handleParamKeyPress}
-                                             onChange={(e) => this.onParamChange('username', e.target.value)}/>
-                            </FormGroup>
-                            {' '}
-                            {' '}
-                            <FormGroup>
-                                <ControlLabel>Full name</ControlLabel>
-                                {' '}
-                                <FormControl type='text'
-                                             defaultValue={size(editUser.user.fullName) ? editUser.user.fullName : 'not set'}
-                                             onKeyPress={this.handleParamKeyPress}
-                                             onChange={(e) => this.onParamChange('fullName', e.target.value)}/>
-                            </FormGroup>
-                            {' '}
-                            <FormGroup>
-                                <ControlLabel>Email</ControlLabel>
-                                {' '}
-                                <FormControl type='text'
-                                             defaultValue={size(editUser.user.email) ? editUser.user.email : 'not set'}
-                                             onKeyPress={this.handleParamKeyPress}
-                                             onChange={(e) => this.onParamChange('email', e.target.value)}/>
-                            </FormGroup>
-                            {' '}
-                            <FormGroup>
-                                <ControlLabel>Institution</ControlLabel>
-                                {' '}
-                                <FormControl type='text'
-                                             defaultValue={size(editUser.user.institution) ? editUser.user.institution : 'not set'}
-                                             onKeyPress={this.handleParamKeyPress}
-                                             onChange={(e) => this.onParamChange('institution', e.target.value)}/>
-                            </FormGroup>
-                            {' '}
-                            <FormGroup>
-                                <Checkbox defaultChecked={editUser.user.permissions.adminAllowed} inline
-                                          disabled={true}>Is admin?
-                                </Checkbox>
-
-                            </FormGroup>
-                        </Form>
-                        <div>
-                            <span className='pull-left'>{editUser.status}</span>
-                            <div className='pull-right'>
-                                <Button bsStyle='primary'
-                                        disabled={!size(editUser.user.username)}
-                                        onClick={this.props.submitUpdate}>Update</Button>
-
-
-
-
-                                <ToggleDisplay show={this.props.allowDelete && size(allUsers) >= 2}>
-                                    <Confirm
-                                        onConfirm={this.props.submitDelete}
-                                        body="Are you sure you want to delete this user?"
-                                        confirmText="Confirm"
-                                        title="Delete user">
-                                        <Button bsStyle='warning' className='pull-right'>Delete</Button>
-                                    </Confirm>
-                                </ToggleDisplay>
+                    <Panel>
+                        <Panel.Heading>
+                            <div>Edit user details
+                                <div className='pull-right'>
+                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={detailsHelp}>
+                                        <Glyphicon glyph='question-sign'/>
+                                    </OverlayTrigger>
+                                </div>
                             </div>
-                        </div>
+                        </Panel.Heading>
+                        <Panel.Body>
+
+                            <Form>
+                                <FormGroup>
+                                    <ControlLabel>Username</ControlLabel>
+                                    {' '}
+                                    <FormControl type='text'
+                                                 disabled={true}
+                                                 defaultValue={size(editUser.user.username) ? editUser.user.username : ''}
+                                                 onKeyPress={this.handleParamKeyPress}
+                                                 onChange={(e) => this.onParamChange('username', e.target.value)}/>
+                                </FormGroup>
+                                {' '}
+                                {' '}
+                                <FormGroup>
+                                    <ControlLabel>Full name</ControlLabel>
+                                    {' '}
+                                    <FormControl type='text'
+                                                 defaultValue={size(editUser.user.fullName) ? editUser.user.fullName : 'not set'}
+                                                 onKeyPress={this.handleParamKeyPress}
+                                                 onChange={(e) => this.onParamChange('fullName', e.target.value)}/>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup>
+                                    <ControlLabel>Email</ControlLabel>
+                                    {' '}
+                                    <FormControl type='text'
+                                                 defaultValue={size(editUser.user.email) ? editUser.user.email : 'not set'}
+                                                 onKeyPress={this.handleParamKeyPress}
+                                                 onChange={(e) => this.onParamChange('email', e.target.value)}/>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup>
+                                    <ControlLabel>Institution</ControlLabel>
+                                    {' '}
+                                    <FormControl type='text'
+                                                 defaultValue={size(editUser.user.institution) ? editUser.user.institution : 'not set'}
+                                                 onKeyPress={this.handleParamKeyPress}
+                                                 onChange={(e) => this.onParamChange('institution', e.target.value)}/>
+                                </FormGroup>
+                                {' '}
+                                <FormGroup>
+                                    <Checkbox defaultChecked={editUser.user.permissions.adminAllowed} inline
+                                              disabled={true}>Is admin?
+                                    </Checkbox>
+
+                                </FormGroup>
+                            </Form>
+                            <div>
+                                <span className='pull-left'>{editUser.status}</span>
+                                <div className='pull-right'>
+                                    <Button bsStyle='primary'
+                                            disabled={!size(editUser.user.username)}
+                                            onClick={this.props.submitUpdate}>Update</Button>
+
+
+
+
+                                    <ToggleDisplay show={this.props.allowDelete && size(allUsers) >= 2}>
+                                        <Confirm
+                                            onConfirm={this.props.submitDelete}
+                                            body="Are you sure you want to delete this user?"
+                                            confirmText="Confirm"
+                                            title="Delete user">
+                                            <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                                        </Confirm>
+                                    </ToggleDisplay>
+                                </div>
+                            </div>
+                        </Panel.Body>
+
+
                     </Panel>
                 </Col>
                 <Col xs={colWidth}
                      md={colWidth}
                      sm={colWidth}
                      lg={colWidth} >
-                    <Panel header={passwordHeader}>
-                        <Form onSubmit={(e) => {
-                            e.preventDefault()
-                        }}>
-                            <ToggleDisplay show={!editUser.changingPwd}>
-                                <Button onClick={this.changePwd}>Change</Button>
-                            </ToggleDisplay>
-                            <ToggleDisplay show={editUser.changingPwd}>
-                                <FormGroup validationState={editUser.passwordValidationState}>
-                                    <ControlLabel>Password</ControlLabel>
-                                    {' '}
-                                    <FormControl type='password'
-                                                 inputRef={(ref) => {
-                                                     this.passwordRef = ref
-                                                 }}
-                                                 placeholder='password'
-                                                 onKeyPress={this.handlePasswordKeyPress}
-                                                 onChange={(e) => this.onPwdChange(e.target.value)}/>
-                                    <HelpBlock>
-                                        <p>{editUser.passwordHelpText}</p>
-                                    </HelpBlock>
-                                </FormGroup>
-                                {' '}
-                                <FormGroup validationState={editUser.passwordValidationState}>
-                                    <ControlLabel>Confirm</ControlLabel>
-                                    {' '}
-                                    <FormControl type='password'
-                                                 inputRef={(ref) => {
-                                                     this.passwordAgainRef = ref
-                                                 }}
-                                                 placeholder='password (again)'
-                                                 onKeyPress={this.handlePasswordKeyPress}
-                                                 onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
-
-                                </FormGroup>
+                    <Panel>
+                        <Panel.Heading>
+                            <div>Password
                                 <div className='pull-right'>
-                                    <Button
-                                        bsStyle={editUser.passwordOk ? 'primary' : 'default'}
-                                        disabled={!editUser.passwordOk || !size(editUser.user.username)}
-                                        onClick={() => {
-                                            this.props.submitPassword(this.passwordRef, this.passwordAgainRef)
-                                        }}>Set</Button>
+                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={passwordHelp}>
+                                        <Glyphicon glyph='question-sign'/>
+                                    </OverlayTrigger>
                                 </div>
-                            </ToggleDisplay>
+                            </div>
+                        </Panel.Heading>
+                        <Panel.Body>
 
-                        </Form>
+
+                            <Form onSubmit={(e) => {
+                                e.preventDefault()
+                            }}>
+                                <ToggleDisplay show={!editUser.changingPwd}>
+                                    <Button onClick={this.changePwd}>Change Password</Button>
+                                </ToggleDisplay>
+                                <ToggleDisplay show={editUser.changingPwd}>
+                                    <FormGroup validationState={editUser.passwordValidationState}>
+                                        <ControlLabel>Password</ControlLabel>
+                                        {' '}
+                                        <FormControl type='password'
+                                                     inputRef={(ref) => {
+                                                         this.passwordRef = ref
+                                                     }}
+                                                     placeholder='password'
+                                                     onKeyPress={this.handlePasswordKeyPress}
+                                                     onChange={(e) => this.onPwdChange(e.target.value)}/>
+                                        <HelpBlock>
+                                            <p>{editUser.passwordHelpText}</p>
+                                        </HelpBlock>
+                                    </FormGroup>
+                                    {' '}
+                                    <FormGroup validationState={editUser.passwordValidationState}>
+                                        <ControlLabel>Confirm</ControlLabel>
+                                        {' '}
+                                        <FormControl type='password'
+                                                     inputRef={(ref) => {
+                                                         this.passwordAgainRef = ref
+                                                     }}
+                                                     placeholder='password (again)'
+                                                     onKeyPress={this.handlePasswordKeyPress}
+                                                     onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
+
+                                    </FormGroup>
+                                    <div className='pull-right'>
+                                        <Button
+                                            bsStyle={editUser.passwordOk ? 'primary' : 'default'}
+                                            disabled={!editUser.passwordOk || !size(editUser.user.username)}
+                                            onClick={() => {
+                                                this.props.submitPassword(this.passwordRef, this.passwordAgainRef)
+                                            }}>Set</Button>
+                                    </div>
+                                </ToggleDisplay>
+
+                            </Form>
+                        </Panel.Body>
+
                     </Panel>
                 </Col>
             </Row>

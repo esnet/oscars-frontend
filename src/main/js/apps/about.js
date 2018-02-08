@@ -24,17 +24,21 @@ export default class AboutApp extends Component {
 
 
     render() {
-        let header = <h3>About OSCARS</h3>
         return (
             <Row>
                 <Col>
-                    <Panel header={header}>
-                        <div>
-                            Frontend version: <u>{this.props.commonStore.version.frontend}</u>
-                        </div>
-                        <div>
-                            Backend version: <u>{this.props.commonStore.version.backend}</u>
-                        </div>
+                    <Panel>
+                        <Panel.Heading>
+                            <h3>About OSCARS</h3>
+                        </Panel.Heading>
+                        <Panel.Body>
+                            <div>
+                                Frontend version: <u>{this.props.commonStore.version.frontend}</u>
+                            </div>
+                            <div>
+                                Backend version: <u>{this.props.commonStore.version.backend}</u>
+                            </div>
+                        </Panel.Body>
                     </Panel>
                 </Col>
             </Row>
