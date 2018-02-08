@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row} from 'react-bootstrap';
+import {Row, Col} from 'react-bootstrap';
 import {inject} from 'mobx-react';
 
 
@@ -22,7 +22,7 @@ export default class ListConnectionsApp extends Component {
     render() {
         return (
             <Row>
-                <ConnectionsList/>
+                <Col mdOffset={1} md={10}><ConnectionsList/></Col>
 
             </Row>
         );

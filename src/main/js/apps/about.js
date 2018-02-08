@@ -26,7 +26,7 @@ export default class AboutApp extends Component {
     render() {
         return (
             <Row>
-                <Col>
+                <Col mdOffset={1} md={10}>
                     <Panel>
                         <Panel.Heading>
                             <h3>About OSCARS</h3>

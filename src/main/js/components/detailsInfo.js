@@ -162,15 +162,15 @@ export default class DetailsInfo extends Component {
                         <Tab eventKey={2} title='Diagnostics'>
                             <Panel>
                                 <Panel.Heading>
-                                    <p>Control plane status</p>
+                                    <Panel.Title toggle>Control plane status</Panel.Title>
                                 </Panel.Heading>
-                                <Panel.Collapse>
+                                <Panel.Body collapsible>
                                     <div>
                                         {cpStatus}
                                     </div>
                                     <Button bsStyle='info'
                                             onClick={this.initControlPlaneCheck}>Initiate new check</Button>
-                                </Panel.Collapse>
+                                </Panel.Body>
                             </Panel>
                         </Tab>
                     </Tabs>

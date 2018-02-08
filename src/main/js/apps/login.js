@@ -44,9 +44,12 @@ export default class Login extends React.Component {
         }
 
         return <Row>
-                <Col md={4}>
-                    <Panel>
-                        <h4>Welcome to OSCARS. Please log in:</h4>
+            <Col mdOffset={1} md={3}>
+                <Panel>
+                    <Panel.Heading>
+                        <Panel.Title>Welcome to OSCARS. Please log in.</Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body>
                         <Form onSubmit={this.handleLogin}>
                             <FormGroup controlId="username">
 
@@ -60,18 +63,19 @@ export default class Login extends React.Component {
                                 <ControlLabel>Password:</ControlLabel>
                                 {' '}
                                 <FormControl
-                                             type="password"
-                                             onKeyPress={this.handleKeyPress}
-                                             onChange={this.handleChangePassword}/>
+                                    type="password"
+                                    onKeyPress={this.handleKeyPress}
+                                    onChange={this.handleChangePassword}/>
                             </FormGroup>
                             <Button bsStyle='primary' className='pull-right' onClick={this.handleLogin}>Login</Button>
                         </Form>
                         <ToggleDisplay show={this.props.accountStore.attempt.error.length > 0}>
                             <div>{this.props.accountStore.attempt.error}</div>
                         </ToggleDisplay>
-                    </Panel>
-                </Col>
-            </Row>;
+                    </Panel.Body>
+                </Panel>
+            </Col>
+        </Row>;
 
     }
 }

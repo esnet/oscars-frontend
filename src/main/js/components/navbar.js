@@ -82,7 +82,7 @@ export default class NavBar extends Component {
 
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <Link to='pages/about'>OSCARS</Link>
+                        <Link to='/pages/about'>OSCARS</Link>
                     </Navbar.Brand>
                 </Navbar.Header>
                 <Navbar.Collapse>

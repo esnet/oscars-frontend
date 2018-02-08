@@ -102,7 +102,7 @@ export default class DetailsApp extends Component {
         if (typeof pathConnectionId === 'undefined' || pathConnectionId === '') {
             return (
                 <Row>
-                    <Col>
+                    <Col mdOffset={1} md={10}>
                         <DetailsControls refresh={this.refresh} load={this.load}/>
                     </Col>
                 </Row>
