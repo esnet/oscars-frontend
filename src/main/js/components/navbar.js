@@ -6,7 +6,7 @@ import {observer, inject} from 'mobx-react';
 import {LinkContainer} from 'react-router-bootstrap';
 import {Link } from 'react-router-dom';
 import { AlertList } from 'react-bs-notifier';
-import {toJS} from 'mobx';
+import {toJS, observable, whyRun, autorunAsync} from 'mobx'
 
 @inject('accountStore', 'commonStore')
 @observer
@@ -14,6 +14,33 @@ export default class NavBar extends Component {
     constructor(props) {
         super(props);
     }
+
+
+
+    componentWillMount() {
+        this.syncLoggedIn();
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeoutId);
+    }
+
+    syncLoggedIn() {
+        if (localStorage.getItem('loggedin.username') == null) {
+            this.props.accountStore.logout();
+        } else {
+            this.props.accountStore.setLoggedinAdmin(localStorage.getItem('loggedin.admin'));
+            this.props.accountStore.setLoggedinToken(localStorage.getItem('loggedin.token'));
+            this.props.accountStore.setLoggedinUsername(localStorage.getItem('loggedin.username'));
+        }
+
+        this.timeoutId = setTimeout(() => {
+            this.syncLoggedIn()
+        }, 500);
+
+
+    }
+
 
     render() {
         let leftNav =
@@ -69,7 +96,6 @@ export default class NavBar extends Component {
                 </Nav>;
 
         }
-
         return (
             <Navbar collapseOnSelect>
                 <AlertList

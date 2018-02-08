@@ -1,6 +1,6 @@
 import {observable, action} from 'mobx';
 
-import {size} from 'lodash'
+import {size} from 'lodash-es'
 import myClient from '../agents/client'
 
 class AccountStore {
@@ -25,7 +25,6 @@ class AccountStore {
         return this.loggedin.admin;
     }
 
-
     @action clearAttempt() {
         this.attempt.username = '';
         this.attempt.password = '';
@@ -36,9 +35,9 @@ class AccountStore {
         this.loggedin.username = '';
         this.loggedin.token = '';
         this.loggedin.admin = false;
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-        localStorage.removeItem('admin');
+        localStorage.removeItem('loggedin.token');
+        localStorage.removeItem('loggedin.username');
+        localStorage.removeItem('loggedin.admin');
     }
 
     @action setAttemptUsername(u) {
@@ -55,17 +54,17 @@ class AccountStore {
 
     @action setLoggedinUsername(u) {
         this.loggedin.username = u;
-        localStorage.setItem('username', u);
+        localStorage.setItem('loggedin.username', u);
     }
 
     @action setLoggedinAdmin(a) {
         this.loggedin.admin = a;
-        localStorage.setItem('admin', a);
+        localStorage.setItem('loggedin.admin', a);
     }
 
     @action setLoggedinToken(t) {
         this.loggedin.token = t;
-        localStorage.setItem('token', t);
+        localStorage.setItem('loggedin.token', t);
     }
 
     login() {
