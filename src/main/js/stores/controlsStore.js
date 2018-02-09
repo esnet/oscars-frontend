@@ -300,7 +300,6 @@ class ControlsStore {
             return false;
         }
         let parsed = JSON.parse(maybeSaved);
-        console.log(parsed);
 
         let until = parsed.held.until;
         let now = new Moment();
