@@ -76,20 +76,25 @@ export default class AccountApp extends Component {
     };
 
 
-    submitPassword = (pwdControlRef, pwdAgainControlRef) => {
+    submitPassword = (pwdControlRef, pwdAgainControlRef, oldPwdControlRef) => {
         let editUser = toJS(this.props.userStore.editUser);
+
 
         if (!editUser.passwordOk) {
             this.props.commonStore.addAlert({
                 id: (new Date()).getTime(),
                 type: 'danger',
                 headline: 'Password not ok',
-                message: 'Did not submit invalid password.'
+                message: 'Input was invalid password, did not submit.'
             });
             return;
         }
+        const request = {
+            'oldPassword': editUser.oldPassword,
+            'newPassword': editUser.password
+        };
 
-        myClient.submitWithToken('POST', '/protected/account_password', editUser.password)
+        myClient.submitWithToken('POST', '/protected/account_password', request)
             .then(
                 (response) => {
                     this.props.commonStore.addAlert({
@@ -111,10 +116,12 @@ export default class AccountApp extends Component {
             );
         // clear it
         this.props.userStore.setPassword('');
+        this.props.userStore.setOldPassword('');
         this.props.userStore.setPasswordAgain('');
         this.props.userStore.setParamsForEditUser({changingPwd: false});
         pwdControlRef.value = '';
         pwdAgainControlRef.value = '';
+        oldPwdControlRef.value = '';
     };
 
     render() {
@@ -122,6 +129,6 @@ export default class AccountApp extends Component {
                              submitUpdate={this.submitUpdate}
                              submitDelete={() => {}}
                              inModal={false}
-                             allowDelete={false} />
+                             adminMode={false} />
     }
 }

@@ -63,7 +63,9 @@ export default class EditUserForm extends Component {
     onPwdAgainChange = (val) => {
         this.props.userStore.setPasswordAgain(val);
     };
-
+    onOldPwdChange = (val) => {
+        this.props.userStore.setOldPassword(val);
+    };
 
     componentWillUnmount() {
         this.disposeOfPwdValidate();
@@ -197,7 +199,7 @@ export default class EditUserForm extends Component {
 
 
 
-                                    <ToggleDisplay show={this.props.allowDelete && size(allUsers) >= 2}>
+                                    <ToggleDisplay show={this.props.adminMode && size(allUsers) >= 2}>
                                         <Confirm
                                             onConfirm={this.props.submitDelete}
                                             body="Are you sure you want to delete this user?"
@@ -237,8 +239,25 @@ export default class EditUserForm extends Component {
                                     <Button onClick={this.changePwd}>Change Password</Button>
                                 </ToggleDisplay>
                                 <ToggleDisplay show={editUser.changingPwd}>
+
+                                    <ToggleDisplay show={!this.props.adminMode}>
+
+                                        <FormGroup>
+                                            <ControlLabel>Old Password</ControlLabel>
+                                            {' '}
+                                            <FormControl type='password'
+                                                         placeholder='old password'
+                                                         inputRef={(ref) => {
+                                                             this.oldPasswordRef = ref
+                                                         }}
+                                                         onChange={(e) => this.onOldPwdChange(e.target.value)}/>
+                                        </FormGroup>
+                                    {' '}
+                                    </ToggleDisplay>
+
+
                                     <FormGroup validationState={editUser.passwordValidationState}>
-                                        <ControlLabel>Password</ControlLabel>
+                                        <ControlLabel>New Password</ControlLabel>
                                         {' '}
                                         <FormControl type='password'
                                                      inputRef={(ref) => {
@@ -269,7 +288,8 @@ export default class EditUserForm extends Component {
                                             bsStyle={editUser.passwordOk ? 'primary' : 'default'}
                                             disabled={!editUser.passwordOk || !size(editUser.user.username)}
                                             onClick={() => {
-                                                this.props.submitPassword(this.passwordRef, this.passwordAgainRef)
+                                                this.props.submitPassword(this.passwordRef, this.passwordAgainRef, this.oldPasswordRef);
+                                                this.props.userStore.setParamsForEditUser({changingPwd: false});
                                             }}>Set</Button>
                                     </div>
                                 </ToggleDisplay>
@@ -290,6 +310,6 @@ EditUserForm.propTypes = {
     submitPassword: PropTypes.func.isRequired,
     submitUpdate: PropTypes.func.isRequired,
     submitDelete: PropTypes.func.isRequired,
-    allowDelete: PropTypes.bool.isRequired,
+    adminMode: PropTypes.bool.isRequired,
     inModal: PropTypes.bool.isRequired
 };

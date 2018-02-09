@@ -15,7 +15,7 @@ export default class UserAdminModal extends Component {
     }
 
 
-    submitPassword = (pwdControlRef, pwdAgainControlRef) => {
+    submitPassword = (pwdControlRef, pwdAgainControlRef, oldPwdControlRef) => {
         let password = this.props.userStore.editUser.password;
         let user = this.props.userStore.editUser.user;
 
@@ -136,7 +136,7 @@ export default class UserAdminModal extends Component {
                     <EditUserForm submitPassword={this.submitPassword}
                                   submitUpdate={this.submitUpdate}
                                   submitDelete={this.submitDelete}
-                                  allowDelete={true}
+                                  adminMode={true}
                                   inModal={true}
                     />
 

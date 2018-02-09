@@ -13,6 +13,7 @@ class UserStore {
         },
         password: '',
         passwordAgain: '',
+        oldPassword: '',
         passwordOk: false,
         passwordValidationState: 'error',
         passwordHelpText: 'Password too short',
@@ -34,6 +35,9 @@ class UserStore {
     }
     @action setPasswordAgain(value) {
         this.editUser.passwordAgain = value;
+    }
+    @action setOldPassword(value) {
+        this.editUser.oldPassword = value;
     }
 }
 export default new UserStore();
