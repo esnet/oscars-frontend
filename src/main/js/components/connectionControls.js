@@ -31,17 +31,21 @@ export default class ConnectionControls extends Component {
 
     componentWillMount() {
 
-        myClient.submitWithToken('GET', '/protected/conn/generateId')
-            .then(
-                action((response) => {
-                    let params = {
-                        description: '',
-                        phase: 'HELD',
-                        connectionId: response,
-                        mode: 'MANUAL'
-                    };
-                    this.props.controlsStore.setParamsForConnection(params);
-                }));
+        if (this.props.controlsStore.connection.connectionId === '') {
+
+            myClient.submitWithToken('GET', '/protected/conn/generateId')
+                .then(
+                    action((response) => {
+                        let params = {
+                            description: '',
+                            phase: 'HELD',
+                            connectionId: response,
+                            mode: 'MANUAL'
+                        };
+                        this.props.controlsStore.setParamsForConnection(params);
+                    }));
+        }
+
 
     }
 

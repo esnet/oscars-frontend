@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS, whyRun} from 'mobx';
+import {action, autorunAsync} from 'mobx';
 import Moment from 'moment';
 import Transformer from '../lib/transform';
 
@@ -132,7 +132,7 @@ export default class HoldTimer extends Component {
             state: 'WAITING',
         };
 
-        myClient.submitWithToken('POST', "/protected/held/" + conn.connectionId, connection)
+        myClient.submitWithToken('POST', '/protected/held/' + conn.connectionId, connection)
             .then(
                 action((response) => {
 //                    console.log(response);

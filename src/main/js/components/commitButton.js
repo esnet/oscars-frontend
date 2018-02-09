@@ -9,7 +9,7 @@ import {withRouter} from 'react-router-dom';
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';
 
-@inject('controlsStore')
+@inject('controlsStore', 'designStore')
 class CommitButton extends Component {
     constructor(props) {
         super(props);
@@ -20,10 +20,16 @@ class CommitButton extends Component {
         myClient.submitWithToken('POST', '/protected/conn/commit', this.props.controlsStore.connection.connectionId)
             .then(action((response) => {
                 const phase = response.replace(/"/g, '');
-
                 this.props.controlsStore.setParamsForConnection({
                     phase: phase
                 });
+                // TODO: do some checking of response?
+
+                this.props.controlsStore.clearEditConnection();
+                this.props.controlsStore.clearEditDesign();
+                this.props.designStore.clear();
+                this.props.controlsStore.clearLocalStorage();
+
                 this.props.history.push('/pages/list');
 
             }));

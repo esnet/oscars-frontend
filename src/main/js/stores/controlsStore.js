@@ -1,6 +1,7 @@
 import {observable, action, toJS} from 'mobx';
 
 import {merge, isArray, mergeWith} from 'lodash-es';
+import Moment from 'moment';
 
 class ControlsStore {
 
@@ -286,6 +287,32 @@ class ControlsStore {
         this.editDesign.disabledSaveButton = true;
     }
 
+    @action saveToLocalStorage() {
+        localStorage.setItem('controlsStore.connection', JSON.stringify(this.connection));
+    }
+    @action clearLocalStorage() {
+        localStorage.removeItem('controlsStore.connection');
+    }
+
+    @action restoreFromLocalStorage() {
+        const maybeSaved = localStorage.getItem('controlsStore.connection');
+        if (maybeSaved == null) {
+            return false;
+        }
+        let parsed = JSON.parse(maybeSaved);
+        console.log(parsed);
+
+        let until = parsed.held.until;
+        let now = new Moment();
+        if (now.isAfter(until)) {
+            return false;
+        }
+        this.connection = parsed;
+
+        return true;
+
+
+    }
 
 
 
