@@ -27,7 +27,7 @@ export default class DesignApp extends Component {
     componentWillMount() {
         this.props.commonStore.setActiveNav('design');
 
-        if (!this.props.controlsStore.restoreFromLocalStorage()) {
+        if (!this.props.controlsStore.restoreFromSessionStorage()) {
             // if we can't restore (ie. first time we visit OR hold time expired), clear
             this.props.mapStore.clearColored();
             this.props.controlsStore.clearEditConnection();
@@ -37,7 +37,7 @@ export default class DesignApp extends Component {
     }
 
     componentWillUnmount() {
-        this.props.controlsStore.saveToLocalStorage();
+        this.props.controlsStore.saveToSessionStorage();
     }
 
 

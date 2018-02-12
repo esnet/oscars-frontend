@@ -287,15 +287,15 @@ class ControlsStore {
         this.editDesign.disabledSaveButton = true;
     }
 
-    @action saveToLocalStorage() {
-        localStorage.setItem('controlsStore.connection', JSON.stringify(this.connection));
+    @action saveToSessionStorage() {
+        sessionStorage.setItem('controlsStore.connection', JSON.stringify(this.connection));
     }
-    @action clearLocalStorage() {
-        localStorage.removeItem('controlsStore.connection');
+    @action clearSessionStorage() {
+        sessionStorage.removeItem('controlsStore.connection');
     }
 
-    @action restoreFromLocalStorage() {
-        const maybeSaved = localStorage.getItem('controlsStore.connection');
+    @action restoreFromSessionStorage() {
+        const maybeSaved = sessionStorage.getItem('controlsStore.connection');
         if (maybeSaved == null) {
             return false;
         }
