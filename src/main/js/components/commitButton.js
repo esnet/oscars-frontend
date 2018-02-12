@@ -3,9 +3,6 @@ import React, {Component} from 'react';
 import {action, toJS} from 'mobx';
 import {inject} from 'mobx-react';
 
-import {Button} from 'react-bootstrap';
-import {withRouter} from 'react-router-dom';
-
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';
 
@@ -41,9 +38,9 @@ class CommitButton extends Component {
     render() {
         return <Confirm
             onConfirm={this.commit}
-            body="Are you sure you want to commit this connection?"
-            confirmText="Confirm"
-            title="Commit connection">
+            body='Are you sure you want to commit this connection?'
+            confirmText='Confirm"
+            title='Commit connection'>
             <Button bsStyle='success' className='pull-right'>Commit</Button>
         </Confirm>
 
