@@ -90,7 +90,7 @@ class ConnectionsList extends Component {
                         {
                             c.archived.cmp.fixtures.map((f) => {
                                 return <div
-                                    key={f.portUrn + ':' + f.vlan.vlanId}>{f.portUrn + ':' + f.vlan.vlanId}</div>
+                                    key={c.connectionId+':'+f.portUrn + ':' + f.vlan.vlanId}>{f.portUrn + ':' + f.vlan.vlanId}</div>
                             })
                         }
                     </td>

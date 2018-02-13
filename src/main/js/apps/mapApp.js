@@ -3,8 +3,10 @@ import {Row, Col} from 'react-bootstrap';
 
 
 import NetworkMap from '../components/networkMap';
+import {inject, observer} from 'mobx-react';
 
-
+@inject('commonStore')
+@observer
 export default class MapApp extends Component {
 
     constructor(props) {
