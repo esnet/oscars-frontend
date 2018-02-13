@@ -64,6 +64,10 @@ export default class NavBar extends Component {
             }
 
             leftNav = <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
+                <LinkContainer to='/pages/map'>
+                    <NavItem eventKey='map'>Network Map</NavItem>
+                </LinkContainer>
+
                 <LinkContainer to='/pages/list'>
                     <NavItem eventKey='list'>List</NavItem>
                 </LinkContainer>
@@ -80,13 +84,16 @@ export default class NavBar extends Component {
                     <NavItem eventKey='selectDesign'>Copy</NavItem>
                 </LinkContainer>
 */}
-                {admin}
             </Nav>;
 
 
 
             rightNav =
                 <Nav pullRight>
+                    <LinkContainer to='/pages/status'>
+                        <NavItem eventKey='status'>Status</NavItem>
+                    </LinkContainer>
+                    {admin}
                     <LinkContainer to='/pages/account'>
                         <NavItem eventKey='account'>My Account</NavItem>
                     </LinkContainer>

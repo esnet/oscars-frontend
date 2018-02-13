@@ -14,6 +14,8 @@ import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AboutApp from './apps/about';
 
+import StatusApp from './apps/statusApp';
+import MapApp from './apps/mapApp';
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
 import ConnectionDetails from './apps/detailsApp';
@@ -101,6 +103,8 @@ ReactDOM.render(
                     <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
                     <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
                     <PrivateRoute exact path="/pages/account" component={AccountApp}/>
+                    <PrivateRoute exact path="/pages/status" component={StatusApp}/>
+                    <PrivateRoute exact path="/pages/map" component={MapApp}/>
                     <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
                 </Switch>
             </Grid>
