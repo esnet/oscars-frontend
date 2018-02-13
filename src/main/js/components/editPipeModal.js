@@ -10,11 +10,12 @@ import PropTypes from 'prop-types';
 
 import ToggleDisplay from 'react-toggle-display';
 import EroTypeahead from './eroTypeahead';
-import {autorun, autorunAsync, whyRun, toJS} from 'mobx';
+import {autorunAsync, toJS} from 'mobx';
 
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';
 import Validator from '../lib/validation';
+import {Tooltip} from 'react-tippy';
 
 const modalName = 'editPipe';
 
@@ -382,12 +383,12 @@ export default class PipeParamsModal extends Component {
 
         design.fixtures.map(f => {
             if (f.device === pipe.a) {
-                aFixtures.push(f)
+                aFixtures.push(f);
                 aIngress = aIngress + f.ingress;
                 aEgress = aEgress + f.egress;
             }
             if (f.device === pipe.z) {
-                zFixtures.push(f)
+                zFixtures.push(f);
                 zIngress = zIngress + f.ingress;
                 zEgress = zEgress + f.egress;
             }
@@ -601,6 +602,104 @@ export default class PipeParamsModal extends Component {
 class PathSelectMode extends Component {
 
     render() {
+        const helpTabs =
+            <Panel>
+                <Panel.Heading>
+                    <Panel.Title>Path mode help</Panel.Title>
+                </Panel.Heading>
+                <Panel.Body>
+                    <div style={{'width' :500, 'backgroundColor': 'white'}}>
+                        <Tabs id='modes' defaultActiveKey={1}>
+                            <Tab eventKey={1} title='Dynamic modes'>
+                                <p>These modes re-calculate your path every time you change the bandwidth.
+                                    Depending on your input and the state of the network, a path might not be
+                                    found; in that case you won't be able to lock the pipe. </p>
+
+                                <PanelGroup accordion id='accordion-dynamic' defaultActiveKey={'fits'}>
+                                    <Panel eventKey='fits'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Fit to bandwidth</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> in this mode OSCARS will calculate the shortest path (based on policy
+                                                metric) that will fit the bandwidth you want. You will always be able
+                                                to find a zero-bandwidth path; this will be the same as the shortest
+                                                (by metric) mode.</p>
+                                        </Panel.Body>
+                                    </Panel>
+                                </PanelGroup>
+                            </Tab>
+                            <Tab eventKey={2} title='Fixed modes'>
+                                <p> These modes will always provide the same path, given a specific schedule and
+                                    start/end points. In these modes, if you change the bandwidth, the path will not
+                                    change; rather, your input will be validated against previously calculated
+                                    maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
+                                <PanelGroup accordion id='accordion-fixed' defaultActiveKey={'sbm'}>
+                                    <Panel eventKey='sbm'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Shortest (by metric)</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The shortest path on the network as calculated by the policy metric.
+                                                Will be
+                                                the
+                                                most economical on resources and will maximize the overall network
+                                                throughput, and
+                                                minimize latency.</p>
+                                        </Panel.Body>
+                                    </Panel>
+                                    <Panel eventKey='sbh'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Least hops</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The path that goes over the least amount of network devices and
+                                                connections.
+                                                This minimizes the chance that the path will be disrupted by
+                                                outages.</p>
+                                        </Panel.Body>
+                                    </Panel>
+                                    <Panel eventKey='wo'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Widest overall</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The path that has the maximum available bandwidth, considered as a sum
+                                                of the available bandwidth in both directions. When you want the most
+                                                possible bandwidth over the network maximizing flow in both
+                                                directions. </p>
+                                        </Panel.Body>
+                                    </Panel>
+                                    <Panel eventKey='wd'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Widest (direction)</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The path that has the maximum available bandwidth in a specific
+                                                direction.
+                                                When you want the greatest possible bandwidth over the network
+                                                maximizing
+                                                flow in one direction only. </p>
+                                        </Panel.Body>
+                                    </Panel>
+
+                                </PanelGroup>
+
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </Panel.Body>
+            </Panel>;
+
+        let helpPopover = <Tooltip
+            title='Path Mode help'
+            position='bottom'
+            trigger='click'
+            interactive={true}
+            html={helpTabs}>
+            <h3><Glyphicon className='pull-left' glyph='question-sign'/> </h3><u>Path mode help</u>
+        </Tooltip>;
+
 
         const pathSelectModeOpts = [
             {value: 'fits', label: 'Fit to bandwidth'},
@@ -613,7 +712,10 @@ class PathSelectMode extends Component {
         ];
         return <Form horizontal>
             <FormGroup>
-                <Col sm={2} componentClass={ControlLabel}>Path mode:</Col>
+                <Col smOffset={1} sm={2} componentClass={ControlLabel}>
+                    <p>Path mode: </p>
+
+                </Col>
                 <Col sm={4}>
                     <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>
                         {
@@ -623,82 +725,8 @@ class PathSelectMode extends Component {
                         }
                     </FormControl>
                 </Col>
-                <Col sm={6}>
-                    <p>Path mode help</p>
-                    <Tabs id='modes' defaultActiveKey={1}>
-                        <Tab eventKey={1} title='Dynamic modes'>
-                            <p>These modes re-calculate your path every time you change the bandwidth.
-                                Depending on your input and the state of the network, a path might not be
-                                found; in that case you won't be able to lock the pipe. </p>
-
-                            <PanelGroup accordion id="accordion-dynamic">
-                                <Panel eventKey='fits'>
-                                    <Panel.Heading>
-                                        <Panel.Title toggle>Fit to bandwidth</Panel.Title>
-                                    </Panel.Heading>
-                                    <Panel.Body collapsible>
-                                        <p> in this mode OSCARS will calculate the shortest path (based on policy
-                                            metric) that will fit the bandwidth you want. You will always be able
-                                            to find a zero-bandwidth path; this will be the same as the shortest
-                                            (by metric) mode.</p>
-                                    </Panel.Body>
-                                </Panel>
-                            </PanelGroup>
-                        </Tab>
-                        <Tab eventKey={2} title='Fixed modes'>
-                            <p> These modes will always provide the same path, given a specific schedule and
-                                start/end points. In these modes, if you change the bandwidth, the path will not
-                                change; rather, your input will be validated against previously calculated
-                                maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
-                            <PanelGroup accordion id="accordion-fixed">
-                                <Panel eventKey='sbm'>
-                                    <Panel.Heading>
-                                        <Panel.Title toggle>Shortest (by metric)</Panel.Title>
-                                    </Panel.Heading>
-                                    <Panel.Body collapsible>
-                                        <p> The shortest path on the network as calculated by the policy metric. Will be
-                                            the
-                                            most economical on resources and will maximize the overall network
-                                            throughput, and
-                                            minimize latency.</p>
-                                    </Panel.Body>
-                                </Panel>
-                                <Panel eventKey='sbh'>
-                                    <Panel.Heading>
-                                        <Panel.Title toggle>Least hops</Panel.Title>
-                                    </Panel.Heading>
-                                    <Panel.Body collapsible>
-                                        <p> The path that goes over the least amount of network devices and connections.
-                                            This minimizes the chance that the path will be disrupted by outages.</p>
-                                    </Panel.Body>
-                                </Panel>
-                                <Panel eventKey='wo'>
-                                    <Panel.Heading>
-                                        <Panel.Title toggle>Widest overall</Panel.Title>
-                                    </Panel.Heading>
-                                    <Panel.Body collapsible>
-                                        <p> The path that has the maximum available bandwidth, considered as a sum
-                                            of the available bandwidth in both directions. When you want the most
-                                            possible bandwidth over the network maximizing flow in both directions. </p>
-                                    </Panel.Body>
-                                </Panel>
-                                <Panel eventKey='wd'>
-                                    <Panel.Heading>
-                                        <Panel.Title toggle>Widest (direction)</Panel.Title>
-                                    </Panel.Heading>
-                                    <Panel.Body collapsible>
-                                        <p> The path that has the maximum available bandwidth in a specific direction.
-                                            When you want the greatest possible bandwidth over the network maximizing
-                                            flow in one direction only. </p>
-                                    </Panel.Body>
-                                </Panel>
-
-                            </PanelGroup>
-
-                        </Tab>
-                    </Tabs>
-
-
+                <Col sm={4} >
+                    {helpPopover}
                 </Col>
             </FormGroup>
         </Form>;
