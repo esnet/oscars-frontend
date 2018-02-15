@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import {
     Modal, Button, FormControl, ControlLabel, FormGroup, Form,
     Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
-    Tabs, Tab,
+    Tabs, Tab, ButtonToolbar,
     ListGroup, ListGroupItem, HelpBlock, InputGroup, PanelGroup
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -451,8 +451,8 @@ export default class PipeParamsModal extends Component {
                                                         <Glyphicon glyph='arrow-right'/>
                                                     </InputGroup.Addon>
 
-                                                    <FormControl type="text"
-                                                                 placeholder="0-100000"
+                                                    <FormControl type='text'
+                                                                 placeholder='0-100000'
                                                                  defaultValue={ep.A_TO_Z.bw}
                                                                  inputRef={ref => {
                                                                      this.azBwControl = ref;
@@ -481,8 +481,8 @@ export default class PipeParamsModal extends Component {
                                         <ToggleDisplay show={!ep.locked}>
                                             <FormGroup validationState={ep.Z_TO_A.validationState}>
                                                 <InputGroup bsSize='large'>
-                                                    <FormControl type="text"
-                                                                 placeholder="0-100000"
+                                                    <FormControl type='text'
+                                                                 placeholder='0-100000'
                                                                  defaultValue={ep.Z_TO_A.bw}
                                                                  inputRef={ref => {
                                                                      this.zaBwControl = ref;
@@ -552,36 +552,33 @@ export default class PipeParamsModal extends Component {
                                     </Col>
                                 </Row>
                                 {' '}
+                                <ToggleDisplay show={!ep.locked}>
+                                    <Well>Select parameters, then click "Lock".</Well>
+                                </ToggleDisplay>
 
-                                <Row>
-                                    <Col>
+                                <ButtonToolbar>
 
-                                        <Confirm
-                                            onConfirm={this.deletePipe}
-                                            body="Are yous sure you want to delete?"
-                                            confirmText="Confirm"
-                                            title="Delete pipe">
-                                            <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                                    <Confirm
+                                        onConfirm={this.deletePipe}
+                                        body='Are you sure you want to delete?'
+                                        confirmText='Confirm'
+                                        title='Delete pipe'>
+                                        <Button bsStyle='warning' className='pull-right'>Delete</Button>
 
-                                        </Confirm>
+                                    </Confirm>
 
-                                        {' '}
-                                        <ToggleDisplay show={!ep.locked}>
-                                            <Button bsStyle='primary'
-                                                    disabled={disableLockBtn}
-                                                    className='pull-right'
-                                                    onClick={this.lockPipe}>Lock</Button>
-                                            {' '}
-                                        </ToggleDisplay>
-                                        <ToggleDisplay show={ep.locked}>
-                                            <Button bsStyle='warning'
-                                                    className='pull-right'
-                                                    onClick={this.unlockPipe}>Unlock</Button>
-                                            {' '}
-                                        </ToggleDisplay>
-
-                                    </Col>
-                                </Row>
+                                    <ToggleDisplay show={!ep.locked}>
+                                        <Button bsStyle='primary'
+                                                disabled={disableLockBtn}
+                                                className='pull-right'
+                                                onClick={this.lockPipe}>Lock</Button>
+                                    </ToggleDisplay>
+                                    <ToggleDisplay show={ep.locked}>
+                                        <Button bsStyle='warning'
+                                                className='pull-right'
+                                                onClick={this.unlockPipe}>Unlock</Button>
+                                    </ToggleDisplay>
+                                </ButtonToolbar>
 
                             </ToggleDisplay>
                         </Panel.Body>
@@ -608,7 +605,7 @@ class PathSelectMode extends Component {
                     <Panel.Title>Path mode help</Panel.Title>
                 </Panel.Heading>
                 <Panel.Body>
-                    <div style={{'width' :500, 'backgroundColor': 'white'}}>
+                    <div style={{'width': 500, 'backgroundColor': 'white'}}>
                         <Tabs id='modes' defaultActiveKey={1}>
                             <Tab eventKey={1} title='Dynamic modes'>
                                 <p>These modes re-calculate your path every time you change the bandwidth.
@@ -697,7 +694,7 @@ class PathSelectMode extends Component {
             trigger='click'
             interactive={true}
             html={helpTabs}>
-            <h3><Glyphicon className='pull-left' glyph='question-sign'/> </h3><u>Path mode help</u>
+            <h3><Glyphicon className='pull-left' glyph='question-sign'/></h3><u>Path mode help</u>
         </Tooltip>;
 
 
@@ -717,7 +714,7 @@ class PathSelectMode extends Component {
 
                 </Col>
                 <Col sm={4}>
-                    <FormControl componentClass="select" onChange={this.props.onSelectModeChange}>
+                    <FormControl componentClass='select' onChange={this.props.onSelectModeChange}>
                         {
                             pathSelectModeOpts.map((option, index) => {
                                 return <option key={index} value={option.value}>{option.label}</option>
@@ -725,7 +722,7 @@ class PathSelectMode extends Component {
                         }
                     </FormControl>
                 </Col>
-                <Col sm={4} >
+                <Col sm={4}>
                     {helpPopover}
                 </Col>
             </FormGroup>

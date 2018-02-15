@@ -145,8 +145,8 @@ export default class BwSelect extends Component {
         if (ef.bw.symmetrical) {
             let ingressValidationState = 'success';
             let egressValidationState = 'success';
-            let ingressValidationText = '';
-            let egressValidationText = '';
+            let ingressValidationText = 'Bandwidth available';
+            let egressValidationText = 'Bandwidth available';
             let error = false;
 
             this.egressControl.value = newIngress;
@@ -236,7 +236,7 @@ export default class BwSelect extends Component {
                         ingress: {
                             mbps: newIngress,
                             validationState: 'success',
-                            validationText: ''
+                            validationText: 'Bandwidth available'
                         }
                     }
                 });
@@ -307,7 +307,7 @@ export default class BwSelect extends Component {
                     egress: {
                         mbps: newEgress,
                         validationState: 'success',
-                        validationText: ''
+                        validationText: 'Bandwidth available'
                     }
                 }
             });
