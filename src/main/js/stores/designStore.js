@@ -1,4 +1,5 @@
 import {observable, action} from 'mobx';
+import Moment from "moment/moment";
 
 class DesignStore {
 
@@ -380,7 +381,24 @@ class DesignStore {
         }
     }
 
+    @action saveToSessionStorage() {
+        sessionStorage.setItem('designStore.design', JSON.stringify(this.design));
+    }
+    @action clearSessionStorage() {
+        sessionStorage.removeItem('designStore.design');
+    }
 
+    @action restoreFromSessionStorage() {
+        const maybeSaved = sessionStorage.getItem('designStore.design');
+        if (maybeSaved == null) {
+            return false;
+        }
+        this.design = JSON.parse(maybeSaved);
+
+        return true;
+
+
+    }
 
 }
 

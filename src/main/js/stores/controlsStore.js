@@ -32,6 +32,7 @@ class ControlsStore {
         held: {
             until: '',
             remaining: '',
+            cmp: {}
         },
         validation: {
             errors: [],

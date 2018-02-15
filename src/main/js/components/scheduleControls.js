@@ -8,6 +8,7 @@ import Confirm from 'react-confirm-bootstrap';
 import chrono from 'chrono-node';
 import Moment from 'moment';
 import jstz from 'jstz';
+import {size} from 'lodash-es';
 
 import {
     HelpBlock, Form, Button, Panel, FormGroup,
@@ -296,6 +297,20 @@ export default class ScheduleControls extends Component {
             <p>Unlocking the schedule will also unlock all other resources.</p>
         </Popover>;
 
+        let unlockControl = <Confirm
+            onConfirm={this.unlockSchedule}
+            body='Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs.'
+            confirmText='Confirm'
+            title='Unlock Schedule'>
+            <Button className='pull-right' bsStyle='warning'>Unlock</Button>
+        </Confirm>;
+        if (size(this.props.designStore.design.fixtures) === 0) {
+            unlockControl = <Button className='pull-right' onClick={this.unlockSchedule} bsStyle='warning'>Unlock</Button>;
+        }
+
+
+
+
 
         return (
             <Panel>
@@ -337,16 +352,10 @@ export default class ScheduleControls extends Component {
                             <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
                         </ToggleDisplay>
                         <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
-                            <Confirm
-                                onConfirm={this.unlockSchedule}
-                                body="Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs."
-                                confirmText="Confirm"
-                                title="Unlock Schedule">
-                                <Button className='pull-right' bsStyle='warning'>Unlock</Button>
-                            </Confirm>
 
-
+                            {unlockControl}
                         </ToggleDisplay>
+
                     </Form>
                 </Panel.Body>
 

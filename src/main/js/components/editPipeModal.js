@@ -618,7 +618,7 @@ class PathSelectMode extends Component {
                                             <Panel.Title toggle>Fit to bandwidth</Panel.Title>
                                         </Panel.Heading>
                                         <Panel.Body collapsible>
-                                            <p> in this mode OSCARS will calculate the shortest path (based on policy
+                                            <p>In this mode OSCARS will calculate the shortest path (based on policy
                                                 metric) that will fit the bandwidth you want. You will always be able
                                                 to find a zero-bandwidth path; this will be the same as the shortest
                                                 (by metric) mode.</p>
@@ -638,11 +638,8 @@ class PathSelectMode extends Component {
                                         </Panel.Heading>
                                         <Panel.Body collapsible>
                                             <p> The shortest path on the network as calculated by the policy metric.
-                                                Will be
-                                                the
-                                                most economical on resources and will maximize the overall network
-                                                throughput, and
-                                                minimize latency.</p>
+                                                Will be the most economical on resources and will maximize the overall
+                                                network throughput, and minimize latency.</p>
                                         </Panel.Body>
                                     </Panel>
                                     <Panel eventKey='sbh'>
@@ -651,9 +648,9 @@ class PathSelectMode extends Component {
                                         </Panel.Heading>
                                         <Panel.Body collapsible>
                                             <p> The path that goes over the least amount of network devices and
-                                                connections.
-                                                This minimizes the chance that the path will be disrupted by
-                                                outages.</p>
+                                                connections. This minimizes the chance that the path will be disrupted
+                                                by outages.
+                                            </p>
                                         </Panel.Body>
                                     </Panel>
                                     <Panel eventKey='wo'>
@@ -663,8 +660,8 @@ class PathSelectMode extends Component {
                                         <Panel.Body collapsible>
                                             <p> The path that has the maximum available bandwidth, considered as a sum
                                                 of the available bandwidth in both directions. When you want the most
-                                                possible bandwidth over the network maximizing flow in both
-                                                directions. </p>
+                                                possible bandwidth over the network maximizing flow in both directions.
+                                            </p>
                                         </Panel.Body>
                                     </Panel>
                                     <Panel eventKey='wd'>
@@ -673,10 +670,9 @@ class PathSelectMode extends Component {
                                         </Panel.Heading>
                                         <Panel.Body collapsible>
                                             <p> The path that has the maximum available bandwidth in a specific
-                                                direction.
-                                                When you want the greatest possible bandwidth over the network
-                                                maximizing
-                                                flow in one direction only. </p>
+                                                direction. Use when you want the greatest possible bandwidth over the
+                                                network, maximizing flow in one direction only.
+                                            </p>
                                         </Panel.Body>
                                     </Panel>
 
