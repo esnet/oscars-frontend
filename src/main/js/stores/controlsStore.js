@@ -17,6 +17,7 @@ class ControlsStore {
             start: {
                 at: '',
                 choice: '',
+                parsed: false,
                 readable: '',
                 validationState: 'success',
                 validationText: '',
@@ -24,6 +25,7 @@ class ControlsStore {
             end: {
                 at: '',
                 choice: '',
+                parsed: false,
                 readable: '',
                 validationState: 'success',
                 validationText: '',

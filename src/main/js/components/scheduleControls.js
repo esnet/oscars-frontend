@@ -39,6 +39,7 @@ export default class ScheduleControls extends Component {
                 start: {
                     at: startAt,
                     choice: 'in 15 minutes',
+                    parsed: true,
                     readable: Moment(startAt).format(format),
                     validationState: 'success',
                     validationText: '',
@@ -46,6 +47,7 @@ export default class ScheduleControls extends Component {
                 end: {
                     at: endAt,
                     choice: 'in 1 year',
+                    parsed: true,
                     readable: Moment(endAt).format(format),
                     validationState: 'success',
                     validationText: '',
@@ -65,23 +67,17 @@ export default class ScheduleControls extends Component {
             this.props.topologyStore.loadAvailable(startSec, endSec);
         }
 
-        if (!conn.schedule.locked) {
-            let params = {
-                schedule: {
-                    start: {
-                        choice: conn.schedule.start.choice
-                    },
-                    end: {
-                        choice: conn.schedule.end.choice
-                    }
-
-                }
-            };
-
-            this.validateStartEnd(params);
-            this.props.controlsStore.setParamsForConnection(params);
-
+        /*
+        if the schedule input is not acceptable after it's been changed etc, unlock all resources
+         */
+        if (!conn.schedule.acceptable) {
+            this.props.designStore.unlockAll();
+            return;
         }
+
+        /*
+        now check if we're past the start time
+         */
 
         if (conn.schedule.start.at < new Date()) {
             this.props.controlsStore.setParamsForConnection({
@@ -97,19 +93,7 @@ export default class ScheduleControls extends Component {
             this.props.designStore.unlockAll();
         }
 
-        if (conn.schedule.end.at < new Date()) {
-            this.props.controlsStore.setParamsForConnection({
-                schedule: {
-                    locked: false,
-                    acceptable: false,
-                    end: {
-                        validationState: 'error',
-                        validationText: 'End time is before now.'
-                    }
-                }
-            });
-            this.props.designStore.unlockAll();
-        }
+        // now do this check again in 5 sec
 
         this.timeoutId = setTimeout(() => {
             this.periodicCheck()
@@ -144,16 +128,21 @@ export default class ScheduleControls extends Component {
                 start: {
                     validationState: 'error',
                     validationText: '',
+                    parsed: false
                 },
                 end: {
-                    validationText: '',
+                    validationState: conn.schedule.end.validationState,
+                    validationText: conn.schedule.end.validationText,
+                    parsed: conn.schedule.end.parsed
 
                 }
+
             }
         };
 
         if (parsed !== null) {
             params.schedule.start.choice = expr;
+            params.schedule.start.parsed = true;
             params.schedule.end.choice = toJS(conn.schedule.end.choice);
             this.validateStartEnd(params);
         } else {
@@ -171,11 +160,15 @@ export default class ScheduleControls extends Component {
         let params = {
             schedule: {
                 start: {
-                    validationText: '',
+                    validationState: conn.schedule.start.validationState,
+                    validationText: conn.schedule.start.validationText,
+                    parsed: conn.schedule.start.parsed
+
                 },
                 end: {
                     validationState: 'error',
                     validationText: '',
+                    parsed: false
                 }
             }
         };
@@ -184,6 +177,7 @@ export default class ScheduleControls extends Component {
         if (parsed !== null) {
             params.schedule.start.choice = toJS(conn.schedule.start.choice);
             params.schedule.end.choice = expr;
+            params.schedule.end.parsed = true;
             this.validateStartEnd(params);
         } else {
             params.schedule.end.validationText = 'Invalid date';
@@ -193,6 +187,12 @@ export default class ScheduleControls extends Component {
     };
 
     validateStartEnd(params) {
+//        console.log(toJS(params));
+        if (!params.schedule.start.parsed || ! params.schedule.end.parsed) {
+
+            return;
+        }
+
         params.schedule.start.validationState = 'success';
         params.schedule.end.validationState = 'success';
 
@@ -233,7 +233,7 @@ export default class ScheduleControls extends Component {
         }
 
         params.schedule.acceptable = !(startError || endError);
-        console.log(toJS(params));
+//        console.log(toJS(params));
 
     }
 
