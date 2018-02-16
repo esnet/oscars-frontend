@@ -434,7 +434,7 @@ export default class PipeParamsModal extends Component {
                                         {
                                             aFixtures.map(f => {
                                                 return <ListGroupItem
-                                                    key={f.label}>{f.label} ({f.ingress} / {f.egress})</ListGroupItem>
+                                                    key={f.label}>{f.label} (i: {f.ingress}M / e: {f.egress}M)</ListGroupItem>
                                             })
                                         }
                                     </ListGroup>
@@ -518,7 +518,7 @@ export default class PipeParamsModal extends Component {
                                         {
                                             zFixtures.map(f => {
                                                 return <ListGroupItem
-                                                    key={f.label}>{f.label} ({f.ingress} / {f.egress})</ListGroupItem>
+                                                    key={f.label}>{f.label} (i: {f.ingress}Mb / e: {f.egress}M)</ListGroupItem>
                                             })
                                         }
                                     </ListGroup>
@@ -553,7 +553,7 @@ export default class PipeParamsModal extends Component {
                                 </Row>
                                 {' '}
                                 <ToggleDisplay show={!ep.locked}>
-                                    <Well>Select parameters, then click "Lock".</Well>
+                                    <Well>Select pipe parameters, then click "Lock".</Well>
                                 </ToggleDisplay>
 
                                 <ButtonToolbar>

@@ -115,7 +115,7 @@ export default class EditFixtureModal extends Component {
                                 </Col>
                             </Row>
                             <ToggleDisplay show={!ef.locked}>
-                                <Well>Select parameters, then click ""Lock".</Well>
+                                <Well>Select fixture parameters, then click "Lock".</Well>
                             </ToggleDisplay>
 
                             <ButtonToolbar>
