@@ -19,10 +19,14 @@ export default class EditFixtureModal extends Component {
     }
 
     closeModal = () => {
+        const ef = this.props.controlsStore.editFixture;
         this.props.modalStore.closeModal(modalName);
+        if (!ef.locked) {
+            this.deleteFixture(false);
+        }
     };
 
-    deleteFixture = () => {
+    deleteFixture = (andCloseModal) => {
         const ef = this.props.controlsStore.editFixture;
 
         let device = this.props.designStore.deviceOf(ef.fixtureId);
@@ -33,7 +37,9 @@ export default class EditFixtureModal extends Component {
         if (!this.props.designStore.junctionExists(device)) {
             this.props.mapStore.deleteColoredNode(device);
         }
-        this.closeModal();
+        if (andCloseModal) {
+            this.closeModal();
+        }
     };
 
     lockFixture = () => {
@@ -115,7 +121,9 @@ export default class EditFixtureModal extends Component {
                             <ButtonToolbar>
 
                                 <Confirm
-                                    onConfirm={this.deleteFixture}
+                                    onConfirm={
+                                        () => {this.deleteFixture(true)}
+                                    }
                                     body='Are you sure you want to delete?'
                                     confirmText='Confirm'
                                     title='Delete fixture'>
