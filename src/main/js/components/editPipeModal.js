@@ -141,7 +141,7 @@ export default class PipeParamsModal extends Component {
                 if (uiParams.paths[ep.ero.mode].acceptable) {
                     uiParams.ero = {
                         acceptable: true,
-                        message: 'Calculated ERO:',
+                        message: 'Path found.',
                         hops: uiParams.paths[ep.ero.mode].ero
                     }
 
@@ -374,7 +374,16 @@ export default class PipeParamsModal extends Component {
         const acceptable = ep.A_TO_Z.acceptable && ep.Z_TO_A.acceptable && ep.ero.acceptable;
         const disableLockBtn = !acceptable;
 
+        const eroControlModes = ['fits', 'widestAZ', 'widestSum', 'widestZA'];
+
+        const showEroControls = !ep.locked && eroControlModes.includes(ep.ero.mode);
+        let eroOffset = 0;
+        if (!showEroControls) {
+            eroOffset = 3;
+        }
+
         let showModal = this.props.modalStore.modals.get(modalName);
+
         let pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
         let aFixtures = [];
         let zFixtures = [];
@@ -428,136 +437,174 @@ export default class PipeParamsModal extends Component {
                                 <h2>Schedule must be locked to edit pipe parameters.</h2>
                             </ToggleDisplay>
 
-                            <Row>
-                                <Col md={4} lg={4} sm={4}>
-                                    <h4>{pipe.a}</h4>
-                                    <u>Fixtures:</u>
-                                    <ListGroup>
-                                        {
-                                            aFixtures.map(f => {
-                                                return <ListGroupItem
-                                                    key={f.label}>{f.label} (i: {f.ingress}M /
-                                                    e: {f.egress}M)</ListGroupItem>
-                                            })
-                                        }
-                                    </ListGroup>
-                                    <p>Total ingress: <b>{aIngress} Mbps</b></p>
-                                    <p>Total egress: <b>{aEgress} Mbps</b></p>
-                                </Col>
-                                <Col md={4} lg={4} sm={4}>
-                                    <hr/>
-                                    <Row>
-                                        <ToggleDisplay show={!ep.locked}>
-                                            <FormGroup validationState={ep.A_TO_Z.validationState}>
-                                                <InputGroup bsSize='large'>
-                                                    <InputGroup.Addon>
-                                                        <Glyphicon glyph='arrow-right'/>
-                                                    </InputGroup.Addon>
-
-                                                    <FormControl type='text'
-                                                                 placeholder='0-100000'
-                                                                 defaultValue={ep.A_TO_Z.bw}
-                                                                 inputRef={ref => {
-                                                                     this.azBwControl = ref;
-                                                                 }}
-
-                                                                 disabled={ep.locked}
-                                                                 onChange={this.onAzBwChange}/>
-                                                </InputGroup>
-                                                <HelpBlock><p>{ep.A_TO_Z.validationText}</p></HelpBlock>
-                                                <HelpBlock>Reservable on this
-                                                    ERO: {ep.A_TO_Z.available} Mbps</HelpBlock>
-                                                <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                    <HelpBlock>Widest: {ep.A_TO_Z.widest} Mbps</HelpBlock>
-                                                </ToggleDisplay>
-                                                <HelpBlock>Baseline: {ep.A_TO_Z.baseline} Mbps</HelpBlock>
-
-                                            </FormGroup>
-                                        </ToggleDisplay>
-                                        <ToggleDisplay show={ep.locked}>
-                                            <Well>{ep.A_TO_Z.bw} Mbps</Well>
-                                        </ToggleDisplay>
-
-                                    </Row>
-                                    <hr/>
-                                    <Row>
-                                        <ToggleDisplay show={!ep.locked}>
-                                            <FormGroup validationState={ep.Z_TO_A.validationState}>
-                                                <InputGroup bsSize='large'>
-                                                    <FormControl type='text'
-                                                                 placeholder='0-100000'
-                                                                 defaultValue={ep.Z_TO_A.bw}
-                                                                 inputRef={ref => {
-                                                                     this.zaBwControl = ref;
-                                                                 }}
-
-                                                                 disabled={ep.locked}
-                                                                 onChange={this.onZaBwChange}/>
-                                                    <InputGroup.Addon>
-                                                        <Glyphicon glyph='arrow-left'/>
-                                                    </InputGroup.Addon>
-                                                </InputGroup>
-
-                                                <HelpBlock><p>{ep.Z_TO_A.validationText}</p></HelpBlock>
-                                                <HelpBlock>Reservable on this
-                                                    ERO: {ep.Z_TO_A.available} Mbps</HelpBlock>
-                                                <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                    <HelpBlock>Widest: {ep.Z_TO_A.widest} Mbps</HelpBlock>
-                                                </ToggleDisplay>
-                                                <HelpBlock>Baseline: {ep.Z_TO_A.baseline} Mbps</HelpBlock>
-
-                                            </FormGroup>
-
-                                        </ToggleDisplay>
-                                        <ToggleDisplay show={ep.locked}>
-                                            <Well>{ep.Z_TO_A.bw} Mbps</Well>
-                                        </ToggleDisplay>
-                                    </Row>
-                                </Col>
-                                <Col md={4} lg={4} sm={4}>
-                                    <h4>{pipe.z}</h4>
-                                    <u>Fixtures:</u>
-                                    <ListGroup>
-                                        {
-                                            zFixtures.map(f => {
-                                                return <ListGroupItem
-                                                    key={f.label}>{f.label} (i: {f.ingress}Mb /
-                                                    e: {f.egress}M)</ListGroupItem>
-                                            })
-                                        }
-                                    </ListGroup>
-                                    <p>Total ingress: <b>{zIngress} Mbps</b></p>
-                                    <p>Total egress: <b>{zEgress} Mbps</b></p>
-                                </Col>
-                            </Row>
-
-
                             <ToggleDisplay show={conn.schedule.locked}>
-                                <ToggleDisplay show={!ep.locked}>
-                                    <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
-                                </ToggleDisplay>
+
                                 <Row>
-                                    <Col md={6} lg={6} sm={6}>
-                                        <h4>Your ERO</h4>
-                                        <p>Input your ERO here.</p>
-                                        <EroSelect/>
-
+                                    <Col md={4} lg={4} sm={4}>
+                                        <Panel>
+                                            <Panel.Heading>
+                                                <Panel.Title>{pipe.a}</Panel.Title>
+                                            </Panel.Heading>
+                                            <Panel.Body>
+                                                <u>Fixtures:</u>
+                                                <small>
+                                                    <ListGroup>
+                                                        {
+                                                            aFixtures.map(f => {
+                                                                return <ListGroupItem
+                                                                    key={f.label}>{f.label} (i: {f.ingress}M /
+                                                                    e: {f.egress}M)</ListGroupItem>
+                                                            })
+                                                        }
+                                                    </ListGroup>
+                                                </small>
+                                                <p>Total ingress: <b>{aIngress} Mbps</b></p>
+                                                <p>Total egress: <b>{aEgress} Mbps</b></p>
+                                            </Panel.Body>
+                                        </Panel>
                                     </Col>
-                                    <Col md={6} lg={6} sm={6}>
-                                        <h4>Computed ERO</h4>
-                                        <p>{ep.ero.message}</p>
-                                        <ListGroup>
-                                            {
-                                                ep.ero.hops.map(urn => {
-                                                    return <ListGroupItem key={urn}>{urn}</ListGroupItem>
-                                                })
-                                            }
-                                        </ListGroup>
+                                    <Col md={4} lg={4} sm={4}>
+                                        <Panel>
+                                            <Panel.Heading>
+                                                <Panel.Title>Bandwidth</Panel.Title>
+                                            </Panel.Heading>
+                                            <Panel.Body>
+                                                <Row>
+                                                    <Col sm={9} md={9} lg={9}>
+                                                        <ToggleDisplay show={!ep.locked}>
+                                                            <FormGroup validationState={ep.A_TO_Z.validationState}>
+                                                                <InputGroup>
+                                                                    <InputGroup.Addon>
+                                                                        <Glyphicon glyph='arrow-right'/>
+                                                                    </InputGroup.Addon>
+
+                                                                    <FormControl type='text'
+                                                                                 placeholder='0-100000'
+                                                                                 defaultValue={ep.A_TO_Z.bw}
+                                                                                 inputRef={ref => {
+                                                                                     this.azBwControl = ref;
+                                                                                 }}
+
+                                                                                 disabled={ep.locked}
+                                                                                 onChange={this.onAzBwChange}/>
+                                                                </InputGroup>
+                                                                <HelpBlock>
+                                                                    <small>
+                                                                        <p>{ep.A_TO_Z.validationText}</p>
+                                                                        <p>Reservable: {ep.A_TO_Z.available} Mbps</p>
+                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                                            <p>Widest: {ep.A_TO_Z.widest} Mbps</p>
+                                                                        </ToggleDisplay>
+                                                                        <p>Baseline: {ep.A_TO_Z.baseline} Mbps</p>
+                                                                    </small>
+                                                                </HelpBlock>
+                                                            </FormGroup>
+                                                        </ToggleDisplay>
+                                                        <ToggleDisplay show={ep.locked}>
+                                                            <Well>{ep.A_TO_Z.bw} Mbps</Well>
+                                                        </ToggleDisplay>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col smOffset={3} mdOffset={3} lgOffset={3} sm={9} md={9} lg={9}>
+                                                        <ToggleDisplay show={!ep.locked}>
+                                                            <FormGroup validationState={ep.Z_TO_A.validationState}>
+                                                                <InputGroup>
+                                                                    <FormControl type='text'
+                                                                                 placeholder='0-100000'
+                                                                                 defaultValue={ep.Z_TO_A.bw}
+                                                                                 inputRef={ref => {
+                                                                                     this.zaBwControl = ref;
+                                                                                 }}
+
+                                                                                 disabled={ep.locked}
+                                                                                 onChange={this.onZaBwChange}/>
+                                                                    <InputGroup.Addon>
+                                                                        <Glyphicon glyph='arrow-left'/>
+                                                                    </InputGroup.Addon>
+                                                                </InputGroup>
+
+                                                                <HelpBlock>
+                                                                    <small>
+                                                                        <p>{ep.Z_TO_A.validationText}</p>
+                                                                        <p>Reservable: {ep.Z_TO_A.available} Mbps</p>
+                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                                            <p>Widest: {ep.Z_TO_A.widest} Mbps</p>
+                                                                        </ToggleDisplay>
+                                                                        <p>Baseline: {ep.Z_TO_A.baseline} Mbps</p>
+                                                                    </small>
+                                                                </HelpBlock>
+                                                            </FormGroup>
+
+                                                        </ToggleDisplay>
+                                                        <ToggleDisplay show={ep.locked}>
+                                                            <Well>{ep.Z_TO_A.bw} Mbps</Well>
+                                                        </ToggleDisplay>
+                                                    </Col>
+                                                </Row>
+                                            </Panel.Body>
+                                        </Panel>
                                     </Col>
-
-
+                                    <Col md={4} lg={4} sm={4}>
+                                        <Panel>
+                                            <Panel.Heading>
+                                                <Panel.Title>{pipe.z}</Panel.Title>
+                                            </Panel.Heading>
+                                            <Panel.Body>
+                                                <u>Fixtures:</u>
+                                                <small>
+                                                    <ListGroup>
+                                                        {
+                                                            zFixtures.map(f => {
+                                                                return <ListGroupItem
+                                                                    key={f.label}>{f.label} (i: {f.ingress}M /
+                                                                    e: {f.egress}M)</ListGroupItem>
+                                                            })
+                                                        }
+                                                    </ListGroup>
+                                                </small>
+                                                <p>Total ingress: <b>{zIngress} Mbps</b></p>
+                                                <p>Total egress: <b>{zEgress} Mbps</b></p>
+                                            </Panel.Body>
+                                        </Panel>
+                                    </Col>
                                 </Row>
-                                {' '}
+
+                                <Panel>
+                                    <Panel.Heading>
+                                        <Panel.Title>
+                                            <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                                        </Panel.Title>
+                                    </Panel.Heading>
+                                    <Panel.Body>
+
+                                        <Row>
+                                            <ToggleDisplay show={showEroControls}>
+                                                <Col md={6} lg={6} sm={6}>
+                                                    <h4>Your ERO</h4>
+                                                    <EroSelect/>
+
+                                                </Col>
+                                            </ToggleDisplay>
+                                            <Col md={6} lg={6} sm={6} smOffset={eroOffset} mdOffset={eroOffset}
+                                                 lgOffset={eroOffset}>
+                                                <h4>Computed ERO</h4>
+                                                <ListGroup>
+                                                    {
+                                                        ep.ero.hops.map(urn => {
+                                                            return <ListGroupItem key={urn}>{urn}</ListGroupItem>
+                                                        })
+                                                    }
+                                                </ListGroup>
+                                                <ToggleDisplay show={!ep.locked}>
+                                                    <small>{ep.ero.message}</small>
+                                                </ToggleDisplay>
+                                            </Col>
+                                        </Row>
+
+
+                                    </Panel.Body>
+                                </Panel>
                                 <ToggleDisplay show={!ep.locked}>
                                     <Well>Select pipe parameters, then click "Lock".</Well>
                                 </ToggleDisplay>
@@ -638,7 +685,7 @@ class PathSelectMode extends Component {
                                 <p>These modes will respond to changes in the ERO constraints, but will not take
                                     bandwidth into account for their calculations.
                                     They will try to find the widest path on the network that matches the ERO.</p>
-                                <PanelGroup accordion id='accordion-semi'  defaultActiveKey={'wo'}>>
+                                <PanelGroup accordion id='accordion-semi' defaultActiveKey={'wo'}>>
                                     <Panel eventKey='wo'>
                                         <Panel.Heading>
                                             <Panel.Title toggle>Widest overall</Panel.Title>
@@ -702,13 +749,15 @@ class PathSelectMode extends Component {
             </Panel>;
 
         let helpPopover = <Tooltip
-            title='Path Mode help'
+            title='Path Mode '
             position='bottom'
             trigger='click'
             interactive={true}
             html={helpTabs}>
-            <h3><Glyphicon className='pull-left' glyph='question-sign'/></h3><u>Path mode help</u>
+            <h4><Glyphicon glyph='question-sign'/></h4>
+
         </Tooltip>;
+        let ep = this.props.controlsStore.editPipe;
 
 
         const pathSelectModeOpts = [
@@ -719,14 +768,13 @@ class PathSelectMode extends Component {
             {value: 'widestAZ', label: 'Widest, priority =>'},
             {value: 'widestZA', label: 'Widest, priority <='},
         ];
-        return <Form horizontal>
-            <FormGroup>
-                <Col smOffset={1} sm={2} componentClass={ControlLabel}>
-                    <p>Path mode: </p>
+        return <Row>
+            <Col sm={4} md={4} lg={4}><b>Path</b></Col>
 
-                </Col>
-                <Col sm={4}>
-                    <FormControl componentClass='select' onChange={this.props.onSelectModeChange}>
+            <ToggleDisplay show={!ep.locked}>
+
+                <Col sm={3} md={3} lg={3}>
+                    <FormControl componentClass='select' className='pull-left' onChange={this.props.onSelectModeChange}>
                         {
                             pathSelectModeOpts.map((option, index) => {
                                 return <option key={index} value={option.value}>{option.label}</option>
@@ -734,11 +782,11 @@ class PathSelectMode extends Component {
                         }
                     </FormControl>
                 </Col>
-                <Col sm={4}>
+                <Col sm={1} md={1} lg={1} componentClass={ControlLabel}>
                     {helpPopover}
                 </Col>
-            </FormGroup>
-        </Form>;
+            </ToggleDisplay>
+        </Row>
     }
 }
 

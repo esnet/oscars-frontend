@@ -136,7 +136,8 @@ export default class EroSelect extends Component {
         new_include.splice(i, 1);
         let params = {
             ero: {
-                include: new_include
+                include: new_include,
+                message: 'Recalculating...'
             }
         };
 
@@ -218,7 +219,8 @@ class NextHopSelect extends Component {
             });
             let params = {
                 ero: {
-                    include: new_include
+                    include: new_include,
+                    message: 'Recalculating...'
                 }
             };
 
