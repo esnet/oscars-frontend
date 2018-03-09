@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import vis from 'vis';
 import {inject, observer} from 'mobx-react';
-import {autorun, autorunAsync, whyRun, toJS, action} from 'mobx';
+import {autorunAsync, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+require('vis/dist/vis-network.min.css');
 
 import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 
@@ -76,7 +77,8 @@ export default class NetworkMap extends Component {
             height: '330px',
             interaction: {
                 hover: false,
-                navigationButtons: false,
+                navigationButtons: true,
+                keyboard: true,
                 zoomView: true,
                 dragView: true
             },

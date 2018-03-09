@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, Glyphicon} from 'react-bootstrap';
+import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, ButtonToolbar, Glyphicon, Well} from 'react-bootstrap';
 
 import {toJS, action, autorun, computed, whyRun} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
@@ -19,10 +19,14 @@ export default class EditFixtureModal extends Component {
     }
 
     closeModal = () => {
+        const ef = this.props.controlsStore.editFixture;
         this.props.modalStore.closeModal(modalName);
+        if (!ef.locked) {
+            this.deleteFixture(false);
+        }
     };
 
-    deleteFixture = () => {
+    deleteFixture = (andCloseModal) => {
         const ef = this.props.controlsStore.editFixture;
 
         let device = this.props.designStore.deviceOf(ef.fixtureId);
@@ -33,7 +37,9 @@ export default class EditFixtureModal extends Component {
         if (!this.props.designStore.junctionExists(device)) {
             this.props.mapStore.deleteColoredNode(device);
         }
-        this.closeModal();
+        if (andCloseModal) {
+            this.closeModal();
+        }
     };
 
     lockFixture = () => {
@@ -108,30 +114,35 @@ export default class EditFixtureModal extends Component {
                                     <BwSelect/>
                                 </Col>
                             </Row>
-
-                            <Confirm
-                                onConfirm={this.deleteFixture}
-                                body="Are yous sure you want to delete?"
-                                confirmText="Confirm"
-                                title="Delete fixture">
-                                <Button bsStyle='warning' className='pull-right'>Delete</Button>
-                            </Confirm>
-
-
-                            {' '}
                             <ToggleDisplay show={!ef.locked}>
-                                <Button bsStyle='primary'
-                                        disabled={disableLockBtn}
-                                        className='pull-right'
-                                        onClick={this.lockFixture}>Lock</Button>
+                                <Well>Select fixture parameters, then click "Lock".</Well>
                             </ToggleDisplay>
-                            {' '}
-                            <ToggleDisplay show={ef.locked}>
-                                <Button bsStyle='warning'
-                                        className='pull-right'
-                                        onClick={this.unlockFixture}>Unlock</Button>
-                            </ToggleDisplay>
-                            {' '}
+
+                            <ButtonToolbar>
+
+                                <Confirm
+                                    onConfirm={
+                                        () => {this.deleteFixture(true)}
+                                    }
+                                    body='Are you sure you want to delete?'
+                                    confirmText='Confirm'
+                                    title='Delete fixture'>
+                                    <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                                </Confirm>
+
+
+                                <ToggleDisplay show={!ef.locked}>
+                                    <Button bsStyle='primary'
+                                            disabled={disableLockBtn}
+                                            className='pull-right'
+                                            onClick={this.lockFixture}>Lock</Button>
+                                </ToggleDisplay>
+                                <ToggleDisplay show={ef.locked}>
+                                    <Button bsStyle='warning'
+                                            className='pull-right'
+                                            onClick={this.unlockFixture}>Unlock</Button>
+                                </ToggleDisplay>
+                            </ButtonToolbar>
                         </Grid>
 
                     </ToggleDisplay>

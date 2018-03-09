@@ -58,7 +58,7 @@ export default class VlanSelect extends Component {
                     ranges: baselineVlanRanges
                 },
                 validationState: 'success',
-                validationText: '',
+                validationText: 'VLAN available',
                 vlanId: lowest,
                 acceptable: true
             }
@@ -77,7 +77,7 @@ export default class VlanSelect extends Component {
         const vlanId = parseInt(e.target.value);
         const ef = this.props.controlsStore.editFixture;
 
-        let valText = '';
+        let valText = 'VLAN available';
         let valState = 'success';
         let hasError = false;
 
@@ -100,12 +100,12 @@ export default class VlanSelect extends Component {
             });
             if (!inAvailable) {
                 hasError = true;
-                valText = 'VLAN has been reserved by another connection.';
+                valText = 'VLAN reserved by another connection.';
 
                 let portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
                 console.log(portVlans);
                 if (portVlans.includes(vlanId)) {
-                    valText = 'VLAN is being used in this connection (by another fixture on this port).';
+                    valText = 'VLAN being used in this connection (by another fixture on this port).';
                 }
             }
         }

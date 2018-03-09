@@ -28,6 +28,7 @@ class CommitButton extends Component {
                 this.props.controlsStore.clearEditDesign();
                 this.props.designStore.clear();
                 this.props.controlsStore.clearSessionStorage();
+                this.props.designStore.clearSessionStorage();
 
                 this.props.history.push('/pages/list');
 

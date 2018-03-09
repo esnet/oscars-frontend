@@ -17,6 +17,7 @@ class ControlsStore {
             start: {
                 at: '',
                 choice: '',
+                parsed: false,
                 readable: '',
                 validationState: 'success',
                 validationText: '',
@@ -24,6 +25,7 @@ class ControlsStore {
             end: {
                 at: '',
                 choice: '',
+                parsed: false,
                 readable: '',
                 validationState: 'success',
                 validationText: '',
@@ -32,6 +34,7 @@ class ControlsStore {
         held: {
             until: '',
             remaining: '',
+            cmp: {}
         },
         validation: {
             errors: [],
@@ -140,6 +143,8 @@ class ControlsStore {
             validationState: 'error',
             hops: [],
             mode: 'shortest',
+            include: [],
+            exclude: []
         },
 
         paths: {

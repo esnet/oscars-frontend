@@ -15,7 +15,7 @@ module.exports = {
     cache: true,
     output: {
         path: PATHS.build,
-        publicPath: '/webjars/oscars-frontend/1.0.7/bundle.js',
+        publicPath: '/webjars/oscars-frontend/1.0.8/bundle.js',
         filename: 'bundle.js'
     },
     module: {
@@ -29,6 +29,18 @@ module.exports = {
                     presets: ['env', 'react', 'stage-1'],
                     plugins: ['transform-decorators-legacy']
                 }
+            },
+            {
+                test: /\.(gif|png|jpe?g|svg)$/i,
+                use: [
+                    'file-loader',
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {
+                            bypassOnDebug: true,
+                        },
+                    },
+                ],
             },
             {
                 test: /\.css$/,

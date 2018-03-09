@@ -137,8 +137,12 @@ export default class HoldTimer extends Component {
                 action((response) => {
 //                    console.log(response);
                     this.props.controlsStore.setParamsForConnection({
-                        held: {until: Moment.unix(response)}
+                        held: {
+                            until: Moment.unix(response)
+                        }
                     });
+                    this.props.controlsStore.saveToSessionStorage();
+                    this.props.designStore.saveToSessionStorage();
 
                     const startSec = conn.schedule.start.at.getTime() / 1000;
                     const endSec = conn.schedule.end.at.getTime() / 1000;

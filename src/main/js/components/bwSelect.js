@@ -66,12 +66,12 @@ export default class BwSelect extends Component {
                 ingress: {
                     mbps: 0,
                     validationState: 'success',
-                    validationText: ''
+                    validationText: 'Bandwidth available'
                 },
                 egress: {
                     mbps: 0,
                     validationState: 'success',
-                    validationText: ''
+                    validationText: 'Bandwidth available'
 
                 }
             }
@@ -145,8 +145,8 @@ export default class BwSelect extends Component {
         if (ef.bw.symmetrical) {
             let ingressValidationState = 'success';
             let egressValidationState = 'success';
-            let ingressValidationText = '';
-            let egressValidationText = '';
+            let ingressValidationText = 'Bandwidth available';
+            let egressValidationText = 'Bandwidth available';
             let error = false;
 
             this.egressControl.value = newIngress;
@@ -154,7 +154,7 @@ export default class BwSelect extends Component {
             if (overInBaseline) {
                 ingressValidationState = 'error';
                 egressValidationState = 'error';
-                ingressValidationText = 'Ingress exceeds baseline';
+                ingressValidationText = 'Ingress exceeds available (and baseline)';
                 error = true;
 
             } else if (overInAvailable) {
@@ -166,7 +166,7 @@ export default class BwSelect extends Component {
             if (overEgBaseline) {
                 ingressValidationState = 'error';
                 egressValidationState = 'error';
-                egressValidationText = 'Egress exceeds baseline';
+                egressValidationText = 'Egress exceeds baseline (and baseline)';
                 error = true;
 
             } else if (overEgAvailable) {
@@ -236,7 +236,7 @@ export default class BwSelect extends Component {
                         ingress: {
                             mbps: newIngress,
                             validationState: 'success',
-                            validationText: ''
+                            validationText: 'Bandwidth available'
                         }
                     }
                 });
@@ -281,7 +281,7 @@ export default class BwSelect extends Component {
                     acceptable: false,
                     egress: {
                         validationState: 'error',
-                        validationText: 'Egress exceeds baseline'
+                        validationText: 'Egress exceeds available (and baseline)'
 
                     }
                 }
@@ -307,7 +307,7 @@ export default class BwSelect extends Component {
                     egress: {
                         mbps: newEgress,
                         validationState: 'success',
-                        validationText: ''
+                        validationText: 'Bandwidth available'
                     }
                 }
             });
