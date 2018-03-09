@@ -16,7 +16,7 @@ import {
 } from 'react-bootstrap';
 import {observer, inject} from 'mobx-react';
 import {toJS, whyRun, autorunAsync} from 'mobx';
-import {size} from 'lodash-es'
+import {size} from 'lodash-es';
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
 import Confirm from 'react-confirm-bootstrap';

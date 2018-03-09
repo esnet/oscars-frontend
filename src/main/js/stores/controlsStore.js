@@ -143,6 +143,8 @@ class ControlsStore {
             validationState: 'error',
             hops: [],
             mode: 'shortest',
+            include: [],
+            exclude: []
         },
 
         paths: {

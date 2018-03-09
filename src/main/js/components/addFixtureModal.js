@@ -23,6 +23,7 @@ export default class AddFixtureModal extends Component {
     componentWillMount() {
         this.props.topologyStore.loadEthernetPorts();
         this.props.topologyStore.loadBaseline();
+        this.props.topologyStore.loadAdjacencies();
     }
 
     closeModal = () => {

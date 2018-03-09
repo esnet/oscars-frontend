@@ -92,7 +92,18 @@ class TopologyStore {
      */
     @observable baseline = observable.map({});
     @observable available = observable.map({});
+    @observable adjacencies = observable.array([]);
 
+
+    @action loadAdjacencies() {
+        if (this.adjacencies.length === 0) {
+            myClient.loadJSON({method: 'GET', url: '/api/topo/adjacencies'})
+                .then(action((response) => {
+                    this.adjacencies = JSON.parse(response);
+                }));
+
+        }
+    }
 
     @action loadBaseline() {
         if (this.baseline.size === 0) {

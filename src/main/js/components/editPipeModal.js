@@ -9,7 +9,7 @@ import {
 import PropTypes from 'prop-types';
 
 import ToggleDisplay from 'react-toggle-display';
-import EroTypeahead from './eroTypeahead';
+import EroSelect from './eroSelect';
 import {autorunAsync, toJS} from 'mobx';
 
 import myClient from '../agents/client';
@@ -26,6 +26,16 @@ export default class PipeParamsModal extends Component {
         super(props);
     }
 
+    /*
+    componentWillMount() {
+        this.props.controlsStore.setParamsForEditPipe({
+            ero: {
+                mode: 'fits'
+            }
+
+        });
+    }
+    */
 
     pathUpdateDispose = autorunAsync('pathUpdate', () => {
         let conn = this.props.controlsStore.connection;
@@ -33,21 +43,7 @@ export default class PipeParamsModal extends Component {
 
         let pipe = this.props.designStore.findPipe(ep.pipeId);
 
-        let mode = ep.ero.mode;
-
         if (pipe === null || pipe.locked || !conn.schedule.locked) {
-            return;
-        }
-
-        let modeNeedsPathUpdate = false;
-
-        if (!ep.paths.sync.initialized) {
-            modeNeedsPathUpdate = true;
-        }
-        if (mode === 'fits') {
-            modeNeedsPathUpdate = true;
-        }
-        if (!modeNeedsPathUpdate) {
             return;
         }
 
@@ -74,6 +70,7 @@ export default class PipeParamsModal extends Component {
             z: ep.z,
             azBw: ep.A_TO_Z.bw,
             zaBw: ep.Z_TO_A.bw,
+            include: ep.ero.include
         };
 
         myClient.loadJSON({method: 'POST', url: '/api/pce/paths', params})
@@ -96,8 +93,8 @@ export default class PipeParamsModal extends Component {
                     Z_TO_A: {}
                 };
 
-                let syncedModes = ['fits', 'shortest', 'leastHops', 'widestSum', 'widestAZ', 'widestZA'];
-                syncedModes.map(mode => {
+                const modes = ['fits', 'shortest', 'leastHops', 'widestSum', 'widestAZ', 'widestZA'];
+                modes.map(mode => {
                     let ero = [];
                     if (parsed[mode] === null) {
                         uiParams.paths[mode].acceptable = false;
@@ -134,34 +131,34 @@ export default class PipeParamsModal extends Component {
                     }
                 });
 
-                if (ep.ero.mode === 'manual') {
-                    // if the selected mode is manual, TODO
-                } else {
-                    // otherwise, the selected mode was just synced from the server; update the ERO.
-                    // the validate() call that comes later will take care of the bandwidth validation
-
-                    if (uiParams.paths[ep.ero.mode].acceptable) {
-                        uiParams.ero = {
-                            acceptable: true,
-                            message: 'Calculated ERO:',
-                            hops: uiParams.paths[ep.ero.mode].ero
-                        }
-
-                    } else {
-                        uiParams.ero = {
-                            acceptable: false,
-                            message: 'No path found!',
-                            hops: []
-                        };
-
-                    }
+                // the selected mode was just synced from the server; update the ERO.
+                // the validate() call that comes later will take care of the bandwidth validation
+                if (typeof ep.paths[ep.ero.mode] === 'undefined') {
+                    console.log('undefined path for ' + ep.ero.mode);
+                    console.log(toJS(ep));
                 }
 
+                if (uiParams.paths[ep.ero.mode].acceptable) {
+                    uiParams.ero = {
+                        acceptable: true,
+                        message: 'Calculated ERO:',
+                        hops: uiParams.paths[ep.ero.mode].ero
+                    }
+
+                } else {
+                    uiParams.ero = {
+                        acceptable: false,
+                        message: 'No path found!',
+                        hops: []
+                    };
+
+                }
 
                 this.props.controlsStore.setParamsForEditPipe(uiParams);
-            }).then(() => {
-            this.validate();
-        });
+            })
+            .then(() => {
+                this.validate();
+            });
 
     }, 1000);
 
@@ -177,6 +174,11 @@ export default class PipeParamsModal extends Component {
         if (ep.paths.sync.loading || !ep.paths.sync.initialized) {
             return;
         }
+        if (typeof ep.paths[ep.ero.mode] === 'undefined') {
+            console.log('undefined path for ' + ep.ero.mode);
+            return;
+        }
+
         let azAvailable = ep.paths[ep.ero.mode].azAvailable;
         let zaAvailable = ep.paths[ep.ero.mode].zaAvailable;
         let azBaseline = ep.paths[ep.ero.mode].azBaseline;
@@ -434,7 +436,8 @@ export default class PipeParamsModal extends Component {
                                         {
                                             aFixtures.map(f => {
                                                 return <ListGroupItem
-                                                    key={f.label}>{f.label} (i: {f.ingress}M / e: {f.egress}M)</ListGroupItem>
+                                                    key={f.label}>{f.label} (i: {f.ingress}M /
+                                                    e: {f.egress}M)</ListGroupItem>
                                             })
                                         }
                                     </ListGroup>
@@ -518,7 +521,8 @@ export default class PipeParamsModal extends Component {
                                         {
                                             zFixtures.map(f => {
                                                 return <ListGroupItem
-                                                    key={f.label}>{f.label} (i: {f.ingress}Mb / e: {f.egress}M)</ListGroupItem>
+                                                    key={f.label}>{f.label} (i: {f.ingress}Mb /
+                                                    e: {f.egress}M)</ListGroupItem>
                                             })
                                         }
                                     </ListGroup>
@@ -534,7 +538,13 @@ export default class PipeParamsModal extends Component {
                                 </ToggleDisplay>
                                 <Row>
                                     <Col md={6} lg={6} sm={6}>
-                                        <h4>ERO</h4>
+                                        <h4>Your ERO</h4>
+                                        <p>Input your ERO here.</p>
+                                        <EroSelect/>
+
+                                    </Col>
+                                    <Col md={6} lg={6} sm={6}>
+                                        <h4>Computed ERO</h4>
                                         <p>{ep.ero.message}</p>
                                         <ListGroup>
                                             {
@@ -543,13 +553,9 @@ export default class PipeParamsModal extends Component {
                                                 })
                                             }
                                         </ListGroup>
-                                        <ToggleDisplay show={!ep.locked && ep.ero.mode === 'manual'}>
-                                            <FormGroup>
-                                                <ControlLabel>Select next hop</ControlLabel>
-                                                <EroTypeahead/>
-                                            </FormGroup>
-                                        </ToggleDisplay>
                                     </Col>
+
+
                                 </Row>
                                 {' '}
                                 <ToggleDisplay show={!ep.locked}>
@@ -598,6 +604,7 @@ export default class PipeParamsModal extends Component {
 @observer
 class PathSelectMode extends Component {
 
+
     render() {
         const helpTabs =
             <Panel>
@@ -607,12 +614,13 @@ class PathSelectMode extends Component {
                 <Panel.Body>
                     <div style={{'width': 500, 'backgroundColor': 'white'}}>
                         <Tabs id='modes' defaultActiveKey={1}>
-                            <Tab eventKey={1} title='Dynamic modes'>
-                                <p>These modes re-calculate your path every time you change the bandwidth.
+                            <Tab eventKey={1} title='Fully responsive'>
+                                <p>These modes will re-calculate the path every time you change the bandwidth,
+                                    as well as when you make changes to the ERO.
                                     Depending on your input and the state of the network, a path might not be
                                     found; in that case you won't be able to lock the pipe. </p>
 
-                                <PanelGroup accordion id='accordion-dynamic' defaultActiveKey={'fits'}>
+                                <PanelGroup accordion id='accordion-fully' defaultActiveKey={'fits'}>
                                     <Panel eventKey='fits'>
                                         <Panel.Heading>
                                             <Panel.Title toggle>Fit to bandwidth</Panel.Title>
@@ -626,9 +634,39 @@ class PathSelectMode extends Component {
                                     </Panel>
                                 </PanelGroup>
                             </Tab>
-                            <Tab eventKey={2} title='Fixed modes'>
+                            <Tab eventKey={2} title='Semi-responsive'>
+                                <p>These modes will respond to changes in the ERO constraints, but will not take
+                                    bandwidth into account for their calculations.
+                                    They will try to find the widest path on the network that matches the ERO.</p>
+                                <PanelGroup accordion id='accordion-semi'  defaultActiveKey={'wo'}>>
+                                    <Panel eventKey='wo'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Widest overall</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The path that has the maximum available bandwidth, considered as a sum
+                                                of the available bandwidth in both directions. When you want the most
+                                                possible bandwidth over the network maximizing flow in both directions.
+                                            </p>
+                                        </Panel.Body>
+                                    </Panel>
+                                    <Panel eventKey='wd'>
+                                        <Panel.Heading>
+                                            <Panel.Title toggle>Widest (direction)</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body collapsible>
+                                            <p> The path that has the maximum available bandwidth in a specific
+                                                direction. Use when you want the greatest possible bandwidth over the
+                                                network, maximizing flow in one direction only.
+                                            </p>
+                                        </Panel.Body>
+                                    </Panel>
+                                </PanelGroup>
+
+                            </Tab>
+                            <Tab eventKey={3} title='Fixed'>
                                 <p> These modes will always provide the same path, given a specific schedule and
-                                    start/end points. In these modes, if you change the bandwidth, the path will not
+                                    start/end points. In this modes, if you change the bandwidth, the path will not
                                     change; rather, your input will be validated against previously calculated
                                     maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
                                 <PanelGroup accordion id='accordion-fixed' defaultActiveKey={'sbm'}>
@@ -653,28 +691,7 @@ class PathSelectMode extends Component {
                                             </p>
                                         </Panel.Body>
                                     </Panel>
-                                    <Panel eventKey='wo'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest overall</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth, considered as a sum
-                                                of the available bandwidth in both directions. When you want the most
-                                                possible bandwidth over the network maximizing flow in both directions.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-                                    <Panel eventKey='wd'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest (direction)</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth in a specific
-                                                direction. Use when you want the greatest possible bandwidth over the
-                                                network, maximizing flow in one direction only.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
+
 
                                 </PanelGroup>
 
@@ -701,7 +718,6 @@ class PathSelectMode extends Component {
             {value: 'widestSum', label: 'Widest overall'},
             {value: 'widestAZ', label: 'Widest, priority =>'},
             {value: 'widestZA', label: 'Widest, priority <='},
-// TODO            {value: 'manual', label: 'Manual mode'}
         ];
         return <Form horizontal>
             <FormGroup>
