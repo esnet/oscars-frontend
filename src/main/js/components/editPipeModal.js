@@ -26,16 +26,6 @@ export default class PipeParamsModal extends Component {
         super(props);
     }
 
-    /*
-    componentWillMount() {
-        this.props.controlsStore.setParamsForEditPipe({
-            ero: {
-                mode: 'fits'
-            }
-
-        });
-    }
-    */
 
     pathUpdateDispose = autorunAsync('pathUpdate', () => {
         let conn = this.props.controlsStore.connection;
@@ -230,7 +220,10 @@ export default class PipeParamsModal extends Component {
     }
 
 
+
     componentWillUnmount() {
+        this.props.controlsStore.setParamsForEditPipe({ero: {include: [], exclude: []}});
+
         this.pathUpdateDispose();
         this.validationDispose();
 
@@ -296,6 +289,19 @@ export default class PipeParamsModal extends Component {
             });
 
         }
+
+
+    };
+
+    resetEro = () => {
+        const ep = this.props.controlsStore.editPipe;
+
+        this.props.controlsStore.setParamsForEditPipe({
+            ero: {
+                include: [ep.a, ep.z],
+                exclude: []
+            }
+        });
 
 
     };
@@ -583,6 +589,7 @@ export default class PipeParamsModal extends Component {
                                                 <Col md={6} lg={6} sm={6}>
                                                     <h4>Your ERO</h4>
                                                     <EroSelect/>
+                                                    <Button onClick={this.resetEro}>Clear</Button>
 
                                                 </Col>
                                             </ToggleDisplay>
