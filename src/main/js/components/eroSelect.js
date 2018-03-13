@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import Topology from '../lib/topology';
 import ToggleDisplay from 'react-toggle-display';
-import { Glyphicon, ListGroup, ListGroupItem, InputGroup } from 'react-bootstrap';
+import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'react-bootstrap';
 import Select from 'react-select-plus';
 
 require('react-bootstrap-typeahead/css/ClearButton.css');
@@ -68,7 +68,7 @@ export default class EroSelect extends Component {
                     }
                 }
             }
-            if (urns.length > 0 ) {
+            if (urns.length > 0) {
                 let value = JSON.stringify(urns);
                 options[0].options.push({label: label, value: value});
             }
@@ -131,13 +131,18 @@ export default class EroSelect extends Component {
 
         ep.ero.include.map((urn, i) => {
             if (i === 0 || urn === last) {
-                items.push(<ListGroupItem key={urn}>{urn}</ListGroupItem>);
+                items.push(<ListGroupItem key={urn}>
+                    <small>{urn}</small>
+                </ListGroupItem>);
             } else {
                 items.push(
-                    <ListGroupItem key={urn}>{urn}
-                        <ToggleDisplay show={!ep.locked}>
-                            <Glyphicon className='pull-right' glyph='minus' onClick={() => this.removeUrn(i)}/>
-                        </ToggleDisplay>
+                    <ListGroupItem key={urn}>
+                        <small>
+                            {urn}
+                            <ToggleDisplay show={!ep.locked}>
+                                <Glyphicon className='pull-right' glyph='minus' onClick={() => this.removeUrn(i)}/>
+                            </ToggleDisplay>
+                        </small>
                     </ListGroupItem>);
 
             }
@@ -148,7 +153,9 @@ export default class EroSelect extends Component {
                 if (Topology.adjacent(urn, next_urn, adjcies) === 'NONE') {
                     let options = this.nextHopOptions(urn, adjcies, ep.ero.include);
                     items.push(<ListGroupItem key={urn + '-next'}>
-                        <NextHopSelect urn={urn} options={options} index={i}/>
+                        <small>
+                            <NextHopSelect urn={urn} options={options} index={i}/>
+                        </small>
 
                     </ListGroupItem>)
                 }

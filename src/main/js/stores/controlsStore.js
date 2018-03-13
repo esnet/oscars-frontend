@@ -89,6 +89,9 @@ class ControlsStore {
                 egress: 0,
             },
             symmetrical: true,
+            qos: {
+                excess: 'scavenger'
+            },
 
             ingress: {
                 mbps: 0,
@@ -114,9 +117,13 @@ class ControlsStore {
         pipeId: '',
         locked: false,
 
+        protect: true,
 
         A_TO_Z: {
             bw: '',
+            qos: {
+                excess: 'scavenger'
+            },
             acceptable: false,
             validationText: '',
             validationState: 'error',
@@ -127,6 +134,9 @@ class ControlsStore {
 
         Z_TO_A: {
             bw: '',
+            qos: {
+                excess: 'scavenger'
+            },
             acceptable: false,
             validationText: '',
             validationState: 'error',

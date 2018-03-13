@@ -78,7 +78,7 @@ class Transformer {
             ero: {
                 include: [pipe.a, pipe.z],
                 hops: pipe.ero,
-                mode: pipe.mode
+                mode: 'fits'
             }
         };
 
