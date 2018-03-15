@@ -702,88 +702,57 @@ class PathSelectMode extends Component {
                 <Panel.Body>
                     <div style={{'width': 500, 'backgroundColor': 'white'}}>
                         <Tabs id='modes' defaultActiveKey={1}>
-                            <Tab eventKey={1} title='Fully responsive'>
-                                <p>These modes will re-calculate the path every time you change the bandwidth,
+                            <Tab eventKey={1} title='Fits BW'>
+                                <p>In this mode OSCARS will calculate the shortest path (based on policy
+                                    metric) that will fit the bandwidth you want. You will always be able
+                                    to find a zero-bandwidth path. This is the recommended mode to use for
+                                    most connections.</p>
+
+                                <p>This mode will re-calculate the path every time you change the bandwidth,
                                     as well as when you make changes to the ERO.
                                     Depending on your input and the state of the network, a path might not be
                                     found; in that case you won't be able to lock the pipe. </p>
-
-                                <PanelGroup accordion id='accordion-fully' defaultActiveKey={'fits'}>
-                                    <Panel eventKey='fits'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Fit to bandwidth</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p>In this mode OSCARS will calculate the shortest path (based on policy
-                                                metric) that will fit the bandwidth you want. You will always be able
-                                                to find a zero-bandwidth path; this will be the same as the shortest
-                                                (by metric) mode.</p>
-                                        </Panel.Body>
-                                    </Panel>
-                                </PanelGroup>
                             </Tab>
-                            <Tab eventKey={2} title='Semi-responsive'>
-                                <p>These modes will respond to changes in the ERO constraints, but will not take
-                                    bandwidth into account for their calculations.
-                                    They will try to find the widest path on the network that matches the ERO.</p>
-                                <PanelGroup accordion id='accordion-semi' defaultActiveKey={'wo'}>
-                                    <Panel eventKey='wo'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest overall</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth, considered as a sum
-                                                of the available bandwidth in both directions. When you want the most
-                                                possible bandwidth over the network maximizing flow in both directions.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-                                    <Panel eventKey='wd'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest (direction)</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth in a specific
-                                                direction. Use when you want the greatest possible bandwidth over the
-                                                network, maximizing flow in one direction only.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-                                </PanelGroup>
 
-                            </Tab>
-                            <Tab eventKey={3} title='Fixed'>
-                                <p> These modes will always provide the same path, given a specific schedule and
-                                    start/end points. In this modes, if you change the bandwidth, the path will not
-                                    change; rather, your input will be validated against previously calculated
+                            <Tab eventKey={2} title='Shortest'>
+                                <p> The shortest path on the network as calculated by the policy metric.
+                                    Will be the most economical on resources and will maximize the overall
+                                    network throughput, and minimize latency.</p>
+
+                                <p> This mode, given a specific schedule and start/end points, will always provide
+                                    the <b>same path</b>. You will not be able to give ERO  constraints.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated
                                     maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
-                                <PanelGroup accordion id='accordion-fixed' defaultActiveKey={'sbm'}>
-                                    <Panel eventKey='sbm'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Shortest (by metric)</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The shortest path on the network as calculated by the policy metric.
-                                                Will be the most economical on resources and will maximize the overall
-                                                network throughput, and minimize latency.</p>
-                                        </Panel.Body>
-                                    </Panel>
-                                    <Panel eventKey='sbh'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Least hops</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that goes over the least amount of network devices and
-                                                connections. This minimizes the chance that the path will be disrupted
-                                                by outages.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-
-
-                                </PanelGroup>
-
                             </Tab>
+                            <Tab eventKey={3} title='Least Hops'>
+                                <p> The path that goes over the least number of network devices and
+                                    connections. use this to minimize the chance that the path will be disrupted
+                                    by outages.
+                                </p>
+
+                                <p> This mode, given a specific schedule and start/end points, will always provide
+                                    the <b>same path</b>. You will not be able to give ERO constraints.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated
+                                    maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
+                            </Tab>
+
+                            <Tab eventKey={4} title='Widest'>
+                                <p> These modes find the path that has the maximum available bandwidth,
+                                    considered either per direction, or as the sum of the available bandwidth
+                                    in both directions.
+                                    Use when you want the most possible bandwidth over the network with less regard
+                                    about keeping the path short.
+                                </p>
+                                <p>These modes will take into account any ERO constraints, but will <b>not</b> take
+                                    bandwidth into account for their calculations; their function is to find the
+                                    maximum.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated.</p>
+                            </Tab>
+
+
                         </Tabs>
                     </div>
                 </Panel.Body>

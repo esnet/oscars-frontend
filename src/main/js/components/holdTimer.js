@@ -177,7 +177,6 @@ class HoldTimer extends Component {
 
 
     render() {
-        console.log('render');
 
         const oneMin = 5 * 60 * 1000;
         const fifteenMins = 10 * 60 * 1000;
