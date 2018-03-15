@@ -4,6 +4,7 @@ import {inject, observer} from 'mobx-react';
 import {autorunAsync, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 require('vis/dist/vis-network.min.css');
+require('vis/dist/vis.css');
 
 import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 
