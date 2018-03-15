@@ -35,12 +35,30 @@ export default class VlanSelect extends Component {
         const availableVlanExpression = available.vlanExpression;
         const availableVlanRanges = available.vlanRanges;
 
+        let suggestion = this.props.topologyStore.suggestions.globalVlan;
+
         let lowest = 99999;
-        availableVlanRanges.map((rng) => {
+        for (let rng of availableVlanRanges) {
             if (lowest > rng.floor) {
                 lowest = rng.floor;
             }
-        });
+        }
+
+        if (suggestion === -1) {
+            suggestion = lowest;
+        }
+
+        for (let f of this.props.designStore.design.fixtures) {
+            if (f.locked) {
+                for (let rng of availableVlanRanges) {
+                    if (f.vlan >= rng.floor && f.vlan <= rng.ceiling) {
+                        suggestion = f.vlan;
+                    }
+                }
+            }
+        }
+
+
 
         if (ef.locked) {
             return;
@@ -51,7 +69,7 @@ export default class VlanSelect extends Component {
                 available: {
                     expression: availableVlanExpression,
                     ranges: availableVlanRanges,
-                    lowest: lowest
+                    suggestion: suggestion
                 },
                 baseline: {
                     expression: baselineVlanExpression,
@@ -59,7 +77,7 @@ export default class VlanSelect extends Component {
                 },
                 validationState: 'success',
                 validationText: 'VLAN available',
-                vlanId: lowest,
+                vlanId: suggestion,
                 acceptable: true
             }
         });
@@ -131,10 +149,9 @@ export default class VlanSelect extends Component {
         let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
             <p>Here you can set the VLAN id for this fixture. </p>
 
-            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to the <u>lowest
-                available</u> VLAN
-                id. You may type in a different value; if it is not available,
-                you will receive feedback explaining why.</p>
+            <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to a suggested VLAN that
+                is likely globally available on the network. You may type in a different value; if it is not available
+                on this fixture you will receive feedback explaining why.</p>
             <p>You will also see 'baseline' and 'available' ranges displayed.</p>
             <p>The <u>baseline</u> range is what would be available if there were no other reservations, and generally
                 does not change.</p>
@@ -156,17 +173,17 @@ export default class VlanSelect extends Component {
                 </Panel.Heading>
                 <Panel.Body>
                     <ToggleDisplay show={!ef.locked}>
-                        <FormGroup controlId="vlanExpression">
+                        <FormGroup controlId='vlanExpression'>
                             <HelpBlock>Available for your schedule: {ef.vlan.available.expression}</HelpBlock>
                             <HelpBlock>Baseline: {ef.vlan.baseline.expression}</HelpBlock>
                         </FormGroup>
 
 
                         {' '}
-                        <FormGroup controlId="vlanChoice" validationState={ef.vlan.validationState}>
+                        <FormGroup controlId='vlanChoice' validationState={ef.vlan.validationState}>
                             <ControlLabel>VLAN choice:</ControlLabel>
                             {' '}
-                            <FormControl defaultValue={ef.vlan.available.lowest} type="text" onChange={this.onTypeIn}/>
+                            <FormControl defaultValue={ef.vlan.available.suggestion} type='text' onChange={this.onTypeIn}/>
                             <HelpBlock><p>{ef.vlan.validationText}</p></HelpBlock>
                             {' '}
                         </FormGroup>

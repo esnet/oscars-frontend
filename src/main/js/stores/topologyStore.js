@@ -1,5 +1,6 @@
 import {toJS, observable, action, computed} from 'mobx';
 import myClient from '../agents/client';
+import {size } from 'lodash-es';
 
 class TopologyStore {
 
@@ -27,6 +28,7 @@ class TopologyStore {
      */
     @observable ethPortsByDevice = observable.map({});
 
+    @observable suggestions = observable.map({});
 
     @action loadEthernetPorts() {
 
@@ -121,8 +123,46 @@ class TopologyStore {
         };
         myClient.loadJSON({method: 'POST', url: '/api/topo/available', params})
             .then(action((response) => {
-//                console.log('loaded available');
                 this.available = JSON.parse(response);
+                let candidates = [];
+                for (let key of Object.keys(this.available)) {
+                    for (let range of this.available[key].vlanRanges) {
+                        if (!candidates.includes(range.floor)) {
+                            candidates.push(range.floor);
+                        }
+                    }
+                }
+                candidates.sort((a, b) => a - b);
+
+                for (let c of candidates) {
+                    let candidateContained = true;
+                    for (let key of Object.keys(this.available)) {
+
+                        if (size(this.available[key].vlanRanges) > 0) {
+                            let containedInThisPort = false;
+                            for (let range of this.available[key].vlanRanges) {
+
+
+                                if (range.floor <= c && range.ceiling >= c) {
+                                    containedInThisPort = true;
+                                }
+                            }
+                            if (!containedInThisPort) {
+                                candidateContained = false;
+                                break;
+                            }
+
+                        }
+                    }
+                    if (candidateContained) {
+                        this.suggestions['globalVlan'] = c;
+                        return;
+                    }
+                }
+                this.suggestions.globalVlan = -1;
+
+
+
             }));
 
     }

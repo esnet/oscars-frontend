@@ -202,7 +202,6 @@ class HoldTimer extends Component {
 
                 <IdleTimer
                     activeAction={() => {
-                        console.log('active');
                         this.props.controlsStore.setParamsForConnection({
                             held: {
                                 idle: false
@@ -210,7 +209,6 @@ class HoldTimer extends Component {
                         });
                     }}
                     idleAction={() => {
-                        console.log('idle');
                         this.props.controlsStore.setParamsForConnection({
                             held: {
                                 idle: true

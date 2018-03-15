@@ -67,7 +67,7 @@ class ControlsStore {
             validationText: '',
 
             available: {
-                lowest: '',
+                suggestion: '',
                 expression: '',
                 ranges: [],
             },

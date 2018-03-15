@@ -157,7 +157,6 @@ export default class DesignDrawing extends Component {
 
 
                 fixtures.map((f) => {
-                    console.log(toJS(f));
                     let fixtureNode = {
                         id: f.id,
                         label: f.label,
@@ -175,6 +174,7 @@ export default class DesignDrawing extends Component {
                         id: f.device + ' --- ' + f.id,
                         from: f.device,
                         to: f.id,
+                        onClick: null,
                         width: 1.5,
                         length: 2
                     };
@@ -216,6 +216,7 @@ export default class DesignDrawing extends Component {
                                 color: {
                                     color: colors[pipe_idx]
                                 },
+                                onClick: null,
                                 to: z,
                                 length: 3,
                                 width: 1.5
@@ -245,7 +246,6 @@ export default class DesignDrawing extends Component {
                         edges.push(edge);
                     }
                 });
-                console.log(toJS(edges));
 
                 VisUtils.mergeItems(nodes, this.datasource.nodes);
 

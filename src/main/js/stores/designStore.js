@@ -1,5 +1,4 @@
 import {observable, action} from 'mobx';
-import Moment from "moment/moment";
 
 class DesignStore {
 
@@ -107,6 +106,9 @@ class DesignStore {
 
     }
     deviceOf(fixtureId) {
+        if (this.findFixture(fixtureId) == null) {
+            return null;
+        }
         return this.findFixture(fixtureId).device;
     }
 
@@ -157,6 +159,9 @@ class DesignStore {
     @action
     deleteFixtureDeep(fixtureId) {
         let fixture = this.findFixture(fixtureId);
+        if (fixture == null) {
+            return;
+        }
 
         this.deleteFixture(fixtureId);
         let device = fixture.device;
