@@ -104,9 +104,9 @@ export default class DesignComponents extends Component {
 
                         <Confirm
                             onConfirm={() => this.props.designStore.clear()}
-                            body="Are you sure you want to delete all components and start over?"
-                            confirmText="Confirm"
-                            title="Clear components">
+                            body='Are you sure you want to delete all components and start over?'
+                            confirmText='Confirm'
+                            title='Clear components'>
                             <Button bsStyle='warning' className='pull-right'>Clear all</Button>
 
 

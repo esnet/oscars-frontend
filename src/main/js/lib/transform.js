@@ -1,5 +1,4 @@
 import React from 'react';
-import {toJS} from 'mobx';
 
 
 class Transformer {
@@ -77,8 +76,9 @@ class Transformer {
                 bw: pipe.zaBw
             },
             ero: {
+                include: [pipe.a, pipe.z],
                 hops: pipe.ero,
-                mode: pipe.mode
+                mode: 'fits'
             }
         };
 

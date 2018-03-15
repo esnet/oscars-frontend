@@ -4,6 +4,7 @@ import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import transformer from '../lib/transform';
 import {FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+require('react-bootstrap-typeahead/css/Typeahead.css');
 
 
 @inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')

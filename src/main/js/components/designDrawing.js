@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync, toJS} from 'mobx';
+import {autorunAsync, toJS, action} from 'mobx';
 import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
 import transformer from '../lib/transform';
 import vis from 'vis';
 import validator from '../lib/validation'
 import VisUtils from '../lib/vis'
+import myClient from '../agents/client';
+require('vis/dist/vis-network.min.css');
+require('vis/dist/vis.css');
 
 
 @inject('controlsStore', 'designStore', 'modalStore')
@@ -54,9 +57,12 @@ export default class DesignDrawing extends Component {
                 dragView: true
             },
             physics: {
-                solver: 'forceAtlas2Based',
+                solver: 'barnesHut',
                 stabilization: {
                     fit: true
+                },
+                barnesHut: {
+                    centralGravity: 0.5
                 }
             },
             nodes: {
@@ -118,98 +124,138 @@ export default class DesignDrawing extends Component {
         let edges = [];
 
 
-        junctions.map((j) => {
-            let junctionNode = {
-                id: j.id,
-                label: j.id,
-                size: 20,
-                data: j,
-                onClick: this.onJunctionClicked
-            };
-            nodes.push(junctionNode);
-        });
-        fixtures.map((f) => {
-            let fixtureNode = {
-                id: f.id,
-                label: f.label,
-                size: 8,
-                color: {'background': validator.fixtureMapColor(f)},
-                data: f,
-                onClick: this.onFixtureClicked
-            };
-            nodes.push(fixtureNode);
-            let edge = {
-                id: f.device + ' --- ' + f.id,
-                from: f.device,
-                to: f.id,
-                length: 3,
-                width: 1.5,
-                onClick: null
-            };
-            edges.push(edge);
-        });
-
-        const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
-
-        pipes.map((p, pipe_idx) => {
-            if (p.locked) {
-                let i = 0;
-                while (i < p.ero.length - 1) {
-                    let a = p.ero[i];
-                    let b = p.ero[i + 1];
-                    let y = p.ero[i + 2];
-                    let z = p.ero[i + 3];
-
-                    let foundZ = false;
-                    nodes.map((node) => {
-                        if (node.id === z) {
-                            foundZ = true;
-                        }
-                    });
-                    if (!foundZ) {
-                        let zNode = {
-                            id: z,
-                            label: z,
-                            onClick: null
-
-                        };
-                        nodes.push(zNode);
+        myClient.loadJSON({method: 'GET', url: '/api/map'})
+            .then(action((response) => {
+                let positions = {};
+                let topology = JSON.parse(response);
+                topology.nodes.map((n) => {
+                    // scale everything down
+                    positions[n.id] = {
+                        x: 0.3 * n.x,
+                        y: 0.3 * n.y
                     }
+
+                });
+
+
+                junctions.map((j) => {
+                    let junctionNode = {
+                        id: j.id,
+                        label: j.id,
+                        size: 20,
+                        data: j,
+                        x: positions[j.id].x,
+                        y: positions[j.id].y,
+                        physics: false,
+                        color: {
+                            inherit: false
+                        },
+                        onClick: this.onJunctionClicked
+                    };
+                    nodes.push(junctionNode);
+                });
+
+
+                fixtures.map((f) => {
+                    let fixtureNode = {
+                        id: f.id,
+                        label: f.label,
+                        x: positions[f.device].x + 10,
+                        size: 8,
+                        color: {
+                            background: validator.fixtureMapColor(f),
+                            inherit: false
+                        },
+                        data: f,
+                        onClick: this.onFixtureClicked
+                    };
+                    nodes.push(fixtureNode);
                     let edge = {
-                        id: pipe_idx + ' : ' + b + ' --- ' + y,
-                        from: a,
-                        color: colors[pipe_idx],
-                        to: z,
-                        length: 3,
+                        id: f.device + ' --- ' + f.id,
+                        from: f.device,
+                        to: f.id,
+                        onClick: null,
                         width: 1.5,
-                        onClick: null
+                        length: 2
                     };
                     edges.push(edge);
+                });
+
+                const colors = [
+                    '#CC0000',
+                    '#3333FF',
+                    '#00CC00', 'orange', 'cyan', 'brown', 'pink'];
+
+                pipes.map((p, pipe_idx) => {
+                    if (p.locked) {
+                        let i = 0;
+                        while (i < p.ero.length - 1) {
+                            let a = p.ero[i];
+                            let b = p.ero[i + 1];
+                            let y = p.ero[i + 2];
+                            let z = p.ero[i + 3];
+
+                            let foundZ = false;
+                            nodes.map((node) => {
+                                if (node.id === z) {
+                                    foundZ = true;
+                                }
+                            });
+                            if (!foundZ) {
+                                let zNode = {
+                                    id: z,
+                                    label: z,
+                                    onClick: null
+
+                                };
+                                nodes.push(zNode);
+                            }
+                            let edge = {
+                                id: pipe_idx + ' : ' + b + ' --- ' + y,
+                                from: a,
+                                color: {
+                                    color: colors[pipe_idx]
+                                },
+                                onClick: null,
+                                to: z,
+                                length: 3,
+                                width: 1.5
+                            };
+                            edges.push(edge);
 
 
-                    i = i + 3;
-                }
+                            i = i + 3;
+                        }
 
 
-            } else {
-                let edge = {
-                    id: p.id,
-                    from: p.a,
-                    to: p.z,
-                    length: 10,
-                    color: colors[pipe_idx],
-                    width: 5,
-                    data: p,
-                    onClick: this.onPipeClicked
+                    } else {
+                        let edge = {
+                            id: p.id,
+                            from: p.a,
+                            to: p.z,
+                            dashes: true,
+                            length: 10,
+                            color: {
+                                color: colors[pipe_idx]
+                            },
+                            width: 5,
+                            data: p,
+                            onClick: this.onPipeClicked
 
-                };
-                edges.push(edge);
-            }
-        });
-        VisUtils.mergeItems(nodes, this.datasource.nodes);
+                        };
+                        edges.push(edge);
+                    }
+                });
 
-        this.datasource.edges.clear();
-        this.datasource.edges.add(edges);
+                VisUtils.mergeItems(nodes, this.datasource.nodes);
+
+                this.datasource.edges.clear();
+                this.datasource.edges.add(edges);
+                this.network.stabilize(1000);
+                this.network.fit({animation: false})
+
+
+            }));
 
 
     }, 500);

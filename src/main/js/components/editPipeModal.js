@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import {
     Modal, Button, FormControl, ControlLabel, FormGroup, Form,
     Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
-    Tabs, Tab, ButtonToolbar,
+    Tabs, Tab, ButtonToolbar, Checkbox, DropdownButton, MenuItem,
     ListGroup, ListGroupItem, HelpBlock, InputGroup, PanelGroup
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -26,16 +26,6 @@ export default class PipeParamsModal extends Component {
         super(props);
     }
 
-    /*
-    componentWillMount() {
-        this.props.controlsStore.setParamsForEditPipe({
-            ero: {
-                mode: 'fits'
-            }
-
-        });
-    }
-    */
 
     pathUpdateDispose = autorunAsync('pathUpdate', () => {
         let conn = this.props.controlsStore.connection;
@@ -130,13 +120,17 @@ export default class PipeParamsModal extends Component {
                         uiParams.Z_TO_A.widest = uiParams.paths[mode].zaAvailable;
                     }
                 });
+                if (ep.ero.mode === '') {
+                    console.log('no mode set; updating to fits');
+                    this.props.controlsStore.setParamsForEditPipe({
+                        ero: {
+                            mode: 'fits'
+                        }
+                    });
+                }
 
                 // the selected mode was just synced from the server; update the ERO.
                 // the validate() call that comes later will take care of the bandwidth validation
-                if (typeof ep.paths[ep.ero.mode] === 'undefined') {
-                    console.log('undefined path for ' + ep.ero.mode);
-                    console.log(toJS(ep));
-                }
 
                 if (uiParams.paths[ep.ero.mode].acceptable) {
                     uiParams.ero = {
@@ -231,6 +225,8 @@ export default class PipeParamsModal extends Component {
 
 
     componentWillUnmount() {
+        this.props.controlsStore.setParamsForEditPipe({ero: {include: [], exclude: []}});
+
         this.pathUpdateDispose();
         this.validationDispose();
 
@@ -296,6 +292,19 @@ export default class PipeParamsModal extends Component {
             });
 
         }
+
+
+    };
+
+    resetEro = () => {
+        const ep = this.props.controlsStore.editPipe;
+
+        this.props.controlsStore.setParamsForEditPipe({
+            ero: {
+                include: [ep.a, ep.z],
+                exclude: []
+            }
+        });
 
 
     };
@@ -417,226 +426,255 @@ export default class PipeParamsModal extends Component {
             <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
         </Popover>;
 
+        let bwPopover = <Popover id='help-strict' title='Bandwidth controls'>
+            <p>Here you can set your desired bandwidth in each direction. Type in the desired number in Mbps.
+                You can type in the 'g' character to add three 0s quickly. </p>
+            <p>Changing the desired bandwidth will cause the computed ERO to be recalculated. A path might
+                not be available for the new value.</p>
+            <p>Set the checkmark next to the direction to set 'strict' policing mode,
+                in which packets exceeding the specified rate are dropped. The default
+                action is to re-mark as scavenger.</p>
+        </Popover>;
+
 
         return (
             <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editing pipe</Modal.Title>
+                    <Modal.Title>
+                        <p>Pipe controls for {pipeTitle}
+                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
+                                <Glyphicon className='pull-right' glyph='question-sign'/>
+                            </OverlayTrigger>
+                        </p>
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Panel>
-                        <Panel.Heading>
-                            <p>Pipe controls for {pipeTitle}
-                                <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
-                                    <Glyphicon className='pull-right' glyph='question-sign'/>
-                                </OverlayTrigger>
-                            </p>
-                        </Panel.Heading>
-                        <Panel.Body>
-                            <ToggleDisplay show={!conn.schedule.locked}>
-                                <h2>Schedule must be locked to edit pipe parameters.</h2>
-                            </ToggleDisplay>
+                    <ToggleDisplay show={!conn.schedule.locked}>
+                        <h2>Schedule must be locked to edit pipe parameters.</h2>
+                    </ToggleDisplay>
 
-                            <ToggleDisplay show={conn.schedule.locked}>
+                    <ToggleDisplay show={conn.schedule.locked}>
 
-                                <Row>
-                                    <Col md={4} lg={4} sm={4}>
-                                        <Panel>
-                                            <Panel.Heading>
-                                                <Panel.Title>{pipe.a}</Panel.Title>
-                                            </Panel.Heading>
-                                            <Panel.Body>
-                                                <u>Fixtures:</u>
-                                                <small>
-                                                    <ListGroup>
-                                                        {
-                                                            aFixtures.map(f => {
-                                                                return <ListGroupItem
-                                                                    key={f.label}>{f.label} (i: {f.ingress}M /
-                                                                    e: {f.egress}M)</ListGroupItem>
-                                                            })
-                                                        }
-                                                    </ListGroup>
-                                                </small>
-                                                <p>Total ingress: <b>{aIngress} Mbps</b></p>
-                                                <p>Total egress: <b>{aEgress} Mbps</b></p>
-                                            </Panel.Body>
-                                        </Panel>
-                                    </Col>
-                                    <Col md={4} lg={4} sm={4}>
-                                        <Panel>
-                                            <Panel.Heading>
-                                                <Panel.Title>Bandwidth</Panel.Title>
-                                            </Panel.Heading>
-                                            <Panel.Body>
-                                                <Row>
-                                                    <Col sm={9} md={9} lg={9}>
-                                                        <ToggleDisplay show={!ep.locked}>
-                                                            <FormGroup validationState={ep.A_TO_Z.validationState}>
-                                                                <InputGroup>
-                                                                    <InputGroup.Addon>
-                                                                        <Glyphicon glyph='arrow-right'/>
-                                                                    </InputGroup.Addon>
-
-                                                                    <FormControl type='text'
-                                                                                 placeholder='0-100000'
-                                                                                 defaultValue={ep.A_TO_Z.bw}
-                                                                                 inputRef={ref => {
-                                                                                     this.azBwControl = ref;
-                                                                                 }}
-
-                                                                                 disabled={ep.locked}
-                                                                                 onChange={this.onAzBwChange}/>
-                                                                </InputGroup>
-                                                                <HelpBlock>
-                                                                    <small>
-                                                                        <p>{ep.A_TO_Z.validationText}</p>
-                                                                        <p>Reservable: {ep.A_TO_Z.available} Mbps</p>
-                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                                            <p>Widest: {ep.A_TO_Z.widest} Mbps</p>
-                                                                        </ToggleDisplay>
-                                                                        <p>Baseline: {ep.A_TO_Z.baseline} Mbps</p>
-                                                                    </small>
-                                                                </HelpBlock>
-                                                            </FormGroup>
-                                                        </ToggleDisplay>
-                                                        <ToggleDisplay show={ep.locked}>
-                                                            <Well>{ep.A_TO_Z.bw} Mbps</Well>
-                                                        </ToggleDisplay>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col smOffset={3} mdOffset={3} lgOffset={3} sm={9} md={9} lg={9}>
-                                                        <ToggleDisplay show={!ep.locked}>
-                                                            <FormGroup validationState={ep.Z_TO_A.validationState}>
-                                                                <InputGroup>
-                                                                    <FormControl type='text'
-                                                                                 placeholder='0-100000'
-                                                                                 defaultValue={ep.Z_TO_A.bw}
-                                                                                 inputRef={ref => {
-                                                                                     this.zaBwControl = ref;
-                                                                                 }}
-
-                                                                                 disabled={ep.locked}
-                                                                                 onChange={this.onZaBwChange}/>
-                                                                    <InputGroup.Addon>
-                                                                        <Glyphicon glyph='arrow-left'/>
-                                                                    </InputGroup.Addon>
-                                                                </InputGroup>
-
-                                                                <HelpBlock>
-                                                                    <small>
-                                                                        <p>{ep.Z_TO_A.validationText}</p>
-                                                                        <p>Reservable: {ep.Z_TO_A.available} Mbps</p>
-                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                                            <p>Widest: {ep.Z_TO_A.widest} Mbps</p>
-                                                                        </ToggleDisplay>
-                                                                        <p>Baseline: {ep.Z_TO_A.baseline} Mbps</p>
-                                                                    </small>
-                                                                </HelpBlock>
-                                                            </FormGroup>
-
-                                                        </ToggleDisplay>
-                                                        <ToggleDisplay show={ep.locked}>
-                                                            <Well>{ep.Z_TO_A.bw} Mbps</Well>
-                                                        </ToggleDisplay>
-                                                    </Col>
-                                                </Row>
-                                            </Panel.Body>
-                                        </Panel>
-                                    </Col>
-                                    <Col md={4} lg={4} sm={4}>
-                                        <Panel>
-                                            <Panel.Heading>
-                                                <Panel.Title>{pipe.z}</Panel.Title>
-                                            </Panel.Heading>
-                                            <Panel.Body>
-                                                <u>Fixtures:</u>
-                                                <small>
-                                                    <ListGroup>
-                                                        {
-                                                            zFixtures.map(f => {
-                                                                return <ListGroupItem
-                                                                    key={f.label}>{f.label} (i: {f.ingress}M /
-                                                                    e: {f.egress}M)</ListGroupItem>
-                                                            })
-                                                        }
-                                                    </ListGroup>
-                                                </small>
-                                                <p>Total ingress: <b>{zIngress} Mbps</b></p>
-                                                <p>Total egress: <b>{zEgress} Mbps</b></p>
-                                            </Panel.Body>
-                                        </Panel>
-                                    </Col>
-                                </Row>
-
+                        <Row>
+                            <Col md={4} lg={4} sm={4}>
                                 <Panel>
                                     <Panel.Heading>
-                                        <Panel.Title>
-                                            <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                                        <Panel.Title>{pipe.a}</Panel.Title>
+                                    </Panel.Heading>
+                                    <Panel.Body>
+                                        <u>Fixtures:</u>
+                                        <small>
+                                            <ListGroup>
+                                                {
+                                                    aFixtures.map(f => {
+                                                        return <ListGroupItem
+                                                            key={f.label}>{f.label} (i: {f.ingress}M /
+                                                            e: {f.egress}M)</ListGroupItem>
+                                                    })
+                                                }
+                                            </ListGroup>
+                                        </small>
+                                        <p>Total ingress: <b>{aIngress} Mbps</b></p>
+                                        <p>Total egress: <b>{aEgress} Mbps</b></p>
+                                    </Panel.Body>
+                                </Panel>
+                            </Col>
+                            <Col md={4} lg={4} sm={4}>
+                                <Panel>
+                                    <Panel.Heading>
+                                        <Panel.Title>Bandwidth
+                                            <OverlayTrigger trigger='click' rootClose placement='right'
+                                                            overlay={bwPopover}>
+                                                <Glyphicon glyph='question-sign' className='pull-right'/>
+                                            </OverlayTrigger>
+
                                         </Panel.Title>
                                     </Panel.Heading>
                                     <Panel.Body>
-
                                         <Row>
-                                            <ToggleDisplay show={showEroControls}>
-                                                <Col md={6} lg={6} sm={6}>
-                                                    <h4>Your ERO</h4>
-                                                    <EroSelect/>
-
-                                                </Col>
-                                            </ToggleDisplay>
-                                            <Col md={6} lg={6} sm={6} smOffset={eroOffset} mdOffset={eroOffset}
-                                                 lgOffset={eroOffset}>
-                                                <h4>Computed ERO</h4>
-                                                <ListGroup>
-                                                    {
-                                                        ep.ero.hops.map(urn => {
-                                                            return <ListGroupItem key={urn}>{urn}</ListGroupItem>
-                                                        })
-                                                    }
-                                                </ListGroup>
+                                            <Col sm={9} md={9} lg={9}>
                                                 <ToggleDisplay show={!ep.locked}>
-                                                    <small>{ep.ero.message}</small>
+                                                    <FormGroup validationState={ep.A_TO_Z.validationState}>
+                                                        <InputGroup>
+                                                            <InputGroup.Addon>
+                                                                <Glyphicon glyph='arrow-right'/>
+
+                                                            </InputGroup.Addon>
+
+
+                                                            <FormControl type='text'
+                                                                         bsSize='small'
+                                                                         placeholder='0-100000'
+                                                                         defaultValue={ep.A_TO_Z.bw}
+                                                                         inputRef={ref => {
+                                                                             this.azBwControl = ref;
+                                                                         }}
+
+                                                                         disabled={ep.locked}
+                                                                         onChange={this.onAzBwChange}/>
+
+                                                            <InputGroup.Addon>
+                                                                <input type='checkbox' aria-label='Strict'/>
+
+                                                            </InputGroup.Addon>
+
+
+                                                        </InputGroup>
+                                                        <HelpBlock>
+                                                            <small>
+                                                                <p>{ep.A_TO_Z.validationText}</p>
+                                                                <p>Reservable: {ep.A_TO_Z.available} Mbps</p>
+                                                                <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                                    <p>Widest: {ep.A_TO_Z.widest} Mbps</p>
+                                                                </ToggleDisplay>
+                                                                <p>Baseline: {ep.A_TO_Z.baseline} Mbps</p>
+                                                            </small>
+                                                        </HelpBlock>
+                                                    </FormGroup>
+                                                </ToggleDisplay>
+                                                <ToggleDisplay show={ep.locked}>
+                                                    <Well>{ep.A_TO_Z.bw} Mbps</Well>
                                                 </ToggleDisplay>
                                             </Col>
                                         </Row>
+                                        <Row>
+                                            <Col smOffset={3} mdOffset={3} lgOffset={3} sm={9} md={9} lg={9}>
+                                                <ToggleDisplay show={!ep.locked}>
+                                                    <FormGroup validationState={ep.Z_TO_A.validationState}>
+                                                        <InputGroup>
+                                                            <InputGroup.Addon>
+                                                                <input type='checkbox' aria-label='Strict'/>
 
+                                                            </InputGroup.Addon>
 
+                                                            <FormControl type='text'
+                                                                         bsSize='small'
+                                                                         placeholder='0-100000'
+                                                                         defaultValue={ep.Z_TO_A.bw}
+                                                                         inputRef={ref => {
+                                                                             this.zaBwControl = ref;
+                                                                         }}
+
+                                                                         disabled={ep.locked}
+                                                                         onChange={this.onZaBwChange}/>
+                                                            <InputGroup.Addon>
+                                                                <Glyphicon glyph='arrow-left'/>
+                                                            </InputGroup.Addon>
+
+                                                        </InputGroup>
+
+                                                        <HelpBlock>
+                                                            <small>
+                                                                <p>{ep.Z_TO_A.validationText}</p>
+                                                                <p>Reservable: {ep.Z_TO_A.available} Mbps</p>
+                                                                <ToggleDisplay show={(ep.ero.mode === 'fits')}>
+                                                                    <p>Widest: {ep.Z_TO_A.widest} Mbps</p>
+                                                                </ToggleDisplay>
+                                                                <p>Baseline: {ep.Z_TO_A.baseline} Mbps</p>
+                                                            </small>
+                                                        </HelpBlock>
+                                                    </FormGroup>
+
+                                                </ToggleDisplay>
+                                                <ToggleDisplay show={ep.locked}>
+                                                    <Well>{ep.Z_TO_A.bw} Mbps</Well>
+                                                </ToggleDisplay>
+                                            </Col>
+                                        </Row>
                                     </Panel.Body>
                                 </Panel>
-                                <ToggleDisplay show={!ep.locked}>
-                                    <Well>Select pipe parameters, then click "Lock".</Well>
-                                </ToggleDisplay>
+                            </Col>
+                            <Col md={4} lg={4} sm={4}>
+                                <Panel>
+                                    <Panel.Heading>
+                                        <Panel.Title>{pipe.z}</Panel.Title>
+                                    </Panel.Heading>
+                                    <Panel.Body>
+                                        <u>Fixtures:</u>
+                                        <small>
+                                            <ListGroup>
+                                                {
+                                                    zFixtures.map(f => {
+                                                        return <ListGroupItem
+                                                            key={f.label}>{f.label} (i: {f.ingress}M /
+                                                            e: {f.egress}M)</ListGroupItem>
+                                                    })
+                                                }
+                                            </ListGroup>
+                                        </small>
+                                        <p>Total ingress: <b>{zIngress} Mbps</b></p>
+                                        <p>Total egress: <b>{zEgress} Mbps</b></p>
+                                    </Panel.Body>
+                                </Panel>
+                            </Col>
+                        </Row>
 
-                                <ButtonToolbar>
+                        <Panel>
+                            <Panel.Heading>
+                                <Panel.Title>
+                                    <PathSelectMode onSelectModeChange={this.onSelectModeChange}/>
+                                </Panel.Title>
+                            </Panel.Heading>
+                            <Panel.Body>
 
-                                    <Confirm
-                                        onConfirm={this.deletePipe}
-                                        body='Are you sure you want to delete?'
-                                        confirmText='Confirm'
-                                        title='Delete pipe'>
-                                        <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                                <Row>
+                                    <ToggleDisplay show={showEroControls}>
+                                        <Col md={6} lg={6} sm={6}>
+                                            <h4>Your ERO</h4>
+                                            <EroSelect/>
+                                            <Button onClick={this.resetEro}>Clear</Button>
 
-                                    </Confirm>
-
-                                    <ToggleDisplay show={!ep.locked}>
-                                        <Button bsStyle='primary'
-                                                disabled={disableLockBtn}
-                                                className='pull-right'
-                                                onClick={this.lockPipe}>Lock</Button>
+                                        </Col>
                                     </ToggleDisplay>
-                                    <ToggleDisplay show={ep.locked}>
-                                        <Button bsStyle='warning'
-                                                className='pull-right'
-                                                onClick={this.unlockPipe}>Unlock</Button>
-                                    </ToggleDisplay>
-                                </ButtonToolbar>
+                                    <Col md={6} lg={6} sm={6} smOffset={eroOffset} mdOffset={eroOffset}
+                                         lgOffset={eroOffset}>
+                                        <h4>Computed ERO</h4>
+                                        <ToggleDisplay show={!ep.locked}>
+                                            <small>{ep.ero.message}</small>
+                                        </ToggleDisplay>
+                                        <ListGroup>
+                                            {
+                                                ep.ero.hops.map(urn => {
+                                                    return <ListGroupItem key={urn}>
+                                                        <small>{urn}</small>
+                                                    </ListGroupItem>
+                                                })
+                                            }
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
 
+
+                            </Panel.Body>
+                        </Panel>
+
+
+                    </ToggleDisplay>
+
+                    <Well>
+                        <ButtonToolbar>
+                            <Confirm
+                                onConfirm={this.deletePipe}
+                                body='Are you sure you want to delete?'
+                                confirmText='Confirm'
+                                title='Delete pipe'>
+                                <Button bsStyle='warning' className='pull-right'>Delete</Button>
+                            </Confirm>
+
+                            <ToggleDisplay show={!ep.locked}>
+                                <Button bsStyle='primary'
+                                        disabled={disableLockBtn}
+                                        className='pull-right'
+                                        onClick={this.lockPipe}>Lock</Button>
                             </ToggleDisplay>
-                        </Panel.Body>
+                            <ToggleDisplay show={ep.locked}>
+                                <Button bsStyle='warning'
+                                        className='pull-right'
+                                        onClick={this.unlockPipe}>Unlock</Button>
+                            </ToggleDisplay>
+                        </ButtonToolbar>
+                    </Well>
 
-                    </Panel>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.closeModal}>Close</Button>
@@ -650,6 +688,9 @@ export default class PipeParamsModal extends Component {
 @inject('controlsStore', 'designStore')
 @observer
 class PathSelectMode extends Component {
+    protectClicked = (e) => {
+
+    };
 
 
     render() {
@@ -661,88 +702,57 @@ class PathSelectMode extends Component {
                 <Panel.Body>
                     <div style={{'width': 500, 'backgroundColor': 'white'}}>
                         <Tabs id='modes' defaultActiveKey={1}>
-                            <Tab eventKey={1} title='Fully responsive'>
-                                <p>These modes will re-calculate the path every time you change the bandwidth,
+                            <Tab eventKey={1} title='Fits BW'>
+                                <p>In this mode OSCARS will calculate the shortest path (based on policy
+                                    metric) that will fit the bandwidth you want. You will always be able
+                                    to find a zero-bandwidth path. This is the recommended mode to use for
+                                    most connections.</p>
+
+                                <p>This mode will re-calculate the path every time you change the bandwidth,
                                     as well as when you make changes to the ERO.
                                     Depending on your input and the state of the network, a path might not be
                                     found; in that case you won't be able to lock the pipe. </p>
-
-                                <PanelGroup accordion id='accordion-fully' defaultActiveKey={'fits'}>
-                                    <Panel eventKey='fits'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Fit to bandwidth</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p>In this mode OSCARS will calculate the shortest path (based on policy
-                                                metric) that will fit the bandwidth you want. You will always be able
-                                                to find a zero-bandwidth path; this will be the same as the shortest
-                                                (by metric) mode.</p>
-                                        </Panel.Body>
-                                    </Panel>
-                                </PanelGroup>
                             </Tab>
-                            <Tab eventKey={2} title='Semi-responsive'>
-                                <p>These modes will respond to changes in the ERO constraints, but will not take
-                                    bandwidth into account for their calculations.
-                                    They will try to find the widest path on the network that matches the ERO.</p>
-                                <PanelGroup accordion id='accordion-semi' defaultActiveKey={'wo'}>>
-                                    <Panel eventKey='wo'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest overall</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth, considered as a sum
-                                                of the available bandwidth in both directions. When you want the most
-                                                possible bandwidth over the network maximizing flow in both directions.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-                                    <Panel eventKey='wd'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Widest (direction)</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that has the maximum available bandwidth in a specific
-                                                direction. Use when you want the greatest possible bandwidth over the
-                                                network, maximizing flow in one direction only.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-                                </PanelGroup>
 
-                            </Tab>
-                            <Tab eventKey={3} title='Fixed'>
-                                <p> These modes will always provide the same path, given a specific schedule and
-                                    start/end points. In this modes, if you change the bandwidth, the path will not
-                                    change; rather, your input will be validated against previously calculated
+                            <Tab eventKey={2} title='Shortest'>
+                                <p> The shortest path on the network as calculated by the policy metric.
+                                    Will be the most economical on resources and will maximize the overall
+                                    network throughput, and minimize latency.</p>
+
+                                <p> This mode, given a specific schedule and start/end points, will always provide
+                                    the <b>same path</b>. You will not be able to give ERO  constraints.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated
                                     maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
-                                <PanelGroup accordion id='accordion-fixed' defaultActiveKey={'sbm'}>
-                                    <Panel eventKey='sbm'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Shortest (by metric)</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The shortest path on the network as calculated by the policy metric.
-                                                Will be the most economical on resources and will maximize the overall
-                                                network throughput, and minimize latency.</p>
-                                        </Panel.Body>
-                                    </Panel>
-                                    <Panel eventKey='sbh'>
-                                        <Panel.Heading>
-                                            <Panel.Title toggle>Least hops</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body collapsible>
-                                            <p> The path that goes over the least amount of network devices and
-                                                connections. This minimizes the chance that the path will be disrupted
-                                                by outages.
-                                            </p>
-                                        </Panel.Body>
-                                    </Panel>
-
-
-                                </PanelGroup>
-
                             </Tab>
+                            <Tab eventKey={3} title='Least Hops'>
+                                <p> The path that goes over the least number of network devices and
+                                    connections. use this to minimize the chance that the path will be disrupted
+                                    by outages.
+                                </p>
+
+                                <p> This mode, given a specific schedule and start/end points, will always provide
+                                    the <b>same path</b>. You will not be able to give ERO constraints.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated
+                                    maximum values. If it exceeds those values, you won't be able to lock the pipe.</p>
+                            </Tab>
+
+                            <Tab eventKey={4} title='Widest'>
+                                <p> These modes find the path that has the maximum available bandwidth,
+                                    considered either per direction, or as the sum of the available bandwidth
+                                    in both directions.
+                                    Use when you want the most possible bandwidth over the network with less regard
+                                    about keeping the path short.
+                                </p>
+                                <p>These modes will take into account any ERO constraints, but will <b>not</b> take
+                                    bandwidth into account for their calculations; their function is to find the
+                                    maximum.
+                                    If you change the bandwidth, the path will not change as it does in 'Fits' mode;
+                                    instead, your input will be validated against previously calculated.</p>
+                            </Tab>
+
+
                         </Tabs>
                     </div>
                 </Panel.Body>
@@ -754,7 +764,7 @@ class PathSelectMode extends Component {
             trigger='click'
             interactive={true}
             html={helpTabs}>
-            <h4><Glyphicon glyph='question-sign'/></h4>
+            <Glyphicon glyph='question-sign'/>
 
         </Tooltip>;
         let ep = this.props.controlsStore.editPipe;
@@ -769,22 +779,38 @@ class PathSelectMode extends Component {
             {value: 'widestZA', label: 'Widest, priority <='},
         ];
         return <Row>
-            <Col sm={4} md={4} lg={4}><b>Path</b></Col>
+            <Col sm={2} md={2} lg={2}><b>Path</b></Col>
+            <Col sm={2} md={2} lg={2}>
+                <FormGroup controlId='protect'>
+                    <Checkbox bsSize='small'
+                              defaultChecked={ep.protect}
+                              inline
+                              disabled={ep.locked}
+                              onChange={this.protectClicked}>
+                        Protect
+                    </Checkbox>
+                </FormGroup>
+            </Col>
 
             <ToggleDisplay show={!ep.locked}>
-
                 <Col sm={3} md={3} lg={3}>
-                    <FormControl componentClass='select' className='pull-left' onChange={this.props.onSelectModeChange}>
-                        {
-                            pathSelectModeOpts.map((option, index) => {
-                                return <option key={index} value={option.value}>{option.label}</option>
-                            })
-                        }
-                    </FormControl>
+                    <InputGroup>
+
+                        <FormControl componentClass='select' bsSize='small' className='pull-left'
+                                     onChange={this.props.onSelectModeChange}>
+                            {
+                                pathSelectModeOpts.map((option, index) => {
+                                    return <option key={index} value={option.value}>{option.label}</option>
+                                })
+                            }
+                        </FormControl>
+                        <InputGroup.Addon>
+                            {helpPopover}
+                        </InputGroup.Addon>
+
+                    </InputGroup>
                 </Col>
-                <Col sm={1} md={1} lg={1} componentClass={ControlLabel}>
-                    {helpPopover}
-                </Col>
+
             </ToggleDisplay>
         </Row>
     }
@@ -793,3 +819,4 @@ class PathSelectMode extends Component {
 PathSelectMode.propTypes = {
     onSelectModeChange: PropTypes.func.isRequired
 };
+

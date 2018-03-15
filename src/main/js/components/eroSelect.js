@@ -1,23 +1,13 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {action, toJS, autorunAsync} from 'mobx';
 import Topology from '../lib/topology';
 import ToggleDisplay from 'react-toggle-display';
-import {
-    Modal, Button, FormControl, ControlLabel, FormGroup, Form,
-    Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
-    Tabs, Tab, ButtonToolbar,
-    ListGroup, ListGroupItem, HelpBlock, InputGroup, PanelGroup
-} from 'react-bootstrap';
+import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'react-bootstrap';
 import Select from 'react-select-plus';
 
-require('react-bootstrap-typeahead/css/ClearButton.css');
-require('react-bootstrap-typeahead/css/Loader.css');
-require('react-bootstrap-typeahead/css/Token.css');
-require('react-bootstrap-typeahead/css/Typeahead.css');
 import {size} from 'lodash-es';
 import 'react-select-plus/dist/react-select-plus.css';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 
 @inject('controlsStore', 'topologyStore')
@@ -29,30 +19,8 @@ export default class EroSelect extends Component {
 
     }
 
-    populateIncludeDispose = autorunAsync('populateIncluded', () => {
-        const ep = this.props.controlsStore.editPipe;
-
-        if (size(ep.ero.include) === 0) {
-            if (size(ep.ero.hops) >= 2) {
-                this.props.controlsStore.setParamsForEditPipe({
-                    ero: {
-                        include: [ep.a, ep.z]
-                    }
-                });
-            }
-
-        }
-
-
-    }, 1000);
-
     componentWillMount() {
         this.props.topologyStore.loadAdjacencies();
-    }
-
-    componentWillUnmount() {
-        this.populateIncludeDispose();
-
     }
 
     nextHopOptions(urn, adjacencies, ero) {
@@ -96,7 +64,7 @@ export default class EroSelect extends Component {
                     }
                 }
             }
-            if (urns.length > 0 ) {
+            if (urns.length > 0) {
                 let value = JSON.stringify(urns);
                 options[0].options.push({label: label, value: value});
             }
@@ -159,13 +127,18 @@ export default class EroSelect extends Component {
 
         ep.ero.include.map((urn, i) => {
             if (i === 0 || urn === last) {
-                items.push(<ListGroupItem key={urn}>{urn}</ListGroupItem>);
+                items.push(<ListGroupItem key={urn}>
+                    <small>{urn}</small>
+                </ListGroupItem>);
             } else {
                 items.push(
-                    <ListGroupItem key={urn}>{urn}
-                        <ToggleDisplay show={!ep.locked}>
-                            <Glyphicon className='pull-right' glyph='minus' onClick={() => this.removeUrn(i)}/>
-                        </ToggleDisplay>
+                    <ListGroupItem key={urn}>
+                        <small>
+                            {urn}
+                            <ToggleDisplay show={!ep.locked}>
+                                <Glyphicon className='pull-right' glyph='minus' onClick={() => this.removeUrn(i)}/>
+                            </ToggleDisplay>
+                        </small>
                     </ListGroupItem>);
 
             }
@@ -176,11 +149,12 @@ export default class EroSelect extends Component {
                 if (Topology.adjacent(urn, next_urn, adjcies) === 'NONE') {
                     let options = this.nextHopOptions(urn, adjcies, ep.ero.include);
                     items.push(<ListGroupItem key={urn + '-next'}>
-                        <NextHopSelect urn={urn} options={options} index={i}/>
+                        <small>
+                            <NextHopSelect urn={urn} options={options} index={i}/>
+                        </small>
 
                     </ListGroupItem>)
                 }
-                ;
             }
         });
 
