@@ -5,10 +5,6 @@ import ToggleDisplay from 'react-toggle-display';
 import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'react-bootstrap';
 import Select from 'react-select-plus';
 
-require('react-bootstrap-typeahead/css/ClearButton.css');
-require('react-bootstrap-typeahead/css/Loader.css');
-require('react-bootstrap-typeahead/css/Token.css');
-require('react-bootstrap-typeahead/css/Typeahead.css');
 import {size} from 'lodash-es';
 import 'react-select-plus/dist/react-select-plus.css';
 import PropTypes from 'prop-types';

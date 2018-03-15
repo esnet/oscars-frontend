@@ -13,6 +13,7 @@ import SelectDesignApp from './apps/selectDesign';
 import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AboutApp from './apps/about';
+import TimeoutApp from './apps/timeout';
 
 import StatusApp from './apps/statusApp';
 import MapApp from './apps/mapApp';
@@ -102,6 +103,7 @@ ReactDOM.render(
                     <PrivateRoute path="/pages/details/:connectionId?" component={ConnectionDetails}/>
                     <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
                     <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
+                    <PrivateRoute exact path="/pages/timeout" component={TimeoutApp}/>
                     <PrivateRoute exact path="/pages/account" component={AccountApp}/>
                     <PrivateRoute exact path="/pages/status" component={StatusApp}/>
                     <PrivateRoute exact path="/pages/map" component={MapApp}/>

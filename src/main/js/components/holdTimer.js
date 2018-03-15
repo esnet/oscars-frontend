@@ -1,19 +1,20 @@
 import React, {Component} from 'react';
-
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync} from 'mobx';
+import {action} from 'mobx';
 import Moment from 'moment';
 import Transformer from '../lib/transform';
+import IdleTimer from 'react-idle-timer';
 
-
-import {OverlayTrigger, Glyphicon, Popover, Panel} from 'react-bootstrap';
+import { Panel} from 'react-bootstrap';
 
 import myClient from '../agents/client';
+import {withRouter} from 'react-router-dom';
 
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer
-export default class HoldTimer extends Component {
+class HoldTimer extends Component {
+
     constructor(props) {
         super(props);
     }
@@ -21,32 +22,33 @@ export default class HoldTimer extends Component {
     componentWillMount() {
         this.setToFifteenMins();
         this.refreshTimer();
+        this.refreshHeld();
     }
 
     componentWillUnmount() {
-        this.disposeOfHeldUpdate();
-        clearTimeout(this.refreshTimeout);
+        clearTimeout(this.refreshHeldTimeout);
+        clearTimeout(this.refreshTimerTimeout);
     }
 
     setToFifteenMins() {
         const untilDt = new Date();
-        untilDt.setTime(untilDt.getTime() + 15 * 60 * 1000);
+        untilDt.setTime(untilDt.getTime() + 15 * 60 * 1000 + 500);
         const until = Moment(untilDt);
         this.props.controlsStore.setParamsForConnection({
             held: {
+                idle: false,
                 remaining: '15:00',
                 until: until
             }
         });
     }
 
-
     refreshTimer = () => {
         const conn = this.props.controlsStore.connection;
 
         if (this.props.designStore.design.junctions.length === 0) {
             this.setToFifteenMins();
-            this.refreshTimeout = setTimeout(this.refreshTimer, 1000); // we will update every second
+            this.refreshTimerTimeout = setTimeout(this.refreshTimer, 1000); // we will update every second
             return;
         }
 
@@ -55,16 +57,11 @@ export default class HoldTimer extends Component {
         let until = conn.held.until;
         let remaining = Moment.duration(until.diff(now));
         if (remaining.asSeconds() < 0) {
-            this.props.controlsStore.setParamsForConnection({
-                schedule: {
-                    locked: false
-                }
-            });
-            this.props.designStore.unlockAll();
+            this.idledOut();
 
         } else {
             this.updateTimer();
-            this.refreshTimeout = setTimeout(this.refreshTimer, 1000); // we will update every second
+            this.refreshTimerTimeout = setTimeout(this.refreshTimer, 1000); // we will update every second
         }
 
     };
@@ -89,15 +86,42 @@ export default class HoldTimer extends Component {
 
     };
 
-    disposeOfHeldUpdate = autorunAsync('held update', () => {
+
+
+    idledOut = () => {
+        clearTimeout(this.refreshHeldTimeout);
+        clearTimeout(this.refreshTimerTimeout);
+
+        this.props.controlsStore.setParamsForConnection({
+            schedule: {
+                locked: false
+            }
+        });
+        this.props.designStore.clear();
+
+        this.props.history.push('/pages/timeout');
+
+    };
+
+
+    refreshHeld = () => {
+
         let conn = this.props.controlsStore.connection;
+        if (conn.held.idle) {
+            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000);
+            return;
+        }
+
         if (!conn.schedule.locked) {
+            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000); // check again next sec
             return;
         }
-        if (typeof conn.connectionId === 'undefined' || conn.connectionId === null) {
+        if (typeof conn.connectionId === 'undefined' || conn.connectionId === null || conn.connectionId === '') {
             console.log('no connectionId!');
+            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000);
             return;
         }
+
 
         let held = {};
         let scheduleRef = conn.connectionId + '-HELD';
@@ -118,9 +142,6 @@ export default class HoldTimer extends Component {
         held.cmp = cmp;
 //        console.log(held);
 //        whyRun();
-        if (conn.connectionId === null || conn.connectionId === '') {
-            return
-        }
 
         let connection = {
             connectionId: conn.connectionId,
@@ -138,7 +159,7 @@ export default class HoldTimer extends Component {
 //                    console.log(response);
                     this.props.controlsStore.setParamsForConnection({
                         held: {
-                            until: Moment.unix(response)
+                            until: Moment.unix(response + 100)
                         }
                     });
                     this.props.controlsStore.saveToSessionStorage();
@@ -150,31 +171,67 @@ export default class HoldTimer extends Component {
                 }));
 
 
-    }, 1000);
+        this.refreshHeldTimeout = setTimeout(this.refreshHeld, 5000);
+
+    };
 
 
     render() {
+        console.log('render');
+
+        const oneMin = 5 * 60 * 1000;
+        const fifteenMins = 10 * 60 * 1000;
+
         const conn = this.props.controlsStore.connection;
 
-        let help = <Popover id='help-timer' title='Timer help'>
-            <p>This shows the remaining time until your locked resources are automatically
-                released on the server. Any modification to the design or the schedule will
-                reset the timer.</p>
-        </Popover>;
+
+        let notify = '';
+        const empty = this.props.designStore.design.junctions.length === 0;
 
 
-        return (
-            <Panel>
+        if (conn.held.idle && !empty) {
+            notify = <Panel>
                 <Panel.Body>
-
-                    <span>Resources held for: {conn.held.remaining}
-                        <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
-                        </OverlayTrigger>
-                    </span>
+                    User idle; will keep holding for: {conn.held.remaining}
                 </Panel.Body>
 
             </Panel>
+        }
+
+        return (
+            <div>
+
+                <IdleTimer
+                    activeAction={() => {
+                        console.log('active');
+                        this.props.controlsStore.setParamsForConnection({
+                            held: {
+                                idle: false
+                            }
+                        });
+                    }}
+                    idleAction={() => {
+                        console.log('idle');
+                        this.props.controlsStore.setParamsForConnection({
+                            held: {
+                                idle: true
+                            }
+                        });
+                    }}
+                    timeout={oneMin} />
+
+                <IdleTimer
+                    idleAction={() => {
+                        this.idledOut();
+                    }}
+                    timeout={fifteenMins} />
+
+
+                {notify}
+            </div>
+
         );
     }
 }
+
+export default withRouter(HoldTimer);
