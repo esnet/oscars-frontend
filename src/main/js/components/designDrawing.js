@@ -142,7 +142,7 @@ export default class DesignDrawing extends Component {
                     let junctionNode = {
                         id: j.id,
                         label: j.id,
-                        size: 20,
+                        size: 16,
                         data: j,
                         x: positions[j.id].x,
                         y: positions[j.id].y,
@@ -162,6 +162,7 @@ export default class DesignDrawing extends Component {
                         label: f.label,
                         x: positions[f.device].x + 10,
                         size: 8,
+                        shape: 'hexagon',
                         color: {
                             background: validator.fixtureMapColor(f),
                             inherit: false
@@ -205,6 +206,8 @@ export default class DesignDrawing extends Component {
                                 let zNode = {
                                     id: z,
                                     label: z,
+                                    size: 12,
+                                    shape: 'diamond',
                                     onClick: null
 
                                 };
