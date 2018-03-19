@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col} from 'reactstrap';
 
 
 import NetworkMap from '../components/networkMap';
@@ -21,7 +21,7 @@ export default class MapApp extends Component {
     render() {
         return (
             <Row>
-                <Col md={10} mdOffset={1}>
+                <Col md={{size: 10, offset: 1}}>
                     <NetworkMap />
                 </Col>
             </Row>

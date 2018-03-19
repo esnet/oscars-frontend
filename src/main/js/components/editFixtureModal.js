@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, ButtonToolbar, Glyphicon, Well} from 'react-bootstrap';
+import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, ButtonToolbar, Glyphicon, Well} from 'reactstrap';
 
-import {toJS, action, autorun, computed, whyRun} from 'mobx';
+import {toJS } from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 import Confirm from 'react-confirm-bootstrap';
 

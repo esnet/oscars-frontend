@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS} from 'mobx';
+import {action, autorun, toJS} from 'mobx';
 
 
 import {
@@ -14,7 +14,7 @@ import {
     FormGroup,
     FormControl,
     OverlayTrigger
-} from 'react-bootstrap';
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 import Transformer from '../lib/transform';
@@ -76,7 +76,7 @@ export default class DesignControls extends Component {
                 }));
     };
 
-    disposeOfValidate = autorunAsync('validate', () => {
+    disposeOfValidate = autorun(() => {
         let editDesign = this.props.controlsStore.editDesign;
         let cmp = {
             junctions: this.props.designStore.design.junctions,
@@ -91,7 +91,7 @@ export default class DesignControls extends Component {
         }
         this.props.designStore.setErrors(result.errors);
 
-    }, 1000);
+    }, { delay: 1000} );
 
 
     componentWillUnmount() {

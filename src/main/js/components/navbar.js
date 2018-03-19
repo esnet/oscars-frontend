@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem}from 'react-bootstrap';
+import {
+    Navbar, NavbarBrand, Nav, NavItem, UncontrolledDropdown, DropdownMenu, DropdownToggle,
+    NavLink, DropdownItem
+} from 'reactstrap';
 import {observer, inject} from 'mobx-react';
 
 import {LinkContainer} from 'react-router-bootstrap';
-import {Link } from 'react-router-dom';
-import { AlertList } from 'react-bs-notifier';
-import {toJS, observable, whyRun, autorunAsync} from 'mobx'
+import {AlertList} from 'react-bs-notifier';
+import {toJS} from 'mobx'
 
 @inject('accountStore', 'commonStore')
 @observer
@@ -14,7 +16,6 @@ export default class NavBar extends Component {
     constructor(props) {
         super(props);
     }
-
 
 
     componentWillMount() {
@@ -43,85 +44,62 @@ export default class NavBar extends Component {
 
 
     render() {
-        let leftNav =
-            <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
-                <LinkContainer to='/login'>
-                    <NavItem eventKey='login'>Login</NavItem>
-                </LinkContainer>
-            </Nav>;
-        let rightNav = null;
 
+        if (!this.props.accountStore.isLoggedIn()) {
+            return <Navbar color='faded' light expand='md'>
+                <NavbarBrand href='/pages/about'>OSCARS</NavbarBrand>
 
-        if (this.props.accountStore.isLoggedIn()) {
-            let admin = null;
-
-            if (this.props.accountStore.isAdmin()) {
-                admin = <NavDropdown id='admin' eventKey='admin' title='Admin'>
-                    <LinkContainer to='/pages/admin/users'>
-                        <MenuItem>Users</MenuItem>
-                    </LinkContainer>
-                </NavDropdown>
-            }
-
-            leftNav = <Nav bsStyle='tabs' activeKey={this.props.commonStore.nav.active}>
-                <LinkContainer to='/pages/map'>
-                    <NavItem eventKey='map'>Network Map</NavItem>
-                </LinkContainer>
-
-                <LinkContainer to='/pages/list'>
-                    <NavItem eventKey='list'>List</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/pages/details'>
-                    <NavItem eventKey='details'>Details</NavItem>
-                </LinkContainer>
-
-                <LinkContainer to='/pages/newDesign'>
-                    <NavItem eventKey='newDesign'>New</NavItem>
-                </LinkContainer>
-
-{/*
-                <LinkContainer to='/pages/selectDesign'>
-                    <NavItem eventKey='selectDesign'>Copy</NavItem>
-                </LinkContainer>
-*/}
-            </Nav>;
-
-
-
-            rightNav =
-                <Nav pullRight>
-                    <LinkContainer to='/pages/status'>
-                        <NavItem eventKey='status'>Status</NavItem>
-                    </LinkContainer>
-                    {admin}
-                    <LinkContainer to='/pages/account'>
-                        <NavItem eventKey='account'>My Account</NavItem>
-                    </LinkContainer>
-                    <LinkContainer to='/logout'>
-                        <NavItem eventKey='logout'>Logout</NavItem>
-                    </LinkContainer>
-                </Nav>;
+                <Nav navbar>
+                    <NavLink href='/login' active={this.props.commonStore.nav.active === 'login'}>Login</NavLink>
+                </Nav>
+            </Navbar>
 
         }
+
+        let admin = null;
+        if (this.props.accountStore.isAdmin()) {
+            admin = <UncontrolledDropdown>
+                <DropdownToggle nav caret>
+                    Admin
+                </DropdownToggle>
+                <DropdownMenu>
+                    <NavLink href='/pages/admin/users'>Users</NavLink>
+                </DropdownMenu>
+            </UncontrolledDropdown>
+        }
+
         return (
-            <Navbar collapseOnSelect>
+            <Navbar color='faded' light expand='md'>
                 <AlertList
                     position='top-right'
                     alerts={toJS(this.props.commonStore.alerts)}
                     timeout={1000}
-                    dismissTitle="Dismiss"
-                    onDismiss={(alert) => {this.props.commonStore.removeAlert(alert)}}
+                    dismissTitle='Dismiss'
+                    onDismiss={(alert) => {
+                        this.props.commonStore.removeAlert(alert)
+                    }}
                 />
+                <NavbarBrand href='/pages/about'>OSCARS</NavbarBrand>
 
-                <Navbar.Header>
-                    <Navbar.Brand>
-                        <Link to='/pages/about'>OSCARS</Link>
-                    </Navbar.Brand>
-                </Navbar.Header>
-                <Navbar.Collapse>
-                    {leftNav}
-                    {rightNav}
-                </Navbar.Collapse>
+
+                <Nav navbar>
+                    <NavLink href='/pages/map'
+                             active={this.props.commonStore.nav.active === 'map'}>Network Map</NavLink>
+                    <NavLink href='/pages/list'
+                             active={this.props.commonStore.nav.active === 'list'}>List</NavLink>
+                    <NavLink href='/pages/details'
+                             active={this.props.commonStore.nav.active === 'details'}>Details</NavLink>
+                    <NavLink href='/pages/newDesign'
+                             active={this.props.commonStore.nav.active === 'newDesign'}>New</NavLink>
+                    <NavLink href='/pages/status'
+                             active={this.props.commonStore.nav.active === 'status'}>Status</NavLink>
+
+                    {admin}
+                    <NavLink href='/pages/account'
+                             active={this.props.commonStore.nav.active === 'account'}>My Account</NavLink>
+                    <NavLink href='/logout'
+                             active={this.props.commonStore.nav.active === 'logout'}>Logout</NavLink>
+                </Nav>
             </Navbar>
         )
     }

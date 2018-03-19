@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {toJS} from 'mobx';
-import validator from '../lib/validation'
-import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-bootstrap';
-import transformer from '../lib/transform';
+import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 @inject('connsStore')

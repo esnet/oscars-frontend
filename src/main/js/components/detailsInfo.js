@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS} from 'mobx';
+import {action, toJS} from 'mobx';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import {Panel, Tabs, Tab, Button} from 'react-bootstrap';
+import {Panel, Tabs, Tab, Button} from 'reactstrap';
 import DetailsGeneral from '../components/detailsGeneral';
 import PropTypes from 'prop-types';
 import myClient from "../agents/client";

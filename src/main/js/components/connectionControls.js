@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS} from 'mobx';
+import {action, autorun, toJS} from 'mobx';
 
 
 import ToggleDisplay from 'react-toggle-display';
@@ -16,7 +16,7 @@ import {
     Well,
     Popover,
     OverlayTrigger
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 import myClient from '../agents/client';
 import validator from '../lib/validation';
@@ -53,7 +53,7 @@ export default class ConnectionControls extends Component {
     // TODO: make sure you can't uncommit past start time
 
 
-    disposeOfValidate = autorunAsync('validate', () => {
+    disposeOfValidate = autorun(() => {
         let validationParams = {
             connection: this.props.controlsStore.connection,
             junctions: this.props.designStore.design.junctions,
@@ -71,7 +71,7 @@ export default class ConnectionControls extends Component {
         });
 
 
-    }, 1000);
+    }, { delay: 1000 });
 
     componentWillUnmount() {
         this.disposeOfValidate();

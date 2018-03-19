@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorun, autorunAsync, toJS} from 'mobx';
+import {action, autorun, toJS} from 'mobx';
 import Moment from 'moment';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ToggleDisplay from 'react-toggle-display';
 import Confirm from 'react-confirm-bootstrap';
 
-import {Panel, Button} from 'react-bootstrap';
+import {Panel, Button} from 'reactstrap';
 import myClient from '../agents/client';
 
 

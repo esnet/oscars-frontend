@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col} from 'reactstrap';
 
 
 export default class WelcomeApp extends Component {
@@ -8,7 +8,7 @@ export default class WelcomeApp extends Component {
 
         return (
             <Row>
-                <Col mdOffset={1} md={10}>
+                <Col md={{size: 10, offset: 1}}>
                     <h4>Welcome to OSCARS</h4>
                 </Col>
             </Row>

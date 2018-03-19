@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import vis from 'vis';
+import vis, {Dataset} from 'vis';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync, toJS, action} from 'mobx';
+import {autorun, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
 
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
 
 import myClient from '../agents/client';
 
@@ -23,7 +23,7 @@ export default class NetworkMap extends Component {
 
 
     // this automagically updates the map;
-    disposeOfMapUpdate = autorunAsync('map update', () => {
+    disposeOfMapUpdate = autorun(() => {
 
         this.datasource = {
             nodes: new vis.DataSet(),
@@ -125,7 +125,7 @@ export default class NetworkMap extends Component {
         }
 
 
-    }, 500);
+    }, { delay: 500});
 
 
     zoomOnColored = () => {

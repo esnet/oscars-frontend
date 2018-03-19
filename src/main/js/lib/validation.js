@@ -2,7 +2,7 @@ import React from 'react';
 
 
 import {Graph, alg} from 'graphlib';
-import {Glyphicon, Label} from 'react-bootstrap';
+import {Glyphicon, Label} from 'reactstrap';
 
 class Validator {
     label(state) {

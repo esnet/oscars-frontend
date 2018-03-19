@@ -1,7 +1,6 @@
-import React from 'react'
-import {observer, inject} from 'mobx-react'
-import {observable, whyRun} from 'mobx'
-import {Redirect} from 'react-router-dom'
+import React from 'react';
+import {observer, inject} from 'mobx-react';
+import {Redirect} from 'react-router-dom';
 
 @inject('accountStore')
 @observer

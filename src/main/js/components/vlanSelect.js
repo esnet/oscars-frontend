@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {toJS, action, autorun, computed, whyRun} from 'mobx';
 import {
     OverlayTrigger, Glyphicon, Popover, Panel, FormGroup,
     FormControl, ControlLabel, HelpBlock, Well
-} from 'react-bootstrap';
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 import Validator from '../lib/validation';

@@ -5,7 +5,7 @@ import Moment from 'moment';
 import Transformer from '../lib/transform';
 import IdleTimer from 'react-idle-timer';
 
-import { Panel} from 'react-bootstrap';
+import { Panel} from 'reactstrap';
 
 import myClient from '../agents/client';
 import {withRouter} from 'react-router-dom';

@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {toJS, autorun, whyRun} from 'mobx';
+import {autorun} from 'mobx';
 import {
-    FormGroup, Glyphicon, FormControl, Checkbox, ControlLabel, Form,
+    FormGroup, Glyphicon, FormControl, Checkbox, ControlLabel,
     Panel, Well, Popover, OverlayTrigger, HelpBlock, Row, Col
-} from 'react-bootstrap';
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 
@@ -18,7 +18,7 @@ export default class BwSelect extends Component {
         super(props);
     }
 
-    bwUpdateDispose = autorun('bwUpdate', () => {
+    bwUpdateDispose = autorun(() => {
         if (!this.props.controlsStore.connection.schedule.locked) {
             return;
         }

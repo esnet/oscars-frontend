@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import Topology from '../lib/topology';
 import ToggleDisplay from 'react-toggle-display';
-import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'react-bootstrap';
+import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'reactstrap';
 import Select from 'react-select-plus';
 
 import {size} from 'lodash-es';

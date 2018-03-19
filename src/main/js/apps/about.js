@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Col,Panel} from 'react-bootstrap';
+import {Row, Col, Card, CardHeader, CardBody} from 'reactstrap';
 import myClient from '../agents/client';
 import {action} from 'mobx';
 import {inject, observer} from 'mobx-react';
@@ -26,20 +26,20 @@ export default class AboutApp extends Component {
     render() {
         return (
             <Row>
-                <Col mdOffset={1} md={10}>
-                    <Panel>
-                        <Panel.Heading>
-                            <h3>About OSCARS</h3>
-                        </Panel.Heading>
-                        <Panel.Body>
+                <Col md={{size: 10, offset: 1}}>
+                    <Card>
+                        <CardHeader>
+                            About OSCARS
+                        </CardHeader>
+                        <CardBody>
                             <div>
                                 Frontend version: <u>{this.props.commonStore.version.frontend}</u>
                             </div>
                             <div>
                                 Backend version: <u>{this.props.commonStore.version.backend}</u>
                             </div>
-                        </Panel.Body>
-                    </Panel>
+                        </CardBody>
+                    </Card>
                 </Col>
             </Row>
         );

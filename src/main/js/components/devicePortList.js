@@ -6,7 +6,7 @@ import {
     Glyphicon,
     Panel,
     Accordion
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 export default class DevicePortList extends Component {
     constructor(props) {

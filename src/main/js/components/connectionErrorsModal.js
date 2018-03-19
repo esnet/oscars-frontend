@@ -6,7 +6,7 @@ import {
     Panel,
     ListGroup,
     ListGroupItem
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const modalName = 'connectionErrors';
 

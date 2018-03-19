@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync, toJS} from 'mobx';
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+import {autorun, toJS} from 'mobx';
+import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
 import vis from 'vis';
 import VisUtils from '../lib/vis'
 
@@ -109,7 +109,7 @@ export default class DetailsDrawing extends Component {
 
     // this automagically updates the map;
     // TODO: maybe use a reaction and don't clear the whole graph, instead add/remove/update
-    disposeOfMapUpdate = autorunAsync(() => {
+    disposeOfMapUpdate = autorun(() => {
 
 
         let design = this.props.connsStore.store.current.archived.cmp;
@@ -199,7 +199,7 @@ export default class DetailsDrawing extends Component {
 
         this.datasource.edges.add(edges);
 
-    }, 500);
+    }, { delay: 500} );
 
     flipMapState = () => {
         this.setState({showMap: !this.state.showMap});

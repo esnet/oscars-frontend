@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Panel, Table, Form, FormControl, FormGroup, ControlLabel} from 'react-bootstrap';
+import {Panel, Table, Form, FormControl, FormGroup, ControlLabel} from 'reactstrap';
 import Moment from 'moment';
-import {toJS, autorunAsync} from 'mobx';
+import {toJS, autorun} from 'mobx';
 import {observer, inject} from 'mobx-react';
 import transformer from '../lib/transform';
 import {withRouter, Link} from 'react-router-dom'
@@ -25,9 +25,9 @@ class ConnectionsList extends Component {
         this.disposeOfUpdateList();
     }
 
-    disposeOfUpdateList = autorunAsync('updateList', () => {
+    disposeOfUpdateList = autorun(() => {
         this.updateList();
-    }, 1000);
+    }, { delay: 1000 });
 
     updateList = () => {
         let filter = {};

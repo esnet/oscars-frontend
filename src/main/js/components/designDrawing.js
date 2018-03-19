@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync, toJS, action} from 'mobx';
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+import {autorun, toJS, action} from 'mobx';
+import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
 import transformer from '../lib/transform';
 import vis from 'vis';
 import validator from '../lib/validation'
@@ -113,7 +113,7 @@ export default class DesignDrawing extends Component {
 
     // this automagically updates the map;
     // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
-    disposeOfMapUpdate = autorunAsync(() => {
+    disposeOfMapUpdate = autorun(() => {
 
         let {design} = this.props.designStore;
         let junctions = toJS(design.junctions);
@@ -261,7 +261,7 @@ export default class DesignDrawing extends Component {
             }));
 
 
-    }, 500);
+    }, { delay: 500} );
 
     flipMapState = () => {
         this.setState({showMap: !this.state.showMap});

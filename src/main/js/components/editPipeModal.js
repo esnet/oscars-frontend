@@ -5,12 +5,12 @@ import {
     Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
     Tabs, Tab, ButtonToolbar, Checkbox, DropdownButton, MenuItem,
     ListGroup, ListGroupItem, HelpBlock, InputGroup, PanelGroup
-} from 'react-bootstrap';
+} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import ToggleDisplay from 'react-toggle-display';
 import EroSelect from './eroSelect';
-import {autorunAsync, toJS} from 'mobx';
+import {autorun, toJS} from 'mobx';
 
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';
@@ -27,7 +27,7 @@ export default class PipeParamsModal extends Component {
     }
 
 
-    pathUpdateDispose = autorunAsync('pathUpdate', () => {
+    pathUpdateDispose = autorun(() => {
         let conn = this.props.controlsStore.connection;
         let ep = this.props.controlsStore.editPipe;
 
@@ -154,13 +154,13 @@ export default class PipeParamsModal extends Component {
                 this.validate();
             });
 
-    }, 1000);
+    }, { delay: 1000});
 
 
-    validationDispose = autorunAsync('validation', () => {
+    validationDispose = autorun(() => {
         this.validate();
 
-    }, 1000);
+    }, {delay: 1000});
 
     validate() {
 

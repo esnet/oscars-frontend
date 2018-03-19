@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal, ModalFooter, ModalHeader, ModalBody, Button} from 'reactstrap';
 import EditUserForm from './editUserForm';
 import myClient from '../agents/client';
 import {size} from 'lodash-es'
@@ -41,7 +41,7 @@ export default class UserAdminModal extends Component {
                         id: (new Date()).getTime(),
                         type: 'danger',
                         headline: 'Could not update password',
-                        message: failResponse.status + ' ' +failResponse.statusText
+                        message: failResponse.status + ' ' + failResponse.statusText
                     });
 
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
@@ -77,7 +77,7 @@ export default class UserAdminModal extends Component {
                         id: (new Date()).getTime(),
                         type: 'danger',
                         headline: 'Could not update user',
-                        message: failResponse.status + ' ' +failResponse.statusText
+                        message: failResponse.status + ' ' + failResponse.statusText
                     });
 
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
@@ -111,7 +111,7 @@ export default class UserAdminModal extends Component {
                         id: (new Date()).getTime(),
                         type: 'danger',
                         headline: 'Could not delete user',
-                        message: failResponse.status + ' ' +failResponse.statusText
+                        message: failResponse.status + ' ' + failResponse.statusText
                     });
                     console.log('Error: ' + failResponse.status + ' - ' + failResponse.statusText);
                 }
@@ -124,27 +124,31 @@ export default class UserAdminModal extends Component {
         this.props.modalStore.closeModal(modalName);
     };
 
+    toggle = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.props.modalStore.closeModal(modalName);
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
+    };
+
     render() {
         let showModal = this.props.modalStore.modals.get(modalName);
 
         return (
-            <Modal show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>User administration</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+            <Modal isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>
+                    User administration
+                </ModalHeader>
+                <ModalBody>
                     <EditUserForm submitPassword={this.submitPassword}
                                   submitUpdate={this.submitUpdate}
                                   submitDelete={this.submitDelete}
                                   adminMode={true}
                                   inModal={true}
                     />
-
-
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                </ModalBody>
             </Modal>
         );
     }

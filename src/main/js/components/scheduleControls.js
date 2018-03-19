@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS, whyRun} from 'mobx';
+import {autorun, toJS} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
 import Confirm from 'react-confirm-bootstrap';
 
@@ -13,7 +13,7 @@ import {size} from 'lodash-es';
 import {
     HelpBlock, Form, Button, Panel, FormGroup,
     FormControl, ControlLabel, Popover, Glyphicon, OverlayTrigger
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const format = 'Y/MM/DD HH:mm:ss';
 
@@ -101,7 +101,7 @@ export default class ScheduleControls extends Component {
 
     }
 
-    disposeOfUpdateAvailable = autorunAsync('updateAvailable', () => {
+    disposeOfUpdateAvailable = autorun(() => {
         let conn = this.props.controlsStore.connection;
         if (conn.schedule.locked) {
             const startSec = conn.schedule.start.at.getTime() / 1000;
@@ -109,7 +109,7 @@ export default class ScheduleControls extends Component {
             this.props.topologyStore.loadAvailable(startSec, endSec);
         }
 
-    }, 1000);
+    }, { delay:  1000});
 
 
     componentWillUnmount() {

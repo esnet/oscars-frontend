@@ -5,7 +5,7 @@ import {
     Button,
     Panel,
     ListGroup,
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const modalName = 'designErrors';
 

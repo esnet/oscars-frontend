@@ -13,7 +13,7 @@ import {
     OverlayTrigger,
     Glyphicon,
     Popover
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 import ToggleDisplay from 'react-toggle-display';
 import transformer from '../lib/transform';

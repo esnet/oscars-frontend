@@ -1,8 +1,7 @@
 import React from 'react'
 import {observer, inject} from 'mobx-react'
-import {observable, whyRun} from 'mobx'
 import {Redirect} from 'react-router-dom'
-import {Row, Col, Panel, Button, Form, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import {Row, Col, Card, CardHeader, CardBody, Button, Form, FormGroup, Input, Label} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
 @inject('accountStore', 'commonStore')
@@ -44,36 +43,33 @@ export default class Login extends React.Component {
         }
 
         return <Row>
-            <Col mdOffset={1} md={3}>
-                <Panel>
-                    <Panel.Heading>
-                        <Panel.Title>Welcome to OSCARS. Please log in.</Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
+            <Col md={{size: 5, offset: 1}}>
+                <Card>
+                    <CardHeader>Welcome to OSCARS. Please log in.</CardHeader>
+                    <CardBody>
                         <Form onSubmit={this.handleLogin}>
-                            <FormGroup controlId="username">
+                            <FormGroup>
 
-                                <ControlLabel>Username:</ControlLabel>
+                                <Label>Username:</Label>
                                 {' '}
-                                <FormControl type="text"
-                                             onChange={this.handleChangeUsername}/>
+                                <Input type='text'
+                                       onChange={this.handleChangeUsername}/>
                             </FormGroup>
-                            <FormGroup controlId="password">
+                            <FormGroup>
 
-                                <ControlLabel>Password:</ControlLabel>
+                                <Label>Password:</Label>
                                 {' '}
-                                <FormControl
-                                    type="password"
-                                    onKeyPress={this.handleKeyPress}
-                                    onChange={this.handleChangePassword}/>
+                                <Input type='password'
+                                       onKeyPress={this.handleKeyPress}
+                                       onChange={this.handleChangePassword}/>
                             </FormGroup>
-                            <Button bsStyle='primary' className='pull-right' onClick={this.handleLogin}>Login</Button>
+                            <Button color='primary' className='pull-right' onClick={this.handleLogin}>Login</Button>
                         </Form>
                         <ToggleDisplay show={this.props.accountStore.attempt.error.length > 0}>
                             <div>{this.props.accountStore.attempt.error}</div>
                         </ToggleDisplay>
-                    </Panel.Body>
-                </Panel>
+                    </CardBody>
+                </Card>
             </Col>
         </Row>;
 

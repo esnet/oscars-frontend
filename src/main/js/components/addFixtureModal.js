@@ -4,10 +4,8 @@ import DevicePortList from './devicePortList';
 import {
     Modal,
     Button,
-    Glyphicon,
-    Popover,
-    OverlayTrigger,
-} from 'react-bootstrap';
+    Popover
+} from 'reactstrap';
 
 import transformer from '../lib/transform';
 
