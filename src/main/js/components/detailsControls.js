@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, toJS} from 'mobx';
 
 import {withRouter} from 'react-router-dom'
 
-import {Button, Panel, FormGroup, ControlLabel, FormControl, HelpBlock} from 'reactstrap';
+import {Button, Card, CardBody, CardHeader, FormGroup, Label, Input} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 @inject('connsStore', 'commonStore')
@@ -38,46 +37,38 @@ class DetailsControls extends Component {
         }
 
         return (
-            <Panel>
-                <Panel.Heading>
-                    <div>Search</div>
-                </Panel.Heading>
-                <Panel.Body>
-
-                    {/*
-                <Button bsStyle='primary' className='pull-right'>Setup</Button>
-                <Button bsStyle='warning' className='pull-right'>Teardown</Button>
-                */}
-                    <FormGroup controlId="connectionId">
-                        <ControlLabel>Connection ID:</ControlLabel>
+            <Card>
+                <CardHeader>Search</CardHeader>
+                <CardBody>
+                    <FormGroup>
+                        <Label>Connection ID:</Label>
                         {' '}
-                        <FormControl
-                            type='text'
-                            inputRef={(ref) => {
-                                this.connectionIdRef = ref
-                            }}
-                            defaultValue={pathConnectionId}
-                            onKeyPress={this.handleKeyPress}
-                            placeholder='Connection ID ("Z0K2")'
+                        <Input type='text'
+                               innerRef={(ref) => {
+                                   this.connectionIdRef = ref
+                               }}
+                               defaultValue={pathConnectionId}
+                               onKeyPress={this.handleKeyPress}
+                               placeholder='Connection ID ("Z0K2")'
                         />
                     </FormGroup>
 
-                    <Button bsStyle='info'
+                    <Button color='info'
                             disabled={!connLoaded}
                             onClick={() => {
                                 this.props.refresh()
                             }}
                             className='pull-left'>Refresh</Button>
 
-                    <Button bsStyle='primary'
+                    <Button color='primary'
                             onClick={() => {
                                 this.load()
                             }}
                             className='pull-right'>Load</Button>
 
-                </Panel.Body>
+                </CardBody>
 
-            </ Panel>
+            </Card>
         );
     }
 }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Panel, Table, Form, FormControl, FormGroup, ControlLabel} from 'reactstrap';
+import {Card, CardBody, CardHeader, Table, Form, Input, FormGroup, Label} from 'reactstrap';
 import Moment from 'moment';
 import {toJS, autorun} from 'mobx';
 import {observer, inject} from 'mobx-react';
@@ -106,23 +106,23 @@ class ConnectionsList extends Component {
         });
 
 
-        return <Panel>
-            <Panel.Body>
+        return <Card>
+            <CardBody>
                 <h3>Filters:</h3>
                 <FormGroup>
-                    <ControlLabel>Phase:</ControlLabel>
-                    <FormControl componentClass="select" onChange={this.selectedPhaseChanged}>
+                    <Label>Phase:</Label>
+                    <Input type="select" onChange={this.selectedPhaseChanged}>
                         <option key='RESERVED' value='RESERVED'>Reserved</option>
                         <option key='ARCHIVED' value='ARCHIVED'>Archived</option>
 
-                    </FormControl>
+                    </Input>
                 </FormGroup>
                 <h3>Connections</h3>
-                <Table striped bordered condensed hover>
+                <Table striped bordered size='sm' hover>
                     <thead>
                     <tr>
                         <th>Connection Id</th>
-                        <th>Description / Username</th>
+                        <th><div>Description</div><div>Username</div></th>
                         <th>Fixtures</th>
                         <th>States</th>
                         <th>Schedule</th>
@@ -132,10 +132,10 @@ class ConnectionsList extends Component {
                     {rows}
                     </tbody>
                 </Table>
-            </Panel.Body>
+            </CardBody>
 
 
-        </Panel>
+        </Card>
 
 
     }

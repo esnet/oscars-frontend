@@ -1,14 +1,20 @@
 import React, {Component} from 'react';
-import vis, {Dataset} from 'vis';
+import vis from 'vis';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
+import FontAwesome from 'react-fontawesome';
 
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
+import {
+    Card, CardHeader, CardBody,
+    Popover, PopoverHeader, PopoverBody
+} from 'reactstrap';
 
 import myClient from '../agents/client';
+import PropTypes from 'prop-types';
 
 @inject('mapStore')
 @observer
@@ -16,10 +22,6 @@ export default class NetworkMap extends Component {
     constructor(props) {
         super(props);
     }
-
-    state = {
-        showMap: true
-    };
 
 
     // this automagically updates the map;
@@ -91,9 +93,10 @@ export default class NetworkMap extends Component {
                 color: {background: 'white'}
             }
         };
+        const mapId = document.getElementById(this.props.mapDivId);
 
         if (this.props.mapStore.network.initialized) {
-            this.network = new vis.Network(this.mapRef, this.datasource, options);
+            this.network = new vis.Network(mapId, this.datasource, options);
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
@@ -125,7 +128,7 @@ export default class NetworkMap extends Component {
         }
 
 
-    }, { delay: 500});
+    }, {delay: 500});
 
 
     zoomOnColored = () => {
@@ -142,6 +145,11 @@ export default class NetworkMap extends Component {
         this.disposeOfMapUpdate();
     }
 
+    componentWillMount() {
+        this.setState({
+            showHelp: false
+        });
+    }
 
     componentDidMount() {
 
@@ -153,59 +161,72 @@ export default class NetworkMap extends Component {
 
     }
 
-    flipMapState = () => {
-        this.setState({showMap: !this.state.showMap});
+    toggleHelp = () => {
+        this.setState({showHelp: !this.state.showHelp});
     };
 
     render() {
-        let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
-        let myHelp = <Popover id='help-networkMap' title='Help'>
-            <p>This is the map of the entire network managed by OSCARS. Devices are represented
-                by circles, and links between them by lines.
-            </p>
-            <p>The primary action is to click on a device to bring up a list of its ports that can be added as a
-                fixture.</p>
-            <p>Zoom in and out by mouse-wheel, click and drag the background to pan,
-                or click-and-drag a node to temporarily reposition.
-            </p>
-            <p>You may also click on the (-) magnifying glass icon to
-                adjust the map to fit the entire network. The (+) magnifying
-                glass will zoom to fit all the selected junctions. Click the chevron icon
-                to hide / show the map.</p>
-        </Popover>;
 
         return (
-            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
-                <Panel.Heading>
-                    <span>
-                        <span onClick={this.flipMapState}>Network Map</span>
-                        <span className='pull-right'>
-                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
-                                <Glyphicon glyph='question-sign'/>
-                            </OverlayTrigger>
-                            {' '}
+            <Card>
+                <CardHeader>
+                    Network Map
+                    <span className='pull-right'>
 
-                            <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                                <Glyphicon onClick={this.zoomOnColored} glyph='zoom-in'/>
-                            </ToggleDisplay>
-                            {' '}
-                            <Glyphicon onClick={() => {
-                                this.network.fit({animation: true})
-                            }} glyph='zoom-out'/>
-                            {' '}
-                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
-                        </span>
+                        <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
+                            <FontAwesome onClick={this.zoomOnColored} name='search-plus'/>
+                        </ToggleDisplay>
+                        {' '}
+
+                        <FontAwesome onClick={() => {
+                            this.network.fit({animation: true})
+                        }} name='search-minus'/>
+                        {' '}
+
+                        <FontAwesome onClick={this.toggleHelp}
+                                     name='question'
+                                     id='mapHelpIcon' />
+
+                        <Popover placement='left'
+                                 isOpen={this.state.showHelp}
+                                 target='mapHelpIcon'
+                                 toggle={this.toggleHelp}>
+                            <PopoverHeader>Map help</PopoverHeader>
+                            <PopoverBody>
+                                <p>This is the map of the entire network managed by OSCARS. Devices are represented
+                                    by circles, and links between them by lines.
+                                </p>
+                                <p>The primary action is to click on a device to bring up a list of its ports that can be added as a
+                                    fixture.</p>
+                                <p>Zoom in and out by mouse-wheel, click and drag the background to pan,
+                                    or click-and-drag a node to temporarily reposition.
+                                </p>
+                                <p>You may also click on the (-) magnifying glass icon to
+                                    adjust the map to fit the entire network. The (+) magnifying
+                                    glass will zoom to fit all the selected junctions. Click the chevron icon
+                                    to hide / show the map.</p>
+                            </PopoverBody>
+                        </Popover>
+
                     </span>
-                </Panel.Heading>
-                <Panel.Collapse >
-                    <div ref={(ref) => {
-                        this.mapRef = ref;
-                    }}><p>Topology</p></div>
-                </Panel.Collapse>
-            </Panel>
+
+                </CardHeader>
+                <CardBody>
+                    <div id={this.props.mapDivId}>
+                        <p> Network Map</p>
+                    </div>
+                </CardBody>
+
+            </Card>
 
         );
 
     }
 }
+
+NetworkMap.propTypes = {
+    mapDivId: PropTypes.string.isRequired,
+    selectDevice: PropTypes.func.isRequired
+
+};

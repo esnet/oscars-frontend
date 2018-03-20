@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS} from 'mobx';
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
+import {Card, CardBody, CardHeader, PopoverHeader, PopoverBody, Popover} from 'reactstrap';
 import vis from 'vis';
 import VisUtils from '../lib/vis'
+import FontAwesome from 'react-fontawesome';
+import {size } from 'lodash-es';
 
 
 @inject('connsStore', 'modalStore')
@@ -21,9 +23,6 @@ export default class DetailsDrawing extends Component {
     }
 
 
-    state = {
-        showMap: true
-    };
 
     onFixtureClicked = (fixture) => {
         this.props.connsStore.setSelected({
@@ -67,7 +66,9 @@ export default class DetailsDrawing extends Component {
             }
         };
 
-        this.network = new vis.Network(this.mapRef, this.datasource, options);
+        const schematicId = document.getElementById('schematicDrawing');
+
+        this.network = new vis.Network(schematicId, this.datasource, options);
 
         this.network.on('dragEnd', (params) => {
             if (params.nodes.length > 0) {
@@ -106,6 +107,13 @@ export default class DetailsDrawing extends Component {
         this.disposeOfMapUpdate();
     }
 
+    componentWillMount() {
+
+        this.setState({
+            showMap: true,
+            showHelp: false
+        });
+    }
 
     // this automagically updates the map;
     // TODO: maybe use a reaction and don't clear the whole graph, instead add/remove/update
@@ -120,7 +128,9 @@ export default class DetailsDrawing extends Component {
 
         let nodes = [];
         let edges = [];
-
+        if (size(junctions) === 0) {
+            return;
+        }
 
         junctions.map((j) => {
             let junctionNode = {
@@ -199,54 +209,53 @@ export default class DetailsDrawing extends Component {
 
         this.datasource.edges.add(edges);
 
-    }, { delay: 500} );
+    }, {delay: 500});
 
-    flipMapState = () => {
-        this.setState({showMap: !this.state.showMap});
+    toggleHelp = () => {
+        this.setState({
+            showHelp: !this.state.showHelp
+        });
     };
 
-
     render() {
-        let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
-
-
-        let myHelp = <Popover id='help-connectionDrawing' title='Schematic'>
-            <p>This schematic displays the fixtures, junctions and pipes of your connection.</p>
-            <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
-                are drawn as lines between junctions.</p>
-            <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
-                to temporarily reposition it.</p>
-            <p>Click on any component to bring up information about it. You may also click on the
-                magnifying glass icon to the right to auto-zoom the map to fit in the displayed window, or the chevron
-                icon
-                to hide / show the map.</p>
-            <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
-        </Popover>;
+        const schHelp =
+            <span className='pull-right'>
+                <FontAwesome
+                    onClick={this.toggleHelp}
+                    className='pull-right'
+                    name='question'
+                    id='mapHelpIcon'
+                />
+                <Popover placement='right'
+                         isOpen={this.state.showHelp}
+                         target='mapHelpIcon'
+                         toggle={this.toggleHelp}>
+                    <PopoverHeader>Schematic help</PopoverHeader>
+                    <PopoverBody>
+                        <p>This schematic displays the fixtures, junctions and pipes of your connection.</p>
+                        <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
+                            are drawn as lines between junctions.</p>
+                        <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
+                            to temporarily reposition it.</p>
+                        <p>Click on any component to bring up information about it. You may also click on the
+                            magnifying glass icon to the right to ¬auto-zoom the map to fit in the displayed window, or the chevron
+                            icon
+                            to hide / show the map.</p>
+                        <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
+                    </PopoverBody>
+                </Popover>
+        </span>;
 
         return (
-            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
-                <Panel.Heading>
-                    <div><span onClick={this.flipMapState}>Schematic</span>
-                        <div className='pull-right'>
-                            <OverlayTrigger trigger='click' rootClose placement='right' overlay={myHelp}>
-                                <Glyphicon glyph='question-sign'/>
-                            </OverlayTrigger>
-                            {' '}
-                            <Glyphicon onClick={() => {
-                                this.network.fit({animation: true})
-                            }} glyph='zoom-out'/>
-                            {' '}
-                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})}
-                                       glyph={toggleIcon}/>
-                        </div>
-                    </div>
-                </Panel.Heading>
-                <Panel.Collapse>
-                    <div ref={(ref) => {
-                        this.mapRef = ref;
-                    }}><p>connection map</p></div>
-                </Panel.Collapse>
-            </Panel>
+            <Card>
+                <CardHeader>
+                    Schematic {schHelp}
+                </CardHeader>
+                <CardBody>
+                    <div id='schematicDrawing'><p>connection map</p></div>
+                    <p>In progress!</p>
+                </CardBody>
+            </Card>
 
         );
     }

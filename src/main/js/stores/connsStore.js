@@ -5,7 +5,17 @@ class ConnectionsStore {
 
     @observable store = {
         conns: [],
-        current: {},
+        current: {
+            archived: {
+                cmp: {},
+                schedule: {
+                    beginning: null,
+                    ending: null
+
+                }
+            },
+
+        },
         foundCurrent: false,
         selected: {},
         commands: new Map(),

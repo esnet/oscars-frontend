@@ -5,7 +5,7 @@ import Moment from 'moment';
 import Transformer from '../lib/transform';
 import IdleTimer from 'react-idle-timer';
 
-import { Panel} from 'reactstrap';
+import { Card, CardBody } from 'reactstrap';
 
 import myClient from '../agents/client';
 import {withRouter} from 'react-router-dom';
@@ -189,12 +189,12 @@ class HoldTimer extends Component {
 
 
         if (conn.held.idle && !empty) {
-            notify = <Panel>
-                <Panel.Body>
-                    User idle; will keep holding for: {conn.held.remaining}
-                </Panel.Body>
+            notify = <Card>
+                <CardBody>
+                    User idle; will keep holding resources for: {conn.held.remaining}
+                </CardBody>
 
-            </Panel>
+            </Card>
         }
 
         return (

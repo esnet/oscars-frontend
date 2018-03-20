@@ -3,16 +3,19 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {autorun, toJS} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
-import Confirm from 'react-confirm-bootstrap';
 
 import chrono from 'chrono-node';
 import Moment from 'moment';
 import jstz from 'jstz';
 import {size} from 'lodash-es';
+import FontAwesome from 'react-fontawesome';
 
 import {
-    HelpBlock, Form, Button, Panel, FormGroup,
-    FormControl, ControlLabel, Popover, Glyphicon, OverlayTrigger
+    FormFeedback, Form, FormText, Button,
+    Card, CardHeader, CardBody,
+    Modal, ModalBody, ModalHeader, ModalFooter,
+    FormGroup, Input, Label,
+    Popover, PopoverHeader, PopoverBody
 } from 'reactstrap';
 
 const format = 'Y/MM/DD HH:mm:ss';
@@ -56,7 +59,10 @@ export default class ScheduleControls extends Component {
         };
         this.props.controlsStore.setParamsForConnection(params);
         this.periodicCheck();
-
+        this.setState({
+            showHelp: false,
+            unlockConfirmOpen: false
+        });
     }
 
     periodicCheck() {
@@ -109,7 +115,7 @@ export default class ScheduleControls extends Component {
             this.props.topologyStore.loadAvailable(startSec, endSec);
         }
 
-    }, { delay:  1000});
+    }, {delay: 1000});
 
 
     componentWillUnmount() {
@@ -188,7 +194,7 @@ export default class ScheduleControls extends Component {
 
     validateStartEnd(params) {
 //        console.log(toJS(params));
-        if (!params.schedule.start.parsed || ! params.schedule.end.parsed) {
+        if (!params.schedule.start.parsed || !params.schedule.end.parsed) {
 
             return;
         }
@@ -279,77 +285,103 @@ export default class ScheduleControls extends Component {
         this.props.designStore.unlockAll();
     };
 
+    toggleHelp = () => {
+        this.setState({showHelp: !this.state.showHelp});
+    };
+
+    toggleUnlockConfirm = () => {
+        this.setState({
+            unlockConfirmOpen: !this.state.unlockConfirmOpen
+        });
+    };
 
     render() {
         const conn = this.props.controlsStore.connection;
         const sched = conn.schedule;
         const timezone = jstz.determine();
 
+        const schHelp =
+            <span className='pull-right'>
+                <FontAwesome
+                    onClick={this.toggleHelp}
+                    className='pull-right'
+                    name='question'
+                    id='schHelpIcon'
+                />
+                <Popover placement='right'
+                         isOpen={this.state.showHelp}
+                         target='schHelpIcon'
+                         toggle={this.toggleHelp}>
+                    <PopoverHeader>Schedule help</PopoverHeader>
+                    <PopoverBody>
+                        <p>Type in the desired date / time for your connection to start and end.
+                            A start time either in the past or after the end time is not accepted.</p>
+                        <p>Then, click "Lock schedule", so that the system can then
+                            calculate resource availability.</p>
+                        <p>Relative time expressions such as "in 10 minutes" are accepted,
+                            but they are only evaluated when you type them in.
+                            The resulting times will not change as time passes.</p>
+                        <p>Unlocking the schedule will also unlock all other resources.</p>
+                    </PopoverBody>
+                </Popover>
+        </span>;
 
-        let help = <Popover id='help-schedule' title='Schedule help'>
-            <p>Type in the desired date / time for your connection to start and end.
-                A start time either in the past or after the end time is not accepted.</p>
-            <p>Then, click "Lock schedule", so that the system can then
-                calculate resource availability.</p>
-            <p>Relative time expressions such as "in 10 minutes" are accepted,
-                but they are only evaluated when you type them in.
-                The resulting times will not change as time passes.</p>
-            <p>Unlocking the schedule will also unlock all other resources.</p>
-        </Popover>;
+        let unlockControl = <div>
 
-        let unlockControl = <Confirm
-            onConfirm={this.unlockSchedule}
-            body='Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs.'
-            confirmText='Confirm'
-            title='Unlock Schedule'>
-            <Button className='pull-right' bsStyle='warning'>Unlock</Button>
-        </Confirm>;
+            <Modal isOpen={this.state.unlockConfirmOpen} toggle={this.toggleUnlockConfirm}>
+                <ModalHeader toggle={this.toggleUnlockConfirm}>Unlock schedule</ModalHeader>
+                <ModalBody>
+                    Unlocking the schedule will unlock all components and
+                    release any held resources, including pipe and fixture bandwidths and VLANs.
+                </ModalBody>
+                <ModalFooter>
+                    <Button color='primary' onClick={this.unlockSchedule}>Unlock</Button>{' '}
+                    <Button color='secondary' onClick={this.toggleUnlockConfirm}>Never mind</Button>
+                </ModalFooter>
+            </Modal>
+            {' '}
+            <Button color='primary' onClick={this.toggleUnlockConfirm}>Delete</Button>
+        </div>;
+
         if (size(this.props.designStore.design.fixtures) === 0) {
-            unlockControl = <Button className='pull-right' onClick={this.unlockSchedule} bsStyle='warning'>Unlock</Button>;
+            unlockControl =
+                <Button className='pull-right' onClick={this.unlockSchedule} color='primary'>Unlock</Button>;
         }
 
 
-
-
-
         return (
-            <Panel>
-                <Panel.Heading>
-                    <span>Schedule
-                        <OverlayTrigger
-                            defaultOverlayShown={false} trigger='click' rootClose placement='right' overlay={help}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
-                        </OverlayTrigger>
-                    </span>
-                </Panel.Heading>
-                <Panel.Body>
+            <Card>
+                <CardHeader>Schedule {schHelp}</CardHeader>
+                <CardBody>
                     <Form>
-                        <p>Timezone: {timezone.name()}</p>
+                        <small>Timezone: {timezone.name()}</small>
 
-                        <FormGroup validationState={sched.start.validationState}>
-                            <ControlLabel>Start:</ControlLabel>
-                            <FormControl type='text'
-                                         defaultValue='in 15 minutes'
-                                         disabled={sched.locked}
-                                         onChange={this.onStartDateChange}/>
-                            <HelpBlock>
-                                <p>{sched.start.readable}</p><p>{sched.start.validationText}</p>
-                            </HelpBlock>
+                        <FormGroup >
+                            <Label>Start:</Label>
+                            <Input type='text'
+                                   valid = {sched.start.validationState === 'success'}
+                                   invalid = {sched.start.validationState === 'error'}
+                                   defaultValue='in 15 minutes'
+                                   disabled={sched.locked}
+                                   onChange={this.onStartDateChange}/>
+                            <FormFeedback>{sched.start.validationText}</FormFeedback>
+                            <FormText>{sched.start.readable}</FormText>
                         </FormGroup>
                         {' '}
-                        <FormGroup validationState={sched.end.validationState}>
-                            <ControlLabel>End:</ControlLabel>
-                            <FormControl type='text'
-                                         disabled={sched.locked}
-                                         defaultValue='in 1 year'
-                                         onChange={this.onEndDateChange}/>
-                            <HelpBlock>
-                                <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
-                            </HelpBlock>
+                        <FormGroup >
+                            <Label>End:</Label>
+                            <Input type='text'
+                                   valid = {sched.end.validationState === 'success'}
+                                   invalid = {sched.end.validationState === 'error'}
+                                   disabled={sched.locked}
+                                   defaultValue='in 1 year'
+                                   onChange={this.onEndDateChange}/>
+                            <FormFeedback>{sched.end.validationText}</FormFeedback>
+                            <FormText>{sched.end.readable}</FormText>
                         </FormGroup>
                         <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
 
-                            <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
+                            <Button color='primary' className='pull-right' onClick={this.lockSchedule}>Lock schedule</Button>
                         </ToggleDisplay>
                         <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
 
@@ -357,9 +389,9 @@ export default class ScheduleControls extends Component {
                         </ToggleDisplay>
 
                     </Form>
-                </Panel.Body>
+                </CardBody>
 
-            </Panel>
+            </Card>
         );
     }
 }

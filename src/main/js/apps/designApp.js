@@ -58,24 +58,27 @@ export default class DesignApp extends Component {
                 <Col md={3} sm={3}>
                     <ConnectionControls />
                     <ScheduleControls />
-                    { /* <DesignControls /> */}
                 </Col>
                 <Col md={6} sm={6}>
-                    <NetworkMap selectDevice={this.selectDevice}/>
-                    <DesignDrawing />
+                    <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>
+                    {/* PUT BACK <DesignDrawing /> */ }
                 </Col>
                 <Col md={3} sm={3}>
-                    <SelectPortTypeahead/>
                     <HoldTimer/>
+                    <SelectPortTypeahead/>
+                    {/* PUT BACK
                     <DesignComponents />
+                    */}
                 </Col>
+                {/* PUT BACK
                 <AddFixtureModal />
                 <EditFixtureModal />
                 <EditJunctionModal />
                 <EditPipeModal />
+                */ }
                 <ConnectionErrorsModal />
                 <DesignHelpModal />
-                { /*<DesignErrorsModal /> */}
+
             </Row>
         );
     }

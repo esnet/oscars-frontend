@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal, Button, FormControl, ControlLabel, FormGroup, Form,
+    Modal, Button, Input, Label, FormGroup,
     Well, Panel, OverlayTrigger, Glyphicon, Popover, Row, Col,
     Tabs, Tab, ButtonToolbar, Checkbox, DropdownButton, MenuItem,
     ListGroup, ListGroupItem, HelpBlock, InputGroup, PanelGroup
@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import ToggleDisplay from 'react-toggle-display';
 import EroSelect from './eroSelect';
 import {autorun, toJS} from 'mobx';
+import FontAwesome from 'react-fontawesome';
 
 import myClient from '../agents/client';
 import Confirm from 'react-confirm-bootstrap';

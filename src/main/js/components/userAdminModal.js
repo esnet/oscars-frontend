@@ -137,10 +137,8 @@ export default class UserAdminModal extends Component {
         let showModal = this.props.modalStore.modals.get(modalName);
 
         return (
-            <Modal isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
-                <ModalHeader toggle={this.toggle}>
-                    User administration
-                </ModalHeader>
+            <Modal size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>Edit user</ModalHeader>
                 <ModalBody>
                     <EditUserForm submitPassword={this.submitPassword}
                                   submitUpdate={this.submitUpdate}

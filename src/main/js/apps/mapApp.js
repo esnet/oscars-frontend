@@ -22,7 +22,7 @@ export default class MapApp extends Component {
         return (
             <Row>
                 <Col md={{size: 10, offset: 1}}>
-                    <NetworkMap />
+                    <NetworkMap mapDivId='mapDiv' selectDevice={() => {}}/>
                 </Col>
             </Row>
         );

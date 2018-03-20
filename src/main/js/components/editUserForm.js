@@ -2,14 +2,11 @@ import React, {Component} from 'react';
 import {
     Row,
     Col,
-    Card,
-    CardHeader,
-    CardBody,
+    Card, CardHeader, CardBody,
     Form,
     FormFeedback,
-    Popover,
-    PopoverHeader,
-    PopoverBody,
+    Modal, ModalFooter, ModalHeader, ModalBody,
+    Popover, PopoverHeader,  PopoverBody,
     Input,
     FormGroup,
     Label,
@@ -20,7 +17,6 @@ import {toJS, autorun} from 'mobx';
 import {size} from 'lodash-es';
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
-import Confirm from 'react-confirm-bootstrap';
 import FontAwesome from 'react-fontawesome';
 
 
@@ -102,10 +98,17 @@ export default class EditUserForm extends Component {
     componentWillMount() {
         this.setState({
             userHelpOpen: false,
-            pwdHelpOpen: false
+            pwdHelpOpen: false,
+            deleteConfirmOpen: false,
         });
 
     }
+
+    toggleDeleteConfirm = () => {
+        this.setState({
+            deleteConfirmOpen: !this.state.deleteConfirmOpen
+        });
+    };
 
     toggleUserHelp = () => {
         this.setState({
@@ -230,15 +233,19 @@ export default class EditUserForm extends Component {
                                             disabled={!size(editUser.user.username)}
                                             onClick={this.props.submitUpdate}>Update</Button>
 
-
                                     <ToggleDisplay show={this.props.adminMode && size(allUsers) >= 2}>
-                                        <Confirm
-                                            onConfirm={this.props.submitDelete}
-                                            body='Are you sure you want to delete this user?'
-                                            confirmText='Confirm'
-                                            title='Delete user'>
-                                            <Button color='warning' className='pull-right'>Delete</Button>
-                                        </Confirm>
+                                        <Modal isOpen={this.state.deleteConfirmOpen} toggle={this.toggleDeleteConfirm} >
+                                            <ModalHeader toggle={this.toggleDeleteConfirm}>Delete user</ModalHeader>
+                                            <ModalBody>
+                                                Are you sure you want to delete this user?
+                                            </ModalBody>
+                                            <ModalFooter>
+                                                <Button color='primary' onClick={this.props.submitDelete}>Delete</Button>{' '}
+                                                <Button color='secondary' onClick={this.toggleDeleteConfirm}>Never mind</Button>
+                                            </ModalFooter>
+                                        </Modal>
+                                        {' '}
+                                        <Button color='primary' onClick={this.toggleDeleteConfirm}>Delete</Button>
                                     </ToggleDisplay>
                                 </div>
                             </div>

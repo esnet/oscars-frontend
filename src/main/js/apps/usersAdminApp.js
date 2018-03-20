@@ -194,9 +194,10 @@ export default class UsersAdminApp extends Component {
                                 e.preventDefault()
                             }}>
                                 <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
-                                    <Label for='username' className='mr-sm-2'>Username: </Label>
+                                    <Label for='username' hidden>Username: </Label>
                                     {' '}
                                     <Input type='text' id='username'
+                                           placeholder='Username'
                                            onKeyPress={this.handleAddUsernameKeyPress}
                                            onChange={(e) => this.onUsernameChange(e.target.value)}/>
                                 </FormGroup>

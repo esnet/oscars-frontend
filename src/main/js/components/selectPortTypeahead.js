@@ -3,20 +3,33 @@ import {Typeahead} from 'react-bootstrap-typeahead';
 import {inject, observer} from 'mobx-react';
 import {toJS} from 'mobx';
 import transformer from '../lib/transform';
-import {FormGroup, InputGroup, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
+
+import {
+    Form, FormGroup, InputGroup, InputGroupAddon, InputGroupText,
+    Popover, PopoverBody, PopoverHeader
+} from 'reactstrap';
+import FontAwesome from 'react-fontawesome';
+
 require('react-bootstrap-typeahead/css/Typeahead.css');
 
 
 @inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
 @observer
 export default class SelectPortTypeahead extends Component {
-    componentWillMount() {
-        this.props.topologyStore.loadEthernetPorts();
-    }
-
     constructor(props) {
         super(props);
     }
+
+    componentWillMount() {
+        this.props.topologyStore.loadEthernetPorts();
+        this.setState({
+            showHelp: false,
+        });
+    }
+
+    toggleHelp = () => {
+        this.setState({showHelp: !this.state.showHelp});
+    };
 
     onTypeaheadSelection = (port) => {
         const {ethPorts} = this.props.topologyStore;
@@ -59,34 +72,46 @@ export default class SelectPortTypeahead extends Component {
             options = toJS(ethPorts);
         }
 
-        let myHelp = <Popover id='help-selectPortTypeahead' title='Text-based port selection.'>
-            <p>Start typing in the text box to bring up an auto-complete list of ports
-                matching your input. Select with up and down arrow keys.
-            </p>
-            <p>Click on a port (or finish typing and press Enter) to add
-                a new fixture with that port.</p>
+        const spHelp =
+            <Popover placement='left'
+                     isOpen={this.state.showHelp}
+                     target='spHelpIcon'
+                     toggle={this.toggleHelp}>
+                <PopoverHeader>Text-based port selection.</PopoverHeader>
+                <PopoverBody>
+                    <p>Start typing in the text box to bring up an auto-complete list of ports
+                        matching your input. Select with up and down arrow keys.
+                    </p>
+                    <p>Click on a port (or finish typing and press Enter) to add
+                        a new fixture with that port.</p>
+                </PopoverBody>
+            </Popover>;
 
-        </Popover>;
+
         return (
+            <Form inline>
                 <FormGroup>
                     <InputGroup>
                         <Typeahead
-                            ref={(ref) => {
+                            innerRef={(ref) => {
                                 this.typeAhead = ref;
                             }}
-                            placeholder='Search fixtures'
+                            placeholder='Add a fixture'
                             minLength={2}
                             options={options}
                             onInputChange={this.onTypeaheadSelection}
                         />
-                        <InputGroup.Addon>
-                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
-                                <Glyphicon className='pull-right' glyph='question-sign'/>
-                            </OverlayTrigger>
-
-                        </InputGroup.Addon>
+                        <InputGroupAddon addonType='append'>
+                            <InputGroupText> <FontAwesome
+                                onClick={this.toggleHelp}
+                                name='question'
+                                id='spHelpIcon'/>
+                            </InputGroupText>
+                        </InputGroupAddon>
                     </InputGroup>
+                    {spHelp}
                 </FormGroup>
+            </Form>
         );
     }
 }

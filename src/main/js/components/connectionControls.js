@@ -2,20 +2,17 @@ import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
 import {action, autorun, toJS} from 'mobx';
-
-
+import FontAwesome from 'react-fontawesome';
 import ToggleDisplay from 'react-toggle-display';
 import {
+    Alert,
     Form,
-    Glyphicon,
-    ControlLabel,
+    Label,
     Button,
-    Panel,
+    Card, CardBody, CardHeader,
     FormGroup,
-    FormControl,
-    Well,
-    Popover,
-    OverlayTrigger
+    Input,
+    Popover, PopoverBody, PopoverHeader
 } from 'reactstrap';
 
 import myClient from '../agents/client';
@@ -46,6 +43,9 @@ export default class ConnectionControls extends Component {
                     }));
         }
 
+        this.setState({
+            showHelp: false
+        })
 
     }
 
@@ -71,7 +71,7 @@ export default class ConnectionControls extends Component {
         });
 
 
-    }, { delay: 1000 });
+    }, {delay: 1000});
 
     componentWillUnmount() {
         this.disposeOfValidate();
@@ -92,62 +92,79 @@ export default class ConnectionControls extends Component {
 
     };
 
+    toggleHelp = () => {
+        this.setState({
+            showHelp: !this.state.showHelp
+        });
+    };
+
     render() {
         const conn = this.props.controlsStore.connection;
+        const buildHelp =
+            <span className='pull-right'>
+                <FontAwesome
+                    onClick={this.toggleHelp}
+                    className='pull-right'
+                    name='question'
+                    id='buildHelpIcon'
+                />
+                <Popover placement='right'
+                         isOpen={this.state.showHelp}
+                         target='buildHelpIcon'
+                         toggle={this.toggleHelp}>
+                    <PopoverHeader>Build mode help</PopoverHeader>
+                    <PopoverBody>
+                        <p>Auto: The connection will be configured on network devices ("built") on schedule at start time. No
+                            further action needed.</p>
+                        <p>Manual: The connection will <b>not</b> be built at start time. Once the connection has been committed,
+                            you can
+                            use the controls in the connection details page to build / dismantle it.</p>
+                        <p>Mode seleciton is not final. In the connection details page, you can switch between modes, as long as
+                            end time has not been reached.</p>
+                        <p>In either mode, once end time is reached the connection will be dismantled.</p>
+                    </PopoverBody>
+                </Popover>
+        </span>;
 
-
-        let helpPopover = <Popover id='help-buildMode' title='Build Mode Help'>
-            <p>Auto: The connection will be configured on network devices ("built") on schedule at start time. No
-                further action needed.</p>
-            <p>Manual: The connection will <b>not</b> be built at start time. Once the connection has been committed,
-                you can
-                use the controls in the connection details page to build / dismantle it.</p>
-            <p>Mode seleciton is not final. In the connection details page, you can switch between modes, as long as
-                end time has not been reached.</p>
-            <p>In either mode, once end time is reached the connection will be dismantled.</p>
-        </Popover>;
 
         return (
-            <Panel>
-                <Panel.Body>
+            <Card>
+                <CardBody>
                     <Form onSubmit={e => {
                         e.preventDefault();
                     }}>
-                        <Well bsSize='small' onClick={() => {
+                        <Alert color='info' onClick={() => {
                             this.props.modalStore.openModal('designHelp')
                         }}>
-                            <h3>Help me! <Glyphicon className='pull-right' glyph='question-sign'/></h3>
-                            <p>Connection id: {this.props.controlsStore.connection.connectionId}</p>
-                        </Well>
-                        <FormGroup validationState={validator.descriptionControl(conn.description)}>
+                            <strong>Help me! <FontAwesome className='pull-right' name='question'/></strong>
+                            <div>Connection id: {this.props.controlsStore.connection.connectionId}</div>
+                        </Alert>
+                        <FormGroup>
                             {' '}
-                            <ControlLabel>
+                            <Label>
                                 Description:
-                            </ControlLabel>
-                            <FormControl type='text' placeholder='Type a description'
-                                         defaultValue={conn.description}
-
-                                         onChange={this.onDescriptionChange}/>
+                            </Label>
+                            <Input type='text' placeholder='Type a description'
+                                   valid={validator.descriptionControl(conn.description) === 'success'}
+                                   defaultValue={conn.description}
+                                   onChange={this.onDescriptionChange}/>
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>
+                            <Label>
                                 Build Mode:
-                            </ControlLabel>
-                            <OverlayTrigger trigger='click' rootClose placement='right' overlay={helpPopover}>
-                                <Glyphicon className='pull-right' glyph='question-sign'/>
-                            </OverlayTrigger>
+                            </Label>
+                            {buildHelp}
                             {' '}
-                            <FormControl componentClass="select"
-                                         onChange={this.onBuildModeChange}>
+                            <Input type='select' onChange={this.onBuildModeChange}>
                                 <option value='AUTOMATIC'>Auto</option>
                                 <option value='MANUAL'>Manual</option>
-                            </FormControl>
+                            </Input>
                         </FormGroup>
 
 
                         <FormGroup className='pull-right'>
                             <ToggleDisplay show={!conn.validation.acceptable}>
-                                <Button bsStyle='warning' className='pull-right'
+                                <Button color='warning' className='pull-right'
                                         onClick={() => {
                                             this.props.modalStore.openModal('connectionErrors');
                                         }}>Display errors</Button>{' '}
@@ -164,8 +181,8 @@ export default class ConnectionControls extends Component {
                             </ToggleDisplay>
                         </FormGroup>
                     </Form>
-                </Panel.Body>
-            </ Panel>
+                </CardBody>
+            </Card>
         );
     }
 }
