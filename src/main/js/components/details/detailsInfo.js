@@ -7,9 +7,9 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import {Card, CardBody, CardHeader,
     Nav, NavItem, NavLink,
     TabPane, TabContent, Button, Collapse} from 'reactstrap';
-import DetailsGeneral from '../components/detailsGeneral';
+import DetailsGeneral from './detailsGeneral';
 import PropTypes from 'prop-types';
-import myClient from '../agents/client';
+import myClient from '../../agents/client';
 import Moment from 'moment';
 import classnames from 'classnames';
 
@@ -118,7 +118,7 @@ export default class DetailsInfo extends Component {
         ];
 
         return <Card>
-            <CardHeader>Fixture</CardHeader>
+            <CardHeader className='p-1'>Fixture</CardHeader>
             <CardBody>
                 <u>In progress!</u>
                 <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
@@ -171,9 +171,7 @@ export default class DetailsInfo extends Component {
 
 
         return <Card>
-            <CardHeader>
-                <p>{deviceUrn}</p>
-            </CardHeader>
+            <CardHeader className='p-1'>{deviceUrn}</CardHeader>
             <CardBody>
                 <div>
                     <Nav tabs>
@@ -200,7 +198,7 @@ export default class DetailsInfo extends Component {
                                         let isOpen = this.state.ccType[c.type] && this.state.ccUrn[c.deviceUrn];
 
                                         return <Card key={c.type}>
-                                            <CardHeader
+                                            <CardHeader className='p-1'
                                                 onClick={() => this.toggleCommandCollapse(c.deviceUrn, c.type)}>
                                                 <NavLink href='#'>{c.type}</NavLink>
                                             </CardHeader>
@@ -266,7 +264,7 @@ export default class DetailsInfo extends Component {
 
 
         return <Card>
-            <CardHeader>Pipes</CardHeader>
+            <CardHeader className='p-1'>Pipes</CardHeader>
             <CardBody>
 
                 <u>In progress!</u>

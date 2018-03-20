@@ -34,7 +34,7 @@ export default class DesignErrorsModal extends Component {
         }
 
         return (
-            <Modal size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+            <Modal fade={false} size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
                 <ModalHeader toggle={this.toggle}>Design errors</ModalHeader>
                 <ModalBody>
                     <Card>

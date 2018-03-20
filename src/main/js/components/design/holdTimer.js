@@ -2,14 +2,12 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {action} from 'mobx';
 import Moment from 'moment';
-import Transformer from '../lib/transform';
 import IdleTimer from 'react-idle-timer';
-
 import { Card, CardBody } from 'reactstrap';
-
-import myClient from '../agents/client';
 import {withRouter} from 'react-router-dom';
 
+import myClient from '../../agents/client';
+import Transformer from '../../lib/transform';
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer

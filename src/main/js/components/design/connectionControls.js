@@ -9,15 +9,15 @@ import {
     Form,
     Label,
     Button,
-    Card, CardBody, CardHeader,
+    Card, CardBody,
     FormGroup,
-    Input,
-    Popover, PopoverBody, PopoverHeader
+    Input
 } from 'reactstrap';
 
-import myClient from '../agents/client';
-import validator from '../lib/validation';
+import myClient from '../../agents/client';
+import validator from '../../lib/validation';
 import CommitButton from './commitButton';
+import HelpPopover from '../helpPopover';
 
 @inject('controlsStore', 'designStore', 'modalStore')
 @observer
@@ -43,9 +43,6 @@ export default class ConnectionControls extends Component {
                     }));
         }
 
-        this.setState({
-            showHelp: false
-        })
 
     }
 
@@ -92,38 +89,24 @@ export default class ConnectionControls extends Component {
 
     };
 
-    toggleHelp = () => {
-        this.setState({
-            showHelp: !this.state.showHelp
-        });
-    };
 
     render() {
         const conn = this.props.controlsStore.connection;
-        const buildHelp =
-            <span className='pull-right'>
-                <FontAwesome
-                    onClick={this.toggleHelp}
-                    className='pull-right'
-                    name='question'
-                    id='buildHelpIcon'
-                />
-                <Popover placement='right'
-                         isOpen={this.state.showHelp}
-                         target='buildHelpIcon'
-                         toggle={this.toggleHelp}>
-                    <PopoverHeader>Build mode help</PopoverHeader>
-                    <PopoverBody>
-                        <p>Auto: The connection will be configured on network devices ("built") on schedule at start time. No
-                            further action needed.</p>
-                        <p>Manual: The connection will <b>not</b> be built at start time. Once the connection has been committed,
-                            you can
-                            use the controls in the connection details page to build / dismantle it.</p>
-                        <p>Mode seleciton is not final. In the connection details page, you can switch between modes, as long as
-                            end time has not been reached.</p>
-                        <p>In either mode, once end time is reached the connection will be dismantled.</p>
-                    </PopoverBody>
-                </Popover>
+
+        const helpHeader = <span>Build mode help</span>;
+        const helpBody = <span>
+            <p>Auto: The connection will be configured on network devices ("built") on schedule at start time. No
+                further action needed.</p>
+            <p>Manual: The connection will <b>not</b> be built at start time. Once the connection has been committed,
+                you can
+                use the controls in the connection details page to build / dismantle it.</p>
+            <p>Mode seleciton is not final. In the connection details page, you can switch between modes, as long as
+                end time has not been reached.</p>
+            <p>In either mode, once end time is reached the connection will be dismantled.</p>
+        </span>;
+
+        const help = <span className='pull-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='buildHelp'/>
         </span>;
 
 
@@ -153,7 +136,7 @@ export default class ConnectionControls extends Component {
                             <Label>
                                 Build Mode:
                             </Label>
-                            {buildHelp}
+                            {help}
                             {' '}
                             <Input type='select' onChange={this.onBuildModeChange}>
                                 <option value='AUTOMATIC'>Auto</option>

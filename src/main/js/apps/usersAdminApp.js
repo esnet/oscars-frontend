@@ -161,7 +161,7 @@ export default class UsersAdminApp extends Component {
                                              isOpen={this.state.popoverOpen}
                                              target='helpIcon'
                                              toggle={this.toggle}>
-                                        <PopoverHeader>Popover Title</PopoverHeader>
+                                        <PopoverHeader>User Administration</PopoverHeader>
                                         <PopoverBody>
                                             <p>This is the users administration form. The list shows all the users
                                                 registered in the system.</p>

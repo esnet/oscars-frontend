@@ -1,14 +1,19 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS, action} from 'mobx';
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'reactstrap';
-import transformer from '../lib/transform';
+import {Card, CardBody, CardHeader} from 'reactstrap';
 import vis from 'vis';
-import validator from '../lib/validation'
-import VisUtils from '../lib/vis'
-import myClient from '../agents/client';
+
+import transformer from '../../lib/transform';
+import validator from '../../lib/validation'
+import VisUtils from '../../lib/vis'
+import myClient from '../../agents/client';
+import HelpPopover from '../helpPopover';
+
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
+import FontAwesome from 'react-fontawesome';
+
 
 
 @inject('controlsStore', 'designStore', 'modalStore')
@@ -25,10 +30,6 @@ export default class DesignDrawing extends Component {
         };
     }
 
-
-    state = {
-        showMap: true
-    };
 
     onFixtureClicked = (fixture) => {
         const params = transformer.existingFixtureToEditParams(fixture);
@@ -70,8 +71,9 @@ export default class DesignDrawing extends Component {
                 color: {background: 'white'}
             }
         };
+        const drawingId = document.getElementById('designDrawing');
 
-        this.network = new vis.Network(this.mapRef, this.datasource, options);
+        this.network = new vis.Network(drawingId, this.datasource, options);
 
         this.network.on('dragEnd', (params) => {
             if (params.nodes.length > 0) {
@@ -109,6 +111,7 @@ export default class DesignDrawing extends Component {
     componentWillUnmount() {
         this.disposeOfMapUpdate();
     }
+
 
 
     // this automagically updates the map;
@@ -261,55 +264,48 @@ export default class DesignDrawing extends Component {
             }));
 
 
-    }, { delay: 500} );
-
-    flipMapState = () => {
-        this.setState({showMap: !this.state.showMap});
-    };
+    }, {delay: 500});
 
     render() {
-        let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
 
-        let myHelp = <Popover id='help-designMap' title='Design drawing'>
+        const helpHeader = <span>Design drawing help</span>;
+        const helpBody = <span>
             <p>This drawing displays the fixtures, junctions and pipes of your design. It starts empty and
                 will auto-update as they are added, deleted, or updated.</p>
-            <p>Fixtures are drawn as small circles. Junctions are represented by larger circles, and pipes
-                are drawn as lines between junctions.</p>
-            <p>Unlocked components are drawn in orange color .</p>
-            <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag a circle
-                to temporarily reposition it.</p>
+            <p>Fixtures are drawn as small hexagons. Junctions are represented by larger circles. Pipes
+                will be drawn as dashed lines of different colors between junctions when unlocked, and
+                as solid lines when locked. Intermediate devices will be drawn as small rhombuses.</p>
+            <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag
+                a node to reposition it.</p>
             <p>Click on any component to bring up its edit form. You may also click on the
-                magnifying glass icon to the right to auto-adjust the zoom level to fit in the displayed window,
-                or the chevron icon to hide / show the map.</p>
+                magnifying glass icon to the right to auto-adjust the zoom level to fit everything
+                in the displayed window.</p>
             <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
-        </Popover>;
+        </span>;
+
+        const help = <span className='pull-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='ddHelp'/>
+        </span>;
 
 
         return (
-            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
-                <Panel.Heading>
-                    <div><span onClick={this.flipMapState}>Design drawing</span>
-                        <div className='pull-right'>
-                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
-                                <Glyphicon glyph='question-sign'/>
-                            </OverlayTrigger>
-                            {' '}
-                            <Glyphicon onClick={() => {
-                                this.network.fit({animation: true})
-                            }} glyph='zoom-out'/>
-                            {' '}
-                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})}
-                                       glyph={toggleIcon}/>
-                        </div>
-                    </div>
-                </Panel.Heading>
-                <Panel.Collapse>
-                    <div ref={(ref) => {
-                        this.mapRef = ref;
-                    }}><p>design map</p></div>
-                </Panel.Collapse>
-            </Panel>
+            <Card>
+                <CardHeader className='p-1'>
+                    Design drawing
+                    <span className='pull-right'>
+
+                        <FontAwesome onClick={() => {
+                            this.network.fit({animation: true})
+                        }} name='search-minus'/>
+                        {' '}
+                        {help}
+                    </span>
+                </CardHeader>
+                <CardBody>
+                    <div id='designDrawing'><p>design drawing</p></div>
+                </CardBody>
+            </Card>
 
         );
     }

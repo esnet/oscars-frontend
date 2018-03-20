@@ -17,9 +17,9 @@ import {
 } from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
-import Transformer from '../lib/transform';
-import myClient from '../agents/client';
-import validator from '../lib/validation';
+import Transformer from '../../lib/transform';
+import myClient from '../../agents/client';
+import validator from '../../lib/validation';
 
 
 @inject('controlsStore', 'designStore', 'accountStore', 'modalStore')

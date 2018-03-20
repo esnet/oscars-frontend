@@ -1,6 +1,8 @@
 var packageJSON = require('./package.json');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 var webpack = require('webpack');
 // var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
@@ -60,17 +62,16 @@ module.exports = {
             inject: 'body',
             favicon: PATHS.templates + '/favicon.ico',
         }),
-        /*
-        new LodashModuleReplacementPlugin,
+    /*
         new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
         new webpack.optimize.AggressiveMergingPlugin(),
+        new UglifyJsPlugin(),
         new webpack.DefinePlugin({
             'process.env': {
                 NODE_ENV: JSON.stringify('production')
             }
-        }),
-        */
+        })
+*/
     ],
 
     devServer: {

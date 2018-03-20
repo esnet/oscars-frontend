@@ -8,15 +8,17 @@ import chrono from 'chrono-node';
 import Moment from 'moment';
 import jstz from 'jstz';
 import {size} from 'lodash-es';
-import FontAwesome from 'react-fontawesome';
 
 import {
     FormFeedback, Form, FormText, Button,
     Card, CardHeader, CardBody,
-    Modal, ModalBody, ModalHeader, ModalFooter,
-    FormGroup, Input, Label,
-    Popover, PopoverHeader, PopoverBody
+    FormGroup, Input, Label
 } from 'reactstrap';
+
+
+import ConfirmModal from '../confirmModal';
+import HelpPopover from '../helpPopover';
+
 
 const format = 'Y/MM/DD HH:mm:ss';
 
@@ -59,10 +61,6 @@ export default class ScheduleControls extends Component {
         };
         this.props.controlsStore.setParamsForConnection(params);
         this.periodicCheck();
-        this.setState({
-            showHelp: false,
-            unlockConfirmOpen: false
-        });
     }
 
     periodicCheck() {
@@ -285,62 +283,37 @@ export default class ScheduleControls extends Component {
         this.props.designStore.unlockAll();
     };
 
-    toggleHelp = () => {
-        this.setState({showHelp: !this.state.showHelp});
-    };
-
-    toggleUnlockConfirm = () => {
-        this.setState({
-            unlockConfirmOpen: !this.state.unlockConfirmOpen
-        });
-    };
 
     render() {
         const conn = this.props.controlsStore.connection;
         const sched = conn.schedule;
         const timezone = jstz.determine();
 
-        const schHelp =
-            <span className='pull-right'>
-                <FontAwesome
-                    onClick={this.toggleHelp}
-                    className='pull-right'
-                    name='question'
-                    id='schHelpIcon'
-                />
-                <Popover placement='right'
-                         isOpen={this.state.showHelp}
-                         target='schHelpIcon'
-                         toggle={this.toggleHelp}>
-                    <PopoverHeader>Schedule help</PopoverHeader>
-                    <PopoverBody>
-                        <p>Type in the desired date / time for your connection to start and end.
-                            A start time either in the past or after the end time is not accepted.</p>
-                        <p>Then, click "Lock schedule", so that the system can then
-                            calculate resource availability.</p>
-                        <p>Relative time expressions such as "in 10 minutes" are accepted,
-                            but they are only evaluated when you type them in.
-                            The resulting times will not change as time passes.</p>
-                        <p>Unlocking the schedule will also unlock all other resources.</p>
-                    </PopoverBody>
-                </Popover>
+        const helpHeader = <span>Schedule help</span>;
+        const helpBody = <span>
+            <p>Type in the desired date / time for your connection to start and end.
+                A start time either in the past or after the end time is not accepted.</p>
+            <p>Then, click "Lock schedule", so that the system can then
+                calculate resource availability.</p>
+            <p>Relative time expressions such as "in 10 minutes" are accepted,
+                but they are only evaluated when you type them in.
+                The resulting times will not change as time passes.</p>
+            <p>Unlocking the schedule will also unlock all other resources.</p>
         </span>;
 
-        let unlockControl = <div>
+        const help = <span className='pull-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='scheduleHelp'/>
+        </span>;
 
-            <Modal isOpen={this.state.unlockConfirmOpen} toggle={this.toggleUnlockConfirm}>
-                <ModalHeader toggle={this.toggleUnlockConfirm}>Unlock schedule</ModalHeader>
-                <ModalBody>
-                    Unlocking the schedule will unlock all components and
-                    release any held resources, including pipe and fixture bandwidths and VLANs.
-                </ModalBody>
-                <ModalFooter>
-                    <Button color='primary' onClick={this.unlockSchedule}>Unlock</Button>{' '}
-                    <Button color='secondary' onClick={this.toggleUnlockConfirm}>Never mind</Button>
-                </ModalFooter>
-            </Modal>
-            {' '}
-            <Button color='primary' onClick={this.toggleUnlockConfirm}>Delete</Button>
+
+        let unlockControl = <div>
+            <ConfirmModal onConfirm={this.unlockSchedule}
+                          buttonText={'Unlock'}
+                          header='Unlock schedule'
+                          body={'Unlocking the schedule will unlock all components and\n' +
+            '                    release any held resources, including pipe and fixture bandwidths and VLANs.'}
+            />
+
         </div>;
 
         if (size(this.props.designStore.design.fixtures) === 0) {
@@ -351,7 +324,7 @@ export default class ScheduleControls extends Component {
 
         return (
             <Card>
-                <CardHeader>Schedule {schHelp}</CardHeader>
+                <CardHeader className='p-1'>Schedule {' '} {help}</CardHeader>
                 <CardBody>
                     <Form>
                         <small>Timezone: {timezone.name()}</small>

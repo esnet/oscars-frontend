@@ -2,11 +2,9 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
     ListGroup,
-    ListGroupItem,
-    Glyphicon,
-    Panel,
-    Accordion
+    ListGroupItem
 } from 'reactstrap';
+import FontAwesome from 'react-fontawesome';
 
 export default class DevicePortList extends Component {
     constructor(props) {
@@ -35,27 +33,26 @@ export default class DevicePortList extends Component {
             if ('tags' in port) {
                 tags = port.tags.map((tag, idx) => {
                     return (
-                        <ListGroupItem key={idx}>{tag}</ListGroupItem>
+                        <ListGroupItem className='p-0' key={idx}>{tag}</ListGroupItem>
                     )
                 });
             }
-            return <Panel key={port.urn} eventKey={port.urn}>
-                    <Panel.Heading>
-                        <div>{portLabel}
-                            <Glyphicon className='pull-right' glyph='plus' onClick={clickHandler}/>
-                        </div>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <ListGroup>
-                            {tags}
-                        </ListGroup>
-                    </Panel.Body>
-                </Panel>;
+            return <ListGroupItem key={port.urn}>
+                <div>
+                    {portLabel}
+                    <FontAwesome className='pull-right' name='plus-square' onClick={clickHandler}/>
+                </div>
+                <small>
+                    <ListGroup className='p-0'>
+                        {tags}
+                    </ListGroup>
+                </small>
+            </ListGroupItem>;
 
 
         });
 
-        return <Accordion id='device-portsaccordion'>{portsNodes}</Accordion>
+        return <ListGroup>{portsNodes}</ListGroup>
     };
 }
 

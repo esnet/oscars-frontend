@@ -9,12 +9,12 @@ import FontAwesome from 'react-fontawesome';
 class Validator {
     label(state) {
         let icon = 'check-circle';
-        let color = 'success';
+        let color = 'green';
         if (!state) {
             icon = 'flag';
-            color = 'warning'
+            color = 'orange'
         }
-        return <Label color={color}><FontAwesome name={icon}/></Label>
+        return <span style={{color: color}}><FontAwesome name={icon}/></span>
     }
 
     mapNodeColor(state) {

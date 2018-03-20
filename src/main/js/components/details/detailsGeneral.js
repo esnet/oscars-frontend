@@ -5,10 +5,9 @@ import {action, toJS} from 'mobx';
 import Moment from 'moment';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ToggleDisplay from 'react-toggle-display';
-import Confirm from 'react-confirm-bootstrap';
 
 import {Card, CardBody, CardHeader, Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
-import myClient from '../agents/client';
+import myClient from '../../agents/client';
 
 
 @inject('connsStore')
@@ -232,7 +231,7 @@ export default class DetailsGeneral extends Component {
 
         return (
             <Card>
-                <CardHeader>Info</CardHeader>
+                <CardHeader className='p-1'>Info</CardHeader>
                 <CardBody>
                     <u>In progress!</u>
                     <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
@@ -261,7 +260,7 @@ export default class DetailsGeneral extends Component {
 
                     <ToggleDisplay show={controls.general.cancel.display}>
 
-                        <Modal isOpen={this.state.releaseModalOpen} toggle={this.toggleReleaseModal}>
+                        <Modal isOpen={this.state.releaseModalOpen} fade={false} toggle={this.toggleReleaseModal}>
                             <ModalHeader toggle={this.toggleReleaseModal}>Release reservation</ModalHeader>
                             <ModalBody>
                                 This will release all resources, and dismantle the reservation if it is built.                            </ModalBody>

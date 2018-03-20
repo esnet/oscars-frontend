@@ -3,27 +3,17 @@ import React, {Component} from 'react';
 import {action, toJS} from 'mobx';
 import {inject} from 'mobx-react';
 
-import myClient from '../agents/client';
-import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from 'reactstrap';
 import {withRouter} from 'react-router-dom'
+
+import myClient from '../../agents/client';
+import ConfirmModal from '../confirmModal';
+
 
 @inject('controlsStore', 'designStore')
 class CommitButton extends Component {
     constructor(props) {
         super(props);
     }
-
-    componentWillMount() {
-        this.setState({
-            confirmOpen: false
-        });
-    }
-
-    toggleConfirm = () => {
-        this.setState({
-            confirmOpen: !this.state.confirmOpen
-        });
-    };
 
 
     commit = () => {
@@ -52,18 +42,13 @@ class CommitButton extends Component {
 
     render() {
         return <div>
-            <Modal isOpen={this.state.confirmOpen} toggle={this.toggleConfirm}>
-                <ModalHeader toggle={this.toggleConfirm}>Commit connection</ModalHeader>
-                <ModalBody>
-                    Are you ready to commit this reservation?
-                </ModalBody>
-                <ModalFooter>
-                    <Button color='primary' onClick={this.commit}>Commit</Button>{' '}
-                    <Button color='secondary' onClick={this.toggleConfirm}>Never mind</Button>
-                </ModalFooter>
-            </Modal>
-            {' '}
-            <Button color='success' onClick={this.toggleConfirm}>Commit</Button>
+
+            <ConfirmModal body='Are you ready to commit this connection?'
+                          header='Commit connection'
+                          buttonText='Commit'
+                          buttonColor='success'
+                          onConfirm={this.commit}/>
+
         </div>;
 
 

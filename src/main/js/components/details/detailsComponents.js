@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {
     Card, CardHeader, CardBody, CardSubtitle,
-    Nav, NavItem, NavLink,
+    ListGroupItem, ListGroup,
+    NavLink,
     Popover, PopoverBody, PopoverHeader} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 import FontAwesome from 'react-fontawesome';
@@ -83,14 +84,14 @@ export default class DetailsComponents extends Component {
         return (
 
             <Card>
-                <CardHeader>Components {compHelp}</CardHeader>
+                <CardHeader className='p-1'>Components {compHelp}</CardHeader>
                 <CardBody>
                     <CardSubtitle>Connection info:</CardSubtitle>
-                    <Nav vertical pills>
-                        <NavItem onClick={this.onConnectionClicked}>
+                    <ListGroup className='p-1'>
+                        <ListGroupItem className='p-1' onClick={this.onConnectionClicked}>
                             <NavLink href='#'>ID: {connId}</NavLink>
-                            </NavItem>
-                    </Nav>
+                        </ListGroupItem>
+                    </ListGroup>
 
                     <ToggleDisplay show={cmp.junctions.length > 0}>
                         <hr />
@@ -103,26 +104,25 @@ export default class DetailsComponents extends Component {
                                         let label = (fixture.portUrn + ':' + fixture.vlan.vlanId)
                                             .replace(junction.refId+':', '');
 
-                                        return <NavItem key={label} onClick={() => {
+                                        return <ListGroupItem className='p-0' key={label} onClick={() => {
                                             this.onFixtureClicked(fixture)
                                         }}>
                                             <NavLink href='#'>{label}</NavLink>
-                                        </NavItem>
+                                        </ListGroupItem>
 
                                     }
                                 });
 
                                 return (
-                                    <Nav vertical pills key={junction.refId + 'nav'}>
-                                        <NavItem key={junction.refId}
+                                    <ListGroup className='p-0' key={junction.refId + 'nav'}>
+                                        <ListGroupItem className='p-0' key={junction.refId}
                                                  onClick={() => {
                                                      this.onJunctionClicked(junction)
                                                  }}>
-                                            <NavLink active href='#'>{junction.refId}</NavLink>
-                                        </NavItem>
+                                            <NavLink href='#'><strong>{junction.refId}</strong></NavLink>
+                                        </ListGroupItem>
                                         {fixtureNodes}
-
-                                    </Nav>
+                                    </ListGroup>
                                 )
                             })
                         }
@@ -132,18 +132,18 @@ export default class DetailsComponents extends Component {
                     <ToggleDisplay show={cmp.pipes.length > 0}>
                         <hr />
                         <CardSubtitle>Pipes:</CardSubtitle>
-                        <Nav pills vertical>
+                        <ListGroup>
                             {
                                 cmp.pipes.map((pipe) => {
-                                    return <NavItem key={pipe.a + ' --' + pipe.z}
+                                    return <ListGroupItem className='p-0' key={pipe.a + ' --' + pipe.z}
                                                     onClick={() => {
                                                         this.onPipeClicked(pipe)
                                                     }}>
                                         <NavLink href='#'><small>{pipe.a} -- {pipe.z}</small></NavLink>
-                                    </NavItem>
+                                    </ListGroupItem>
                                 })
                             }
-                        </Nav>
+                        </ListGroup>
                     </ToggleDisplay>
                 </CardBody>
 

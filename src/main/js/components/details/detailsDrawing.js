@@ -3,7 +3,7 @@ import {inject, observer} from 'mobx-react';
 import {autorun, toJS} from 'mobx';
 import {Card, CardBody, CardHeader, PopoverHeader, PopoverBody, Popover} from 'reactstrap';
 import vis from 'vis';
-import VisUtils from '../lib/vis'
+import VisUtils from '../../lib/vis'
 import FontAwesome from 'react-fontawesome';
 import {size } from 'lodash-es';
 
@@ -248,7 +248,7 @@ export default class DetailsDrawing extends Component {
 
         return (
             <Card>
-                <CardHeader>
+                <CardHeader className='p-1'>
                     Schematic {schHelp}
                 </CardHeader>
                 <CardBody>

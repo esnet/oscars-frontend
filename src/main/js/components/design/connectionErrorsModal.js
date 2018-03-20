@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal, ModalBody, ModalHeader, ModalFooter,
-    Button,
+    Modal, ModalBody, ModalHeader,
     Card, CardBody,
     ListGroup,
     ListGroupItem
@@ -38,7 +37,7 @@ export default class ConnectionErrorsModal extends Component {
         }
 
         return (
-            <Modal size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+            <Modal size='lg'fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
                 <ModalHeader toggle={this.toggle}>Connection parameter errors</ModalHeader>
                 <ModalBody>
                     <Card>

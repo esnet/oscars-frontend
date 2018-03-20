@@ -170,7 +170,7 @@ export default class NetworkMap extends Component {
 
         return (
             <Card>
-                <CardHeader>
+                <CardHeader className='p-1'>
                     Network Map
                     <span className='pull-right'>
 

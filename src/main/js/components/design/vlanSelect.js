@@ -1,12 +1,18 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    OverlayTrigger, Glyphicon, Popover, Panel, FormGroup,
-    FormControl, ControlLabel, HelpBlock, Well
+    Card, CardBody, CardHeader, Form,
+    InputGroup, InputGroupAddon, InputGroupText,
+    FormGroup, Input, Label,
+    FormFeedback, FormText, Alert
 } from 'reactstrap';
+import HelpPopover from '../helpPopover';
+
+import {toJS} from 'mobx';
+
 import ToggleDisplay from 'react-toggle-display';
 
-import Validator from '../lib/validation';
+import Validator from '../../lib/validation';
 
 
 @inject('designStore', 'controlsStore', 'topologyStore')
@@ -58,7 +64,6 @@ export default class VlanSelect extends Component {
         }
 
 
-
         if (ef.locked) {
             return;
         }
@@ -104,7 +109,13 @@ export default class VlanSelect extends Component {
                 inBaseline = true;
             }
         });
-        if (!inBaseline) {
+        if (e.target.value === '' ) {
+            hasError = true;
+            valText = 'No input.';
+        } else if (isNaN(vlanId)) {
+            hasError = true;
+            valText = 'Unable to parse.';
+        } else if (!inBaseline) {
             hasError = true;
             valText = 'VLAN not in baseline.';
         } else {
@@ -145,7 +156,8 @@ export default class VlanSelect extends Component {
     render() {
         const ef = this.props.controlsStore.editFixture;
 
-        let helpPopover = <Popover id='help-vlanSelect' title='VLAN selection'>
+        const helpHeader = <span>VLAN selection</span>;
+        const helpBody = <span>
             <p>Here you can set the VLAN id for this fixture. </p>
 
             <p>In 'unlocked' mode, when the dialog opens the value will be editable and set to a suggested VLAN that
@@ -158,45 +170,53 @@ export default class VlanSelect extends Component {
                 reservations overlapping the selected schedule.</p>
             <p>When the fixture is locked, this control will display the selected value, and will not be editable.
                 Unlock the fixture to edit.</p>
-        </Popover>;
+        </span>;
 
+        const help = <span className='pull-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='left' popoverId='vlanSelectHelp'/>
+        </span>;
 
         return (
-            <Panel>
-                <Panel.Heading>
-                    <p>VLAN selection
-                        <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
-                        </OverlayTrigger>
-                    </p>
-                </Panel.Heading>
-                <Panel.Body>
+            <Card>
+                <CardHeader className='p-1'>VLAN selection {help}</CardHeader>
+                <CardBody>
                     <ToggleDisplay show={!ef.locked}>
-                        <FormGroup controlId='vlanExpression'>
-                            <HelpBlock>Available for your schedule: {ef.vlan.available.expression}</HelpBlock>
-                            <HelpBlock>Baseline: {ef.vlan.baseline.expression}</HelpBlock>
-                        </FormGroup>
+                        <Form>
+                            <FormGroup>
+                                <Label>VLAN:</Label>
+                                {' '}
+                                <InputGroup>
 
-
-                        {' '}
-                        <FormGroup controlId='vlanChoice' validationState={ef.vlan.validationState}>
-                            <ControlLabel>VLAN choice:</ControlLabel>
+                                    <Input type='text'
+                                           invalid={ef.vlan.validationState === 'error'}
+                                           defaultValue={ef.vlan.available.suggestion}
+                                           onChange={this.onTypeIn}/>
+                                    <InputGroupAddon addonType='append'>
+                                        <InputGroupText>
+                                            {Validator.label(ef.vlan.acceptable)}
+                                        </InputGroupText>
+                                    </InputGroupAddon>
+                                </InputGroup>
+                                {' '}
+                                <FormFeedback>{ef.vlan.validationText}</FormFeedback>
+                            </FormGroup>
                             {' '}
-                            <FormControl defaultValue={ef.vlan.available.suggestion} type='text' onChange={this.onTypeIn}/>
-                            <HelpBlock><p>{ef.vlan.validationText}</p></HelpBlock>
-                            {' '}
-                        </FormGroup>
-                        {' '}
-                        {Validator.label(ef.vlan.acceptable)}
+                            <FormGroup>
+                                <FormText>Available : {ef.vlan.available.expression}</FormText>
+                            </FormGroup>
+                            <FormGroup>
+                                <FormText>Baseline: {ef.vlan.baseline.expression}</FormText>
+                            </FormGroup>
+                        </Form>
 
                     </ToggleDisplay>
                     {' '}
                     <ToggleDisplay show={ef.locked}>
-                        <Well>Locked VLAN: {ef.vlan.vlanId}</Well>
+                        <Alert color='info'>Locked VLAN: {ef.vlan.vlanId}</Alert>
                     </ToggleDisplay>
-                </Panel.Body>
+                </CardBody>
 
-            </Panel>
+            </Card>
 
         );
 

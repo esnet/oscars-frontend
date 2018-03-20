@@ -234,7 +234,7 @@ export default class EditUserForm extends Component {
                                             onClick={this.props.submitUpdate}>Update</Button>
 
                                     <ToggleDisplay show={this.props.adminMode && size(allUsers) >= 2}>
-                                        <Modal isOpen={this.state.deleteConfirmOpen} toggle={this.toggleDeleteConfirm} >
+                                        <Modal fade={false} isOpen={this.state.deleteConfirmOpen} toggle={this.toggleDeleteConfirm} >
                                             <ModalHeader toggle={this.toggleDeleteConfirm}>Delete user</ModalHeader>
                                             <ModalBody>
                                                 Are you sure you want to delete this user?
