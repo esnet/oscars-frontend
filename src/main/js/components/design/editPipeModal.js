@@ -492,10 +492,10 @@ export default class EditPipeModal extends Component {
                                                                            invalid={ep.A_TO_Z.validationState === 'error'}
                                                                            disabled={ep.locked}
                                                                            onChange={this.onAzBwChange}/>
+                                                                    <FormFeedback>
+                                                                        <small>{ep.A_TO_Z.validationText}</small>
+                                                                    </FormFeedback>
                                                                 </InputGroup>
-                                                                <FormFeedback>
-                                                                    <small>{ep.A_TO_Z.validationText}</small>
-                                                                </FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup>
                                                                 <FormText className='m-0 p-0'>
@@ -534,9 +534,11 @@ export default class EditPipeModal extends Component {
                                                                             &lt;
                                                                         </InputGroupText>
                                                                     </InputGroupAddon>
+                                                                    <FormFeedback>
+                                                                        <small>{ep.Z_TO_A.validationText}</small>
+                                                                    </FormFeedback>
 
                                                                 </InputGroup>
-                                                                <FormFeedback>{ep.Z_TO_A.validationText}</FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup>
                                                                 <FormText>

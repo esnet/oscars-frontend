@@ -45,10 +45,8 @@ export default class ConfirmModal extends Component {
 
         return  <span>
             <Modal isOpen={this.state.confirmOpen} fade={false} toggle={this.toggleConfirm}>
-                <ModalHeader toggle={this.toggleConfirm}>Delete fixture</ModalHeader>
-                <ModalBody>
-                    Are you ready to delete this fixture?
-                </ModalBody>
+                <ModalHeader toggle={this.toggleConfirm}>{this.props.header}</ModalHeader>
+                <ModalBody>{this.props.body}</ModalBody>
                 <ModalFooter>
                     <Button color={this.props.confirmButtonColor}
                             onClick={this.confirm}>{this.props.confirmButtonText}</Button>{' '}

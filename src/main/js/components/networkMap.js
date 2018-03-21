@@ -6,8 +6,8 @@ import ToggleDisplay from 'react-toggle-display';
 
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
-import ActionZoomIn from 'react-material-icons/icons/action/zoom-in';
-import ActionZoomOut from 'react-material-icons/icons/action/zoom-out';
+import ZoomIn from 'material-ui-icons/ZoomIn';
+import ZoomOut from 'material-ui-icons/ZoomIn';
 
 
 import {
@@ -188,11 +188,11 @@ export default class NetworkMap extends Component {
                     <span className='float-right'>
 
                         <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                            <ActionZoomIn onClick={this.zoomOnColored} />
+                            <ZoomIn onClick={this.zoomOnColored} />
                         </ToggleDisplay>
                         {' '}
 
-                        <ActionZoomOut onClick={() => {
+                        <ZoomOut onClick={() => {
                             this.network.fit({animation: true})
                         }} />
                         {' '}

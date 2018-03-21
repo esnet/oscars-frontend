@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import {
     ListGroup,
     ListGroupItem,
+    Row, Col, Container,
+    Card, CardBody, CardSubtitle,
+    Button
 } from 'reactstrap';
 
 
@@ -39,15 +42,24 @@ export default class DevicePortList extends Component {
                 });
             }
             return <ListGroupItem key={port.urn}>
-                <div>
-                    {portLabel}
-                    <span className='float-right' onClick={clickHandler}>Add</span>
-                </div>
-                <small>
-                    <ListGroup className='p-0'>
-                        {tags}
-                    </ListGroup>
-                </small>
+                <Container>
+                    <Row>
+                        <Col>
+                            {portLabel}
+                            {' '}
+                            <Button color='primary' className='float-right' onClick={clickHandler}>Add</Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <small>
+                                <ListGroup className='p-0'>
+                                    {tags}
+                                </ListGroup>
+                            </small>
+                        </Col>
+                    </Row>
+                </Container>
             </ListGroupItem>;
 
 

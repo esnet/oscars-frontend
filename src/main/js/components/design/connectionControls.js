@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
 import {action, autorun, toJS} from 'mobx';
-import ActionHelp from 'react-material-icons/icons/action/help';
+import Help from 'material-ui-icons/Help';
 import ToggleDisplay from 'react-toggle-display';
 import {
     Alert,
@@ -119,7 +119,11 @@ export default class ConnectionControls extends Component {
                         <Alert color='info' onClick={() => {
                             this.props.modalStore.openModal('designHelp')
                         }}>
-                            <strong>Help me! <span className='float-right' ><ActionHelp /></span></strong>
+                            <strong>Help me!
+                                <span className='float-right'>
+                                    <Help style={{height: '18px', width: '18px'}}/>
+                                </span>
+                            </strong>
                             <div>Connection id: {this.props.controlsStore.connection.connectionId}</div>
                         </Alert>
                         <FormGroup>

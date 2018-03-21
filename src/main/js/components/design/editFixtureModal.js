@@ -142,13 +142,11 @@ export default class EditFixtureModal extends Component {
                                     {' '}
                                     <Button color='primary'
                                             disabled={disableLockBtn}
-                                            className='float-right'
                                             onClick={this.lockFixture}>Lock</Button>
                                 </ToggleDisplay>
                                 <ToggleDisplay show={ef.locked}>
                                     {' '}
                                     <Button color='warning'
-                                            className='float-right'
                                             onClick={this.unlockFixture}>Unlock</Button>
                                 </ToggleDisplay>
                             </ButtonToolbar>

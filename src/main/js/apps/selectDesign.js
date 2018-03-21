@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Row, Col, ListGroup, ListGroupItem, Card } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {observer, inject} from 'mobx-react';
-import Help from 'react-material-icons/icons/action/help';
+import Help from 'material-ui-icons/Help';
 
 import myClient from '../agents/client';
 import transformer from '../lib/transform';

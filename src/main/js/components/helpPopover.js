@@ -3,7 +3,7 @@ import {
     Popover, PopoverHeader, PopoverBody
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import ActionHelp from 'react-material-icons/icons/action/help';
+import Help from 'material-ui-icons/Help';
 
 
 export default class HelpPopover extends Component {
@@ -26,8 +26,10 @@ export default class HelpPopover extends Component {
 
     render() {
 
-        return <span>
-                <ActionHelp onClick={this.toggle}
+        return <span >
+
+                <Help style={{height: '18px', width: '18px'}}
+                    onClick={this.toggle}
                             id={this.props.popoverId}/>
                 <Popover placement={this.props.placement}
                          isOpen={this.state.showPopover}

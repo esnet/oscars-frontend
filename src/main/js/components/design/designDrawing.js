@@ -12,7 +12,7 @@ import HelpPopover from '../helpPopover';
 
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
-import ActionZoomOut from 'react-material-icons/icons/action/zoom-out';
+import ZoomOut from 'material-ui-icons/ZoomOut';
 
 
 
@@ -292,7 +292,7 @@ export default class DesignDrawing extends Component {
                 <CardHeader className='p-1'>
                     Design drawing
                     <span className='float-right'>
-                        <ActionZoomOut onClick={() => {
+                        <ZoomOut onClick={() => {
                             this.network.fit({animation: true})
                         }} />
                     </span>
