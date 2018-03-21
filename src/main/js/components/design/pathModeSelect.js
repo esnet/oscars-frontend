@@ -7,7 +7,8 @@ import {
     InputGroup, InputGroupText, InputGroupAddon
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import FontAwesome from 'react-fontawesome';
+import ActionHelp from 'react-material-icons/icons/action/help';
+
 
 
 @inject('controlsStore', 'designStore')
@@ -92,9 +93,7 @@ export default class PathModeSelect extends Component {
                         </Card>
                     </ModalBody>
                 </Modal>
-                <FontAwesome
-                    onClick={this.toggle}
-                    name='question'/>
+                <ActionHelp onClick={this.toggle} />
             </span>;
 
 

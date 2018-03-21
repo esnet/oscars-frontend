@@ -11,17 +11,14 @@ import {
     Label,
     Input,
     Form,
-    FormGroup,
-    Popover,
-    PopoverHeader,
-    PopoverBody
+    FormGroup
 } from 'reactstrap';
 import {toJS} from 'mobx';
 import myClient from '../agents/client';
 import {observer, inject} from 'mobx-react';
 import UserAdminModal from '../components/userAdminModal';
 import {size} from 'lodash-es'
-import FontAwesome from 'react-fontawesome';
+import HelpPopover from '../components/helpPopover';
 
 @inject('controlsStore', 'commonStore', 'modalStore', 'userStore')
 @observer
@@ -35,9 +32,6 @@ export default class UsersAdminApp extends Component {
     componentWillMount() {
         this.props.commonStore.setActiveNav('admin');
         this.props.userStore.setParamsForEditUser({user: {username: ''}});
-        this.setState({
-            popoverOpen: false
-        });
 
         this.refreshUserList();
     }
@@ -134,45 +128,33 @@ export default class UsersAdminApp extends Component {
         }
     };
 
-    toggle = () => {
-        this.setState({
-            popoverOpen: !this.state.popoverOpen
-        });
-    };
 
 
     render() {
         let editUser = this.props.userStore.editUser;
+
+        const helpHeader = <span>Add a fixture</span>;
+        const helpBody = <span>
+            <p>This is the users administration form. The list shows all the users
+                registered in the system.</p>
+            <p>Click on a username on the list to edit user details.</p>
+            <p>To add a new user, type a username in the box then click "Add new user"
+                or press Enter.</p>
+        </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='userAdminHelp'/>
+        </span>;
+
 
         return (
             <Row>
                 <Col xs={{size: 8, offset: 2}} md={{size: 8, offset: 2}}>
                     <Card>
                         <CardHeader>
-                            <div>Users administration
-                                <div className='pull-right'>
-                                    <FontAwesome
-                                        onClick={this.toggle}
-                                        className='pull-right'
-                                        name='question'
-                                        id='helpIcon'
-                                    />
-                                    <Popover placement='left'
-                                             isOpen={this.state.popoverOpen}
-                                             target='helpIcon'
-                                             toggle={this.toggle}>
-                                        <PopoverHeader>User Administration</PopoverHeader>
-                                        <PopoverBody>
-                                            <p>This is the users administration form. The list shows all the users
-                                                registered in the system.</p>
-                                            <p>Click on a username on the list to edit user details.</p>
-                                            <p>To add a new user, type a username in the box then click "Add new user"
-                                                or press Enter.</p>
-                                        </PopoverBody>
-                                    </Popover>
-
-                                </div>
-                            </div>
+                            Users administration
+                            {' '}
+                            {help}
                         </CardHeader>
                         <CardBody>
                             <ListGroup>
@@ -188,7 +170,7 @@ export default class UsersAdminApp extends Component {
                                     })
                                 }
                             </ListGroup>
-                            <hr />
+                            <hr/>
 
                             <Form inline onSubmit={(e) => {
                                 e.preventDefault()
@@ -202,7 +184,7 @@ export default class UsersAdminApp extends Component {
                                            onChange={(e) => this.onUsernameChange(e.target.value)}/>
                                 </FormGroup>
                                 {' '}
-                                <Button className='pull-right'
+                                <Button className='float-right'
                                         disabled={!size(editUser.user.username)}
                                         onClick={this.addUser}>Add </Button>
                             </Form>

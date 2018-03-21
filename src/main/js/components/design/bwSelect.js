@@ -343,7 +343,7 @@ export default class BwSelect extends Component {
                 and egress values, and will not be editable. Unlock the fixture to edit.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='bwSelectHelp'/>
         </span>;
 

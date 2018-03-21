@@ -1,20 +1,17 @@
 import React from 'react';
 
-
 import {Graph, alg} from 'graphlib';
-import {Label} from 'reactstrap';
-import FontAwesome from 'react-fontawesome';
+import ContentFlag from 'react-material-icons/icons/content/flag';
+import ActionCheckCircle from 'react-material-icons/icons/action/check-circle';
 
 
 class Validator {
     label(state) {
-        let icon = 'check-circle';
-        let color = 'green';
         if (!state) {
-            icon = 'flag';
-            color = 'orange'
+            return <span style={{color: 'orange'}}><ContentFlag /></span>
+
         }
-        return <span style={{color: color}}><FontAwesome name={icon}/></span>
+        return <span style={{color: 'green'}}><ActionCheckCircle /></span>
     }
 
     mapNodeColor(state) {

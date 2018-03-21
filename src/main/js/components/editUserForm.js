@@ -1,15 +1,9 @@
 import React, {Component} from 'react';
 import {
-    Row,
-    Col,
+    Row, Col,
     Card, CardHeader, CardBody,
-    Form,
-    FormFeedback,
-    Modal, ModalFooter, ModalHeader, ModalBody,
-    Popover, PopoverHeader,  PopoverBody,
-    Input,
-    FormGroup,
-    Label,
+    Form, FormFeedback,
+    Input, FormGroup, Label,
     Button
 } from 'reactstrap';
 import {observer, inject} from 'mobx-react';
@@ -17,7 +11,8 @@ import {toJS, autorun} from 'mobx';
 import {size} from 'lodash-es';
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
-import FontAwesome from 'react-fontawesome';
+import ConfirmModal from './confirmModal';
+import HelpPopover from './helpPopover';
 
 
 @inject('controlsStore', 'userStore')
@@ -95,31 +90,6 @@ export default class EditUserForm extends Component {
     }, {delay: 500});
 
 
-    componentWillMount() {
-        this.setState({
-            userHelpOpen: false,
-            pwdHelpOpen: false,
-            deleteConfirmOpen: false,
-        });
-
-    }
-
-    toggleDeleteConfirm = () => {
-        this.setState({
-            deleteConfirmOpen: !this.state.deleteConfirmOpen
-        });
-    };
-
-    toggleUserHelp = () => {
-        this.setState({
-            userHelpOpen: !this.state.userHelpOpen
-        });
-    };
-    togglePwdHelp = () => {
-        this.setState({
-            pwdHelpOpen: !this.state.pwdHelpOpen
-        });
-    };
 
 
     render() {
@@ -149,6 +119,26 @@ export default class EditUserForm extends Component {
             passwordInvalid = false;
         }
 
+        const helpHeader = <span>User editing</span>;
+        const helpBody = <span>
+            <p> Make the changes you want. To apply, press Enter in a
+                textbox or click Update.</p>
+        </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editUserHelp'/>
+        </span>;
+
+        const pwdHelpHeader = <span>Changing password</span>;
+        const pwdHelpBody = <span>
+            <p>Click "Change" to show the password input form.</p>
+            <p>Type in the new password, then click Set to apply.</p>
+        </span>;
+
+        const pwdHelp = <span className='float-right'>
+            <HelpPopover header={pwdHelpHeader} body={pwdHelpBody} placement='bottom' popoverId='pwdHelp'/>
+        </span>;
+
         return <div>
             <Row>
                 <Col xs={{size: colWidth, offset: colOffset}}
@@ -157,25 +147,8 @@ export default class EditUserForm extends Component {
                      lg={{size: colWidth, offset: colOffset}}>
                     <Card>
                         <CardHeader>
-                            Edit user details
-                            <div className='pull-right'>
-                                <FontAwesome
-                                    onClick={this.toggleUserHelp}
-                                    className='pull-right'
-                                    name='question'
-                                    id='userHelpIcon'
-                                />
-                                <Popover placement='left'
-                                         isOpen={this.state.userHelpOpen}
-                                         target='userHelpIcon'
-                                         toggle={this.toggleUserHelp}>
-                                    <PopoverHeader>Help: Changing user details</PopoverHeader>
-                                    <PopoverBody>
-                                        <p> Make the changes you want. To apply, press Enter in a
-                                            textbox or click Update.</p>
-                                    </PopoverBody>
-                                </Popover>
-                            </div>
+                            Edit user details{' '}{help}
+
                         </CardHeader>
                         <CardBody>
 
@@ -227,25 +200,18 @@ export default class EditUserForm extends Component {
 
                             </Form>
                             <div>
-                                <span className='pull-left'>{editUser.status}</span>
-                                <div className='pull-right'>
+                                <span className='float-left'>{editUser.status}</span>
+                                <div className='float-right'>
                                     <Button color='primary'
                                             disabled={!size(editUser.user.username)}
                                             onClick={this.props.submitUpdate}>Update</Button>
 
                                     <ToggleDisplay show={this.props.adminMode && size(allUsers) >= 2}>
-                                        <Modal fade={false} isOpen={this.state.deleteConfirmOpen} toggle={this.toggleDeleteConfirm} >
-                                            <ModalHeader toggle={this.toggleDeleteConfirm}>Delete user</ModalHeader>
-                                            <ModalBody>
-                                                Are you sure you want to delete this user?
-                                            </ModalBody>
-                                            <ModalFooter>
-                                                <Button color='primary' onClick={this.props.submitDelete}>Delete</Button>{' '}
-                                                <Button color='secondary' onClick={this.toggleDeleteConfirm}>Never mind</Button>
-                                            </ModalFooter>
-                                        </Modal>
-                                        {' '}
-                                        <Button color='primary' onClick={this.toggleDeleteConfirm}>Delete</Button>
+
+                                        <ConfirmModal body='Are you ready to delete this user?'
+                                                      header='Delete user'
+                                                      buttonText='Delete'
+                                                      onConfirm={this.props.submitDelete}/>
                                     </ToggleDisplay>
                                 </div>
                             </div>
@@ -259,29 +225,7 @@ export default class EditUserForm extends Component {
                      sm={colWidth}
                      lg={colWidth}>
                     <Card>
-                        <CardHeader>
-                            <div>Password
-                                <div className='pull-right'>
-                                    <FontAwesome
-                                        onClick={this.togglePwdHelp}
-                                        className='pull-right'
-                                        name='question'
-                                        id='pwdHelpIcon'
-                                    />
-
-                                    <Popover placement='left'
-                                             isOpen={this.state.pwdHelpOpen}
-                                             target='pwdHelpIcon'
-                                             toggle={this.togglePwdHelp}>
-                                        <PopoverHeader>Help: Changing user password</PopoverHeader>
-                                        <PopoverBody>
-                                            <p>Click "Change" to show the password input form.</p>
-                                            <p>Type in the new password, then click Set to apply.</p>
-                                        </PopoverBody>
-                                    </Popover>
-                                </div>
-                            </div>
-                        </CardHeader>
+                        <CardHeader>Password {' '} {pwdHelp}</CardHeader>
                         <CardBody>
 
 
@@ -341,7 +285,7 @@ export default class EditUserForm extends Component {
                                                onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
 
                                     </FormGroup>
-                                    <div className='pull-right'>
+                                    <div className='float-right'>
                                         <Button
                                             color={editUser.passwordOk ? 'primary' : 'default'}
                                             disabled={!editUser.passwordOk || !size(editUser.user.username)}

@@ -13,7 +13,7 @@ const PATHS = {
 
 module.exports = {
     entry: ['babel-polyfill', './src/main/js/index.js'],
-    devtool: 'sourcemaps',
+//    devtool: 'eval',
     cache: true,
     output: {
         path: PATHS.build,
@@ -33,27 +33,29 @@ module.exports = {
                 }
             },
             {
-                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader?limit=10000&mimetype=application/font-woff"
-            },
-            {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader"},
-            {
                 test: /\.(gif|png|jpe?g|svg)$/i,
                 use: [
-                    'file-loader',
-                    {
-                        loader: 'image-webpack-loader',
-                        options: {
-                            bypassOnDebug: true,
-                        },
-                    },
+                    'file-loader'
                 ],
             },
             {
                 test: /\.css$/,
-                include: /node_modules/,
-                use: ['style-loader', 'css-loader']
-            }
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            /*
+
+                            sourceMap: true,
+                            convertToAbsoluteUrls: true
+                            */
+                        }
+                    },
+                    'css-loader'
+
+                ]
+            },
+
         ]
     },
     plugins: [
@@ -62,16 +64,18 @@ module.exports = {
             inject: 'body',
             favicon: PATHS.templates + '/favicon.ico',
         }),
-    /*
-        new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
-        new UglifyJsPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('production')
-            }
-        })
-*/
+
+        /*
+        new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en)$/),
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new webpack.optimize.AggressiveMergingPlugin(),
+            new UglifyJsPlugin(),
+            new webpack.DefinePlugin({
+                'process.env': {
+                    NODE_ENV: JSON.stringify('production')
+                }
+            })
+    */
     ],
 
     devServer: {

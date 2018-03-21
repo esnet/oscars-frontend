@@ -103,7 +103,7 @@ export default class EditFixtureModal extends Component {
                 The 'Unlock' button will be available to switch back.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editFixHelp'/>
         </span>;
 
@@ -129,7 +129,7 @@ export default class EditFixtureModal extends Component {
                                 <Alert color='info'>Select fixture parameters, then click "Lock".</Alert>
                             </ToggleDisplay>
 
-                            <ButtonToolbar className='pull-right'>
+                            <ButtonToolbar className='float-right'>
 
                                 <ConfirmModal body='Are you ready to delete this fixture?'
                                               header='Delete fixture'
@@ -142,13 +142,13 @@ export default class EditFixtureModal extends Component {
                                     {' '}
                                     <Button color='primary'
                                             disabled={disableLockBtn}
-                                            className='pull-right'
+                                            className='float-right'
                                             onClick={this.lockFixture}>Lock</Button>
                                 </ToggleDisplay>
                                 <ToggleDisplay show={ef.locked}>
                                     {' '}
                                     <Button color='warning'
-                                            className='pull-right'
+                                            className='float-right'
                                             onClick={this.unlockFixture}>Unlock</Button>
                                 </ToggleDisplay>
                             </ButtonToolbar>

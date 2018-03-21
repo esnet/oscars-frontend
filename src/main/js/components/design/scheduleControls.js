@@ -301,7 +301,7 @@ export default class ScheduleControls extends Component {
             <p>Unlocking the schedule will also unlock all other resources.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='scheduleHelp'/>
         </span>;
 
@@ -318,7 +318,7 @@ export default class ScheduleControls extends Component {
 
         if (size(this.props.designStore.design.fixtures) === 0) {
             unlockControl =
-                <Button className='pull-right' onClick={this.unlockSchedule} color='primary'>Unlock</Button>;
+                <Button className='float-right' onClick={this.unlockSchedule} color='primary'>Unlock</Button>;
         }
 
 
@@ -354,7 +354,7 @@ export default class ScheduleControls extends Component {
                         </FormGroup>
                         <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
 
-                            <Button color='primary' className='pull-right' onClick={this.lockSchedule}>Lock schedule</Button>
+                            <Button color='primary' className='float-right' onClick={this.lockSchedule}>Lock schedule</Button>
                         </ToggleDisplay>
                         <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
 

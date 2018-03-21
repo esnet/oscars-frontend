@@ -135,7 +135,7 @@ export default class DesignControls extends Component {
                 <Panel.Heading>
                     <div>Save design
                         <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                            <Glyphicon className='float-right' glyph='question-sign'/>
                         </OverlayTrigger>
                     </div>
                 </Panel.Heading>
@@ -150,7 +150,7 @@ export default class DesignControls extends Component {
                                          onChange={this.onDescriptionChange}/>
                         </FormGroup>
                         {' '}
-                        <FormGroup className='pull-right'>
+                        <FormGroup className='float-right'>
                             <ToggleDisplay show={designOk}>
                                 <Button disabled={editDesign.disabledSaveButton} onClick={this.saveDesign}>Save</Button>
                             </ToggleDisplay>

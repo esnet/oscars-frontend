@@ -3,13 +3,14 @@ import {
     Popover, PopoverHeader, PopoverBody
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import FontAwesome from 'react-fontawesome';
+import ActionHelp from 'react-material-icons/icons/action/help';
 
 
 export default class HelpPopover extends Component {
     constructor(props) {
         super(props);
     }
+
     componentWillMount() {
         this.setState({
             showPopover: false
@@ -26,10 +27,8 @@ export default class HelpPopover extends Component {
     render() {
 
         return <span>
-                <FontAwesome
-                    onClick={this.toggle}
-                    name='question'
-                    id={this.props.popoverId} />
+                <ActionHelp onClick={this.toggle}
+                            id={this.props.popoverId}/>
                 <Popover placement={this.props.placement}
                          isOpen={this.state.showPopover}
                          target={this.props.popoverId}

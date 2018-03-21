@@ -172,7 +172,7 @@ export default class VlanSelect extends Component {
                 Unlock the fixture to edit.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='left' popoverId='vlanSelectHelp'/>
         </span>;
 

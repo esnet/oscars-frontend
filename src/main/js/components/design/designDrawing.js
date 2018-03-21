@@ -12,7 +12,7 @@ import HelpPopover from '../helpPopover';
 
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
-import FontAwesome from 'react-fontawesome';
+import ActionZoomOut from 'react-material-icons/icons/action/zoom-out';
 
 
 
@@ -284,21 +284,20 @@ export default class DesignDrawing extends Component {
             <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
         </span>;
 
-        const help = <span className='pull-right'>
-            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='ddHelp'/>
-        </span>;
+        const help = <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='ddHelp'/>
 
 
         return (
             <Card>
                 <CardHeader className='p-1'>
                     Design drawing
-                    <span className='pull-right'>
-
-                        <FontAwesome onClick={() => {
+                    <span className='float-right'>
+                        <ActionZoomOut onClick={() => {
                             this.network.fit({animation: true})
-                        }} name='search-minus'/>
-                        {' '}
+                        }} />
+                    </span>
+                    {' '}
+                    <span className='float-right'>
                         {help}
                     </span>
                 </CardHeader>

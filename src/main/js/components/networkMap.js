@@ -6,15 +6,17 @@ import ToggleDisplay from 'react-toggle-display';
 
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
-import FontAwesome from 'react-fontawesome';
+import ActionZoomIn from 'react-material-icons/icons/action/zoom-in';
+import ActionZoomOut from 'react-material-icons/icons/action/zoom-out';
+
 
 import {
-    Card, CardHeader, CardBody,
-    Popover, PopoverHeader, PopoverBody
+    Card, CardHeader, CardBody
 } from 'reactstrap';
+import PropTypes from 'prop-types';
 
 import myClient from '../agents/client';
-import PropTypes from 'prop-types';
+import HelpPopover from './helpPopover';
 
 @inject('mapStore')
 @observer
@@ -22,7 +24,6 @@ export default class NetworkMap extends Component {
     constructor(props) {
         super(props);
     }
-
 
     // this automagically updates the map;
     disposeOfMapUpdate = autorun(() => {
@@ -145,11 +146,6 @@ export default class NetworkMap extends Component {
         this.disposeOfMapUpdate();
     }
 
-    componentWillMount() {
-        this.setState({
-            showHelp: false
-        });
-    }
 
     componentDidMount() {
 
@@ -161,53 +157,46 @@ export default class NetworkMap extends Component {
 
     }
 
-    toggleHelp = () => {
-        this.setState({showHelp: !this.state.showHelp});
-    };
 
     render() {
+
+        const helpHeader = <span>Network Map</span>;
+        const helpBody = <span>
+            <p>This is the map of the entire network managed by OSCARS. Devices are represented
+                by circles, and links between them by lines.
+            </p>
+            <p>The primary action is to click on a device to bring up a list of its ports that can be added as a
+                fixture.</p>
+            <p>Zoom in and out by mouse-wheel, click and drag the background to pan,
+                or click-and-drag a node to temporarily reposition.
+            </p>
+            <p>You may also click on the (-) magnifying glass icon to
+                adjust the map to fit the entire network. The (+) magnifying
+                glass will zoom to fit all the selected junctions. Click the chevron icon
+                to hide / show the map.</p>
+        </span>;
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='networkMapHelp'/>
+        </span>;
+
 
 
         return (
             <Card>
                 <CardHeader className='p-1'>
                     Network Map
-                    <span className='pull-right'>
+                    <span className='float-right'>
 
                         <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                            <FontAwesome onClick={this.zoomOnColored} name='search-plus'/>
+                            <ActionZoomIn onClick={this.zoomOnColored} />
                         </ToggleDisplay>
                         {' '}
 
-                        <FontAwesome onClick={() => {
+                        <ActionZoomOut onClick={() => {
                             this.network.fit({animation: true})
-                        }} name='search-minus'/>
+                        }} />
                         {' '}
-
-                        <FontAwesome onClick={this.toggleHelp}
-                                     name='question'
-                                     id='mapHelpIcon' />
-
-                        <Popover placement='left'
-                                 isOpen={this.state.showHelp}
-                                 target='mapHelpIcon'
-                                 toggle={this.toggleHelp}>
-                            <PopoverHeader>Map help</PopoverHeader>
-                            <PopoverBody>
-                                <p>This is the map of the entire network managed by OSCARS. Devices are represented
-                                    by circles, and links between them by lines.
-                                </p>
-                                <p>The primary action is to click on a device to bring up a list of its ports that can be added as a
-                                    fixture.</p>
-                                <p>Zoom in and out by mouse-wheel, click and drag the background to pan,
-                                    or click-and-drag a node to temporarily reposition.
-                                </p>
-                                <p>You may also click on the (-) magnifying glass icon to
-                                    adjust the map to fit the entire network. The (+) magnifying
-                                    glass will zoom to fit all the selected junctions. Click the chevron icon
-                                    to hide / show the map.</p>
-                            </PopoverBody>
-                        </Popover>
+                        {help}
 
                     </span>
 

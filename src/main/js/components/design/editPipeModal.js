@@ -13,7 +13,6 @@ import {
 } from 'reactstrap';
 
 import {autorun, toJS} from 'mobx';
-import FontAwesome from 'react-fontawesome';
 
 
 import ToggleDisplay from 'react-toggle-display';
@@ -430,7 +429,7 @@ export default class EditPipeModal extends Component {
             <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editPipeHelp'/>
         </span>;
 
@@ -442,7 +441,7 @@ export default class EditPipeModal extends Component {
                 not be available for the new value.</p>
         </span>;
 
-        const bwHelp = <span className='pull-right'>
+        const bwHelp = <span className='float-right'>
             <HelpPopover header={bwHelpHeader} body={bwHelpBody} placement='bottom' popoverId='pipeBwHelp'/>
         </span>;
 
@@ -481,7 +480,7 @@ export default class EditPipeModal extends Component {
                                                                 <InputGroup>
                                                                     <InputGroupAddon addonType='prepend'>
                                                                         <InputGroupText>
-                                                                            <FontAwesome name='arrow-right'/>
+                                                                            &gt;
                                                                         </InputGroupText>
                                                                     </InputGroupAddon>
                                                                     <Input type='text'
@@ -532,7 +531,7 @@ export default class EditPipeModal extends Component {
                                                                            onChange={this.onZaBwChange}/>
                                                                     <InputGroupAddon addonType='append'>
                                                                         <InputGroupText>
-                                                                            <FontAwesome name='arrow-left'/>
+                                                                            &lt;
                                                                         </InputGroupText>
                                                                     </InputGroupAddon>
 
@@ -624,7 +623,7 @@ export default class EditPipeModal extends Component {
                         </Container>
                     </ToggleDisplay>
                     <hr/>
-                    <ButtonToolbar className='pull-right'>
+                    <ButtonToolbar className='float-right'>
 
                         <ConfirmModal body='Are you ready to delete this pipe?'
                                       header='Delete pipe'

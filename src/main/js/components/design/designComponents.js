@@ -38,7 +38,7 @@ export default class DesignComponents extends Component {
             <p>You may click on any component to bring up its edit form.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='left' popoverId='compHelp'/>
         </span>;
 

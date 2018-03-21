@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Row, Col, ListGroup, ListGroupItem, Card } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {observer, inject} from 'mobx-react';
-import FontAwesome from 'react-fontawesome';
+import Help from 'react-material-icons/icons/action/help';
 
 import myClient from '../agents/client';
 import transformer from '../lib/transform';
@@ -83,12 +83,9 @@ export default class SelectDesign extends Component {
                 <Col xs={5} md={5} mdOffset={1} sm={5} smOffset={1} lg={5} lgOffset={1}>
                     <Card>
                         <Card.Heading>
-                            <h3>My designs
-                                <FontAwesome
-                                    onClick={this.toggle}
-                                    className='pull-right'
-                                    name='question'
-                                />
+                            <h3>My designs <span className='float-right'>
+                                <FaQuestion onClick={this.toggle} />
+                            </span>
 
                             </h3>
                         </Card.Heading>
@@ -114,9 +111,7 @@ export default class SelectDesign extends Component {
                     <Card>
                         <Card.Heading>
                             <h3>Other designs
-                                <OverlayTrigger trigger="click" rootClose placement="left" overlay={otherHelp}>
-                                    <Glyphicon className='pull-right' glyph='question-sign'/>
-                                </OverlayTrigger>
+
                             </h3>
                         </Card.Heading>
                         <Card.Body>

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
 import {action, autorun, toJS} from 'mobx';
-import FontAwesome from 'react-fontawesome';
+import ActionHelp from 'react-material-icons/icons/action/help';
 import ToggleDisplay from 'react-toggle-display';
 import {
     Alert,
@@ -105,7 +105,7 @@ export default class ConnectionControls extends Component {
             <p>In either mode, once end time is reached the connection will be dismantled.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='buildHelp'/>
         </span>;
 
@@ -119,7 +119,7 @@ export default class ConnectionControls extends Component {
                         <Alert color='info' onClick={() => {
                             this.props.modalStore.openModal('designHelp')
                         }}>
-                            <strong>Help me! <FontAwesome className='pull-right' name='question'/></strong>
+                            <strong>Help me! <span className='float-right' ><ActionHelp /></span></strong>
                             <div>Connection id: {this.props.controlsStore.connection.connectionId}</div>
                         </Alert>
                         <FormGroup>
@@ -145,9 +145,9 @@ export default class ConnectionControls extends Component {
                         </FormGroup>
 
 
-                        <FormGroup className='pull-right'>
+                        <FormGroup className='float-right'>
                             <ToggleDisplay show={!conn.validation.acceptable}>
-                                <Button color='warning' className='pull-right'
+                                <Button color='warning' className='float-right'
                                         onClick={() => {
                                             this.props.modalStore.openModal('connectionErrors');
                                         }}>Display errors</Button>{' '}

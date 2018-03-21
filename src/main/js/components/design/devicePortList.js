@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
     ListGroup,
-    ListGroupItem
+    ListGroupItem,
 } from 'reactstrap';
-import FontAwesome from 'react-fontawesome';
+
+
 
 export default class DevicePortList extends Component {
     constructor(props) {
@@ -40,7 +41,7 @@ export default class DevicePortList extends Component {
             return <ListGroupItem key={port.urn}>
                 <div>
                     {portLabel}
-                    <FontAwesome className='pull-right' name='plus-square' onClick={clickHandler}/>
+                    <span className='float-right' onClick={clickHandler}>Add</span>
                 </div>
                 <small>
                     <ListGroup className='p-0'>

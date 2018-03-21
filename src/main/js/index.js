@@ -1,12 +1,12 @@
 import React from 'react';
 
 import ReactDOM from 'react-dom';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import {Container, Row, Col} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
-require('font-awesome-webpack');
 
 import {configure} from 'mobx';
 import {Provider} from 'mobx-react';
@@ -37,7 +37,6 @@ import topologyStore from './stores/topologyStore';
 import connsStore from './stores/connsStore';
 import userStore from './stores/userStore';
 import modalStore from './stores/modalStore';
-
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -87,7 +86,8 @@ const stores = {
 configure({ enforceActions: true });
 
 ReactDOM.render(
-    <Provider {...stores}>
+    <MuiThemeProvider>
+        <Provider {...stores}>
         <BrowserRouter>
             <Container fluid={true}>
                 <Row>
@@ -114,4 +114,5 @@ ReactDOM.render(
                 </Switch>
             </Container>
         </BrowserRouter>
-    </Provider>, document.getElementById('react'));
+    </Provider>
+    </MuiThemeProvider>, document.getElementById('react'));

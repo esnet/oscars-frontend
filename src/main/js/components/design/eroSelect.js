@@ -9,7 +9,7 @@ import {
     InputGroup, InputGroupAddon, InputGroupText
 } from 'reactstrap';
 import Select from 'react-select-plus';
-import FontAwesome from 'react-fontawesome';
+import ActionDelete from 'react-material-icons/icons/action/delete';
 
 import {size} from 'lodash-es';
 import 'react-select-plus/dist/react-select-plus.css';
@@ -159,8 +159,9 @@ export default class EroSelect extends Component {
                             {urn}
 
                             <ToggleDisplay show={!ep.locked}>
-                                <FontAwesome className='pull-right' name='minus-square'
-                                             onClick={() => this.removeUrn(i)}/>
+                                <span className='float-right'>
+                                    <ActionDelete onClick={() => this.removeUrn(i)}/>
+                                </span>
                             </ToggleDisplay>
                         </small>
                     </ListGroupItem>);

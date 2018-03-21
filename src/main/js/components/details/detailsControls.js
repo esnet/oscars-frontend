@@ -58,13 +58,13 @@ class DetailsControls extends Component {
                             onClick={() => {
                                 this.props.refresh()
                             }}
-                            className='pull-left'>Refresh</Button>
+                            className='float-left'>Refresh</Button>
 
                     <Button color='primary'
                             onClick={() => {
                                 this.load()
                             }}
-                            className='pull-right'>Load</Button>
+                            className='float-right'>Load</Button>
 
                 </CardBody>
 

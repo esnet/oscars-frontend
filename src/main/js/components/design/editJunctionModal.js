@@ -154,7 +154,7 @@ export default class EditJunctionModal extends Component {
                 well as all the fixtures belonging to it and pipes connecting to here. </p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editJctHelp'/>
         </span>;
 

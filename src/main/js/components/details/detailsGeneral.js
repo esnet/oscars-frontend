@@ -240,22 +240,22 @@ export default class DetailsGeneral extends Component {
                     </BootstrapTable>
                     <ToggleDisplay show={controls.general.manual.display}>
                         <Button color='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
-                                className='pull-left'>Set mode to MANUAL</Button>
+                                className='float-left'>Set mode to MANUAL</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.auto.display}>
                         <Button color='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
-                                className='pull-left'>Set mode to AUTO</Button>
+                                className='float-left'>Set mode to AUTO</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.build.display}>
                         <Button color='info' disabled={!controls.general.build.enabled} onClick={this.build}
-                                className='pull-left'>Build</Button>
+                                className='float-left'>Build</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.dismantle.display}>
                         <Button color='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
-                                className='pull-left'>Dismantle</Button>
+                                className='float-left'>Dismantle</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.cancel.display}>

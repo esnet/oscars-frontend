@@ -75,7 +75,7 @@ export default class AddFixtureModal extends Component {
                 fixture on that port, and start editing it.</p>
         </span>;
 
-        const help = <span className='pull-right'>
+        const help = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='addFixHelp'/>
         </span>;
 

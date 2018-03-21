@@ -63,7 +63,7 @@ export default class Login extends React.Component {
                                        onKeyPress={this.handleKeyPress}
                                        onChange={this.handleChangePassword}/>
                             </FormGroup>
-                            <Button color='primary' className='pull-right' onClick={this.handleLogin}>Login</Button>
+                            <Button color='primary' className='float-right' onClick={this.handleLogin}>Login</Button>
                         </Form>
                         <ToggleDisplay show={this.props.accountStore.attempt.error.length > 0}>
                             <div>{this.props.accountStore.attempt.error}</div>

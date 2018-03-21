@@ -3,11 +3,11 @@ import {inject, observer} from 'mobx-react';
 import {
     Card, CardHeader, CardBody, CardSubtitle,
     ListGroupItem, ListGroup,
-    NavLink,
-    Popover, PopoverBody, PopoverHeader} from 'reactstrap';
+    NavLink
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
-import FontAwesome from 'react-fontawesome';
 import {size } from 'lodash-es';
+import HelpPopover from '../helpPopover';
 
 @inject('connsStore')
 @observer
@@ -42,14 +42,6 @@ export default class DetailsComponents extends Component {
             data: '',
         });
     };
-    componentWillMount() {
-        this.setState({
-            showHelp: false
-        });
-    }
-    toggleHelp = () => {
-        this.setState({showHelp: !this.state.showHelp});
-    };
 
     render() {
 
@@ -59,32 +51,22 @@ export default class DetailsComponents extends Component {
         }
         const connId = this.props.connsStore.store.current.connectionId;
 
-        const compHelp =
-            <span className='pull-right'>
-                        <FontAwesome
-                            onClick={this.toggleHelp}
-                            className='pull-right'
-                            name='question'
-                            id='compHelpIcon'
-                        />
-                        <Popover placement='left'
-                                 isOpen={this.state.showHelp}
-                                 target='compHelpIcon'
-                                 toggle={this.toggleHelp}>
-                            <PopoverHeader>Component list</PopoverHeader>
-                            <PopoverBody>
-                            <p>This displays the fixtures, junctions, and pipes for the current connection. </p>
-                            <p>You may click on any component to bring up information about it.</p>
-
-                            </PopoverBody>
-                        </Popover>
+        const helpHeader = <span>Component List</span>;
+        const helpBody = <span>
+            <p>This displays the fixtures, junctions, and pipes for the current connection. </p>
+            <p>You may click on any component to bring up information about it.</p>
         </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='dcHelp'/>
+        </span>;
+
 
 
         return (
 
             <Card>
-                <CardHeader className='p-1'>Components {compHelp}</CardHeader>
+                <CardHeader className='p-1'>Components {help}</CardHeader>
                 <CardBody>
                     <CardSubtitle>Connection info:</CardSubtitle>
                     <ListGroup className='p-1'>
