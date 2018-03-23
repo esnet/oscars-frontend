@@ -63,7 +63,7 @@ class ControlsStore {
             acceptable: false,
             adviceText: '',
 
-            validationState: null,
+            validationState: 'success',
             validationText: '',
 
             available: {

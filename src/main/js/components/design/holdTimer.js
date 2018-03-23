@@ -2,14 +2,12 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {action} from 'mobx';
 import Moment from 'moment';
-import Transformer from '../lib/transform';
 import IdleTimer from 'react-idle-timer';
-
-import { Panel} from 'react-bootstrap';
-
-import myClient from '../agents/client';
+import { Card, CardBody } from 'reactstrap';
 import {withRouter} from 'react-router-dom';
 
+import myClient from '../../agents/client';
+import Transformer from '../../lib/transform';
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer
@@ -189,12 +187,12 @@ class HoldTimer extends Component {
 
 
         if (conn.held.idle && !empty) {
-            notify = <Panel>
-                <Panel.Body>
-                    User idle; will keep holding for: {conn.held.remaining}
-                </Panel.Body>
+            notify = <Card>
+                <CardBody>
+                    User idle; will keep holding resources for: {conn.held.remaining}
+                </CardBody>
 
-            </Panel>
+            </Card>
         }
 
         return (

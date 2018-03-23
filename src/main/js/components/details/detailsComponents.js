@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {toJS} from 'mobx';
-import validator from '../lib/validation'
-import {Panel, Glyphicon, Nav, NavItem, OverlayTrigger, Popover} from 'react-bootstrap';
-import transformer from '../lib/transform';
+import {
+    Card, CardHeader, CardBody, CardSubtitle,
+    ListGroupItem, ListGroup,
+    NavLink
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
+import {size } from 'lodash-es';
+import HelpPopover from '../helpPopover';
 
 @inject('connsStore')
 @observer
@@ -43,60 +46,65 @@ export default class DetailsComponents extends Component {
     render() {
 
         const cmp = this.props.connsStore.store.current.archived.cmp;
+        if (size(cmp.junctions) === 0) {
+            return <p>Loading..</p>;
+        }
         const connId = this.props.connsStore.store.current.connectionId;
 
-
-        let compHelp = <Popover id='help-detailsComponents' title='Component list'>
+        const helpHeader = <span>Component List</span>;
+        const helpBody = <span>
             <p>This displays the fixtures, junctions, and pipes for the current connection. </p>
             <p>You may click on any component to bring up information about it.</p>
-        </Popover>;
+        </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='dcHelp'/>
+        </span>;
+
 
 
         return (
 
-            <Panel>
-                <Panel.Heading>
-                    <p>Components
-                        <OverlayTrigger trigger='click' rootClose placement='left' overlay={compHelp}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
-                        </OverlayTrigger>
-                    </p>
-                </Panel.Heading>
-                <Panel.Body>
-                    <h5><b>General connection info</b></h5>
-                    <Nav bsStyle='pills' stacked>
-                        <NavItem onClick={this.onConnectionClicked}>ID: {connId}</NavItem>
-                    </Nav>
+            <Card>
+                <CardHeader className='p-1'>Components {help}</CardHeader>
+                <CardBody>
+                    <CardSubtitle>Connection info:</CardSubtitle>
+                    <ListGroup className='p-1'>
+                        <ListGroupItem className='p-1' onClick={this.onConnectionClicked}>
+                            <NavLink href='#'>ID: {connId}</NavLink>
+                        </ListGroupItem>
+                    </ListGroup>
 
                     <ToggleDisplay show={cmp.junctions.length > 0}>
-                        <h5><b>Junctions & fixtures</b></h5>
+                        <hr />
+                        <CardSubtitle>Junctions & fixtures:</CardSubtitle>
                         {
                             cmp.junctions.map((junction) => {
                                 let fixtureNodes = cmp.fixtures.map((fixture) => {
                                     if (fixture.junction === junction.refId) {
-                                        const label = fixture.portUrn + ':' + fixture.vlan.vlanId;
 
-                                        return <NavItem key={label} onClick={() => {
+                                        let label = (fixture.portUrn + ':' + fixture.vlan.vlanId)
+                                            .replace(junction.refId+':', '');
+
+                                        return <ListGroupItem className='p-0' key={label} onClick={() => {
                                             this.onFixtureClicked(fixture)
                                         }}>
-                                            {label}
-                                        </NavItem>
+                                            <NavLink href='#'>{label}</NavLink>
+                                        </ListGroupItem>
 
                                     }
                                 });
 
                                 return (
-                                    <Nav bsStyle='pills' stacked key={junction.refId + 'nav'}>
-                                        <NavItem active={true}
-                                                 key={junction.refId}
+                                    <ListGroup className='p-0' key={junction.refId + 'nav'}>
+                                        <ListGroupItem className='p-0' key={junction.refId}
                                                  onClick={() => {
                                                      this.onJunctionClicked(junction)
                                                  }}>
-                                            <b><u>{junction.refId}</u></b>
-                                        </NavItem>
+                                            <NavLink href='#'><strong>{junction.refId}</strong></NavLink>
+                                        </ListGroupItem>
                                         {fixtureNodes}
-
-                                    </Nav>
+                                    </ListGroup>
                                 )
                             })
                         }
@@ -104,23 +112,24 @@ export default class DetailsComponents extends Component {
 
 
                     <ToggleDisplay show={cmp.pipes.length > 0}>
-                        <h5><b>Pipes</b></h5>
-                        <Nav bsStyle='pills' stacked>
+                        <hr />
+                        <CardSubtitle>Pipes:</CardSubtitle>
+                        <ListGroup>
                             {
                                 cmp.pipes.map((pipe) => {
-                                    return <NavItem key={pipe.a + ' --' + pipe.z}
+                                    return <ListGroupItem className='p-0' key={pipe.a + ' --' + pipe.z}
                                                     onClick={() => {
                                                         this.onPipeClicked(pipe)
                                                     }}>
-                                        {pipe.a} -- {pipe.z}
-                                    </NavItem>
+                                        <NavLink href='#'><small>{pipe.a} -- {pipe.z}</small></NavLink>
+                                    </ListGroupItem>
                                 })
                             }
-                        </Nav>
+                        </ListGroup>
                     </ToggleDisplay>
-                </Panel.Body>
+                </CardBody>
 
-            </Panel>
+            </Card>
         )
     };
 

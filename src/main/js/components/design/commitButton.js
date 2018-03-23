@@ -3,16 +3,18 @@ import React, {Component} from 'react';
 import {action, toJS} from 'mobx';
 import {inject} from 'mobx-react';
 
-import myClient from '../agents/client';
-import Confirm from 'react-confirm-bootstrap';
-import { Button}  from 'react-bootstrap';
 import {withRouter} from 'react-router-dom'
+
+import myClient from '../../agents/client';
+import ConfirmModal from '../confirmModal';
+
 
 @inject('controlsStore', 'designStore')
 class CommitButton extends Component {
     constructor(props) {
         super(props);
     }
+
 
     commit = () => {
 
@@ -22,7 +24,7 @@ class CommitButton extends Component {
                 this.props.controlsStore.setParamsForConnection({
                     phase: phase
                 });
-                // TODO: do some checking of response?
+                // TODO: do some checking of response!
 
                 this.props.controlsStore.clearEditConnection();
                 this.props.controlsStore.clearEditDesign();
@@ -39,14 +41,15 @@ class CommitButton extends Component {
 
 
     render() {
-        return <Confirm
-            onConfirm={this.commit}
-            body='Are you sure you want to commit this connection?'
-            confirmText='Confirm'
-            title='Commit connection'>
-            <Button bsStyle='success' className='pull-right'>Commit</Button>
-        </Confirm>
+        return <div>
 
+            <ConfirmModal body='Are you ready to commit this connection?'
+                          header='Commit connection'
+                          buttonText='Commit'
+                          buttonColor='success'
+                          onConfirm={this.commit}/>
+
+        </div>;
 
 
     }

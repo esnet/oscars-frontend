@@ -1,18 +1,17 @@
 import React from 'react';
 
-
 import {Graph, alg} from 'graphlib';
-import {Glyphicon, Label} from 'react-bootstrap';
+import Flag from 'material-ui-icons/Flag';
+import CheckCircle from 'material-ui-icons/CheckCircle';
+
 
 class Validator {
     label(state) {
-        let icon = 'ok';
-        let bsStyle = 'success';
         if (!state) {
-            icon = 'flag';
-            bsStyle = 'warning'
+            return <Flag color='orange'/>
+
         }
-        return <Label bsStyle={bsStyle}><Glyphicon glyph={icon}/></Label>
+        return <CheckCircle color='green'/>
     }
 
     mapNodeColor(state) {
@@ -31,7 +30,7 @@ class Validator {
 
 
     fixtureState(fixture) {
-        if (!fixture.locked ) {
+        if (!fixture.locked) {
             return false;
         }
         return true;
@@ -92,7 +91,7 @@ class Validator {
             for (let f of fixtures) {
                 if (!f.locked) {
                     result.ok = false;
-                    result.errors.push('Fixture '+f.label+': not locked.');
+                    result.errors.push('Fixture ' + f.label + ': not locked.');
                 }
             }
         }
@@ -100,7 +99,7 @@ class Validator {
             for (let p of pipes) {
                 if (!p.locked) {
                     result.ok = false;
-                    result.errors.push('Pipe '+p.id+': not locked. ');
+                    result.errors.push('Pipe ' + p.id + ': not locked. ');
                 }
             }
         } else {
@@ -130,7 +129,7 @@ class Validator {
             g.setNode(j.id, j.id);
         });
         pipes.map(p => {
-            g.setEdge(p.a, p.z, p.a+' - '+p.z);
+            g.setEdge(p.a, p.z, p.a + ' - ' + p.z);
 
         });
         const connected = alg.components(g);
@@ -157,7 +156,7 @@ class Validator {
             // ok
         } else {
             result.ok = false;
-            result.errors.push('Mode is invalid '+connection.mode);
+            result.errors.push('Mode is invalid ' + connection.mode);
         }
 
         if (!connection.schedule.locked) {
@@ -184,7 +183,7 @@ class Validator {
         return 'success';
     }
 
-    cleanBandwidth(inputStr, control){
+    cleanBandwidth(inputStr, control) {
 
         let cleanedUp = false;
         let ws_re = /\s+/;
@@ -192,11 +191,11 @@ class Validator {
         let g_re = /g/i;
         let g_idx = inputStr.search(g_re);
 
-        if (ws_idx >= 0 ) {
+        if (ws_idx >= 0) {
             inputStr = inputStr.replace(ws_re, '');
             cleanedUp = true;
         }
-        if (g_idx >= 0 ) {
+        if (g_idx >= 0) {
             inputStr = inputStr.replace(g_re, '000');
             cleanedUp = true;
         }

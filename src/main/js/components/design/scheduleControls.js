@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS, whyRun} from 'mobx';
+import {autorun, toJS} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
-import Confirm from 'react-confirm-bootstrap';
 
 import chrono from 'chrono-node';
 import Moment from 'moment';
@@ -11,9 +10,15 @@ import jstz from 'jstz';
 import {size} from 'lodash-es';
 
 import {
-    HelpBlock, Form, Button, Panel, FormGroup,
-    FormControl, ControlLabel, Popover, Glyphicon, OverlayTrigger
-} from 'react-bootstrap';
+    FormFeedback, Form, FormText, Button,
+    Card, CardHeader, CardBody,
+    FormGroup, Input, Label
+} from 'reactstrap';
+
+
+import ConfirmModal from '../confirmModal';
+import HelpPopover from '../helpPopover';
+
 
 const format = 'Y/MM/DD HH:mm:ss';
 
@@ -56,7 +61,6 @@ export default class ScheduleControls extends Component {
         };
         this.props.controlsStore.setParamsForConnection(params);
         this.periodicCheck();
-
     }
 
     periodicCheck() {
@@ -101,7 +105,7 @@ export default class ScheduleControls extends Component {
 
     }
 
-    disposeOfUpdateAvailable = autorunAsync('updateAvailable', () => {
+    disposeOfUpdateAvailable = autorun(() => {
         let conn = this.props.controlsStore.connection;
         if (conn.schedule.locked) {
             const startSec = conn.schedule.start.at.getTime() / 1000;
@@ -109,7 +113,7 @@ export default class ScheduleControls extends Component {
             this.props.topologyStore.loadAvailable(startSec, endSec);
         }
 
-    }, 1000);
+    }, {delay: 1000});
 
 
     componentWillUnmount() {
@@ -188,7 +192,7 @@ export default class ScheduleControls extends Component {
 
     validateStartEnd(params) {
 //        console.log(toJS(params));
-        if (!params.schedule.start.parsed || ! params.schedule.end.parsed) {
+        if (!params.schedule.start.parsed || !params.schedule.end.parsed) {
 
             return;
         }
@@ -285,8 +289,8 @@ export default class ScheduleControls extends Component {
         const sched = conn.schedule;
         const timezone = jstz.determine();
 
-
-        let help = <Popover id='help-schedule' title='Schedule help'>
+        const helpHeader = <span>Schedule help</span>;
+        const helpBody = <span>
             <p>Type in the desired date / time for your connection to start and end.
                 A start time either in the past or after the end time is not accepted.</p>
             <p>Then, click "Lock schedule", so that the system can then
@@ -295,61 +299,62 @@ export default class ScheduleControls extends Component {
                 but they are only evaluated when you type them in.
                 The resulting times will not change as time passes.</p>
             <p>Unlocking the schedule will also unlock all other resources.</p>
-        </Popover>;
+        </span>;
 
-        let unlockControl = <Confirm
-            onConfirm={this.unlockSchedule}
-            body='Unlocking the schedule will unlock all components and release all resources, including pipe and fixture bandwidths and VLANs.'
-            confirmText='Confirm'
-            title='Unlock Schedule'>
-            <Button className='pull-right' bsStyle='warning'>Unlock</Button>
-        </Confirm>;
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='scheduleHelp'/>
+        </span>;
+
+
+        let unlockControl = <div>
+            <ConfirmModal onConfirm={this.unlockSchedule}
+                          buttonText={'Unlock'}
+                          header='Unlock schedule'
+                          body={'Unlocking the schedule will unlock all components and\n' +
+            '                    release any held resources, including pipe and fixture bandwidths and VLANs.'}
+            />
+
+        </div>;
+
         if (size(this.props.designStore.design.fixtures) === 0) {
-            unlockControl = <Button className='pull-right' onClick={this.unlockSchedule} bsStyle='warning'>Unlock</Button>;
+            unlockControl =
+                <Button className='float-right' onClick={this.unlockSchedule} color='primary'>Unlock</Button>;
         }
 
 
-
-
-
         return (
-            <Panel>
-                <Panel.Heading>
-                    <span>Schedule
-                        <OverlayTrigger
-                            defaultOverlayShown={false} trigger='click' rootClose placement='right' overlay={help}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
-                        </OverlayTrigger>
-                    </span>
-                </Panel.Heading>
-                <Panel.Body>
+            <Card>
+                <CardHeader className='p-1'>Schedule {' '} {help}</CardHeader>
+                <CardBody>
                     <Form>
-                        <p>Timezone: {timezone.name()}</p>
+                        <small>Timezone: {timezone.name()}</small>
 
-                        <FormGroup validationState={sched.start.validationState}>
-                            <ControlLabel>Start:</ControlLabel>
-                            <FormControl type='text'
-                                         defaultValue='in 15 minutes'
-                                         disabled={sched.locked}
-                                         onChange={this.onStartDateChange}/>
-                            <HelpBlock>
-                                <p>{sched.start.readable}</p><p>{sched.start.validationText}</p>
-                            </HelpBlock>
+                        <FormGroup >
+                            <Label>Start:</Label>
+                            <Input type='text'
+                                   valid = {sched.start.validationState === 'success'}
+                                   invalid = {sched.start.validationState === 'error'}
+                                   defaultValue='in 15 minutes'
+                                   disabled={sched.locked}
+                                   onChange={this.onStartDateChange}/>
+                            <FormFeedback>{sched.start.validationText}</FormFeedback>
+                            <FormText>{sched.start.readable}</FormText>
                         </FormGroup>
                         {' '}
-                        <FormGroup validationState={sched.end.validationState}>
-                            <ControlLabel>End:</ControlLabel>
-                            <FormControl type='text'
-                                         disabled={sched.locked}
-                                         defaultValue='in 1 year'
-                                         onChange={this.onEndDateChange}/>
-                            <HelpBlock>
-                                <p>{sched.end.readable}</p><p>{sched.end.validationText}</p>
-                            </HelpBlock>
+                        <FormGroup >
+                            <Label>End:</Label>
+                            <Input type='text'
+                                   valid = {sched.end.validationState === 'success'}
+                                   invalid = {sched.end.validationState === 'error'}
+                                   disabled={sched.locked}
+                                   defaultValue='in 1 year'
+                                   onChange={this.onEndDateChange}/>
+                            <FormFeedback>{sched.end.validationText}</FormFeedback>
+                            <FormText>{sched.end.readable}</FormText>
                         </FormGroup>
                         <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
 
-                            <Button bsStyle='primary' onClick={this.lockSchedule}>Lock schedule</Button>
+                            <Button color='primary' className='float-right' onClick={this.lockSchedule}>Lock schedule</Button>
                         </ToggleDisplay>
                         <ToggleDisplay show={sched.locked && conn.phase === 'HELD'}>
 
@@ -357,9 +362,9 @@ export default class ScheduleControls extends Component {
                         </ToggleDisplay>
 
                     </Form>
-                </Panel.Body>
+                </CardBody>
 
-            </Panel>
+            </Card>
         );
     }
 }

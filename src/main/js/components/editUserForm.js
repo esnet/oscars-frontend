@@ -1,25 +1,19 @@
 import React, {Component} from 'react';
 import {
-    Row,
-    Col,
-    Panel,
-    Form,
-    OverlayTrigger,
-    Popover,
-    Glyphicon,
-    FormControl,
-    FormGroup,
-    ControlLabel,
-    HelpBlock,
-    Button,
-    Checkbox
-} from 'react-bootstrap';
+    Row, Col,
+    Card, CardHeader, CardBody,
+    Form, FormFeedback,
+    Input, FormGroup, Label,
+    Button
+} from 'reactstrap';
 import {observer, inject} from 'mobx-react';
-import {toJS, whyRun, autorunAsync} from 'mobx';
+import {toJS, autorun} from 'mobx';
 import {size} from 'lodash-es';
 import ToggleDisplay from 'react-toggle-display';
 import PropTypes from 'prop-types';
-import Confirm from 'react-confirm-bootstrap';
+import ConfirmModal from './confirmModal';
+import HelpPopover from './helpPopover';
+
 
 @inject('controlsStore', 'userStore')
 @observer
@@ -73,7 +67,7 @@ export default class EditUserForm extends Component {
         clearTimeout(this.refreshTimeout);
     }
 
-    disposeOfPwdValidate = autorunAsync('password validation', () => {
+    disposeOfPwdValidate = autorun(() => {
         const editUser = this.props.userStore.editUser;
         let passwordHelpText = '';
         let passwordOk = false;
@@ -93,7 +87,10 @@ export default class EditUserForm extends Component {
             'passwordHelpText': passwordHelpText
         });
 
-    }, 500);
+    }, {delay: 500});
+
+
+
 
     render() {
         let colOffset = 2;
@@ -110,126 +107,126 @@ export default class EditUserForm extends Component {
         if (Object.keys(this.props.userStore.editUser.user).length === 0) {
             return <div>Waiting to load..</div>;
         }
+        let passwordValid = null;
+        let passwordInvalid = null;
 
+        if (editUser.passwordValidationState === 'error') {
+            passwordValid = false;
+            passwordInvalid = true;
 
-        let detailsHelp = <Popover id='help-userdetails' title='Help'>
-            Make changes, then press Enter in a textbox or click Update to apply.
+        } else if (editUser.passwordValidationState === 'success') {
+            passwordValid = true;
+            passwordInvalid = false;
+        }
 
-        </Popover>;
+        const helpHeader = <span>User editing</span>;
+        const helpBody = <span>
+            <p> Make the changes you want. To apply, press Enter in a
+                textbox or click Update.</p>
+        </span>;
 
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editUserHelp'/>
+        </span>;
 
-        let passwordHelp = <Popover id='help-password' title='Help'>
+        const pwdHelpHeader = <span>Changing password</span>;
+        const pwdHelpBody = <span>
             <p>Click "Change" to show the password input form.</p>
-            <p>Type in the new password then click Set to apply.</p>
-        </Popover>;
+            <p>Type in the new password, then click Set to apply.</p>
+        </span>;
 
-
+        const pwdHelp = <span className='float-right'>
+            <HelpPopover header={pwdHelpHeader} body={pwdHelpBody} placement='bottom' popoverId='pwdHelp'/>
+        </span>;
 
         return <div>
             <Row>
-                <Col xs={colWidth} xsOffset={colOffset}
-                     md={colWidth} mdOffset={colOffset}
-                     sm={colWidth} smOffset={colOffset}
-                     lg={colWidth} lgOffset={colOffset}>
-                    <Panel>
-                        <Panel.Heading>
-                            <div>Edit user details
-                                <div className='pull-right'>
-                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={detailsHelp}>
-                                        <Glyphicon glyph='question-sign'/>
-                                    </OverlayTrigger>
-                                </div>
-                            </div>
-                        </Panel.Heading>
-                        <Panel.Body>
+                <Col xs={{size: colWidth, offset: colOffset}}
+                     md={{size: colWidth, offset: colOffset}}
+                     sm={{size: colWidth, offset: colOffset}}
+                     lg={{size: colWidth, offset: colOffset}}>
+                    <Card>
+                        <CardHeader>
+                            Edit user details{' '}{help}
+
+                        </CardHeader>
+                        <CardBody>
 
                             <Form>
                                 <FormGroup>
-                                    <ControlLabel>Username</ControlLabel>
+                                    <Label>Username</Label>
                                     {' '}
-                                    <FormControl type='text'
-                                                 disabled={true}
-                                                 defaultValue={size(editUser.user.username) ? editUser.user.username : ''}
-                                                 onKeyPress={this.handleParamKeyPress}
-                                                 onChange={(e) => this.onParamChange('username', e.target.value)}/>
+                                    <Input type='text'
+                                           disabled={true}
+                                           defaultValue={size(editUser.user.username) ? editUser.user.username : ''}
+                                           onKeyPress={this.handleParamKeyPress}
+                                           onChange={(e) => this.onParamChange('username', e.target.value)}/>
                                 </FormGroup>
                                 {' '}
                                 {' '}
                                 <FormGroup>
-                                    <ControlLabel>Full name</ControlLabel>
+                                    <Label>Full name</Label>
                                     {' '}
-                                    <FormControl type='text'
-                                                 defaultValue={size(editUser.user.fullName) ? editUser.user.fullName : 'not set'}
-                                                 onKeyPress={this.handleParamKeyPress}
-                                                 onChange={(e) => this.onParamChange('fullName', e.target.value)}/>
+                                    <Input type='text'
+                                           defaultValue={size(editUser.user.fullName) ? editUser.user.fullName : 'not set'}
+                                           onKeyPress={this.handleParamKeyPress}
+                                           onChange={(e) => this.onParamChange('fullName', e.target.value)}/>
                                 </FormGroup>
                                 {' '}
                                 <FormGroup>
-                                    <ControlLabel>Email</ControlLabel>
+                                    <Label>Email</Label>
                                     {' '}
-                                    <FormControl type='text'
-                                                 defaultValue={size(editUser.user.email) ? editUser.user.email : 'not set'}
-                                                 onKeyPress={this.handleParamKeyPress}
-                                                 onChange={(e) => this.onParamChange('email', e.target.value)}/>
+                                    <Input type='text'
+                                           defaultValue={size(editUser.user.email) ? editUser.user.email : 'not set'}
+                                           onKeyPress={this.handleParamKeyPress}
+                                           onChange={(e) => this.onParamChange('email', e.target.value)}/>
                                 </FormGroup>
                                 {' '}
                                 <FormGroup>
-                                    <ControlLabel>Institution</ControlLabel>
+                                    <Label>Institution</Label>
                                     {' '}
-                                    <FormControl type='text'
-                                                 defaultValue={size(editUser.user.institution) ? editUser.user.institution : 'not set'}
-                                                 onKeyPress={this.handleParamKeyPress}
-                                                 onChange={(e) => this.onParamChange('institution', e.target.value)}/>
+                                    <Input type='text'
+                                           defaultValue={size(editUser.user.institution) ? editUser.user.institution : 'not set'}
+                                           onKeyPress={this.handleParamKeyPress}
+                                           onChange={(e) => this.onParamChange('institution', e.target.value)}/>
                                 </FormGroup>
                                 {' '}
-                                <FormGroup>
-                                    <Checkbox defaultChecked={editUser.user.permissions.adminAllowed} inline
-                                              disabled={true}>Is admin?
-                                    </Checkbox>
+                                <FormGroup check inline>
+                                    <Label>Is admin?{' '}
+                                    <Input type='checkbox' defaultChecked={editUser.user.permissions.adminAllowed}
+                                              disabled={true} />
+                                    </Label>
+                                </FormGroup>
 
-                                </FormGroup>
                             </Form>
                             <div>
-                                <span className='pull-left'>{editUser.status}</span>
-                                <div className='pull-right'>
-                                    <Button bsStyle='primary'
+                                <span className='float-left'>{editUser.status}</span>
+                                <div className='float-right'>
+                                    <Button color='primary'
                                             disabled={!size(editUser.user.username)}
                                             onClick={this.props.submitUpdate}>Update</Button>
 
-
-
-
                                     <ToggleDisplay show={this.props.adminMode && size(allUsers) >= 2}>
-                                        <Confirm
-                                            onConfirm={this.props.submitDelete}
-                                            body="Are you sure you want to delete this user?"
-                                            confirmText="Confirm"
-                                            title="Delete user">
-                                            <Button bsStyle='warning' className='pull-right'>Delete</Button>
-                                        </Confirm>
+
+                                        <ConfirmModal body='Are you ready to delete this user?'
+                                                      header='Delete user'
+                                                      buttonText='Delete'
+                                                      onConfirm={this.props.submitDelete}/>
                                     </ToggleDisplay>
                                 </div>
                             </div>
-                        </Panel.Body>
+                        </CardBody>
 
 
-                    </Panel>
+                    </Card>
                 </Col>
                 <Col xs={colWidth}
                      md={colWidth}
                      sm={colWidth}
-                     lg={colWidth} >
-                    <Panel>
-                        <Panel.Heading>
-                            <div>Password
-                                <div className='pull-right'>
-                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={passwordHelp}>
-                                        <Glyphicon glyph='question-sign'/>
-                                    </OverlayTrigger>
-                                </div>
-                            </div>
-                        </Panel.Heading>
-                        <Panel.Body>
+                     lg={colWidth}>
+                    <Card>
+                        <CardHeader>Password {' '} {pwdHelp}</CardHeader>
+                        <CardBody>
 
 
                             <Form onSubmit={(e) => {
@@ -243,61 +240,68 @@ export default class EditUserForm extends Component {
                                     <ToggleDisplay show={!this.props.adminMode}>
 
                                         <FormGroup>
-                                            <ControlLabel>Old Password</ControlLabel>
+                                            <Label>Old Password</Label>
                                             {' '}
-                                            <FormControl type='password'
-                                                         placeholder='old password'
-                                                         inputRef={(ref) => {
-                                                             this.oldPasswordRef = ref
-                                                         }}
-                                                         onChange={(e) => this.onOldPwdChange(e.target.value)}/>
+                                            <Input type='password'
+                                                   innerRef={(ref) => {
+                                                       this.oldPasswordRef = ref
+                                                   }}
+
+                                                   placeholder='old password'
+                                                   onChange={(e) => this.onOldPwdChange(e.target.value)}/>
                                         </FormGroup>
-                                    {' '}
+                                        {' '}
                                     </ToggleDisplay>
 
 
-                                    <FormGroup validationState={editUser.passwordValidationState}>
-                                        <ControlLabel>New Password</ControlLabel>
+                                    <FormGroup >
+                                        <Label>New Password</Label>
                                         {' '}
-                                        <FormControl type='password'
-                                                     inputRef={(ref) => {
-                                                         this.passwordRef = ref
-                                                     }}
-                                                     placeholder='password'
-                                                     onKeyPress={this.handlePasswordKeyPress}
-                                                     onChange={(e) => this.onPwdChange(e.target.value)}/>
-                                        <HelpBlock>
+                                        <Input type='password'
+                                               valid={passwordValid}
+                                               invalid={passwordInvalid}
+                                               innerRef={(ref) => {
+                                                   this.passwordRef = ref
+                                               }}
+                                               placeholder='password'
+                                               onKeyPress={this.handlePasswordKeyPress}
+                                               onChange={(e) => this.onPwdChange(e.target.value)}/>
+                                        <FormFeedback>
                                             <p>{editUser.passwordHelpText}</p>
-                                        </HelpBlock>
+                                        </FormFeedback>
                                     </FormGroup>
                                     {' '}
-                                    <FormGroup validationState={editUser.passwordValidationState}>
-                                        <ControlLabel>Confirm</ControlLabel>
+                                    <FormGroup >
+                                        <Label>Confirm</Label>
                                         {' '}
-                                        <FormControl type='password'
-                                                     inputRef={(ref) => {
-                                                         this.passwordAgainRef = ref
-                                                     }}
-                                                     placeholder='password (again)'
-                                                     onKeyPress={this.handlePasswordKeyPress}
-                                                     onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
+                                        <Input type='password'
+                                               valid={passwordValid}
+                                               invalid={passwordInvalid}
+                                               innerRef={(ref) => {
+                                                   this.passwordAgainRef = ref
+                                               }}
+                                               placeholder='password (again)'
+                                               onKeyPress={this.handlePasswordKeyPress}
+                                               onChange={(e) => this.onPwdAgainChange(e.target.value)}/>
 
                                     </FormGroup>
-                                    <div className='pull-right'>
+                                    <div className='float-right'>
                                         <Button
-                                            bsStyle={editUser.passwordOk ? 'primary' : 'default'}
+                                            color={editUser.passwordOk ? 'primary' : 'default'}
                                             disabled={!editUser.passwordOk || !size(editUser.user.username)}
                                             onClick={() => {
-                                                this.props.submitPassword(this.passwordRef, this.passwordAgainRef, this.oldPasswordRef);
+                                                this.props.submitPassword(this.passwordRef,
+                                                    this.passwordAgainRef,
+                                                    this.oldPasswordRef);
                                                 this.props.userStore.setParamsForEditUser({changingPwd: false});
                                             }}>Set</Button>
                                     </div>
                                 </ToggleDisplay>
 
                             </Form>
-                        </Panel.Body>
+                        </CardBody>
 
-                    </Panel>
+                    </Card>
                 </Col>
             </Row>
         </div>;

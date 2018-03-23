@@ -2,24 +2,23 @@ import React, {Component} from 'react';
 import {
     Row,
     Col,
-    Panel,
+    Card,
+    CardHeader,
+    CardBody,
     ListGroup,
     ListGroupItem,
     Button,
+    Label,
+    Input,
     Form,
-    FormGroup,
-    FormControl,
-    ControlLabel,
-    Popover,
-    OverlayTrigger,
-    Glyphicon
-} from 'react-bootstrap';
+    FormGroup
+} from 'reactstrap';
 import {toJS} from 'mobx';
 import myClient from '../agents/client';
 import {observer, inject} from 'mobx-react';
 import UserAdminModal from '../components/userAdminModal';
 import {size} from 'lodash-es'
-
+import HelpPopover from '../components/helpPopover';
 
 @inject('controlsStore', 'commonStore', 'modalStore', 'userStore')
 @observer
@@ -27,11 +26,13 @@ export default class UsersAdminApp extends Component {
 
     constructor(props) {
         super(props);
+
     }
 
     componentWillMount() {
         this.props.commonStore.setActiveNav('admin');
         this.props.userStore.setParamsForEditUser({user: {username: ''}});
+
         this.refreshUserList();
     }
 
@@ -127,29 +128,35 @@ export default class UsersAdminApp extends Component {
         }
     };
 
+
+
     render() {
         let editUser = this.props.userStore.editUser;
 
-        let adminHelp = <Popover id='help-adminusers' title='Help'>
-            <p>This is the users administration form. The list shows all the users registered in the system.</p>
+        const helpHeader = <span>Add a fixture</span>;
+        const helpBody = <span>
+            <p>This is the users administration form. The list shows all the users
+                registered in the system.</p>
             <p>Click on a username on the list to edit user details.</p>
-            <p>To add a new user, type a username in the box then click "Add new user" or press Enter.</p>
-        </Popover>;
+            <p>To add a new user, type a username in the box then click "Add new user"
+                or press Enter.</p>
+        </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='userAdminHelp'/>
+        </span>;
+
 
         return (
             <Row>
-                <Col xs={8} xsOffset={2} md={6} mdOffset={3} sm={6} smOffset={3} lg={6} lgOffset={3}>
-                    <Panel>
-                        <Panel.Heading>
-                            <div>Users administration
-                                <div className='pull-right'>
-                                    <OverlayTrigger trigger="click" rootClose placement="left" overlay={adminHelp}>
-                                        <Glyphicon glyph='question-sign'/>
-                                    </OverlayTrigger>
-                                </div>
-                            </div>
-                        </Panel.Heading>
-                        <Panel.Body>
+                <Col xs={{size: 8, offset: 2}} md={{size: 8, offset: 2}}>
+                    <Card>
+                        <CardHeader>
+                            Users administration
+                            {' '}
+                            {help}
+                        </CardHeader>
+                        <CardBody>
                             <ListGroup>
                                 {
                                     editUser.allUsers.map((u) => {
@@ -163,23 +170,27 @@ export default class UsersAdminApp extends Component {
                                     })
                                 }
                             </ListGroup>
-                            <Form onSubmit={(e) => {
+                            <hr/>
+
+                            <Form inline onSubmit={(e) => {
                                 e.preventDefault()
                             }}>
-                                <FormGroup>
-                                    <ControlLabel>Username</ControlLabel>
+                                <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
+                                    <Label for='username' hidden>Username: </Label>
                                     {' '}
-                                    <FormControl type='text'
-                                                 onKeyPress={this.handleAddUsernameKeyPress}
-                                                 onChange={(e) => this.onUsernameChange(e.target.value)}/>
+                                    <Input type='text' id='username'
+                                           placeholder='Username'
+                                           onKeyPress={this.handleAddUsernameKeyPress}
+                                           onChange={(e) => this.onUsernameChange(e.target.value)}/>
                                 </FormGroup>
-                                <Button className='pull-right'
+                                {' '}
+                                <Button className='float-right'
                                         disabled={!size(editUser.user.username)}
-                                        onClick={this.addUser}>Add new user</Button>
+                                        onClick={this.addUser}>Add </Button>
                             </Form>
-                        </Panel.Body>
+                        </CardBody>
 
-                    </Panel>
+                    </Card>
 
                 </Col>
                 <UserAdminModal refresh={this.refreshUserList}/>

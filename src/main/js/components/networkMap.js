@@ -1,14 +1,22 @@
 import React, {Component} from 'react';
 import vis from 'vis';
 import {inject, observer} from 'mobx-react';
-import {autorunAsync, toJS, action} from 'mobx';
+import {autorun, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.css');
+import ZoomIn from 'material-ui-icons/ZoomIn';
+import ZoomOut from 'material-ui-icons/ZoomIn';
 
-import {Panel, Glyphicon, OverlayTrigger, Popover} from 'react-bootstrap';
+
+import {
+    Card, CardHeader, CardBody
+} from 'reactstrap';
+import PropTypes from 'prop-types';
 
 import myClient from '../agents/client';
+import HelpPopover from './helpPopover';
 
 @inject('mapStore')
 @observer
@@ -17,13 +25,8 @@ export default class NetworkMap extends Component {
         super(props);
     }
 
-    state = {
-        showMap: true
-    };
-
-
     // this automagically updates the map;
-    disposeOfMapUpdate = autorunAsync('map update', () => {
+    disposeOfMapUpdate = autorun(() => {
 
         this.datasource = {
             nodes: new vis.DataSet(),
@@ -91,9 +94,10 @@ export default class NetworkMap extends Component {
                 color: {background: 'white'}
             }
         };
+        const mapId = document.getElementById(this.props.mapDivId);
 
         if (this.props.mapStore.network.initialized) {
-            this.network = new vis.Network(this.mapRef, this.datasource, options);
+            this.network = new vis.Network(mapId, this.datasource, options);
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
@@ -125,7 +129,7 @@ export default class NetworkMap extends Component {
         }
 
 
-    }, 500);
+    }, {delay: 500});
 
 
     zoomOnColored = () => {
@@ -153,14 +157,11 @@ export default class NetworkMap extends Component {
 
     }
 
-    flipMapState = () => {
-        this.setState({showMap: !this.state.showMap});
-    };
 
     render() {
-        let toggleIcon = this.state.showMap ? 'chevron-down' : 'chevron-right';
 
-        let myHelp = <Popover id='help-networkMap' title='Help'>
+        const helpHeader = <span>Network Map</span>;
+        const helpBody = <span>
             <p>This is the map of the entire network managed by OSCARS. Devices are represented
                 by circles, and links between them by lines.
             </p>
@@ -173,39 +174,48 @@ export default class NetworkMap extends Component {
                 adjust the map to fit the entire network. The (+) magnifying
                 glass will zoom to fit all the selected junctions. Click the chevron icon
                 to hide / show the map.</p>
-        </Popover>;
+        </span>;
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='networkMapHelp'/>
+        </span>;
+
+
 
         return (
-            <Panel expanded={this.state.showMap} onToggle={this.flipMapState}>
-                <Panel.Heading>
-                    <span>
-                        <span onClick={this.flipMapState}>Network Map</span>
-                        <span className='pull-right'>
-                            <OverlayTrigger trigger='click' rootClose placement='left' overlay={myHelp}>
-                                <Glyphicon glyph='question-sign'/>
-                            </OverlayTrigger>
-                            {' '}
+            <Card>
+                <CardHeader className='p-1'>
+                    Network Map
+                    <span className='float-right'>
 
-                            <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                                <Glyphicon onClick={this.zoomOnColored} glyph='zoom-in'/>
-                            </ToggleDisplay>
-                            {' '}
-                            <Glyphicon onClick={() => {
-                                this.network.fit({animation: true})
-                            }} glyph='zoom-out'/>
-                            {' '}
-                            <Glyphicon onClick={() => this.setState({showMap: !this.state.showMap})} glyph={toggleIcon}/>
-                        </span>
+                        <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
+                            <ZoomIn onClick={this.zoomOnColored} />
+                        </ToggleDisplay>
+                        {' '}
+
+                        <ZoomOut onClick={() => {
+                            this.network.fit({animation: true})
+                        }} />
+                        {' '}
+                        {help}
+
                     </span>
-                </Panel.Heading>
-                <Panel.Collapse >
-                    <div ref={(ref) => {
-                        this.mapRef = ref;
-                    }}><p>Topology</p></div>
-                </Panel.Collapse>
-            </Panel>
+
+                </CardHeader>
+                <CardBody>
+                    <div id={this.props.mapDivId}>
+                        <p> Network Map</p>
+                    </div>
+                </CardBody>
+
+            </Card>
 
         );
 
     }
 }
+
+NetworkMap.propTypes = {
+    mapDivId: PropTypes.string.isRequired,
+    selectDevice: PropTypes.func.isRequired
+
+};

@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorun, autorunAsync, toJS} from 'mobx';
+import {action, toJS} from 'mobx';
 import Moment from 'moment';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ToggleDisplay from 'react-toggle-display';
-import Confirm from 'react-confirm-bootstrap';
 
-import {Panel, Button} from 'react-bootstrap';
-import myClient from '../agents/client';
+import {Card, CardBody, CardHeader, Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
+import myClient from '../../agents/client';
 
 
 @inject('connsStore')
@@ -23,6 +22,10 @@ export default class DetailsGeneral extends Component {
     }
 
     componentWillMount() {
+        this.setState({
+            releaseModalOpen: false
+        });
+
         this.refreshControls();
     }
 
@@ -97,7 +100,7 @@ export default class DetailsGeneral extends Component {
             }));
     };
 
-    cancel = () => {
+    doRelease = () => {
         let current = this.props.connsStore.store.current;
         myClient.submitWithToken('POST', '/protected/conn/cancel', current.connectionId)
             .then(action((response) => {
@@ -110,7 +113,21 @@ export default class DetailsGeneral extends Component {
 
             }));
 
+        this.closeReleaseModal();
         return false;
+    };
+
+    closeReleaseModal = () => {
+        this.setState({
+            releaseModalOpen: false
+        });
+
+    };
+
+    toggleReleaseModal = () => {
+        this.setState({
+            releaseModalOpen: !this.state.releaseModalOpen
+        });
     };
 
     // bleh
@@ -213,55 +230,52 @@ export default class DetailsGeneral extends Component {
 
 
         return (
-            <Panel>
-                <Panel.Heading>
-                    <div>Info</div>
-                </Panel.Heading>
-
-
-                <Panel.Body>
+            <Card>
+                <CardHeader className='p-1'>Info</CardHeader>
+                <CardBody>
+                    <u>In progress!</u>
                     <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
                         <TableHeaderColumn dataField='k' isKey={true}/>
                         <TableHeaderColumn dataField='v'/>
                     </BootstrapTable>
                     <ToggleDisplay show={controls.general.manual.display}>
-                        <Button bsStyle='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
-                                className='pull-left'>Set mode to MANUAL</Button>
+                        <Button color='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
+                                className='float-left'>Set mode to MANUAL</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.auto.display}>
-                        <Button bsStyle='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
-                                className='pull-left'>Set mode to AUTO</Button>
+                        <Button color='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
+                                className='float-left'>Set mode to AUTO</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.build.display}>
-                        <Button bsStyle='info' disabled={!controls.general.build.enabled} onClick={this.build}
-                                className='pull-left'>Build</Button>
+                        <Button color='info' disabled={!controls.general.build.enabled} onClick={this.build}
+                                className='float-left'>Build</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.dismantle.display}>
-                        <Button bsStyle='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
-                                className='pull-left'>Dismantle</Button>
+                        <Button color='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
+                                className='float-left'>Dismantle</Button>
                     </ToggleDisplay>
 
                     <ToggleDisplay show={controls.general.cancel.display}>
-                        <Confirm
-                            onConfirm={this.cancel}
-                            body="Cancelling will release all resources and dismantle the reservation if it is built."
-                            confirmText="Confirm cancellation"
-                            cancelText="Never mind"
-                            title="Cancel connection">
-                            <Button bsStyle='danger'
-                                    disabled={!controls.general.cancel.enabled} className='pull-right'>Cancel</Button>
 
-                        </Confirm>
-
+                        <Modal isOpen={this.state.releaseModalOpen} fade={false} toggle={this.toggleReleaseModal}>
+                            <ModalHeader toggle={this.toggleReleaseModal}>Release reservation</ModalHeader>
+                            <ModalBody>
+                                This will release all resources, and dismantle the reservation if it is built.                            </ModalBody>
+                            <ModalFooter>
+                                <Button color='primary' onClick={this.doRelease}>Release</Button>{' '}
+                                <Button color='secondary' onClick={this.closeReleaseModal}>Never mind</Button>
+                            </ModalFooter>
+                        </Modal>
+                        <Button color='primary' onClick={this.toggleReleaseModal} >Release</Button>
 
                     </ToggleDisplay>
-                </Panel.Body>
+                </CardBody>
 
 
-            </Panel>);
+            </Card>);
 
     }
 }

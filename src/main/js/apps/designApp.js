@@ -1,21 +1,21 @@
 import React, {Component} from 'react';
-import {Row, Col, Button} from 'react-bootstrap';
+import {Row, Col} from 'reactstrap';
 import {inject} from 'mobx-react';
 
 
 import NetworkMap from '../components/networkMap';
-import AddFixtureModal from '../components/addFixtureModal';
-import EditFixtureModal from '../components/editFixtureModal';
-import EditJunctionModal from '../components/editJunctionModal';
-import EditPipeModal from '../components/editPipeModal';
-import DesignHelpModal from '../components/designHelpModal'
-import ConnectionErrorsModal from '../components/connectionErrorsModal';
-import DesignDrawing from '../components/designDrawing';
-import DesignComponents from '../components/designComponents';
-import ScheduleControls from '../components/scheduleControls';
-import ConnectionControls from '../components/connectionControls';
-import SelectPortTypeahead from '../components/selectPortTypeahead';
-import HoldTimer from '../components/holdTimer';
+import AddFixtureModal from '../components/design/addFixtureModal';
+import EditFixtureModal from '../components/design/editFixtureModal';
+import EditJunctionModal from '../components/design/editJunctionModal';
+import EditPipeModal from '../components/design/editPipeModal';
+import DesignHelpModal from '../components/design/designHelpModal'
+import ConnectionErrorsModal from '../components/design/connectionErrorsModal';
+import DesignDrawing from '../components/design/designDrawing';
+import DesignComponents from '../components/design/designComponents';
+import ScheduleControls from '../components/design/scheduleControls';
+import ConnectionControls from '../components/design/connectionControls';
+import SelectPortTypeahead from '../components/design/selectPortTypeahead';
+import HoldTimer from '../components/design/holdTimer';
 
 @inject('controlsStore', 'mapStore', 'designStore', 'commonStore', 'modalStore')
 export default class DesignApp extends Component {
@@ -58,15 +58,14 @@ export default class DesignApp extends Component {
                 <Col md={3} sm={3}>
                     <ConnectionControls />
                     <ScheduleControls />
-                    { /* <DesignControls /> */}
                 </Col>
                 <Col md={6} sm={6}>
-                    <NetworkMap selectDevice={this.selectDevice}/>
+                    <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>
                     <DesignDrawing />
                 </Col>
                 <Col md={3} sm={3}>
-                    <SelectPortTypeahead/>
                     <HoldTimer/>
+                    <SelectPortTypeahead/>
                     <DesignComponents />
                 </Col>
                 <AddFixtureModal />
@@ -75,7 +74,7 @@ export default class DesignApp extends Component {
                 <EditPipeModal />
                 <ConnectionErrorsModal />
                 <DesignHelpModal />
-                { /*<DesignErrorsModal /> */}
+
             </Row>
         );
     }

@@ -1,13 +1,19 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, Button, Grid, Row, Col, Popover, OverlayTrigger, ButtonToolbar, Glyphicon, Well} from 'react-bootstrap';
+import {
+    Modal, ModalHeader, ModalBody,
+    Button, Container, Row, Col, Alert,
+    ButtonToolbar,
+} from 'reactstrap';
 
-import {toJS, action, autorun, computed, whyRun} from 'mobx';
+import {toJS} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
-import Confirm from 'react-confirm-bootstrap';
 
 import VlanSelect from './vlanSelect';
 import BwSelect from './bwSelect';
+
+import ConfirmModal from '../confirmModal';
+import HelpPopover from '../helpPopover';
 
 const modalName = 'editFixture';
 
@@ -18,12 +24,24 @@ export default class EditFixtureModal extends Component {
         super(props);
     }
 
+
+    toggleModal = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.closeModal();
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
+    };
+
+
+
     closeModal = () => {
         const ef = this.props.controlsStore.editFixture;
-        this.props.modalStore.closeModal(modalName);
         if (!ef.locked) {
             this.deleteFixture(false);
         }
+        this.props.modalStore.closeModal(modalName);
     };
 
     deleteFixture = (andCloseModal) => {
@@ -68,44 +86,37 @@ export default class EditFixtureModal extends Component {
 
     };
 
+
     render() {
         let showModal = this.props.modalStore.modals.get(modalName);
         let conn = this.props.controlsStore.connection;
         let ef = this.props.controlsStore.editFixture;
 
-        let helpPopover = <Popover id='help-editFixture' title='Edit fixture help'>
+        const helpHeader = <span>Edit fixture help</span>;
+        const helpBody = <span>
             <p>Here you can edit / view parameters for this fixture. </p>
-
-            <p>In the initial 'unlocked' mode, when the dialog opens the bandwidth and VLAN controls will be editable
-                and reset to default values.
+            <p>In the initial 'unlocked' mode, when the dialog opens the bandwidth and
+                VLAN controls will be editable and reset to default values.
                 If all values are within acceptable ranges the 'Lock Fixture' button will be available.</p>
             <p>You will need to lock all fixtures (and pipes) to commit the connection request.</p>
-            <p>In 'locked' mode, you will only be able to view previous selection. The 'Unlock' button will be available
-                to switch back.</p>
+            <p>In 'locked' mode, you will only be able to view previous selection.
+                The 'Unlock' button will be available to switch back.</p>
+        </span>;
 
-        </Popover>;
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editFixHelp'/>
+        </span>;
 
         let title = ef.device + ':' + ef.label;
-
-
-        let header = <p>{title}
-            <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={helpPopover}>
-                <Glyphicon className='pull-right' glyph='question-sign'/>
-            </OverlayTrigger>
-            {' '}
-        </p>;
-
-
         const disableLockBtn = !ef.vlan.acceptable || !ef.bw.acceptable;
 
+
         return (
-            <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{header}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+            <Modal size='lg' isOpen={showModal} toggle={this.toggleModal} fade={false} onExit={this.closeModal}>
+                <ModalHeader className='p-2' toggle={this.toggleModal}>{title} {' '} {help}</ModalHeader>
+                <ModalBody>
                     <ToggleDisplay show={conn.schedule.locked}>
-                        <Grid fluid={true}>
+                        <Container fluid>
                             <Row>
                                 <Col md={5} sm={5} lg={5}>
                                     <VlanSelect/>
@@ -115,45 +126,38 @@ export default class EditFixtureModal extends Component {
                                 </Col>
                             </Row>
                             <ToggleDisplay show={!ef.locked}>
-                                <Well>Select fixture parameters, then click "Lock".</Well>
+                                <Alert color='info'>Select fixture parameters, then click "Lock".</Alert>
                             </ToggleDisplay>
 
-                            <ButtonToolbar>
+                            <ButtonToolbar className='float-right'>
 
-                                <Confirm
-                                    onConfirm={
-                                        () => {this.deleteFixture(true)}
-                                    }
-                                    body='Are you sure you want to delete?'
-                                    confirmText='Confirm'
-                                    title='Delete fixture'>
-                                    <Button bsStyle='warning' className='pull-right'>Delete</Button>
-                                </Confirm>
-
+                                <ConfirmModal body='Are you ready to delete this fixture?'
+                                              header='Delete fixture'
+                                              buttonText='Delete'
+                                              onConfirm={() => {
+                                                  this.deleteFixture(true)
+                                              }}/>
 
                                 <ToggleDisplay show={!ef.locked}>
-                                    <Button bsStyle='primary'
+                                    {' '}
+                                    <Button color='primary'
                                             disabled={disableLockBtn}
-                                            className='pull-right'
                                             onClick={this.lockFixture}>Lock</Button>
                                 </ToggleDisplay>
                                 <ToggleDisplay show={ef.locked}>
-                                    <Button bsStyle='warning'
-                                            className='pull-right'
+                                    {' '}
+                                    <Button color='warning'
                                             onClick={this.unlockFixture}>Unlock</Button>
                                 </ToggleDisplay>
                             </ButtonToolbar>
-                        </Grid>
+                        </Container>
 
                     </ToggleDisplay>
                     <ToggleDisplay show={!conn.schedule.locked}>
-                        <h3>Schedule must be locked to edit fixture parameters.</h3>
+                        <Alert color='info'>Schedule must be locked to edit fixture parameters.</Alert>
                     </ToggleDisplay>
 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                </ModalBody>
             </Modal>
         );
     }

@@ -1,14 +1,21 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import Topology from '../lib/topology';
 import ToggleDisplay from 'react-toggle-display';
-import {Glyphicon, ListGroup, ListGroupItem, InputGroup} from 'react-bootstrap';
+import {
+    ListGroup, ListGroupItem,
+    Button,
+    Card, CardBody, CardSubtitle,
+
+    InputGroup, InputGroupAddon, InputGroupText
+} from 'reactstrap';
 import Select from 'react-select-plus';
+import Delete  from 'material-ui-icons/Delete';
 
 import {size} from 'lodash-es';
 import 'react-select-plus/dist/react-select-plus.css';
 import PropTypes from 'prop-types';
 
+import Topology from '../../lib/topology';
 
 @inject('controlsStore', 'topologyStore')
 @observer
@@ -22,6 +29,18 @@ export default class EroSelect extends Component {
     componentWillMount() {
         this.props.topologyStore.loadAdjacencies();
     }
+
+    resetEro = () => {
+        const ep = this.props.controlsStore.editPipe;
+
+        this.props.controlsStore.setParamsForEditPipe({
+            ero: {
+                include: [ep.a, ep.z],
+                exclude: []
+            }
+        });
+    };
+
 
     nextHopOptions(urn, adjacencies, ero) {
         let options = [
@@ -37,6 +56,7 @@ export default class EroSelect extends Component {
 
         ];
 
+        // TODO: this can be improved
         let added = ero.slice();
         for (let adjcy of adjacencies) {
             let urns = [];
@@ -127,16 +147,22 @@ export default class EroSelect extends Component {
 
         ep.ero.include.map((urn, i) => {
             if (i === 0 || urn === last) {
-                items.push(<ListGroupItem key={urn}>
-                    <small>{urn}</small>
+                items.push(<ListGroupItem className='p-1' key={urn}>
+                    <small>
+                        {urn}
+                    </small>
                 </ListGroupItem>);
             } else {
                 items.push(
-                    <ListGroupItem key={urn}>
+                    <ListGroupItem className='p-1' key={urn}>
                         <small>
                             {urn}
+
                             <ToggleDisplay show={!ep.locked}>
-                                <Glyphicon className='pull-right' glyph='minus' onClick={() => this.removeUrn(i)}/>
+                                <span className='float-right'>
+                                    <Delete style={{height: '16px', width: '16px'}}
+                                        onClick={() => this.removeUrn(i)}/>
+                                </span>
                             </ToggleDisplay>
                         </small>
                     </ListGroupItem>);
@@ -148,19 +174,22 @@ export default class EroSelect extends Component {
 
                 if (Topology.adjacent(urn, next_urn, adjcies) === 'NONE') {
                     let options = this.nextHopOptions(urn, adjcies, ep.ero.include);
-                    items.push(<ListGroupItem key={urn + '-next'}>
-                        <small>
-                            <NextHopSelect urn={urn} options={options} index={i}/>
-                        </small>
-
+                    items.push(<ListGroupItem className='p-1' key={urn + '-next'}>
+                        <NextHopSelect urn={urn} options={options} index={i}/>
                     </ListGroupItem>)
                 }
             }
         });
 
         return (
-            <ListGroup>{items}</ListGroup>
+            <Card>
+                <CardBody>
+                    <p><strong>ERO constraints</strong></p>
 
+                    <ListGroup>{items}</ListGroup>
+                    <Button onClick={this.resetEro}>Clear</Button>
+                </CardBody>
+            </Card>
         );
     }
 }
@@ -174,15 +203,10 @@ class NextHopSelect extends Component {
         },
     };
 
-    handleChange = (selectedOption) => {
+
+    insertUrn = (selectedOption) => {
         if (selectedOption != null && selectedOption.value !== '') {
             this.setState({selectedOption});
-        }
-    };
-
-    insertUrn = () => {
-        const {selectedOption} = this.state;
-        if (selectedOption != null && selectedOption.value !== '') {
             let urns = JSON.parse(selectedOption.value);
 
             const ep = this.props.controlsStore.editPipe;
@@ -206,21 +230,22 @@ class NextHopSelect extends Component {
     render() {
         const {selectedOption} = this.state;
         let value = '';
+
         if (selectedOption != null) {
             value = selectedOption.value;
         }
 
         return (
             <InputGroup>
-                <Select name={this.props.urn + '-next-select'}
-                        onChange={this.handleChange}
-                        value={value}
-                        options={this.props.options}/>
-                <InputGroup.Addon>
-                    <Glyphicon className='pull-right' glyph='plus' onClick={this.insertUrn}/>
-                </InputGroup.Addon>
-            </InputGroup>
+                <small>
+                    <Select name={this.props.urn + '-next-select'}
+                            onChange={this.insertUrn}
+                            value={value}
+                            autosize={false}
+                            options={this.props.options}/>
 
+                </small>
+            </InputGroup>
         );
 
     }

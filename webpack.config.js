@@ -1,6 +1,8 @@
 var packageJSON = require('./package.json');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 var webpack = require('webpack');
 // var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
@@ -11,7 +13,7 @@ const PATHS = {
 
 module.exports = {
     entry: ['babel-polyfill', './src/main/js/index.js'],
-    devtool: 'sourcemaps',
+//    devtool: 'eval',
     cache: true,
     output: {
         path: PATHS.build,
@@ -33,20 +35,27 @@ module.exports = {
             {
                 test: /\.(gif|png|jpe?g|svg)$/i,
                 use: [
-                    'file-loader',
-                    {
-                        loader: 'image-webpack-loader',
-                        options: {
-                            bypassOnDebug: true,
-                        },
-                    },
+                    'file-loader'
                 ],
             },
             {
                 test: /\.css$/,
-                include: /node_modules/,
-                use: ['style-loader', 'css-loader']
-            }
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            /*
+
+                            sourceMap: true,
+                            convertToAbsoluteUrls: true
+                            */
+                        }
+                    },
+                    'css-loader'
+
+                ]
+            },
+
         ]
     },
     plugins: [
@@ -55,17 +64,18 @@ module.exports = {
             inject: 'body',
             favicon: PATHS.templates + '/favicon.ico',
         }),
+
         /*
-        new LodashModuleReplacementPlugin,
-        new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('production')
-            }
-        }),
-        */
+        new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en)$/),
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new webpack.optimize.AggressiveMergingPlugin(),
+            new UglifyJsPlugin(),
+            new webpack.DefinePlugin({
+                'process.env': {
+                    NODE_ENV: JSON.stringify('production')
+                }
+            })
+    */
     ],
 
     devServer: {

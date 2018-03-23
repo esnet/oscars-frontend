@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {toJS, action, whyRun} from 'mobx';
-import {Row, Col} from 'react-bootstrap';
-import DetailsControls from '../components/detailsControls';
-import DetailsDrawing from '../components/detailsDrawing';
-import DetailsComponents from '../components/detailsComponents';
-import DetailsInfo from '../components/detailsInfo';
+import {action} from 'mobx';
+import {Row, Col} from 'reactstrap';
+import DetailsControls from '../components/details/detailsControls';
+import DetailsDrawing from '../components/details/detailsDrawing';
+import DetailsComponents from '../components/details/detailsComponents';
+import DetailsInfo from '../components/details/detailsInfo';
 import myClient from '../agents/client';
 import transformer from '../lib/transform';
 
@@ -102,7 +102,7 @@ export default class DetailsApp extends Component {
         if (typeof pathConnectionId === 'undefined' || pathConnectionId === '') {
             return (
                 <Row>
-                    <Col mdOffset={1} md={10}>
+                    <Col md={{size: 10, offset: 1}}>
                         <DetailsControls refresh={this.refresh} load={this.load}/>
                     </Col>
                 </Row>

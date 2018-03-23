@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Row, Col, ListGroup, ListGroupItem, Panel, OverlayTrigger, Popover, Glyphicon} from 'react-bootstrap';
+import {Row, Col, ListGroup, ListGroupItem, Card } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {observer, inject} from 'mobx-react';
-import {toJS, whyRun} from 'mobx';
+import Help from 'material-ui-icons/Help';
 
 import myClient from '../agents/client';
 import transformer from '../lib/transform';
@@ -52,6 +52,11 @@ export default class SelectDesign extends Component {
         this.props.mapStore.setColoredNodes(coloredNodes);
     };
 
+    toggle() {
+        this.setState({
+            popoverOpen: !this.state.popoverOpen
+        });
+    }
 
     render() {
         let myDesigns = [];
@@ -71,26 +76,20 @@ export default class SelectDesign extends Component {
         </Popover>;
 
 
-        let otherHelp = <Popover id='help-otherDesigns' title='Help'>
-            Click on a design from the list to copy its parameters into
-            a new connection request.
-            This list includes all the the designs by everybody else.
-        </Popover>;
-
 
 
         return (
             <Row>
                 <Col xs={5} md={5} mdOffset={1} sm={5} smOffset={1} lg={5} lgOffset={1}>
-                    <Panel>
-                        <Panel.Heading>
-                            <h3>My designs
-                                <OverlayTrigger trigger="click" rootClose placement="left" overlay={myHelp}>
-                                    <Glyphicon className='pull-right' glyph='question-sign'/>
-                                </OverlayTrigger>
+                    <Card>
+                        <Card.Heading>
+                            <h3>My designs <span className='float-right'>
+                                <FaQuestion onClick={this.toggle} />
+                            </span>
+
                             </h3>
-                        </Panel.Heading>
-                        <Panel.Body>
+                        </Card.Heading>
+                        <Card.Body>
 
                             <ListGroup>
                                 {
@@ -105,19 +104,17 @@ export default class SelectDesign extends Component {
                                     })
                                 }
                             </ListGroup>
-                        </Panel.Body>
-                    </Panel>
+                        </Card.Body>
+                    </Card>
                 </Col>
                 <Col xs={5} md={5} sm={5} lg={5}>
-                    <Panel>
-                        <Panel.Heading>
+                    <Card>
+                        <Card.Heading>
                             <h3>Other designs
-                                <OverlayTrigger trigger="click" rootClose placement="left" overlay={otherHelp}>
-                                    <Glyphicon className='pull-right' glyph='question-sign'/>
-                                </OverlayTrigger>
+
                             </h3>
-                        </Panel.Heading>
-                        <Panel.Body>
+                        </Card.Heading>
+                        <Card.Body>
                             <ListGroup>
                                 {
                                     otherDesigns.map((d) => {
@@ -131,9 +128,9 @@ export default class SelectDesign extends Component {
                                     })
                                 }
                             </ListGroup>
-                        </Panel.Body>
+                        </Card.Body>
 
-                    </Panel>
+                    </Card>
 
                 </Col>
 

@@ -68,7 +68,8 @@ class TopologyStore {
                         {
                             'id': port.urn,
                             'label': port.urn,
-                            'device': device
+                            'device': device,
+                            'reservableVlans': port.reservableVlans
                         }
                     )
                 }

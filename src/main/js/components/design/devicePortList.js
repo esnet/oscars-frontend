@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import {
     ListGroup,
     ListGroupItem,
-    Glyphicon,
-    Panel,
-    Accordion
-} from 'react-bootstrap';
+    Row, Col, Container,
+    Card, CardBody, CardSubtitle,
+    Button
+} from 'reactstrap';
+
+
 
 export default class DevicePortList extends Component {
     constructor(props) {
@@ -35,27 +37,35 @@ export default class DevicePortList extends Component {
             if ('tags' in port) {
                 tags = port.tags.map((tag, idx) => {
                     return (
-                        <ListGroupItem key={idx}>{tag}</ListGroupItem>
+                        <ListGroupItem className='p-0' key={idx}>{tag}</ListGroupItem>
                     )
                 });
             }
-            return <Panel key={port.urn} eventKey={port.urn}>
-                    <Panel.Heading>
-                        <div>{portLabel}
-                            <Glyphicon className='pull-right' glyph='plus' onClick={clickHandler}/>
-                        </div>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <ListGroup>
-                            {tags}
-                        </ListGroup>
-                    </Panel.Body>
-                </Panel>;
+            return <ListGroupItem key={port.urn}>
+                <Container>
+                    <Row>
+                        <Col>
+                            {portLabel}
+                            {' '}
+                            <Button color='primary' className='float-right' onClick={clickHandler}>Add</Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <small>
+                                <ListGroup className='p-0'>
+                                    {tags}
+                                </ListGroup>
+                            </small>
+                        </Col>
+                    </Row>
+                </Container>
+            </ListGroupItem>;
 
 
         });
 
-        return <Accordion id='device-portsaccordion'>{portsNodes}</Accordion>
+        return <ListGroup>{portsNodes}</ListGroup>
     };
 }
 

@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal,
-    Button,
-    Panel,
+    Modal, ModalBody, ModalHeader,
+    Card, CardBody,
     ListGroup,
     ListGroupItem
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const modalName = 'connectionErrors';
 
@@ -21,6 +20,14 @@ export default class ConnectionErrorsModal extends Component {
         this.props.modalStore.closeModal(modalName);
     };
 
+    toggle = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.props.modalStore.closeModal(modalName);
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
+    };
 
     render() {
 
@@ -30,13 +37,11 @@ export default class ConnectionErrorsModal extends Component {
         }
 
         return (
-            <Modal show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Connection parameter errors:</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Panel>
-                        <Panel.Body>
+            <Modal size='lg'fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>Connection parameter errors</ModalHeader>
+                <ModalBody>
+                    <Card>
+                        <CardBody>
                             <ListGroup>
                                 {
                                     this.props.controlsStore.connection.validation.errors.map((e, idx) => {
@@ -44,12 +49,9 @@ export default class ConnectionErrorsModal extends Component {
                                     })
                                 }
                             </ListGroup>
-                        </Panel.Body>
-                    </Panel>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                        </CardBody>
+                    </Card>
+                </ModalBody>
             </Modal>
 
         );

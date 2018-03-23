@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal,
-    Button,
-    Panel,
+    Modal, ModalBody, ModalHeader,
+    Card, CardBody,
     ListGroup,
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const modalName = 'designErrors';
 
@@ -19,7 +18,14 @@ export default class DesignErrorsModal extends Component {
     closeModal = () => {
         this.props.modalStore.closeModal(modalName);
     };
+    toggle = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.props.modalStore.closeModal(modalName);
+        } else {
+            this.props.modalStore.openModal(modalName);
 
+        }
+    };
 
     render() {
         let showModal = this.props.modalStore.modals.get(modalName);
@@ -28,20 +34,15 @@ export default class DesignErrorsModal extends Component {
         }
 
         return (
-            <Modal show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Design issues:</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Panel>
-                        <Panel.Body>
+            <Modal fade={false} size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>Design errors</ModalHeader>
+                <ModalBody>
+                    <Card>
+                        <CardBody>
                             <ListGroup>{this.props.designStore.design.errors}</ListGroup>
-                        </Panel.Body>
-                    </Panel>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                        </CardBody>
+                    </Card>
+                </ModalBody>
             </Modal>
 
         );

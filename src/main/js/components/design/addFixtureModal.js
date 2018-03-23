@@ -2,14 +2,11 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import DevicePortList from './devicePortList';
 import {
-    Modal,
-    Button,
-    Glyphicon,
-    Popover,
-    OverlayTrigger,
-} from 'react-bootstrap';
+    Modal, ModalBody, ModalHeader
+} from 'reactstrap';
+import HelpPopover from '../helpPopover';
 
-import transformer from '../lib/transform';
+import transformer from '../../lib/transform';
 
 const modalName = 'addFixture';
 
@@ -28,6 +25,15 @@ export default class AddFixtureModal extends Component {
 
     closeModal = () => {
         this.props.modalStore.closeModal(modalName);
+    };
+
+    toggle = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.props.modalStore.closeModal(modalName);
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
     };
 
     addFixture = (device, port) => {
@@ -59,30 +65,29 @@ export default class AddFixtureModal extends Component {
                 }
             );
         }
-        const help = <Popover id='help-addFixtureModal' title='Fixture selection'>
-            <p>Here you can see all the physical ports on the selected device that you
-                can use for fixtures.</p>
-            <p>You can click on the port name to expand details.</p>
-            <p>Click on the plus sign to close this form, add a fixture on that port, and start editing it.</p>
-        </Popover>;
 
-        const questionmark = <OverlayTrigger trigger='click' rootClose placement='left' overlay={help}>
-            <Glyphicon className='pull-right' glyph='question-sign'/>
-        </OverlayTrigger>;
+        const helpHeader = <span>Add a fixture</span>;
+        const helpBody = <span>
+            <p>Here you can see all the physical ports that you
+                can use for fixtures on the selected device .</p>
+            <p>You can click on the port name to view further details.</p>
+            <p>Click on the plus sign next to a port to close this form, add a
+                fixture on that port, and start editing it.</p>
+        </span>;
+
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='addFixHelp'/>
+        </span>;
 
 
         let showModal = this.props.modalStore.modals.get(modalName);
+
         return (
-            <Modal show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{device} {questionmark} </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+            <Modal isOpen={showModal} toggle={this.toggle} fade={false} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>{device}{' '} {help} </ModalHeader>
+                <ModalBody>
                     <DevicePortList ports={ports} onAddClicked={this.addFixture}/>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                </ModalBody>
             </Modal>
         );
     }

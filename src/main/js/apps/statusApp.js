@@ -1,6 +1,12 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Row, Col, Panel, Tabs, Tab, Button} from 'react-bootstrap';
+import {
+    Row, Col, Card, Button,
+    Nav, NavItem, NavLink,
+    CardHeader, CardBody, TabPane, TabContent
+} from 'reactstrap';
+
+import classnames from 'classnames';
 
 @inject('connsStore', 'commonStore')
 @observer
@@ -12,35 +18,70 @@ export default class StatusApp extends Component {
 
     componentWillMount() {
         this.props.commonStore.setActiveNav('status');
+        this.setState({
+            activeTab: 'conn'
+        });
     }
 
+    toggle = (tab) => {
+        if (this.state.activeTab !== tab) {
+            this.setState({
+                activeTab: tab
+            });
+        }
+    };
 
     render() {
         return (
             <Row>
-                <Col mdOffset={1} md={10}>
-                    <Panel>
-                        <Panel.Heading>
-                            <Panel.Title>OSCARS status</Panel.Title>
-                        </Panel.Heading>
-                        <Panel.Body>
+                <Col md={{size: 10, offset: 1}}>
+                    <Card>
+                        <CardHeader>OSCARS status</CardHeader>
+                        <CardBody>
+                            <Nav tabs>
+                                <NavItem>
+                                    <NavLink
+                                        className={classnames({active: this.state.activeTab === 'conn'})}
+                                        onClick={() => {
+                                            this.toggle('conn');
+                                        }}
+                                    >Connections</NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        className={classnames({active: this.state.activeTab === 'pss'})}
+                                        onClick={() => {
+                                            this.toggle('pss');
+                                        }}
+                                    >PSS</NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        className={classnames({active: this.state.activeTab === 'topo'})}
+                                        onClick={() => {
+                                            this.toggle('topo');
+                                        }}
+                                    >Topology</NavLink>
+                                </NavItem>
+                            </Nav>
+
                             <div>
-                                <Tabs id='statusTabs' defaultActiveKey={1}>
-                                    <Tab eventKey={1} title='Connections'>
+                                <TabContent activeTab={this.state.activeTab}>
+                                    <TabPane tabId='conn'>
                                         <p>IN PROGRESS, PLACEHOLDER</p>
                                         <p>Active: <b>4 (+)</b> expand</p>
                                         <p>Failed: <b>1 (+)</b> expand</p>
                                         <p>Archived: <b>12</b></p>
-                                    </Tab>
-                                    <Tab eventKey={2} title='PSS'>
+                                    </TabPane>
+                                    <TabPane tabId='pss'>
                                         <p>IN PROGRESS, PLACEHOLDER</p>
                                         <p>REST: <b>OK</b></p>
                                         <p>Profile: <b>netlab</b></p>
                                         <p>Configuration: <b>OK</b></p>
                                         <p>Issues: <b>(+)</b> expand</p>
                                         <Button>Verify</Button>
-                                    </Tab>
-                                    <Tab eventKey={3} title='Topology'>
+                                    </TabPane>
+                                    <TabPane tabId='topo'>
                                         <p>IN PROGRESS, PLACEHOLDER</p>
                                         <p>Files: <b>./config/topo/netlab.json</b></p>
                                         <p>Version: <b>123</b></p>
@@ -49,12 +90,12 @@ export default class StatusApp extends Component {
                                         <p>Adjacencies: <b>5</b></p>
                                         <p>Consistent: <b>NO</b></p>
                                         <p>Issues: <b>(+)</b> expand</p>
-                                    </Tab>
-                                </Tabs>
+                                    </TabPane>
+                                </TabContent>
                             </div>
-                        </Panel.Body>
+                        </CardBody>
 
-                    </Panel>
+                    </Card>
 
                 </Col>
             </Row>

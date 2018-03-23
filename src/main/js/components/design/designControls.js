@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS} from 'mobx';
+import {action, autorun, toJS} from 'mobx';
 
 
 import {
@@ -14,12 +14,12 @@ import {
     FormGroup,
     FormControl,
     OverlayTrigger
-} from 'react-bootstrap';
+} from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
-import Transformer from '../lib/transform';
-import myClient from '../agents/client';
-import validator from '../lib/validation';
+import Transformer from '../../lib/transform';
+import myClient from '../../agents/client';
+import validator from '../../lib/validation';
 
 
 @inject('controlsStore', 'designStore', 'accountStore', 'modalStore')
@@ -76,7 +76,7 @@ export default class DesignControls extends Component {
                 }));
     };
 
-    disposeOfValidate = autorunAsync('validate', () => {
+    disposeOfValidate = autorun(() => {
         let editDesign = this.props.controlsStore.editDesign;
         let cmp = {
             junctions: this.props.designStore.design.junctions,
@@ -91,7 +91,7 @@ export default class DesignControls extends Component {
         }
         this.props.designStore.setErrors(result.errors);
 
-    }, 1000);
+    }, { delay: 1000} );
 
 
     componentWillUnmount() {
@@ -135,7 +135,7 @@ export default class DesignControls extends Component {
                 <Panel.Heading>
                     <div>Save design
                         <OverlayTrigger trigger='click' rootClose placement='top' overlay={helpPopover}>
-                            <Glyphicon className='pull-right' glyph='question-sign'/>
+                            <Glyphicon className='float-right' glyph='question-sign'/>
                         </OverlayTrigger>
                     </div>
                 </Panel.Heading>
@@ -150,7 +150,7 @@ export default class DesignControls extends Component {
                                          onChange={this.onDescriptionChange}/>
                         </FormGroup>
                         {' '}
-                        <FormGroup className='pull-right'>
+                        <FormGroup className='float-right'>
                             <ToggleDisplay show={designOk}>
                                 <Button disabled={editDesign.disabledSaveButton} onClick={this.saveDesign}>Save</Button>
                             </ToggleDisplay>

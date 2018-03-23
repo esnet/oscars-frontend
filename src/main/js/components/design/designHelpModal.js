@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal,
-    Button,
-    Panel,
+    Modal, ModalHeader, ModalBody,
+    Card, CardBody,
     ListGroup,
     ListGroupItem
-} from 'react-bootstrap';
+} from 'reactstrap';
 
 const modalName = 'designHelp';
 
@@ -21,6 +20,14 @@ export default class DesignHelpModal extends Component {
         this.props.modalStore.closeModal(modalName);
     };
 
+    toggle = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.props.modalStore.closeModal(modalName);
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
+    };
 
     render() {
         let showModal = this.props.modalStore.modals.get(modalName);
@@ -29,18 +36,16 @@ export default class DesignHelpModal extends Component {
         }
 
         return (
-            <Modal bsSize='large' show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>OSCARS help</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Panel>
-                        <Panel.Body>
+            <Modal size='lg' fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+                <ModalHeader toggle={this.toggle}>OSCARS help</ModalHeader>
+                <ModalBody>
+                    <Card>
+                        <CardBody>
                             <h2>TL; DR</h2>
                             <ListGroup>
-                                <ListGroupItem>Set a description, then optionally change the schedule,</ListGroupItem>
-                                <ListGroupItem>Add one fixture, decide its VLAN and bandwidth and lock
-                                    it,</ListGroupItem>
+                                <ListGroupItem>Set a description,</ListGroupItem>
+                                <ListGroupItem>(optionally) unlock, change, then re-lock the schedule,</ListGroupItem>
+                                <ListGroupItem>Add one fixture, decide its VLAN and bandwidth and lock it,</ListGroupItem>
                                 <ListGroupItem>Add at least one more fixture, and lock it,</ListGroupItem>
                                 <ListGroupItem>Click on any pipes, set their parameters, and lock them,</ListGroupItem>
                                 <ListGroupItem>Click "Commit"</ListGroupItem>
@@ -60,13 +65,10 @@ export default class DesignHelpModal extends Component {
                             <p>Junctions are where things interconnect. In our case, a junction represents a
                                 physical device where our pipes and/or fixtures are interconnected. </p>
 
-                        </Panel.Body>
+                        </CardBody>
 
-                    </Panel>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                    </Card>
+                </ModalBody>
             </Modal>
 
         );

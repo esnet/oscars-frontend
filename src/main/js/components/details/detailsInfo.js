@@ -1,14 +1,17 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, autorunAsync, toJS} from 'mobx';
+import {action, toJS} from 'mobx';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import {Panel, Tabs, Tab, Button} from 'react-bootstrap';
-import DetailsGeneral from '../components/detailsGeneral';
+import {Card, CardBody, CardHeader,
+    Nav, NavItem, NavLink,
+    TabPane, TabContent, Button, Collapse} from 'reactstrap';
+import DetailsGeneral from './detailsGeneral';
 import PropTypes from 'prop-types';
-import myClient from "../agents/client";
+import myClient from '../../agents/client';
 import Moment from 'moment';
+import classnames from 'classnames';
 
 const format = 'Y/MM/DD HH:mm:ss';
 
@@ -20,6 +23,15 @@ export default class DetailsInfo extends Component {
     }
 
     componentWillMount() {
+        this.setState({
+            junctionTab: 'commands',
+            ccUrn: {
+
+            },
+            ccType: {
+
+            }
+        });
         this.refreshStatuses();
     }
 
@@ -105,19 +117,43 @@ export default class DetailsInfo extends Component {
             },
         ];
 
-        return <Panel>
-            <Panel.Heading>
-                <p>Fixture</p>
-            </Panel.Heading>
-            <Panel.Body>
+        return <Card>
+            <CardHeader className='p-1'>Fixture</CardHeader>
+            <CardBody>
+                <u>In progress!</u>
                 <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
                     <TableHeaderColumn dataField='k' isKey={true}/>
                     <TableHeaderColumn dataField='v'/>
                 </BootstrapTable>
-            </Panel.Body>
-        </Panel>
+            </CardBody>
+        </Card>
 
     }
+
+    setJunctionTab = (tab) => {
+        if (this.state.junctionTab !== tab) {
+            this.setState({
+                junctionTab : tab
+            });
+        }
+    };
+
+    toggleCommandCollapse = (urn, type) => {
+        let newSt = {ccType: {}, ccUrn: {}};
+        if (this.state.ccType[type]) {
+            newSt.ccType[type] = false;
+        } else {
+            newSt.ccType[type] = true;
+        }
+        if (this.state.ccUrn[urn]) {
+            newSt.ccUrn[urn] = false;
+        } else {
+            newSt.ccUrn[urn] = true;
+        }
+        this.setState(newSt);
+
+
+    };
 
     junctionInfo() {
 
@@ -132,52 +168,73 @@ export default class DetailsInfo extends Component {
                 <p>Output: {statuses['output']}</p>
             </div>;
         }
-        return <Panel>
-            <Panel.Heading>
-                <p>{deviceUrn}</p>
-            </Panel.Heading>
-            <Panel.Body>
+
+
+        return <Card>
+            <CardHeader className='p-1'>{deviceUrn}</CardHeader>
+            <CardBody>
                 <div>
-                    <Tabs id='junctionTabs' defaultActiveKey={1}>
-                        <Tab eventKey={1} title="Router commands">
+                    <Nav tabs>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.junctionTab === 'commands' })}
+                                onClick={() => { this.setJunctionTab('commands'); }}>
+                                Router commands
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.junctionTab === 'diagnostics' })}
+                                onClick={() => { this.setJunctionTab('diagnostics'); }}>
+                                Diagnostics
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab={this.state.junctionTab}>
+                        <TabPane tabId='commands' title='Router commands'>
                             {
                                 this.props.connsStore.store.commands.map(c => {
                                     if (c.deviceUrn === selected.data.deviceUrn) {
-                                        return <Panel key={c.type} defaultExpanded={false}>
-                                            <Panel.Heading>
-                                                <Panel.Title toggle>{c.type}</Panel.Title>
-                                            </Panel.Heading>
-                                            <Panel.Body collapsible>
-                                                <pre>{c.contents}</pre>
-                                            </Panel.Body>
+                                        let isOpen = this.state.ccType[c.type] && this.state.ccUrn[c.deviceUrn];
 
-                                        </Panel>
+                                        return <Card key={c.type}>
+                                            <CardHeader className='p-1'
+                                                onClick={() => this.toggleCommandCollapse(c.deviceUrn, c.type)}>
+                                                <NavLink href='#'>{c.type}</NavLink>
+                                            </CardHeader>
+                                            <CardBody>
+                                                <Collapse isOpen={isOpen}>
+                                                    <pre>{c.contents}</pre>
+                                                </Collapse>
+                                            </CardBody>
+
+                                        </Card>
                                     } else {
                                         return null;
                                     }
 
                                 })
                             }
-                        </Tab>
-                        <Tab eventKey={2} title='Diagnostics'>
-                            <Panel>
-                                <Panel.Heading>
-                                    <Panel.Title toggle>Control plane status</Panel.Title>
-                                </Panel.Heading>
-                                <Panel.Body collapsible>
+                        </TabPane>
+                        <TabPane tabId='diagnostics' title='Diagnostics'>
+                            <Card>
+                                <CardHeader>
+                                    Control plane status
+                                </CardHeader>
+                                <CardBody>
                                     <div>
                                         {cpStatus}
                                     </div>
-                                    <Button bsStyle='info'
+                                    <Button color='info'
                                             onClick={this.initControlPlaneCheck}>Initiate new check</Button>
-                                </Panel.Body>
-                            </Panel>
-                        </Tab>
-                    </Tabs>
+                                </CardBody>
+                            </Card>
+                        </TabPane>
+                    </TabContent>
                 </div>
-            </Panel.Body>
+            </CardBody>
 
-        </Panel>
+        </Card>
 
     }
 
@@ -206,17 +263,17 @@ export default class DetailsInfo extends Component {
         }
 
 
-        return <Panel>
-            <Panel.Heading>
-                <p>Pipes</p>
-            </Panel.Heading>
-            <Panel.Body>
+        return <Card>
+            <CardHeader className='p-1'>Pipes</CardHeader>
+            <CardBody>
+
+                <u>In progress!</u>
                 <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
                     <TableHeaderColumn dataField='k' isKey={true}/>
                     <TableHeaderColumn dataField='v'/>
                 </BootstrapTable>
-            </Panel.Body>
-        </Panel>
+            </CardBody>
+        </Card>
 
     }
 

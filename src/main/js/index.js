@@ -1,11 +1,14 @@
 import React from 'react';
 
 import ReactDOM from 'react-dom';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
-import {Grid, Row, Col} from 'react-bootstrap';
+import {Container, Row, Col} from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.css';
 
-import {useStrict} from 'mobx';
+
+import {configure} from 'mobx';
 import {Provider} from 'mobx-react';
 
 import ListConnectionsApp from './apps/listConnections';
@@ -34,7 +37,6 @@ import topologyStore from './stores/topologyStore';
 import connsStore from './stores/connsStore';
 import userStore from './stores/userStore';
 import modalStore from './stores/modalStore';
-
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -80,13 +82,14 @@ const stores = {
     userStore,
     modalStore
 };
-useStrict(true);
 
+configure({ enforceActions: true });
 
 ReactDOM.render(
-    <Provider {...stores}>
+    <MuiThemeProvider>
+        <Provider {...stores}>
         <BrowserRouter>
-            <Grid fluid={true}>
+            <Container fluid={true}>
                 <Row>
                     <NavBar/>
                 </Row>
@@ -109,6 +112,7 @@ ReactDOM.render(
                     <PrivateRoute exact path="/pages/map" component={MapApp}/>
                     <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
                 </Switch>
-            </Grid>
+            </Container>
         </BrowserRouter>
-    </Provider>, document.getElementById('react'));
+    </Provider>
+    </MuiThemeProvider>, document.getElementById('react'));

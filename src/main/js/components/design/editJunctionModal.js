@@ -1,22 +1,22 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import {
-    Modal,
+    Modal, ModalHeader, ModalBody, ModalFooter,
     Button,
-    Panel,
-    FormControl,
-    ControlLabel,
+    Card, CardHeader, CardBody,
+    Input, Label,
     FormGroup,
     Form,
     ListGroup,
-    ListGroupItem,
-    OverlayTrigger,
-    Glyphicon,
-    Popover
-} from 'react-bootstrap';
+    ListGroupItem
+} from 'reactstrap';
+
 
 import ToggleDisplay from 'react-toggle-display';
-import transformer from '../lib/transform';
+
+import transformer from '../../lib/transform';
+import ConfirmModal from '../confirmModal';
+import HelpPopover from '../helpPopover';
 
 
 const modalName = 'editJunction';
@@ -27,6 +27,16 @@ export default class EditJunctionModal extends Component {
     constructor(props) {
         super(props);
     }
+
+
+    toggleModal = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.closeModal();
+        } else {
+            this.props.modalStore.openModal(modalName);
+        }
+    };
+
 
     closeModal = () => {
         this.props.controlsStore.setParamsForEditJunction({
@@ -42,6 +52,10 @@ export default class EditJunctionModal extends Component {
         this.props.designStore.deleteJunctionDeep(junction);
 
         this.props.mapStore.deleteColoredNode(junction);
+        this.setState({
+            confirmOpen: false
+        });
+
         this.closeModal();
     };
 
@@ -116,7 +130,7 @@ export default class EditJunctionModal extends Component {
 
         let addPipeButton = null;
         if (editJunction.showAddPipeButton) {
-            addPipeButton = <Button bsStyle='primary' onClick={this.addPipe}>Add</Button>
+            addPipeButton = <Button color='primary' onClick={this.addPipe}>Add</Button>
         }
 
         let unconnectedJunctions = this.unconnectedJunctions();
@@ -129,8 +143,8 @@ export default class EditJunctionModal extends Component {
 
         let connectedPipes = this.props.designStore.pipesConnectedTo(junction);
 
-
-        let helpPopover = <Popover id='help-junctionControls' title='Junction Controls'>
+        const helpHeader = <span>Edit junction help</span>;
+        const helpBody = <span>
             <p>Here you can view a list of pipes connected to this junction. Click
                 on one of them to open the form that edits the pipe parameters.</p>
             <p>If the design contains other junctions that could potentially be connected to this
@@ -138,24 +152,19 @@ export default class EditJunctionModal extends Component {
                 of the pipe. Click the "Add" button to add a new pipe.</p>
             <p>Finally, you may click the "Delete" button to remove this junction as
                 well as all the fixtures belonging to it and pipes connecting to here. </p>
-        </Popover>;
+        </span>;
 
+        const help = <span className='float-right'>
+            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editJctHelp'/>
+        </span>;
 
         return (
-            <Modal show={showModal} onHide={this.closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{junction}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Panel>
-                        <Panel.Heading>
-                            <p>Junction controls
-                                <OverlayTrigger trigger='click' rootClose placement='left' overlay={helpPopover}>
-                                    <Glyphicon className='pull-right' glyph='question-sign'/>
-                                </OverlayTrigger>
-                            </p>
-                        </Panel.Heading>
-                        <Panel.Body>
+            <Modal size='lg' isOpen={showModal} toggle={this.toggleModal} fade={false} onExit={this.closeModal}>
+                <ModalHeader className='p-2' toggle={this.toggleModal}>{junction}</ModalHeader>
+                <ModalBody>
+                    <Card>
+                        <CardHeader>Junction controls {help}</CardHeader>
+                        <CardBody>
 
                             <ListGroup> {
                                 connectedPipes.map((pipe) => {
@@ -171,10 +180,10 @@ export default class EditJunctionModal extends Component {
                             {' '}
                             <ToggleDisplay show={showAddPipeControls}>
                                 <Form>
-                                    <FormGroup controlId="pipe">
-                                        <ControlLabel>New pipe to:</ControlLabel>
+                                    <FormGroup>
+                                        <Label>New pipe to:</Label>
                                         {' '}
-                                        <FormControl componentClass="select" defaultValue='choose'
+                                        <Input type='select' defaultValue='choose'
                                                      onChange={this.selectOtherJunction}>
                                             {
                                                 unconnectedJunctions.map((option, index) => {
@@ -182,7 +191,7 @@ export default class EditJunctionModal extends Component {
                                                                    value={option.value}>{option.label}</option>
                                                 })
                                             }
-                                        </FormControl>
+                                        </Input>
                                     </FormGroup>
                                     {addPipeButton}
 
@@ -190,17 +199,13 @@ export default class EditJunctionModal extends Component {
                             </ToggleDisplay>
 
                             {noPipesText}
-
-                            <Button bsStyle='warning' className='pull-right' onClick={this.deleteJunction}>Delete
-                                junction</Button>
-                        </Panel.Body>
-
-                    </Panel>
-
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.closeModal}>Close</Button>
-                </Modal.Footer>
+                            <ConfirmModal body='Are you ready to delete this junction?'
+                                          header='Delete junction'
+                                          buttonText='Delete'
+                                          onConfirm={this.deleteJunction}/>
+                        </CardBody>
+                    </Card>
+                </ModalBody>
             </Modal>
 
 
