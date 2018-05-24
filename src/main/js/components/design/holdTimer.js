@@ -129,14 +129,12 @@ class HoldTimer extends Component {
     };
 
     idledOut = () => {
+        // empty design and controls, push to timeout
+
+        this.props.controlsStore.clearSessionStorage();
+        this.props.designStore.clearSessionStorage();
         this.cleanupTasks();
 
-        this.props.controlsStore.setParamsForConnection({
-            schedule: {
-                locked: false
-            }
-        });
-        this.props.designStore.clear();
 
         this.props.history.push('/pages/timeout');
 

@@ -61,7 +61,7 @@ export default class DesignApp extends Component {
                 </Col>
                 <Col md={6} sm={6}>
                     <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>
-                    <DesignDrawing />
+                    <DesignDrawing containerId={'mainDesignDrawing'}/>
                 </Col>
                 <Col md={3} sm={3}>
                     <HoldTimer/>

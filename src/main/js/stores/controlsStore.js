@@ -9,7 +9,7 @@ class ControlsStore {
         connectionId: '',
         description: '',
         phase: '',
-        mode: 'MANUAL',
+        mode: 'AUTOMATIC',
         schedule: {
             locked: false,
             acceptable: false,
@@ -118,11 +118,14 @@ class ControlsStore {
         z: '',
         pipeId: '',
         locked: false,
+        bwMode: 'auto',
 
         protect: true,
 
         A_TO_Z: {
-            bw: '',
+            bw: 0,
+            fixturesIngress: 0,
+            fixturesEgress: 0,
             qos: {
                 excess: 'scavenger'
             },
@@ -135,7 +138,9 @@ class ControlsStore {
         },
 
         Z_TO_A: {
-            bw: '',
+            bw: 0,
+            fixturesIngress: 0,
+            fixturesEgress: 0,
             qos: {
                 excess: 'scavenger'
             },

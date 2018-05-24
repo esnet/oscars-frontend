@@ -8,6 +8,7 @@ import ToggleDisplay from 'react-toggle-display';
 
 import {Card, CardBody, CardHeader, Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 import myClient from '../../agents/client';
+import DetailsDrawing from './detailsDrawing';
 
 
 @inject('connsStore')
@@ -274,6 +275,7 @@ export default class DetailsGeneral extends Component {
                     </ToggleDisplay>
                 </CardBody>
 
+                <DetailsDrawing/>
 
             </Card>);
 

@@ -3,7 +3,6 @@ import {observer, inject} from 'mobx-react';
 import {action} from 'mobx';
 import {Row, Col} from 'reactstrap';
 import DetailsControls from '../components/details/detailsControls';
-import DetailsDrawing from '../components/details/detailsDrawing';
 import DetailsComponents from '../components/details/detailsComponents';
 import DetailsInfo from '../components/details/detailsInfo';
 import myClient from '../agents/client';
@@ -114,7 +113,6 @@ export default class DetailsApp extends Component {
             return <Row>
                 <Col sm={3} md={3} lg={3}>
                     <DetailsControls refresh={this.refresh} load={this.load}/>
-                    <DetailsDrawing/>
                 </Col>
                 <Col sm={6} md={6} lg={6}>
                     <DetailsInfo refresh={this.refresh}/>

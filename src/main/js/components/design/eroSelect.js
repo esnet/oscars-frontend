@@ -236,7 +236,7 @@ class NextHopSelect extends Component {
         }
 
         return (
-            <InputGroup>
+            <InputGroup className='p-1 m-1'>
                 <small>
                     <Select name={this.props.urn + '-next-select'}
                             onChange={this.insertUrn}

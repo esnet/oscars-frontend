@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {
-    Input,
+    Input, Label, FormGroup,
     Modal, ModalHeader, ModalBody,
     Card, CardBody, CardHeader, CardGroup,
     InputGroup, InputGroupText, InputGroupAddon
 } from 'reactstrap';
 import PropTypes from 'prop-types';
 import Octicon from 'react-octicon'
-
 
 
 @inject('controlsStore', 'designStore')
@@ -93,9 +92,8 @@ export default class PathModeSelect extends Component {
                         </Card>
                     </ModalBody>
                 </Modal>
-                <Octicon name='info' style={{height: '18px', width: '18px'}} onClick={this.toggle} />
+                <Octicon name='info' style={{height: '12px', width: '12px'}} onClick={this.toggle}/>
             </span>;
-
 
 
         const pathSelectModeOpts = [
@@ -107,20 +105,25 @@ export default class PathModeSelect extends Component {
             {value: 'widestZA', label: 'Widest, priority <='},
         ];
         return (
-            <InputGroup>
-                <Input type='select' onChange={this.props.onSelectModeChange}>
-                    {
-                        pathSelectModeOpts.map((option, index) => {
-                            return <option key={index} value={option.value}>{option.label}</option>
-                        })
-                    }
-                </Input>
-                <InputGroupAddon addonType='append'>
-                    <InputGroupText>
-                        {help}
-                    </InputGroupText>
-                </InputGroupAddon>
-            </InputGroup>);
+            <FormGroup className='mt-1 mb-1 pt-1 pb-1'>
+                <InputGroup size={'sm'} className={'p-1 m-1'}>
+                    <InputGroupAddon addonType='prepend'>PCE mode</InputGroupAddon>
+
+                    <Input id={'pathModeSelect'}
+
+                           type='select'
+                           onChange={this.props.onSelectModeChange}>
+                        {
+                            pathSelectModeOpts.map((option, index) => {
+                                return <option key={index} value={option.value}>{option.label}</option>
+                            })
+                        }
+                    </Input>
+                    <InputGroupAddon addonType='append'>
+                        <InputGroupText>{help}</InputGroupText>
+                    </InputGroupAddon>
+                </InputGroup>
+            </FormGroup>);
     }
 }
 

@@ -10,6 +10,7 @@ import VisUtils from '../../lib/vis'
 import myClient from '../../agents/client';
 import HelpPopover from '../helpPopover';
 import Octicon from 'react-octicon'
+import PropTypes from "prop-types";
 
 require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.min.css');
@@ -71,7 +72,7 @@ export default class DesignDrawing extends Component {
                 color: {background: 'white'}
             }
         };
-        const drawingId = document.getElementById('designDrawing');
+        const drawingId = document.getElementById(this.props.containerId);
 
         this.network = new Network(drawingId, this.datasource, options);
 
@@ -302,10 +303,14 @@ export default class DesignDrawing extends Component {
                     </span>
                 </CardHeader>
                 <CardBody>
-                    <div id='designDrawing'><p>design drawing</p></div>
+                    <div id={this.props.containerId}><p>design drawing</p></div>
                 </CardBody>
             </Card>
 
         );
     }
 }
+
+DesignDrawing.propTypes = {
+    containerId: PropTypes.string.isRequired,
+};

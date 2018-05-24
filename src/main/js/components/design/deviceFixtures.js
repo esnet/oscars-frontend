@@ -21,7 +21,7 @@ export default class DeviceFixtures extends Component {
                     <ListGroup>
                         {
                             this.props.fixtures.map(f => {
-                                return <ListGroupItem
+                                return <ListGroupItem className='p-1 m-1'
                                     key={f.label}>{f.label} (i: {f.ingress}M /
                                     e: {f.egress}M)</ListGroupItem>
                             })

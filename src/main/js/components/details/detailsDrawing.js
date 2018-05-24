@@ -8,7 +8,7 @@ import HelpPopover from '../helpPopover';
 import {size } from 'lodash-es';
 
 
-@inject('connsStore', 'modalStore')
+@inject('connsStore', 'modalStore', 'mapStore')
 @observer
 export default class DetailsDrawing extends Component {
     constructor(props) {
@@ -46,6 +46,9 @@ export default class DetailsDrawing extends Component {
     };
 
     componentDidMount() {
+        if (size(this.props.mapStore.positions) === 0) {
+            this.props.mapStore.loadPositions()
+        }
         let options = {
             height: '300px',
             interaction: {
@@ -55,9 +58,12 @@ export default class DetailsDrawing extends Component {
                 dragView: true
             },
             physics: {
-                solver: 'forceAtlas2Based',
+                solver: 'barnesHut',
                 stabilization: {
                     fit: true
+                },
+                barnesHut: {
+                    centralGravity: 0.5
                 }
             },
             nodes: {
@@ -116,6 +122,7 @@ export default class DetailsDrawing extends Component {
         let junctions = toJS(design.junctions);
         let fixtures = toJS(design.fixtures);
         let pipes = toJS(design.pipes);
+        let positions = this.props.mapStore.positions;
 
 
         let nodes = [];
@@ -125,21 +132,31 @@ export default class DetailsDrawing extends Component {
         }
 
         junctions.map((j) => {
+            let x = this.props.mapStore.positions[j.deviceUrn].x;
+            let y = this.props.mapStore.positions[j.deviceUrn].y;
             let junctionNode = {
                 id: j.deviceUrn,
                 label: j.deviceUrn,
                 size: 20,
                 data: j,
+                physics: false,
+                fixed: {x: true, y: true},
+                x: x,
+                y: y,
                 onClick: this.onJunctionClicked
             };
             nodes.push(junctionNode);
         });
         fixtures.map((f) => {
+
             let fixtureNode = {
                 id: f.portUrn + ':' + f.vlan.vlanId,
                 label: f.portUrn + ':' + f.vlan.vlanId,
+                x: positions[f.junction].x + 10,
+                shape: 'hexagon',
                 size: 8,
                 data: f,
+
                 onClick: this.onFixtureClicked
             };
             nodes.push(fixtureNode);
@@ -147,14 +164,13 @@ export default class DetailsDrawing extends Component {
                 id: f.portUrn + ':' + f.vlan.vlanId,
                 from: f.junction,
                 to: f.portUrn + ':' + f.vlan.vlanId,
-                length: 3,
+                length: 2,
                 width: 1.5,
                 onClick: null
             };
             edges.push(edge);
         });
         if (typeof pipes !== 'undefined') {
-            console.log(pipes);
             const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
 
             pipes.map((p, pipe_idx) => {
@@ -172,10 +188,16 @@ export default class DetailsDrawing extends Component {
                         }
                     });
                     if (!foundZ) {
+                        let x = this.props.mapStore.positions[z].x;
+                        let y = this.props.mapStore.positions[z].y;
                         let zNode = {
                             id: z,
                             label: z,
-                            onClick: null
+                            shape: 'diamond',
+                            onClick: null,
+                            fixed: {x: true, y: true},
+                            x: x,
+                            y: y,
 
                         };
                         nodes.push(zNode);
@@ -185,7 +207,6 @@ export default class DetailsDrawing extends Component {
                         from: a,
                         color: colors[pipe_idx],
                         to: z,
-                        length: 3,
                         width: 1.5,
                         onClick: null
                     };
@@ -201,8 +222,10 @@ export default class DetailsDrawing extends Component {
         this.datasource.edges.clear();
 
         this.datasource.edges.add(edges);
+        this.network.fit({animation: false})
 
-    }, {delay: 500});
+
+    }, {delay: 5000});
 
 
     render() {

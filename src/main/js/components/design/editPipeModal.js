@@ -3,16 +3,15 @@ import {observer, inject} from 'mobx-react';
 import {
     Modal, ModalBody, ModalHeader,
     Button, Input, Container, FormGroup,
-    Card, CardBody, CardHeader, CardSubtitle,
+    Card, CardBody, CardHeader, TabContent, TabPane,
     Alert, Label,
-    Row, Col,
+    Row, Col, Nav, NavItem, NavLink,
     ButtonToolbar,
-    ListGroup, ListGroupItem,
-    FormText, FormFeedback,
-    InputGroup, InputGroupText, InputGroupAddon
+    ListGroup, ListGroupItem, Form,
 } from 'reactstrap';
 
 import {autorun, toJS} from 'mobx';
+import classnames from 'classnames';
 
 
 import ToggleDisplay from 'react-toggle-display';
@@ -20,9 +19,10 @@ import EroSelect from './eroSelect';
 import DeviceFixtures from './deviceFixtures';
 import PathModeSelect from './pathModeSelect';
 import myClient from '../../agents/client';
-import Validator from '../../lib/validation';
 import ConfirmModal from '../confirmModal';
 import HelpPopover from '../helpPopover';
+import PipeBwInput from './pipeBwInput';
+import DesignDrawing from './designDrawing';
 
 
 const modalName = 'editPipe';
@@ -32,7 +32,42 @@ const modalName = 'editPipe';
 export default class EditPipeModal extends Component {
     constructor(props) {
         super(props);
+        this.bwCtlRefs = {};
     }
+
+    componentWillMount() {
+        this.setState({
+            eroTab: 'drawing',
+        });
+    }
+
+    componentWillUnmount() {
+        this.props.controlsStore.setParamsForEditPipe(
+            {
+                ero: {
+                    include: [],
+                    exclude: [],
+                    acceptable: false,
+                    message: ''
+                }
+            });
+        this.pathUpdateDispose();
+        this.validationDispose();
+    }
+
+    closeModal = () => {
+        this.props.controlsStore.setParamsForEditPipe({pipeId: null});
+        this.props.modalStore.closeModal(modalName);
+    };
+
+    toggleModal = () => {
+        if (this.props.modalStore.modals.get(modalName)) {
+            this.closeModal();
+        } else {
+            this.props.modalStore.openModal(modalName);
+
+        }
+    };
 
     protectClicked = (e) => {
     };
@@ -173,14 +208,35 @@ export default class EditPipeModal extends Component {
     }, {delay: 1000});
 
     validate() {
+        let ep = this.props.controlsStore.editPipe;
 
-        const ep = this.props.controlsStore.editPipe;
+
         if (ep.paths.sync.loading || !ep.paths.sync.initialized) {
             return;
         }
         if (typeof ep.paths[ep.ero.mode] === 'undefined') {
             console.log('undefined path for ' + ep.ero.mode);
             return;
+        }
+
+        let aIngress = 0;
+        let aEgress = 0;
+        let zIngress = 0;
+        let zEgress = 0;
+
+        let pipe = this.props.designStore.findPipe(ep.pipeId);
+        if (pipe != null) {
+            let design = this.props.designStore.design;
+            design.fixtures.map(f => {
+                if (f.device === pipe.a) {
+                    aIngress = aIngress + f.ingress;
+                    aEgress = aEgress + f.egress;
+                }
+                if (f.device === pipe.z) {
+                    zIngress = zIngress + f.ingress;
+                    zEgress = zEgress + f.egress;
+                }
+            });
         }
 
         let azAvailable = ep.paths[ep.ero.mode].azAvailable;
@@ -190,14 +246,24 @@ export default class EditPipeModal extends Component {
 
         let params = {
             A_TO_Z: {
+                fixturesIngress: aIngress,
+                fixturesEgress: aEgress,
                 available: azAvailable,
                 baseline: azBaseline,
             },
             Z_TO_A: {
+                fixturesIngress: zIngress,
+                fixturesEgress: zEgress,
                 available: zaAvailable,
                 baseline: zaBaseline,
             }
         };
+        if (ep.bwMode === 'auto') {
+            this.setBwControls('auto', aIngress, zIngress);
+            params.A_TO_Z.bw = aIngress;
+            params.Z_TO_A.bw = zIngress;
+        }
+
         if (ep.A_TO_Z.bw > azAvailable) {
 
             params.A_TO_Z.validationText = 'Larger than available';
@@ -234,77 +300,6 @@ export default class EditPipeModal extends Component {
     }
 
 
-    componentWillUnmount() {
-        this.props.controlsStore.setParamsForEditPipe({ero: {include: [], exclude: []}});
-
-        this.pathUpdateDispose();
-        this.validationDispose();
-
-    }
-
-
-    onAzBwChange = (e) => {
-        let inputStr = Validator.cleanBandwidth(e.target.value, this.azBwControl);
-        const newBw = Number(inputStr);
-
-        if (isNaN(newBw) || e.target.value.length === 0) {
-            this.props.controlsStore.setParamsForEditPipe({
-                A_TO_Z: {
-                    validationText: 'Not a number',
-                    validationState: 'error',
-                    acceptable: false
-                }
-            });
-        } else if (newBw < 0) {
-            this.props.controlsStore.setParamsForEditPipe({
-                A_TO_Z: {
-                    validationText: 'Negative value',
-                    validationState: 'error',
-                    acceptable: false
-                }
-            });
-        } else {
-            this.props.controlsStore.setParamsForEditPipe({
-                A_TO_Z: {
-                    bw: newBw,
-                }
-            });
-
-        }
-    };
-
-
-    onZaBwChange = (e) => {
-        let inputStr = Validator.cleanBandwidth(e.target.value, this.zaBwControl);
-        const newBw = Number(inputStr);
-
-        if (isNaN(newBw) || e.target.value.length === 0) {
-            this.props.controlsStore.setParamsForEditPipe({
-                Z_TO_A: {
-                    validationText: 'Not a number',
-                    validationState: 'error',
-                    acceptable: false
-                }
-            });
-        } else if (newBw < 0) {
-            this.props.controlsStore.setParamsForEditPipe({
-                Z_TO_A: {
-                    validationText: 'Negative value',
-                    validationState: 'error',
-                    acceptable: false
-                }
-            });
-        } else {
-            this.props.controlsStore.setParamsForEditPipe({
-                Z_TO_A: {
-                    bw: newBw,
-                }
-            });
-
-        }
-
-
-    };
 
     deletePipe = () => {
         let pipeId = this.props.controlsStore.editPipe.pipeId;
@@ -332,19 +327,6 @@ export default class EditPipeModal extends Component {
 
     };
 
-    closeModal = () => {
-        this.props.controlsStore.setParamsForEditPipe({pipeId: null});
-        this.props.modalStore.closeModal(modalName);
-    };
-
-    toggleModal = () => {
-        if (this.props.modalStore.modals.get(modalName)) {
-            this.closeModal();
-        } else {
-            this.props.modalStore.openModal(modalName);
-
-        }
-    };
 
     onSelectModeChange = (e) => {
         const mode = e.target.value;
@@ -377,6 +359,79 @@ export default class EditPipeModal extends Component {
 
     };
 
+    invalidBwReason = (direction) => {
+        const ep = this.props.controlsStore.editPipe;
+        return ep[direction].validationText;
+    };
+
+    isBwInvalid = (direction) => {
+        const ep = this.props.controlsStore.editPipe;
+        return !ep[direction].acceptable;
+    };
+
+    onBwInvalid = (direction, text) => {
+        let params = {};
+        params[direction] = {
+            validationText: text,
+            validationState: error,
+            acceptable: false,
+        };
+
+        this.props.controlsStore.setParamsForEditPipe(params);
+
+    };
+    onBwValid = (direction, mbps) => {
+        let params = {};
+        let ep = this.props.controlsStore.editPipe;
+        console.log(toJS(ep));
+
+        params[direction] = {
+            validationText: '',
+            validationState: 'success',
+            acceptable: true,
+            bw: mbps
+        };
+        this.props.controlsStore.setParamsForEditPipe(params);
+
+    };
+    setBwCtlRef = (direction, ref) => {
+        this.bwCtlRefs[direction] = ref;
+    };
+
+    setBwControls(bwMode, azBw, zaBw) {
+
+        let params = {
+            bwMode: bwMode,
+            A_TO_Z: {
+                bw: azBw,
+            },
+            Z_TO_A: {
+                bw: zaBw,
+            }
+        };
+        if (this.bwCtlRefs['A_TO_Z'] != null) {
+            this.bwCtlRefs['A_TO_Z'].value = azBw;
+        }
+        if (this.bwCtlRefs['Z_TO_A'] != null) {
+            this.bwCtlRefs['Z_TO_A'].value = zaBw;
+        }
+
+        this.props.controlsStore.setParamsForEditPipe(params);
+    }
+
+    modeCheckboxClicked = (e) => {
+        const mustBecomeAuto = e.target.checked;
+        const ep = this.props.controlsStore.editPipe;
+        if (mustBecomeAuto) {
+            this.setBwControls('auto', ep.A_TO_Z.fixturesIngress, ep.Z_TO_A.fixturesIngress);
+
+        } else {
+            this.setBwControls('manual', 0, 0);
+        }
+
+    };
+
+
     render() {
         let ep = this.props.controlsStore.editPipe;
         let conn = this.props.controlsStore.connection;
@@ -399,23 +454,249 @@ export default class EditPipeModal extends Component {
         let pipeTitle = <span>{pipe.a} - {pipe.z}</span>;
         let aFixtures = [];
         let zFixtures = [];
-        let aIngress = 0;
-        let aEgress = 0;
-        let zIngress = 0;
-        let zEgress = 0;
 
         design.fixtures.map(f => {
             if (f.device === pipe.a) {
                 aFixtures.push(f);
-                aIngress = aIngress + f.ingress;
-                aEgress = aEgress + f.egress;
             }
             if (f.device === pipe.z) {
                 zFixtures.push(f);
-                zIngress = zIngress + f.ingress;
-                zEgress = zEgress + f.egress;
             }
         });
+
+        let azDefaultBw = 0;
+        let zaDefaultBw = 0;
+        let inputMode = ep.bwMode;
+        if (ep.locked) {
+            inputMode = 'locked';
+        }
+        if (inputMode === 'auto') {
+            azDefaultBw = ep.A_TO_Z.fixturesIngress;
+            zaDefaultBw = ep.Z_TO_A.fixturesIngress;
+        } else if (inputMode === 'locked') {
+            azDefaultBw = ep.A_TO_Z.bw;
+            zaDefaultBw = ep.Z_TO_A.bw;
+        }
+
+//        console.log(toJS(ep));
+        let modePath = ep.paths[ep.ero.mode];
+        // console.log(toJS(modePath));
+        let azAvailable = modePath.azAvailable;
+        let zaAvailable = modePath.zaAvailable;
+        let azBaseline = modePath.azBaseline;
+        let zaBaseline = modePath.zaBaseline;
+        let azWidest = ep.paths.widestAZ.azAvailable;
+        let zaWidest = ep.paths.widestZA.zaAvailable;
+
+        let azBwInput = <PipeBwInput direction={'A_TO_Z'}
+                                     available={azAvailable}
+                                     baseline={azBaseline}
+                                     defaultValue={azDefaultBw}
+                                     widest={azWidest}
+                                     refCallback={this.setBwCtlRef}
+
+                                     getInvalidReason={this.invalidBwReason}
+                                     isInvalid={this.isBwInvalid}
+                                     eroMode={ep.ero.mode}
+                                     inputMode={inputMode}
+                                     onBwInvalid={this.onBwInvalid}
+                                     onBwValid={this.onBwValid}
+        />;
+
+        let zaBwInput = <PipeBwInput direction={'Z_TO_A'}
+                                     available={zaAvailable}
+                                     baseline={zaBaseline}
+                                     defaultValue={zaDefaultBw}
+                                     widest={zaWidest}
+                                     refCallback={this.setBwCtlRef}
+                                     getInvalidReason={this.invalidBwReason}
+                                     isInvalid={this.isBwInvalid}
+                                     eroMode={ep.ero.mode}
+                                     inputMode={inputMode}
+                                     onBwInvalid={this.onBwInvalid}
+                                     onBwValid={this.onBwValid}
+        />;
+
+        const help = this.makePipeHelp();
+        const bwHelp = this.makeBwHelp();
+
+        let alert = null;
+        let bwModeBox = <FormGroup check inline>
+            <Label check>
+                <Input type='checkbox'
+                       defaultChecked={ep.bwMode === 'auto'}
+                       onChange={this.modeCheckboxClicked}/>
+                {' '} Auto
+            </Label>
+        </FormGroup>;
+        let bwControls = <Container fluid={true}>
+            <Row noGutters>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                    <DeviceFixtures fixtures={aFixtures}
+                                    junction={pipe.a}
+                                    ingress={ep.A_TO_Z.fixturesIngress}
+                                    egress={ep.A_TO_Z.fixturesEgress}/>
+
+                </Col>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                    <Card>
+                        <CardHeader className='p-1'>Bandwidth {' '} {bwHelp}</CardHeader>
+                        <CardBody className='p-1'>
+                            <Container fluid className='pt-0 pb-0'>
+                                <Row noGutters>
+                                    <Col sm={7} md={7} lg={7}
+                                         className='mt-1 mb-1 pt-1 pb-1'>
+                                        {azBwInput}
+                                    </Col>
+                                    <Col sm={{size: 4, offset: 1}} md={{size: 4, offset: 1}}
+                                         className='mt-1 mb-1 pt-1 pb-1'>
+                                        {bwModeBox}
+                                    </Col>
+                                </Row>
+                                <Row noGutters>
+                                    <Col sm={{size: 7, offset: 5}} md={{size: 7, offset: 5}}>
+                                        {zaBwInput}
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </CardBody>
+                    </Card>
+                </Col>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                    <DeviceFixtures fixtures={zFixtures}
+                                    junction={pipe.z}
+                                    ingress={ep.Z_TO_A.fixturesIngress}
+                                    egress={ep.Z_TO_A.fixturesEgress}/>
+
+                </Col>
+            </Row>
+        </Container>;
+
+        let pathControls = <Container fluid={true}>
+            <Row noGutters>
+                <Form inline>
+                    <Col xs={2} sm={2} md={2} lg={2}><strong>Path</strong></Col>
+                    <Col xs={2} sm={2} md={2} lg={2}>
+                        <FormGroup>
+                            <Label>
+                                <Input type='checkbox' defaultChecked={ep.protect}
+                                       disabled={ep.locked}
+                                       onChange={this.protectClicked}/>
+                                Protect
+                            </Label>
+                        </FormGroup>
+                    </Col>
+
+                    <ToggleDisplay show={!ep.locked}>
+                        <Col>
+                            <PathModeSelect onSelectModeChange={this.onSelectModeChange}/>
+                        </Col>
+                    </ToggleDisplay>
+                </Form>
+            </Row>
+        </Container>;
+
+
+        let eroControls = <Container fluid={true}>
+
+            <Row noGutters={true}>
+                <ToggleDisplay show={showEroControls}>
+                    <Col>
+                        <EroSelect/>
+                    </Col>
+                </ToggleDisplay>
+                <Col>
+                    <Nav tabs>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.eroTab === 'drawing' })}
+                                onClick={() => { this.setEroTab('drawing'); }}>
+                                Drawing
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.eroTab === 'ero' })}
+                                onClick={() => { this.setEroTab('ero'); }}>
+                                ERO
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab={this.state.eroTab}>
+                        <TabPane tabId='ero' title='ERO'>
+                            <ToggleDisplay show={!ep.locked}>
+                                <small>{ep.ero.message}</small>
+                            </ToggleDisplay>
+                            <ListGroup>
+                                {
+                                    ep.ero.hops.map(urn => {
+                                        return <ListGroupItem className='p-1' key={urn}>
+                                            <small>{urn}</small>
+                                        </ListGroupItem>
+                                    })
+                                }
+                            </ListGroup>
+                        </TabPane>
+                        <TabPane tabId='drawing' title='Drawing'>
+                            <DesignDrawing containerId={'modalDesignDrawing'} />
+
+                        </TabPane>
+                    </TabContent>
+
+                </Col>
+            </Row>
+        </Container>;
+
+
+        if (!conn.schedule.locked) {
+            alert = <Alert color='info'>Schedule must be locked to edit pipe parameters.</Alert>;
+            bwControls = null;
+            pathControls = null;
+            eroControls = null;
+        }
+
+        return (
+            <Modal style={{maxWidth: '95%'}} isOpen={showModal}
+                   toggle={this.toggleModal} fade={false} onExit={this.closeModal}>
+
+                <ModalHeader className='p-2' toggle={this.toggleModal}>
+                    Pipe controls for {pipeTitle} {' '} {help}
+                </ModalHeader>
+
+                <ModalBody>
+                    {alert}
+                    {bwControls}
+
+                    <hr className='m-1'/>
+                    {pathControls}
+
+                    <hr className='m-1'/>
+                    {eroControls}
+
+                    <hr className='m-1'/>
+                    <ButtonToolbar className='float-right'>
+
+                        <ConfirmModal body='Are you ready to delete this pipe?'
+                                      header='Delete pipe'
+                                      buttonText='Delete'
+                                      onConfirm={this.deletePipe}/>
+                        {' '}
+                        <ToggleDisplay show={!ep.locked}>
+                            <Button color='primary'
+                                    disabled={disableLockBtn}
+                                    onClick={this.lockPipe}>Lock</Button>
+                        </ToggleDisplay>
+                        <ToggleDisplay show={ep.locked}>
+                            <Button color='warning'
+                                    onClick={this.unlockPipe}>Unlock</Button>
+                        </ToggleDisplay>
+                    </ButtonToolbar>
+                </ModalBody>
+            </Modal>);
+    }
+
+
+    makePipeHelp() {
 
 
         const helpHeader = <span>Pipe controls</span>;
@@ -430,9 +711,23 @@ export default class EditPipeModal extends Component {
             <p>Alternatively, you may click the "Delete" button to remove this pipe from the design.</p>
         </span>;
 
-        const help = <span className='float-right'>
+        return <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='editPipeHelp'/>
         </span>;
+
+
+    }
+
+
+    setEroTab = (tab) => {
+        if (this.state.eroTab !== tab) {
+            this.setState({
+                eroTab : tab
+            });
+        }
+    };
+
+    makeBwHelp() {
 
         const bwHelpHeader = <span>Pipe controls</span>;
         const bwHelpBody = <span>
@@ -442,211 +737,9 @@ export default class EditPipeModal extends Component {
                 not be available for the new value.</p>
         </span>;
 
-        const bwHelp = <span className='float-right'>
+        return <span className='float-right'>
             <HelpPopover header={bwHelpHeader} body={bwHelpBody} placement='bottom' popoverId='pipeBwHelp'/>
         </span>;
-
-        return (
-            <Modal style={{maxWidth: '95%'}} isOpen={showModal}
-                   toggle={this.toggleModal} fade={false} onExit={this.closeModal}>
-
-                <ModalHeader className='p-2' toggle={this.toggleModal}>
-                    Pipe controls for {pipeTitle} {' '} {help}
-                </ModalHeader>
-
-                <ModalBody>
-                    <ToggleDisplay show={!conn.schedule.locked}>
-                        <Alert color='info'>Schedule must be locked to edit pipe parameters.</Alert>
-                    </ToggleDisplay>
-
-                    <ToggleDisplay show={conn.schedule.locked}>
-                        <Container fluid={true}>
-                            <Row noGutters>
-                                <Col xs={4} sm={4} md={4} lg={4}>
-                                    <DeviceFixtures fixtures={aFixtures}
-                                                    junction={pipe.a}
-                                                    ingress={aIngress}
-                                                    egress={aEgress}/>
-
-                                </Col>
-                                <Col xs={4} sm={4} md={4} lg={4}>
-                                    <Card>
-                                        <CardHeader className='p-1'>Bandwidth {' '} {bwHelp}</CardHeader>
-                                        <CardBody>
-                                            <Container fluid>
-                                                <Row>
-                                                    <Col sm={10} md={10} lg={10}>
-                                                        <ToggleDisplay show={!ep.locked}>
-                                                            <FormGroup>
-                                                                <InputGroup>
-                                                                    <InputGroupAddon addonType='prepend'>
-                                                                        <InputGroupText>
-                                                                            &gt;
-                                                                        </InputGroupText>
-                                                                    </InputGroupAddon>
-                                                                    <Input type='text'
-                                                                           placeholder='0-100000'
-                                                                           defaultValue={aIngress}
-                                                                           innerRef={ref => {
-                                                                               this.azBwControl = ref;
-                                                                           }}
-                                                                           invalid={ep.A_TO_Z.validationState === 'error'}
-                                                                           disabled={ep.locked}
-                                                                           onChange={this.onAzBwChange}/>
-                                                                    <FormFeedback>
-                                                                        <small>{ep.A_TO_Z.validationText}</small>
-                                                                    </FormFeedback>
-                                                                </InputGroup>
-                                                            </FormGroup>
-                                                            <FormGroup>
-                                                                <FormText className='m-0 p-0'>
-                                                                    <small>
-                                                                        <p className='m-0'>Reservable: {ep.A_TO_Z.available} Mbps</p>
-                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                                            <p className='m-0'>Widest: {ep.A_TO_Z.widest} Mbps</p>
-                                                                        </ToggleDisplay>
-                                                                        <p className='m-0'>Baseline: {ep.A_TO_Z.baseline} Mbps</p>
-                                                                    </small>
-                                                                </FormText>
-
-                                                            </FormGroup>
-                                                        </ToggleDisplay>
-                                                        <ToggleDisplay show={ep.locked}>
-                                                            <Alert color='info'>{ep.A_TO_Z.bw} Mbps</Alert>
-                                                        </ToggleDisplay>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col sm={{size: 10, offset: 2}} md={{size: 10, offset: 2}}>
-                                                        <ToggleDisplay show={!ep.locked}>
-                                                            <FormGroup>
-                                                                <InputGroup>
-                                                                    <Input type='text'
-                                                                           placeholder='0-100000'
-                                                                           defaultValue={zIngress}
-                                                                           innerRef={ref => {
-                                                                               this.zaBwControl = ref;
-                                                                           }}
-                                                                           invalid={ep.Z_TO_A.validationState === 'error'}
-                                                                           disabled={ep.locked}
-                                                                           onChange={this.onZaBwChange}/>
-                                                                    <InputGroupAddon addonType='append'>
-                                                                        <InputGroupText>
-                                                                            &lt;
-                                                                        </InputGroupText>
-                                                                    </InputGroupAddon>
-                                                                    <FormFeedback>
-                                                                        <small>{ep.Z_TO_A.validationText}</small>
-                                                                    </FormFeedback>
-
-                                                                </InputGroup>
-                                                            </FormGroup>
-                                                            <FormGroup>
-                                                                <FormText>
-                                                                    <small>
-                                                                        <p className='m-0'>Reservable: {ep.Z_TO_A.available} Mbps</p>
-                                                                        <ToggleDisplay show={(ep.ero.mode === 'fits')}>
-                                                                            <p className='m-0'>Widest: {ep.Z_TO_A.widest} Mbps</p>
-                                                                        </ToggleDisplay>
-                                                                        <p className='m-0'>Baseline: {ep.Z_TO_A.baseline} Mbps</p>
-                                                                    </small>
-                                                                </FormText>
-                                                            </FormGroup>
-                                                        </ToggleDisplay>
-                                                        <ToggleDisplay show={ep.locked}>
-                                                            <Alert color='info'>{ep.Z_TO_A.bw} Mbps</Alert>
-                                                        </ToggleDisplay>
-                                                    </Col>
-                                                </Row>
-                                            </Container>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                                <Col xs={4} sm={4} md={4} lg={4}>
-                                    <DeviceFixtures fixtures={zFixtures}
-                                                    junction={pipe.z}
-                                                    ingress={zIngress}
-                                                    egress={zEgress}/>
-
-                                </Col>
-                            </Row>
-                        </Container>
-                        <hr/>
-                        <Container fluid={true}>
-                            <Row noGutters>
-                                <Col xs={2} sm={2} md={2} lg={2}><strong>Path</strong></Col>
-                                <Col xs={2} sm={2} md={2} lg={2}>
-                                    <FormGroup>
-                                        <Label>
-                                            <Input type='checkbox' defaultChecked={ep.protect}
-                                                   disabled={ep.locked}
-                                                   onChange={this.protectClicked}/>
-                                            Protect
-                                        </Label>
-                                    </FormGroup>
-                                </Col>
-
-                                <ToggleDisplay show={!ep.locked}>
-                                    <Col>
-                                        <PathModeSelect onSelectModeChange={this.onSelectModeChange}/>
-                                    </Col>
-                                </ToggleDisplay>
-                            </Row>
-                        </Container>
-                        <hr/>
-                        <Container fluid={true}>
-
-                            <Row noGutters={true}>
-                                <ToggleDisplay show={showEroControls}>
-                                    <Col>
-                                        <EroSelect/>
-                                    </Col>
-                                </ToggleDisplay>
-                                <Col>
-                                    <Card>
-                                        <CardBody>
-                                            <p><strong>ERO</strong></p>
-                                            <ToggleDisplay show={!ep.locked}>
-                                                <small>{ep.ero.message}</small>
-                                            </ToggleDisplay>
-                                            <ListGroup>
-                                                {
-                                                    ep.ero.hops.map(urn => {
-                                                        return <ListGroupItem className='p-1' key={urn}>
-                                                            <small>{urn}</small>
-                                                        </ListGroupItem>
-                                                    })
-                                                }
-                                            </ListGroup>
-
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            </Row>
-                        </Container>
-                    </ToggleDisplay>
-                    <hr/>
-                    <ButtonToolbar className='float-right'>
-
-                        <ConfirmModal body='Are you ready to delete this pipe?'
-                                      header='Delete pipe'
-                                      buttonText='Delete'
-                                      onConfirm={this.deletePipe}/>
-
-                        <ToggleDisplay show={!ep.locked}>
-                            {' '}
-                            <Button color='primary'
-                                    disabled={disableLockBtn}
-                                    onClick={this.lockPipe}>Lock</Button>
-                        </ToggleDisplay>
-                        <ToggleDisplay show={ep.locked}>
-                            {' '}
-                            <Button color='warning'
-                                    onClick={this.unlockPipe}>Unlock</Button>
-                        </ToggleDisplay>
-                    </ButtonToolbar>
-                </ModalBody>
-            </Modal>);
     }
 }
 

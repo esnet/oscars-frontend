@@ -3,6 +3,14 @@ import myClient from '../agents/client';
 
 class MapStore {
 
+    @observable positions = observable.map({});
+
+    @action loadPositions() {
+        myClient.loadJSON({method: 'GET', url: '/api/positions'})
+            .then(action((response) => {
+                this.positions = JSON.parse(response);
+            }));
+    }
 
     @observable network = {
         nodes: [],
@@ -43,6 +51,7 @@ class MapStore {
     @action setColoredNodes(nodes) {
         this.network.coloredNodes = nodes;
     }
+
     @action setColoredEdges(edges) {
         this.network.coloredEdges = edges;
     }
