@@ -1,17 +1,16 @@
 import React from 'react';
 
 import {Graph, alg} from 'graphlib';
-import Flag from 'material-ui-icons/Flag';
-import CheckCircle from 'material-ui-icons/CheckCircle';
+import Octicon from 'react-octicon'
 
 
 class Validator {
     label(state) {
         if (!state) {
-            return <Flag color='orange'/>
-
+            return <Octicon color='orange' name='alert'/>
         }
-        return <CheckCircle color='green'/>
+        return <Octicon color='green' name='check'/>
+
     }
 
     mapNodeColor(state) {

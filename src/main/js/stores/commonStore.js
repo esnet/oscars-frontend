@@ -8,7 +8,7 @@ class CommonStore {
     };
 
     @observable version = {
-        frontend: '1.0.9',
+        frontend: __VERSION__,
         backend: 'unknown'
     };
 

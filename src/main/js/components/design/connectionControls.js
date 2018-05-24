@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
 import {action, autorun, toJS} from 'mobx';
-import Help from 'material-ui-icons/Help';
+import Octicon from 'react-octicon'
 import ToggleDisplay from 'react-toggle-display';
 import {
     Alert,
@@ -116,12 +116,14 @@ export default class ConnectionControls extends Component {
                     <Form onSubmit={e => {
                         e.preventDefault();
                     }}>
-                        <Alert color='info' onClick={() => {
-                            this.props.modalStore.openModal('designHelp')
-                        }}>
+                        <Alert color='info'>
                             <strong>Help me!
                                 <span className='float-right'>
-                                    <Help style={{height: '18px', width: '18px'}}/>
+                                        <Octicon name='info' style={{height: '18px', width: '18px'}}
+                                                 onClick={() => {
+                                                     this.props.modalStore.openModal('designHelp')
+                                                 }}
+                                        />
                                 </span>
                             </strong>
                             <div>Connection id: {this.props.controlsStore.connection.connectionId}</div>

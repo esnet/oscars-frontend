@@ -7,7 +7,7 @@ import {
     InputGroup, InputGroupText, InputGroupAddon
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import Help from 'material-ui-icons/Help';
+import Octicon from 'react-octicon'
 
 
 
@@ -93,7 +93,7 @@ export default class PathModeSelect extends Component {
                         </Card>
                     </ModalBody>
                 </Modal>
-                <Help style={{height: '18px', width: '18px'}} onClick={this.toggle} />
+                <Octicon name='info' style={{height: '18px', width: '18px'}} onClick={this.toggle} />
             </span>;
 
 

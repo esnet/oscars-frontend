@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
-import vis from 'vis';
+import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS, action} from 'mobx';
 import ToggleDisplay from 'react-toggle-display';
+import Octicon from 'react-octicon'
 
 require('vis/dist/vis-network.min.css');
-require('vis/dist/vis.css');
-import ZoomIn from 'material-ui-icons/ZoomIn';
-import ZoomOut from 'material-ui-icons/ZoomIn';
+require('vis/dist/vis.min.css');
 
 
 import {
@@ -17,8 +16,9 @@ import PropTypes from 'prop-types';
 
 import myClient from '../agents/client';
 import HelpPopover from './helpPopover';
+import Moment from "moment/moment";
 
-@inject('mapStore')
+@inject('mapStore', 'topologyStore')
 @observer
 export default class NetworkMap extends Component {
     constructor(props) {
@@ -29,8 +29,8 @@ export default class NetworkMap extends Component {
     disposeOfMapUpdate = autorun(() => {
 
         this.datasource = {
-            nodes: new vis.DataSet(),
-            edges: new vis.DataSet(),
+            nodes: new DataSet(),
+            edges: new DataSet(),
         };
 
         this.datasource.nodes.add(toJS(this.props.mapStore.network.nodes));
@@ -97,7 +97,7 @@ export default class NetworkMap extends Component {
         const mapId = document.getElementById(this.props.mapDivId);
 
         if (this.props.mapStore.network.initialized) {
-            this.network = new vis.Network(mapId, this.datasource, options);
+            this.network = new Network(mapId, this.datasource, options);
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
@@ -118,13 +118,16 @@ export default class NetworkMap extends Component {
                     this.datasource.nodes.update({id: nodeId, fixed: {x: false, y: false}});
                 }
             });
+            /*
             this.network.on('stabilizationIterationsDone', () => {
+
                 if (this.props.mapStore.network.zoomedOnColored) {
 
                     this.zoomOnColored();
                     this.props.mapStore.setZoomOnColored(false);
                 }
             });
+            */
 
         }
 
@@ -155,10 +158,14 @@ export default class NetworkMap extends Component {
                 this.props.mapStore.setNetwork(topology.nodes, topology.edges);
             }));
 
+        this.props.topologyStore.loadVersion();
     }
 
 
     render() {
+        let version = this.props.topologyStore.version;
+        let updated = Moment.unix(version.updated).format("MM/DD/YYYY hh:mm")
+        let versionInfo = 'v.'+version.id+' ('+updated+')';
 
         const helpHeader = <span>Network Map</span>;
         const helpBody = <span>
@@ -180,21 +187,15 @@ export default class NetworkMap extends Component {
         </span>;
 
 
-
         return (
             <Card>
                 <CardHeader className='p-1'>
                     Network Map
                     <span className='float-right'>
-
-                        <ToggleDisplay show={this.props.mapStore.network.coloredNodes.length > 0}>
-                            <ZoomIn onClick={this.zoomOnColored} />
-                        </ToggleDisplay>
                         {' '}
-
-                        <ZoomOut onClick={() => {
+                        <Octicon name='search' onClick={() => {
                             this.network.fit({animation: true})
-                        }} />
+                        }}/>
                         {' '}
                         {help}
 
@@ -205,6 +206,7 @@ export default class NetworkMap extends Component {
                     <div id={this.props.mapDivId}>
                         <p> Network Map</p>
                     </div>
+                    <div style={{fontSize: '8px'}}>{versionInfo}</div>
                 </CardBody>
 
             </Card>

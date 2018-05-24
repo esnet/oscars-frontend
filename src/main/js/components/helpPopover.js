@@ -3,7 +3,7 @@ import {
     Popover, PopoverHeader, PopoverBody
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import Help from 'material-ui-icons/Help';
+import Octicon from 'react-octicon'
 
 
 export default class HelpPopover extends Component {
@@ -26,11 +26,10 @@ export default class HelpPopover extends Component {
 
     render() {
 
-        return <span >
-
-                <Help style={{height: '18px', width: '18px'}}
-                    onClick={this.toggle}
-                            id={this.props.popoverId}/>
+        return <span>
+            <Octicon name='info' style={{height: '18px', width: '18px'}}
+                     onClick={this.toggle}
+                     id={this.props.popoverId}/>
                 <Popover placement={this.props.placement}
                          isOpen={this.state.showPopover}
                          target={this.props.popoverId}

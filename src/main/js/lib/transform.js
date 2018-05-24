@@ -148,28 +148,18 @@ class Transformer {
         };
         junctions.map((j) => {
             let entry = {
-                refId: j.id,
-                deviceUrn: j.id,
+                device: j.id,
             };
             cmp.junctions.push(entry);
         });
         if (typeof pipes !== 'undefined') {
             pipes.map((p) => {
-                let azEro = [];
-                let zaEro = [];
-                p.ero.map((h) => {
-                    azEro.push({urn: h});
-                    zaEro.unshift({urn: h});
-                });
                 let entry = {
                     a: p.a,
                     z: p.z,
-                    azBandwidth: p.azBw,
-                    zaBandwidth: p.zaBw,
-                    schedule: scheduleRef,
-                    azERO: azEro,
-                    zaERO: zaEro
-
+                    azMbps: p.azBw,
+                    zaMbps: p.zaBw,
+                    ero: p.ero
                 };
                 if (p.locked) {
                     cmp.pipes.push(entry);
@@ -179,15 +169,10 @@ class Transformer {
         fixtures.map((f) => {
             let entry = {
                 junction: f.device,
-                ingressBandwidth: f.ingress,
-                egressBandwidth: f.egress,
-                portUrn: f.port,
-                schedule: scheduleRef,
-                vlan: {
-                    urn: f.port,
-                    vlanId: f.vlan,
-                    schedule: scheduleRef
-                }
+                inMbps: f.ingress,
+                outMbps: f.egress,
+                port: f.port,
+                vlan: f.vlan
             };
             if (f.locked) {
                 cmp.fixtures.push(entry);

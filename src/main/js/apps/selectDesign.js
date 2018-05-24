@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Row, Col, ListGroup, ListGroupItem, Card } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {observer, inject} from 'mobx-react';
-import Help from 'material-ui-icons/Help';
 
 import myClient from '../agents/client';
 import transformer from '../lib/transform';
@@ -43,12 +42,14 @@ export default class SelectDesign extends Component {
         let cmp = transformer.fromBackend(design.cmp);
         this.props.designStore.setComponents(cmp);
         let coloredNodes = [];
+        /*
         cmp.junctions.map((j) => {
             coloredNodes.push({
                 id: j.id,
                 color: 'green',
             });
         });
+        */
         this.props.mapStore.setColoredNodes(coloredNodes);
     };
 

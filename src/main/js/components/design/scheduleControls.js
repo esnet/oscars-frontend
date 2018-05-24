@@ -65,11 +65,6 @@ export default class ScheduleControls extends Component {
 
     periodicCheck() {
         let conn = this.props.controlsStore.connection;
-        if (conn.schedule.locked) {
-            const startSec = conn.schedule.start.at.getTime() / 1000;
-            const endSec = conn.schedule.end.at.getTime() / 1000;
-            this.props.topologyStore.loadAvailable(startSec, endSec);
-        }
 
         /*
         if the schedule input is not acceptable after it's been changed etc, unlock all resources
@@ -105,19 +100,9 @@ export default class ScheduleControls extends Component {
 
     }
 
-    disposeOfUpdateAvailable = autorun(() => {
-        let conn = this.props.controlsStore.connection;
-        if (conn.schedule.locked) {
-            const startSec = conn.schedule.start.at.getTime() / 1000;
-            const endSec = conn.schedule.end.at.getTime() / 1000;
-            this.props.topologyStore.loadAvailable(startSec, endSec);
-        }
-
-    }, {delay: 1000});
 
 
     componentWillUnmount() {
-        this.disposeOfUpdateAvailable();
         clearTimeout(this.timeoutId);
         this.props.controlsStore.setParamsForConnection({schedule: {locked: false}});
     }

@@ -30,6 +30,15 @@ class TopologyStore {
 
     @observable suggestions = observable.map({});
 
+    @observable version = observable.map({});
+
+    @action loadVersion() {
+        myClient.loadJSON({method: 'GET', url: '/api/topo/version'})
+            .then(action((response) => {
+                this.version = JSON.parse(response);
+            }));
+    }
+
     @action loadEthernetPorts() {
 
         if (this.ethPortsByDevice.size === 0) {

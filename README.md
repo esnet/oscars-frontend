@@ -1,21 +1,21 @@
 # oscars-frontend
 A frontend for OSCARS 1.0. 
 
-Building blocks: React, Redux, Bootstrap and visjs .
+Building blocks: React, MobX, React-Bootstrap v4, vis.js .
 
 
-## Developer guide
+## Developer guid``e
 ### Installing prerequisites
 `npm install` (`mvn package` will also do that)
 
-### Bring up a standalone server 
+### Bring up a dev server 
 `npm run start`
 
 ### Packaging for Maven deployment 
-`mvn package`
+`mvn clean package`
 
 ### Deploying artifact to github repo
-`mvn clean deploy`
+`mvn clean package deploy`
 
 
 ### IntelliJ IDEA notes: 
@@ -29,10 +29,7 @@ Building blocks: React, Redux, Bootstrap and visjs .
   - select 'jasmine', Download and install, Apply
   
 ### Misc development notes
-- The version number is important; any changes must be consistent between all the following files:
-  - `package.json`
+- The version number is important; it should be the same in all of these files:
+  - `package.json` 
   - `pom.xml`
-  - `webpack.config.js`
   - `main/resources/frontend/index.html`
-  - `main/js/stores/commonStore.js`
-- After changing the version number, `npm run start` will stop working until you run a `mvn package`

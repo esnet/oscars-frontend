@@ -1,7 +1,6 @@
 import React from 'react';
 
 import ReactDOM from 'react-dom';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import {Container, Row, Col} from 'reactstrap';
@@ -86,7 +85,6 @@ const stores = {
 configure({ enforceActions: true });
 
 ReactDOM.render(
-    <MuiThemeProvider>
         <Provider {...stores}>
         <BrowserRouter>
             <Container fluid={true}>
@@ -114,5 +112,4 @@ ReactDOM.render(
                 </Switch>
             </Container>
         </BrowserRouter>
-    </Provider>
-    </MuiThemeProvider>, document.getElementById('react'));
+    </Provider>, document.getElementById('react'));

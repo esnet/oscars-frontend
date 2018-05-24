@@ -9,7 +9,7 @@ import {
     InputGroup, InputGroupAddon, InputGroupText
 } from 'reactstrap';
 import Select from 'react-select-plus';
-import Delete  from 'material-ui-icons/Delete';
+import Octicon from 'react-octicon'
 
 import {size} from 'lodash-es';
 import 'react-select-plus/dist/react-select-plus.css';
@@ -160,7 +160,7 @@ export default class EroSelect extends Component {
 
                             <ToggleDisplay show={!ep.locked}>
                                 <span className='float-right'>
-                                    <Delete style={{height: '16px', width: '16px'}}
+                                    <Octicon name='trashcan' style={{height: '16px', width: '16px'}}
                                         onClick={() => this.removeUrn(i)}/>
                                 </span>
                             </ToggleDisplay>

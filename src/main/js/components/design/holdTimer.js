@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {action} from 'mobx';
 import Moment from 'moment';
 import IdleTimer from 'react-idle-timer';
 import { Card, CardBody } from 'reactstrap';
@@ -8,10 +7,12 @@ import {withRouter} from 'react-router-dom';
 
 import myClient from '../../agents/client';
 import Transformer from '../../lib/transform';
+import {autorun, toJS, action} from 'mobx';
 
 @inject('controlsStore', 'designStore', 'topologyStore')
 @observer
 class HoldTimer extends Component {
+
 
     constructor(props) {
         super(props);
@@ -20,12 +21,20 @@ class HoldTimer extends Component {
     componentWillMount() {
         this.setToFifteenMins();
         this.refreshTimer();
-        this.refreshHeld();
+        this.extendHold();
+        this.refreshAvailable();
     }
 
     componentWillUnmount() {
-        clearTimeout(this.refreshHeldTimeout);
+        this.cleanupTasks();
+    }
+
+    cleanupTasks() {
+        this.heldUpdateDispose();
+        clearTimeout(this.extendHoldTimeout);
         clearTimeout(this.refreshTimerTimeout);
+        clearTimeout(this.availableTimeout);
+
     }
 
     setToFifteenMins() {
@@ -42,7 +51,20 @@ class HoldTimer extends Component {
     }
 
     refreshTimer = () => {
+//        console.log('refreshing our timer');
         const conn = this.props.controlsStore.connection;
+        let now = Moment();
+
+
+        let startAt = Moment(conn.schedule.start.at);
+        let secsAfterNow = Moment.duration(startAt.diff(now));
+        let sec = Math.round(secsAfterNow.asSeconds());
+
+        // console.log(sec)
+        this.props.controlsStore.setParamsForConnection({
+            schedule: {start: {secsAfterNow: sec}}
+        });
+
 
         if (this.props.designStore.design.junctions.length === 0) {
             this.setToFifteenMins();
@@ -51,9 +73,9 @@ class HoldTimer extends Component {
         }
 
 
-        let now = Moment();
         let until = conn.held.until;
         let remaining = Moment.duration(until.diff(now));
+
         if (remaining.asSeconds() < 0) {
             this.idledOut();
 
@@ -84,11 +106,30 @@ class HoldTimer extends Component {
 
     };
 
+    refreshAvailable = () => {
+        let delay = 5000;
+        let conn = this.props.controlsStore.connection;
 
+        if (conn.held.idle) {
+            // don't bug the server if idle
+            this.availableTimeout = setTimeout(this.refreshAvailable, delay);
+            return;
+        }
+        // do not extend if schedule isn't locked; everything is released at that point anyway
+        if (!conn.schedule.locked) {
+            // don't bug the server if schedule unlocked
+            this.availableTimeout = setTimeout(this.refreshAvailable, delay);
+            return;
+        }
+        const startSec = conn.schedule.start.at.getTime() / 1000;
+        const endSec = conn.schedule.end.at.getTime() / 1000;
+        this.props.topologyStore.loadAvailable(startSec, endSec);
+        this.availableTimeout = setTimeout(this.refreshAvailable, delay);
+
+    };
 
     idledOut = () => {
-        clearTimeout(this.refreshHeldTimeout);
-        clearTimeout(this.refreshTimerTimeout);
+        this.cleanupTasks();
 
         this.props.controlsStore.setParamsForConnection({
             schedule: {
@@ -102,62 +143,85 @@ class HoldTimer extends Component {
     };
 
 
-    refreshHeld = () => {
+    extendHold = () => {
+        // extend our hold every 10 seconds
+        let delay = 10000;
 
         let conn = this.props.controlsStore.connection;
+        // do not extend if user is idle; check again later in case they become un-idle
         if (conn.held.idle) {
-            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000);
+//            console.log('not extending hold for idle');
+            this.extendHoldTimeout = setTimeout(this.extendHold, delay);
             return;
         }
+        // do not extend if schedule isn't locked; everything is released at that point anyway
+        if (!conn.schedule.locked) {
+//            console.log('not extending hold for unlocked schedule');
+            this.extendHoldTimeout = setTimeout(this.extendHold, delay); // check again next sec
+            return;
+        }
+        // we should be at HELD phase; that means there's a hold that we should be extending
+        if (conn.phase === 'HELD') {
+            myClient.submitWithToken('GET', '/protected/extend_hold/' + conn.connectionId)
+                .then(
+                    action((response) => {
+                        this.props.controlsStore.setParamsForConnection({
+                            held: {
+                                until: Moment.unix(response + 100)
+                            }
+                        });
+                        this.props.controlsStore.saveToSessionStorage();
+                        this.props.designStore.saveToSessionStorage();
+
+                    }));
+        } else {
+            console.log('unexpected state encountered while extending hold');
+        }
+
+        this.extendHoldTimeout = setTimeout(this.extendHold, delay);
+
+    };
+
+    // this autorun will submit our hold changes to the server
+    // when there's a change in the data
+    heldUpdateDispose = autorun(() => {
+        let conn = this.props.controlsStore.connection;
 
         if (!conn.schedule.locked) {
-            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000); // check again next sec
             return;
         }
         if (typeof conn.connectionId === 'undefined' || conn.connectionId === null || conn.connectionId === '') {
-            console.log('no connectionId!');
-            this.refreshHeldTimeout = setTimeout(this.refreshHeld, 1000);
+            console.log('no connectionId; will try again later');
             return;
         }
 
 
-        let held = {};
-        let scheduleRef = conn.connectionId + '-HELD';
+        let cmp = Transformer.toBackend(this.props.designStore.design);
 
-        let cmp = Transformer.toBackend(this.props.designStore.design, scheduleRef);
-
-        held.connectionId = conn.connectionId;
-
-        held.schedule = {
-            beginning: conn.schedule.start.at.getTime() / 1000,
-            ending: conn.schedule.end.at.getTime() / 1000,
-            connectionId: conn.connectionId,
-            phase: 'HELD',
-            refId: scheduleRef
-        };
-        //  just needs to not be null
-        held.expiration = new Date().getTime() / 1000;
-        held.cmp = cmp;
-//        console.log(held);
-//        whyRun();
-
+        // TODO: handle tags
         let connection = {
             connectionId: conn.connectionId,
             mode: conn.mode,
-            held: held,
             description: conn.description,
             username: '',
             phase: 'HELD',
             state: 'WAITING',
+            begin: conn.schedule.start.at.getTime() / 1000,
+            end: conn.schedule.end.at.getTime() / 1000,
+            tags: [],
+            pipes: cmp.pipes,
+            junctions: cmp.junctions,
+            fixtures: cmp.fixtures
         };
+        // console.log(connection);
 
-        myClient.submitWithToken('POST', '/protected/held/' + conn.connectionId, connection)
+        myClient.submitWithToken('POST', '/protected/hold', connection)
             .then(
                 action((response) => {
-//                    console.log(response);
+                    // console.log(response);
                     this.props.controlsStore.setParamsForConnection({
                         held: {
-                            until: Moment.unix(response + 100)
+                            until: Moment.unix(response.heldUntil)
                         }
                     });
                     this.props.controlsStore.saveToSessionStorage();
@@ -165,19 +229,16 @@ class HoldTimer extends Component {
 
                     const startSec = conn.schedule.start.at.getTime() / 1000;
                     const endSec = conn.schedule.end.at.getTime() / 1000;
-                    this.props.topologyStore.loadAvailable(startSec, endSec);
+                    // this.props.topologyStore.loadAvailable(startSec, endSec);
                 }));
 
 
-        this.refreshHeldTimeout = setTimeout(this.refreshHeld, 5000);
-
-    };
-
+    }, {delay: 1000});
 
     render() {
-
-        const oneMin = 5 * 60 * 1000;
-        const fifteenMins = 10 * 60 * 1000;
+        const fiveSec = 5000;
+        const fiveMin = 5 * 60 * 1000;
+        const fifteenMin = 10 * 60 * 1000;
 
         const conn = this.props.controlsStore.connection;
 
@@ -194,6 +255,20 @@ class HoldTimer extends Component {
 
             </Card>
         }
+
+        let secsAfterNow = conn.schedule.start.secsAfterNow;
+        // console.log(secsAfterNow);
+        if (conn.schedule.locked && secsAfterNow > 0) {
+            if (secsAfterNow <= 180) {
+                notify = <Card>
+                    <CardBody>
+                        <strong>Approaching reservation start time; {secsAfterNow} seconds left.</strong>
+                    </CardBody>
+                </Card>
+
+            }
+        }
+
 
         return (
             <div>
@@ -213,13 +288,13 @@ class HoldTimer extends Component {
                             }
                         });
                     }}
-                    timeout={oneMin} />
+                    timeout={fiveMin} />
 
                 <IdleTimer
                     idleAction={() => {
                         this.idledOut();
                     }}
-                    timeout={fifteenMins} />
+                    timeout={fifteenMin} />
 
 
                 {notify}

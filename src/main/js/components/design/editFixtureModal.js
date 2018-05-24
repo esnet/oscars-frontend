@@ -35,7 +35,6 @@ export default class EditFixtureModal extends Component {
     };
 
 
-
     closeModal = () => {
         const ef = this.props.controlsStore.editFixture;
         if (!ef.locked) {
@@ -74,7 +73,7 @@ export default class EditFixtureModal extends Component {
         eParams.label = this.props.designStore.lockFixture(ef.fixtureId, tParams);
 
         this.props.controlsStore.setParamsForEditFixture(eParams);
-
+        this.closeModal()
 
     };
 

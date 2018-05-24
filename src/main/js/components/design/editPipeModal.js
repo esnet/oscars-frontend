@@ -322,6 +322,7 @@ export default class EditPipeModal extends Component {
         };
         this.props.designStore.lockPipe(ep.pipeId, params);
         this.props.controlsStore.setParamsForEditPipe({locked: true});
+        this.closeModal()
 
     };
     unlockPipe = () => {
@@ -485,7 +486,7 @@ export default class EditPipeModal extends Component {
                                                                     </InputGroupAddon>
                                                                     <Input type='text'
                                                                            placeholder='0-100000'
-                                                                           defaultValue={ep.A_TO_Z.bw}
+                                                                           defaultValue={aIngress}
                                                                            innerRef={ref => {
                                                                                this.azBwControl = ref;
                                                                            }}
@@ -522,7 +523,7 @@ export default class EditPipeModal extends Component {
                                                                 <InputGroup>
                                                                     <Input type='text'
                                                                            placeholder='0-100000'
-                                                                           defaultValue={ep.Z_TO_A.bw}
+                                                                           defaultValue={zIngress}
                                                                            innerRef={ref => {
                                                                                this.zaBwControl = ref;
                                                                            }}

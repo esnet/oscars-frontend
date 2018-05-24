@@ -1,60 +1,57 @@
 let packageJSON = require('./package.json');
 let path = require('path');
 let HtmlWebpackPlugin = require('html-webpack-plugin');
-let ExtractTextPlugin = require('extract-text-webpack-plugin')
+let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 let webpack = require('webpack');
 
-let LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const PATHS = {
-    build: path.join(__dirname, 'target', 'classes', 'META-INF', 'resources', 'webjars', packageJSON.name, packageJSON.version),
+    build: path.join(__dirname, 'target', 'devel', packageJSON.version),
     templates: path.join(__dirname, 'src', 'main', 'resources', 'templates')
 };
 
-// best for prod
-let devtool = false;
 
 let plugins = [
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
     new webpack.DefinePlugin({
         'process.env': {
-            NODE_ENV: JSON.stringify('production'),
+            NODE_ENV: JSON.stringify('development')
         },
         __VERSION__: JSON.stringify(packageJSON.version)
+
     }),
-    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.AggressiveMergingPlugin(),
-    new LodashModuleReplacementPlugin({ 'currying': true, 'flattening': true } ),
-    new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin({
         template: PATHS.templates + '/template_index.html',
         inject: 'body',
         favicon: PATHS.templates + '/favicon.ico',
     }),
-// enable to view module sizes on a browser window
-//    new BundleAnalyzerPlugin(),
-
+// show bundle sizes and whatnot
+// new BundleAnalyzerPlugin(),
 ];
 
-let publicPath = '/webjars/oscars-frontend/'+packageJSON.version+'/bundle.js';
+let devtool = 'eval';
 
 module.exports = {
     entry: ['babel-polyfill', './src/main/js/index.js'],
     devtool: devtool,
     cache: true,
-    mode: 'production',
+    mode: 'development',
 
     output: {
         path: PATHS.build,
-        publicPath: publicPath,
+        publicPath: '/',
         filename: 'bundle.js'
     },
     performance: {
         hints: false
     },
+    optimization: {
+        nodeEnv: 'production',
+        minimize: true,
+    },
     module: {
+
         rules: [
             {
                 test: /node_modules[\\\/]vis[\\\/].*\.js$/, // vis.js files
@@ -69,10 +66,9 @@ module.exports = {
                         }]
                     ],
                     plugins: [
-                        'transform-es3-property-literals', // see https://github.com/almende/vis/pull/2452
-                        'transform-es3-member-expression-literals', // see https://github.com/almende/vis/pull/2566
-                        'transform-runtime', // see https://github.com/almende/vis/pull/2566
-                        'lodash'
+                        'transform-es3-property-literals',
+                        'transform-es3-member-expression-literals',
+                        'transform-runtime',
                     ]
                 }
             },
@@ -91,7 +87,7 @@ module.exports = {
                         }],
                         'react', 'stage-1',
                     ],
-                    plugins: ['transform-decorators-legacy', 'lodash']
+                    plugins: ['transform-decorators-legacy']
                 }
             },
             {
@@ -112,14 +108,43 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: { loader: 'css-loader', options: {minimize: true} }
-                })
+                use: [
+                    {
+                        loader: 'style-loader',
+                    },
+                    'css-loader'
+
+                ]
             }
 
         ]
     },
-    plugins: plugins
+    plugins: plugins,
 
+    devServer: {
+        port: 8181,
+        contentBase: PATHS.build,
+        historyApiFallback: true,
+        watchOptions: {
+            poll: 1000
+        },
+        proxy: {
+            '/api/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            },
+            '/protected/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            },
+            '/admin/*': {
+                secure: false,
+                changeOrigin: true,
+                target: 'https://localhost:8201/'
+            }
+
+        }
+    }
 };

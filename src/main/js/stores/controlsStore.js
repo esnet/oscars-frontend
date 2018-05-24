@@ -16,6 +16,7 @@ class ControlsStore {
             adviceText: '',
             start: {
                 at: '',
+                secsAfterNow: -1,
                 choice: '',
                 parsed: false,
                 readable: '',

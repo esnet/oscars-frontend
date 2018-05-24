@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS} from 'mobx';
 import {Card, CardBody, CardHeader} from 'reactstrap';
-import vis from 'vis';
+import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 import VisUtils from '../../lib/vis'
 import HelpPopover from '../helpPopover';
 import {size } from 'lodash-es';
@@ -14,8 +14,8 @@ export default class DetailsDrawing extends Component {
     constructor(props) {
         super(props);
 
-        let nodeDataset = new vis.DataSet();
-        let edgeDataset = new vis.DataSet();
+        let nodeDataset = new DataSet();
+        let edgeDataset = new DataSet();
         this.datasource = {
             nodes: nodeDataset,
             edges: edgeDataset
@@ -68,7 +68,7 @@ export default class DetailsDrawing extends Component {
 
         const schematicId = document.getElementById('schematicDrawing');
 
-        this.network = new vis.Network(schematicId, this.datasource, options);
+        this.network = new Network(schematicId, this.datasource, options);
 
         this.network.on('dragEnd', (params) => {
             if (params.nodes.length > 0) {
@@ -154,6 +154,7 @@ export default class DetailsDrawing extends Component {
             edges.push(edge);
         });
         if (typeof pipes !== 'undefined') {
+            console.log(pipes);
             const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
 
             pipes.map((p, pipe_idx) => {

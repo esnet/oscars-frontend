@@ -2,17 +2,17 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS, action} from 'mobx';
 import {Card, CardBody, CardHeader} from 'reactstrap';
-import vis from 'vis';
+import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 
 import transformer from '../../lib/transform';
 import validator from '../../lib/validation'
 import VisUtils from '../../lib/vis'
 import myClient from '../../agents/client';
 import HelpPopover from '../helpPopover';
+import Octicon from 'react-octicon'
 
 require('vis/dist/vis-network.min.css');
-require('vis/dist/vis.css');
-import ZoomOut from 'material-ui-icons/ZoomOut';
+require('vis/dist/vis.min.css');
 
 
 
@@ -22,8 +22,8 @@ export default class DesignDrawing extends Component {
     constructor(props) {
         super(props);
 
-        let nodeDataset = new vis.DataSet();
-        let edgeDataset = new vis.DataSet();
+        let nodeDataset = new DataSet();
+        let edgeDataset = new DataSet();
         this.datasource = {
             nodes: nodeDataset,
             edges: edgeDataset
@@ -73,7 +73,7 @@ export default class DesignDrawing extends Component {
         };
         const drawingId = document.getElementById('designDrawing');
 
-        this.network = new vis.Network(drawingId, this.datasource, options);
+        this.network = new Network(drawingId, this.datasource, options);
 
         this.network.on('dragEnd', (params) => {
             if (params.nodes.length > 0) {
@@ -292,7 +292,7 @@ export default class DesignDrawing extends Component {
                 <CardHeader className='p-1'>
                     Design drawing
                     <span className='float-right'>
-                        <ZoomOut onClick={() => {
+                        <Octicon name='search' onClick={() => {
                             this.network.fit({animation: true})
                         }} />
                     </span>
