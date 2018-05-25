@@ -56,7 +56,7 @@ export default class DetailsInfo extends Component {
                         this.props.connsStore.setStatuses(deviceUrn, status);
                     }));
         }
-        this.refreshTimeout = setTimeout(this.refreshStatuses, 5000); // update per 5 seconds
+        this.refreshTimeout = setTimeout(this.refreshStatuses, 10000); // update per 5 seconds
 
     };
 

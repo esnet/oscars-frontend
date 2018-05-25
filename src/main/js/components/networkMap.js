@@ -82,7 +82,7 @@ export default class NetworkMap extends Component {
             interaction: {
                 hover: false,
                 navigationButtons: true,
-                keyboard: true,
+                keyboard: false,
                 zoomView: true,
                 dragView: true
             },

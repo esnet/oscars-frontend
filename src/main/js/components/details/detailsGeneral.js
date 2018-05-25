@@ -6,7 +6,14 @@ import Moment from 'moment';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ToggleDisplay from 'react-toggle-display';
 
-import {Card, CardBody, CardHeader, Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
+import {
+    Card, CardBody, CardHeader,
+    Nav, NavLink, NavItem,
+    TabPane, TabContent,
+    Button, Modal, ModalBody,
+    ModalHeader, ModalFooter
+} from 'reactstrap';
+import classnames from 'classnames';
 import myClient from '../../agents/client';
 import DetailsDrawing from './detailsDrawing';
 
@@ -24,11 +31,20 @@ export default class DetailsGeneral extends Component {
 
     componentWillMount() {
         this.setState({
-            releaseModalOpen: false
+            releaseModalOpen: false,
+            tab: 'drawing'
         });
 
         this.refreshControls();
     }
+
+    setTab = (tab) => {
+        if (this.state.tab !== tab) {
+            this.setState({
+                tab : tab
+            });
+        }
+    };
 
     build = () => {
         const conn = this.props.connsStore.store.current;
@@ -234,48 +250,79 @@ export default class DetailsGeneral extends Component {
             <Card>
                 <CardHeader className='p-1'>Info</CardHeader>
                 <CardBody>
-                    <u>In progress!</u>
-                    <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                        <TableHeaderColumn dataField='k' isKey={true}/>
-                        <TableHeaderColumn dataField='v'/>
-                    </BootstrapTable>
-                    <ToggleDisplay show={controls.general.manual.display}>
-                        <Button color='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
-                                className='float-left'>Set mode to MANUAL</Button>
-                    </ToggleDisplay>
 
-                    <ToggleDisplay show={controls.general.auto.display}>
-                        <Button color='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
-                                className='float-left'>Set mode to AUTO</Button>
-                    </ToggleDisplay>
+                    <Nav tabs>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.tab === 'drawing'})}
+                                onClick={() => {
+                                    this.setTab('drawing');
+                                }}>
+                                Drawing
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.tab === 'info'})}
+                                onClick={() => {
+                                    this.setTab('info');
+                                }}>
+                                Info
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab={this.state.tab}>
+                        <TabPane tabId='info' title='Info'>
 
-                    <ToggleDisplay show={controls.general.build.display}>
-                        <Button color='info' disabled={!controls.general.build.enabled} onClick={this.build}
-                                className='float-left'>Build</Button>
-                    </ToggleDisplay>
+                            <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
+                                <TableHeaderColumn dataField='k' isKey={true}/>
+                                <TableHeaderColumn dataField='v'/>
+                            </BootstrapTable>
+                            <ToggleDisplay show={controls.general.manual.display}>
+                                <Button color='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
+                                        className='float-left'>Set mode to MANUAL</Button>
+                            </ToggleDisplay>
 
-                    <ToggleDisplay show={controls.general.dismantle.display}>
-                        <Button color='info' disabled={!controls.general.dismantle.enabled} onClick={this.dismantle}
-                                className='float-left'>Dismantle</Button>
-                    </ToggleDisplay>
+                            <ToggleDisplay show={controls.general.auto.display}>
+                                <Button color='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
+                                        className='float-left'>Set mode to AUTO</Button>
+                            </ToggleDisplay>
 
-                    <ToggleDisplay show={controls.general.cancel.display}>
+                            <ToggleDisplay show={controls.general.build.display}>
+                                <Button color='info' disabled={!controls.general.build.enabled} onClick={this.build}
+                                        className='float-left'>Build</Button>
+                            </ToggleDisplay>
 
-                        <Modal isOpen={this.state.releaseModalOpen} fade={false} toggle={this.toggleReleaseModal}>
-                            <ModalHeader toggle={this.toggleReleaseModal}>Release reservation</ModalHeader>
-                            <ModalBody>
-                                This will release all resources, and dismantle the reservation if it is built.                            </ModalBody>
-                            <ModalFooter>
-                                <Button color='primary' onClick={this.doRelease}>Release</Button>{' '}
-                                <Button color='secondary' onClick={this.closeReleaseModal}>Never mind</Button>
-                            </ModalFooter>
-                        </Modal>
-                        <Button color='primary' onClick={this.toggleReleaseModal} >Release</Button>
+                            <ToggleDisplay show={controls.general.dismantle.display}>
+                                <Button color='info' disabled={!controls.general.dismantle.enabled}
+                                        onClick={this.dismantle}
+                                        className='float-left'>Dismantle</Button>
+                            </ToggleDisplay>
 
-                    </ToggleDisplay>
+                            <ToggleDisplay show={controls.general.cancel.display}>
+
+                                <Modal isOpen={this.state.releaseModalOpen} fade={false}
+                                       toggle={this.toggleReleaseModal}>
+                                    <ModalHeader toggle={this.toggleReleaseModal}>Release reservation</ModalHeader>
+                                    <ModalBody>
+                                        This will release all resources, and dismantle the reservation if it is
+                                        built. </ModalBody>
+                                    <ModalFooter>
+                                        <Button color='primary' onClick={this.doRelease}>Release</Button>{' '}
+                                        <Button color='secondary' onClick={this.closeReleaseModal}>Never mind</Button>
+                                    </ModalFooter>
+                                </Modal>
+                                <Button color='primary' onClick={this.toggleReleaseModal}>Release</Button>
+
+                            </ToggleDisplay>
+                        </TabPane>
+                        <TabPane tabId='drawing' title='Drawing'>
+                            <DetailsDrawing/>
+                        </TabPane>
+                    </TabContent>
+
+
                 </CardBody>
-
-                <DetailsDrawing/>
 
             </Card>);
 

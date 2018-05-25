@@ -5,10 +5,11 @@ import {Card, CardBody, CardHeader} from 'reactstrap';
 import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 import VisUtils from '../../lib/vis'
 import HelpPopover from '../helpPopover';
-import {size } from 'lodash-es';
+import {size} from 'lodash-es';
+import validator from "../../lib/validation";
 
 
-@inject('connsStore', 'modalStore', 'mapStore')
+@inject('connsStore', 'modalStore', 'mapStore', 'topologyStore')
 @observer
 export default class DetailsDrawing extends Component {
     constructor(props) {
@@ -21,7 +22,6 @@ export default class DetailsDrawing extends Component {
             edges: edgeDataset
         };
     }
-
 
 
     onFixtureClicked = (fixture) => {
@@ -48,6 +48,9 @@ export default class DetailsDrawing extends Component {
     componentDidMount() {
         if (size(this.props.mapStore.positions) === 0) {
             this.props.mapStore.loadPositions()
+        }
+        if (size(this.props.topologyStore.positions) === 0) {
+            this.props.topologyStore.loadAdjacencies()
         }
         let options = {
             height: '300px',
@@ -114,7 +117,6 @@ export default class DetailsDrawing extends Component {
     }
 
     // this automagically updates the map;
-    // TODO: maybe use a reaction and don't clear the whole graph, instead add/remove/update
     disposeOfMapUpdate = autorun(() => {
 
 
@@ -124,37 +126,46 @@ export default class DetailsDrawing extends Component {
         let pipes = toJS(design.pipes);
         let positions = this.props.mapStore.positions;
 
-
         let nodes = [];
         let edges = [];
+        let detailsDevices = [];
         if (size(junctions) === 0) {
             return;
         }
 
         junctions.map((j) => {
-            let x = this.props.mapStore.positions[j.deviceUrn].x;
-            let y = this.props.mapStore.positions[j.deviceUrn].y;
             let junctionNode = {
                 id: j.deviceUrn,
                 label: j.deviceUrn,
                 size: 20,
                 data: j,
-                physics: false,
-                fixed: {x: true, y: true},
-                x: x,
-                y: y,
                 onClick: this.onJunctionClicked
             };
+            if (j.deviceUrn in positions) {
+                junctionNode.x = positions[j.deviceUrn].x * 0.4;
+                junctionNode.y = positions[j.deviceUrn].y * 0.4;
+                junctionNode.fixed = {x: true, y: true};
+                junctionNode.physics = false;
+            }
+
+
+            detailsDevices.push(j.deviceUrn);
             nodes.push(junctionNode);
         });
         fixtures.map((f) => {
-
+            // console.log(toJS(f));
+            const label  = f.portUrn.replace(f.junction+':', '');
             let fixtureNode = {
                 id: f.portUrn + ':' + f.vlan.vlanId,
-                label: f.portUrn + ':' + f.vlan.vlanId,
-                x: positions[f.junction].x + 10,
+                label: label,
                 shape: 'hexagon',
-                size: 8,
+                color: {
+                    background: 'lightblue',
+                    inherit: false
+                },
+
+
+                size: 12,
                 data: f,
 
                 onClick: this.onFixtureClicked
@@ -164,14 +175,14 @@ export default class DetailsDrawing extends Component {
                 id: f.portUrn + ':' + f.vlan.vlanId,
                 from: f.junction,
                 to: f.portUrn + ':' + f.vlan.vlanId,
-                length: 2,
-                width: 1.5,
+                length: 0.4,
+                width: 2,
                 onClick: null
             };
             edges.push(edge);
         });
         if (typeof pipes !== 'undefined') {
-            const colors = ['red', 'blue', 'green', 'orange', 'cyan', 'brown', 'pink'];
+            const colors = ['red', 'orange', 'green', 'orange', 'cyan', 'brown', 'pink'];
 
             pipes.map((p, pipe_idx) => {
                 let i = 0;
@@ -188,29 +199,38 @@ export default class DetailsDrawing extends Component {
                         }
                     });
                     if (!foundZ) {
-                        let x = this.props.mapStore.positions[z].x;
-                        let y = this.props.mapStore.positions[z].y;
                         let zNode = {
                             id: z,
                             label: z,
                             shape: 'diamond',
+                            size: 12,
+                            color:  colors[pipe_idx],
                             onClick: null,
-                            fixed: {x: true, y: true},
-                            x: x,
-                            y: y,
 
                         };
+                        if (z in positions) {
+                            zNode.x = positions[z].x * 0.4;
+                            zNode.y = positions[z].y * 0.4;
+                            zNode.fixed = {x: true, y: true}
+                        }
+
                         nodes.push(zNode);
                     }
                     let edge = {
                         id: pipe_idx + ' : ' + b + ' --- ' + y,
                         from: a,
-                        color: colors[pipe_idx],
+                        color: {
+                            inherit: false,
+                            color: colors[pipe_idx]
+                        },
                         to: z,
-                        width: 1.5,
+                        width: 3,
+                        length: 12,
                         onClick: null
                     };
                     edges.push(edge);
+                    detailsDevices.push(a);
+                    detailsDevices.push(z);
 
 
                     i = i + 3;
@@ -218,10 +238,74 @@ export default class DetailsDrawing extends Component {
 
             });
         }
+        console.log(edges);
+        let addedEdges = [];
+        let addedNodes = [];
+        for (let adjcy of this.props.topologyStore.adjacencies) {
+            const addAz = (detailsDevices.includes(adjcy.a) && !detailsDevices.includes(adjcy.z));
+            const addZa = (detailsDevices.includes(adjcy.z) && !detailsDevices.includes(adjcy.a));
+            let a = null;
+            let z = null;
+
+            if (addAz) {
+                a = adjcy.a;
+                z = adjcy.z;
+
+            }
+            if (addZa) {
+                a = adjcy.z;
+                z = adjcy.a;
+            }
+            if (addAz || addZa) {
+                let edgeId = a+ ' --- ' + z;
+                if (addedEdges.includes(edgeId)) {
+                    continue;
+                }
+                let zNode = {
+                    id: z,
+                    label: z,
+                    font: {
+                        size: 9
+                    },
+                    size: 5,
+                    shape: 'dot',
+                    onClick: null,
+                };
+                if (z in positions) {
+                    zNode.x = positions[z].x * 0.4;
+                    zNode.y = positions[z].y * 0.4;
+                    zNode.fixed = {x: true, y: true}
+                }
+                if (!addedNodes.includes(z)) {
+                    nodes.push(zNode);
+                    addedNodes.push(z);
+                }
+
+                let edge = {
+                    id: edgeId,
+                    from: a,
+                    to: z,
+                    width: 0.5,
+                    length: 10,
+                    color: {
+                        inherit: false,
+                        color: 'blue',
+                        opacity: 0.5
+                    },
+
+                    dashes: true,
+
+                    onClick: null
+                };
+                edges.push(edge);
+                addedEdges.push(edgeId);
+            }
+        }
+
         VisUtils.mergeItems(nodes, this.datasource.nodes);
         this.datasource.edges.clear();
-
         this.datasource.edges.add(edges);
+        this.network.stabilize(1000);
         this.network.fit({animation: false})
 
 

@@ -33,7 +33,7 @@ export default class DetailsApp extends Component {
         this.timeoutId = setTimeout(() => {
             this.refresh();
             this.periodicCheck();
-        }, 10000);
+        }, 30000);
     }
 
     load = (connectionId) => {

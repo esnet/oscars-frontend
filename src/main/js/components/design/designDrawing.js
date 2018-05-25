@@ -254,12 +254,17 @@ export default class DesignDrawing extends Component {
                     }
                 });
 
+                topology.nodes.map((n) => {
+
+                });
+
                 VisUtils.mergeItems(nodes, this.datasource.nodes);
 
                 this.datasource.edges.clear();
                 this.datasource.edges.add(edges);
                 this.network.stabilize(1000);
                 this.network.fit({animation: false})
+
 
 
             }));
