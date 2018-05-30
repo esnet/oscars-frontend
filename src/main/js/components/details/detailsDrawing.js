@@ -6,7 +6,6 @@ import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 import VisUtils from '../../lib/vis'
 import HelpPopover from '../helpPopover';
 import {size} from 'lodash-es';
-import validator from "../../lib/validation";
 
 
 @inject('connsStore', 'modalStore', 'mapStore', 'topologyStore')
@@ -238,7 +237,7 @@ export default class DetailsDrawing extends Component {
 
             });
         }
-        console.log(edges);
+//        console.log(edges);
         let addedEdges = [];
         let addedNodes = [];
         for (let adjcy of this.props.topologyStore.adjacencies) {

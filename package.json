@@ -28,7 +28,7 @@
     "prop-types": "^15.5.10",
     "react": "^16.3.2",
     "react-addons-shallow-compare": "^15.6.0",
-    "react-bootstrap-table": "^4.0.1",
+    "react-bootstrap-table-next": "^0.1.12",
     "react-bootstrap-typeahead": "^2.5.1",
     "react-bs-notifier": "^5.0.0",
     "react-dates": "^12.2.4",

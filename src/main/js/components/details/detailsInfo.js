@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
 import {action, toJS} from 'mobx';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import BootstrapTable from 'react-bootstrap-table-next';
 
-import {Card, CardBody, CardHeader,
-    Nav, NavItem, NavLink,
-    TabPane, TabContent, Button, Collapse} from 'reactstrap';
+import {
+    Card, CardBody, CardHeader,
+    Nav, NavItem, NavLink, ListGroup, ListGroupItem,
+    TabPane, TabContent, Button, Collapse
+} from 'reactstrap';
 import DetailsGeneral from './detailsGeneral';
 import PropTypes from 'prop-types';
 import myClient from '../../agents/client';
@@ -14,6 +16,8 @@ import Moment from 'moment';
 import classnames from 'classnames';
 
 const format = 'Y/MM/DD HH:mm:ss';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+
 
 @inject('connsStore')
 @observer
@@ -25,12 +29,8 @@ export default class DetailsInfo extends Component {
     componentWillMount() {
         this.setState({
             junctionTab: 'commands',
-            ccUrn: {
-
-            },
-            ccType: {
-
-            }
+            ccUrn: {},
+            ccType: {}
         });
         this.refreshStatuses();
     }
@@ -117,14 +117,22 @@ export default class DetailsInfo extends Component {
             },
         ];
 
+        const columns = [{
+            dataField: 'k',
+            text: 'Field',
+            headerTitle: true
+        }, {
+            dataField: 'v',
+            text: 'Value',
+            headerTitle: true
+        }];
         return <Card>
             <CardHeader className='p-1'>Fixture</CardHeader>
             <CardBody>
-                <u>In progress!</u>
-                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                    <TableHeaderColumn dataField='k' isKey={true}/>
-                    <TableHeaderColumn dataField='v'/>
-                </BootstrapTable>
+                <BootstrapTable tableHeaderClass={'hidden'}
+                                keyField='k'
+                                data={info} columns={columns}
+                                bordered={false}/>
             </CardBody>
         </Card>
 
@@ -133,7 +141,7 @@ export default class DetailsInfo extends Component {
     setJunctionTab = (tab) => {
         if (this.state.junctionTab !== tab) {
             this.setState({
-                junctionTab : tab
+                junctionTab: tab
             });
         }
     };
@@ -177,15 +185,19 @@ export default class DetailsInfo extends Component {
                     <Nav tabs>
                         <NavItem>
                             <NavLink
-                                className={classnames({ active: this.state.junctionTab === 'commands' })}
-                                onClick={() => { this.setJunctionTab('commands'); }}>
+                                className={classnames({active: this.state.junctionTab === 'commands'})}
+                                onClick={() => {
+                                    this.setJunctionTab('commands');
+                                }}>
                                 Router commands
                             </NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink
-                                className={classnames({ active: this.state.junctionTab === 'diagnostics' })}
-                                onClick={() => { this.setJunctionTab('diagnostics'); }}>
+                                className={classnames({active: this.state.junctionTab === 'diagnostics'})}
+                                onClick={() => {
+                                    this.setJunctionTab('diagnostics');
+                                }}>
                                 Diagnostics
                             </NavLink>
                         </NavItem>
@@ -199,7 +211,7 @@ export default class DetailsInfo extends Component {
 
                                         return <Card key={c.type}>
                                             <CardHeader className='p-1'
-                                                onClick={() => this.toggleCommandCollapse(c.deviceUrn, c.type)}>
+                                                        onClick={() => this.toggleCommandCollapse(c.deviceUrn, c.type)}>
                                                 <NavLink href='#'>{c.type}</NavLink>
                                             </CardHeader>
                                             <CardBody>
@@ -240,6 +252,17 @@ export default class DetailsInfo extends Component {
 
     pipeInfo() {
         const d = this.props.connsStore.store.selected.data;
+
+        let ero = <ListGroup>
+            <ListGroupItem active>ERO</ListGroupItem>
+            {
+            d.azERO.map((entry) => {
+                return <ListGroupItem key={entry.urn}>{entry.urn}</ListGroupItem>;
+            })
+
+        }</ListGroup>
+
+
         const info = [
             {
                 'k': 'A',
@@ -258,20 +281,27 @@ export default class DetailsInfo extends Component {
                 'v': d.zaBandwidth + ' Mbps'
             },
         ];
-        for (let i = 0; i < d.azERO.length; i++) {
-            info.push({k: '', v: d.azERO[i].urn});
-        }
 
+        const columns = [{
+            dataField: 'k',
+            text: 'Field',
+            headerTitle: true
+        }, {
+            dataField: 'v',
+            text: 'Value',
+            headerTitle: true
+        }];
 
         return <Card>
             <CardHeader className='p-1'>Pipes</CardHeader>
             <CardBody>
 
-                <u>In progress!</u>
-                <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                    <TableHeaderColumn dataField='k' isKey={true}/>
-                    <TableHeaderColumn dataField='v'/>
-                </BootstrapTable>
+                <BootstrapTable keyField='k'
+                                columns={columns}
+                                data={info}
+                                bordered={false}/>
+                <hr />
+                {ero}
             </CardBody>
         </Card>
 

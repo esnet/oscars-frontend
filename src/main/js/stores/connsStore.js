@@ -1,5 +1,7 @@
 import { observable, action } from 'mobx';
 import {isArray, mergeWith} from 'lodash-es';
+import transformer from "../lib/transform";
+import myClient from "../agents/client";
 
 class ConnectionsStore {
 
@@ -23,32 +25,44 @@ class ConnectionsStore {
     };
 
     @observable controls = {
-        general: {
+        buildmode: {
+            ok: false,
+            show: false,
+            text: ''
+        },
+        build: {
+            ok: false,
+            show: false,
+            text: ''
+        },
+        dismantle: {
+            ok: false,
+            show: false,
+            text: ''
+        },
+        release: {
+            ok: false,
+            show: false,
+            text: ''
+        },
+        help: {
             build: {
-                display: false,
-                enable: false,
-                clicked: false
+                'header': null,
+                'body': null,
+            },
+            buildMode: {
+                'header': null,
+                'body': null,
+            },
+            release: {
+                'header': null,
+                'body': null,
             },
             dismantle: {
-                display: false,
-                enable: false,
-                clicked: false
+                'header': null,
+                'body': null,
             },
-            auto: {
-                display: false,
-                enable: false,
-                clicked: false
-            },
-            manual: {
-                display: false,
-                enable: false,
-                clicked: false
-            },
-            cancel: {
-                display: false,
-                enable: false,
-                clicked: false
-            }
+
         }
     };
 
@@ -66,8 +80,11 @@ class ConnectionsStore {
         this.store.commands = commands;
     }
 
-    @action setControl(unit, control, params) {
-        this.controls[unit][control] = params;
+    @action setControl(unit, params) {
+        this.controls[unit] = params;
+    }
+    @action setControlHelp(unit, params) {
+        this.controls.help[unit] = params;
     }
 
 
@@ -96,6 +113,18 @@ class ConnectionsStore {
     @action updateList(resvs) {
         this.store.conns = [];
         this.store.conns = resvs;
+    }
+    @action refreshCurrent() {
+        myClient.submitWithToken('GET', '/api/conn/info/' + this.store.current.connectionId)
+            .then(action(
+                (response) => {
+                    let conn = JSON.parse(response);
+                    transformer.fixSerialization(conn);
+                    this.setCurrent(conn);
+
+                }));
+
+
     }
 
     findConnection(connectionId) {
