@@ -17,10 +17,12 @@ import myClient from '../agents/client';
 class ConnectionsList extends Component {
 
     componentWillMount() {
+        /*
         this.props.connsStore.setFilter({
             criteria: ['phase'],
             phase: 'RESERVED'
         });
+        */
 
         this.updateList();
     }
