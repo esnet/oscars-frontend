@@ -64,6 +64,7 @@ export default class NavBar extends Component {
                 </DropdownToggle>
                 <DropdownMenu>
                     <NavLink href='/pages/admin/users'>Users</NavLink>
+                    <NavLink href='/pages/admin/tags'>Tags</NavLink>
                 </DropdownMenu>
             </UncontrolledDropdown>
         }

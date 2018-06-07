@@ -47,8 +47,8 @@ export default class SelectPortTypeahead extends Component {
 
             let fixture = this.props.designStore.addFixtureDeep(params);
 
-            this.props.mapStore.addColoredNode({id: device, color: 'green'});
-            this.props.mapStore.setZoomOnColored(true);
+            // this.props.mapStore.addColoredNode({id: device, color: 'green'});
+            // this.props.mapStore.setZoomOnColored(true);
 
             const editFixtureParams = transformer.newFixtureToEditParams(fixture);
             this.props.controlsStore.setParamsForEditFixture(editFixtureParams);

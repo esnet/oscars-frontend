@@ -215,6 +215,20 @@ class DesignStore {
     @action
     lockFixture(id, params) {
         let outLabel = null;
+        let error = false;
+        this.design.fixtures.map((entry) => {
+            if (entry.id !== id) {
+                if (entry.port === params.port) {
+                    if (entry.vlan === params.vlan) {
+                        console.log('ERROR; duplicate VLAN detected when locking');
+                        error = true;
+                    }
+                }
+            }
+        });
+        if (error) {
+            return;
+        }
         this.design.fixtures.map((entry) => {
             if (entry.id === id) {
                 outLabel = entry.port.split(':')[1] + ':' + params.vlan;

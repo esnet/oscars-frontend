@@ -293,7 +293,7 @@ export default class ScheduleControls extends Component {
 
         let unlockControl = <div>
             <ConfirmModal onConfirm={this.unlockSchedule}
-                          buttonText={'Unlock'}
+                          uiElement={<Button color='warning'>{'Unlock'}</Button>}
                           header='Unlock schedule'
                           body={'Unlocking the schedule will unlock all components and\n' +
             '                    release any held resources, including pipe and fixture bandwidths and VLANs.'}
@@ -308,34 +308,33 @@ export default class ScheduleControls extends Component {
 
 
         return (
-            <Card>
+            <Card className='p-1'>
                 <CardHeader className='p-1'>Schedule {' '} {help}</CardHeader>
-                <CardBody>
-                    <Form>
-                        <small>Timezone: {timezone.name()}</small>
+                <CardBody className='p-1'>
+                    <Form className='p-1 m-1'>
 
-                        <FormGroup >
-                            <Label>Start:</Label>
+                        <FormGroup className='p-1'>
+                            <Label className='p-1'>Start:</Label>
                             <Input type='text'
                                    valid = {sched.start.validationState === 'success'}
                                    invalid = {sched.start.validationState === 'error'}
                                    defaultValue='in 15 minutes'
                                    disabled={sched.locked}
                                    onChange={this.onStartDateChange}/>
-                            <FormFeedback>{sched.start.validationText}</FormFeedback>
-                            <FormText>{sched.start.readable}</FormText>
+                            <FormFeedback className='p-1'>{sched.start.validationText}</FormFeedback>
+                            <FormText className='p-1'>{sched.start.readable}</FormText>
                         </FormGroup>
                         {' '}
-                        <FormGroup >
-                            <Label>End:</Label>
+                        <FormGroup className='p-1'>
+                            <Label className='p-1'>End:</Label>
                             <Input type='text'
                                    valid = {sched.end.validationState === 'success'}
                                    invalid = {sched.end.validationState === 'error'}
                                    disabled={sched.locked}
                                    defaultValue='in 1 year'
                                    onChange={this.onEndDateChange}/>
-                            <FormFeedback>{sched.end.validationText}</FormFeedback>
-                            <FormText>{sched.end.readable}</FormText>
+                            <FormFeedback className='p-1'>{sched.end.validationText}</FormFeedback>
+                            <FormText className='p-1'>{sched.end.readable}</FormText>
                         </FormGroup>
                         <ToggleDisplay show={!sched.locked && sched.acceptable && conn.phase === 'HELD'}>
 
@@ -345,7 +344,7 @@ export default class ScheduleControls extends Component {
 
                             {unlockControl}
                         </ToggleDisplay>
-
+                        <small>Timezone: {timezone.name()}</small>
                     </Form>
                 </CardBody>
 

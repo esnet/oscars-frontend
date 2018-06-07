@@ -36,9 +36,50 @@ export default class VlanSelect extends Component {
             return;
         }
 
+
+
+        let portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
+        portVlans.sort();
+
         const available = this.props.topologyStore.available[ef.port];
-        const availableVlanExpression = available.vlanExpression;
-        const availableVlanRanges = available.vlanRanges;
+        let availableVlanRanges = available.vlanRanges.slice();
+
+        for (let vlan of portVlans) {
+            let temp = [];
+            for (let range of availableVlanRanges) {
+                if (vlan === range.floor) {
+                    if (range.floor === range.ceiling) {
+                        // do not append this range, single-element range gets completely removed
+                    } else {
+                        range.floor = range.floor +1;
+                        temp.push(range);
+                    }
+                } else if (vlan === range.ceiling) {
+                    range.ceiling = range.ceiling - 1;
+                    temp.push(range);
+                } else if (vlan > range.floor && vlan < range.ceiling) {
+                    let r1 = {floor: range.floor, ceiling: vlan -1 };
+                    let r2 = {floor: vlan+1, ceiling: range.ceiling };
+                    temp.push(r1);
+                    temp.push(r2);
+                } else {
+                    temp.push(range);
+                }
+            }
+            availableVlanRanges = temp.slice()
+        }
+
+        let expressionParts = [];
+
+        for (let range of availableVlanRanges) {
+            if (range.floor === range.ceiling) {
+                expressionParts.push(range.floor)
+            } else {
+                expressionParts.push(range.floor+'-'+range.ceiling);
+            }
+        }
+        const availableVlanExpression = expressionParts.join(',');
+
 
         let suggestion = this.props.topologyStore.suggestions.globalVlan;
 
@@ -54,7 +95,7 @@ export default class VlanSelect extends Component {
         }
 
         for (let f of this.props.designStore.design.fixtures) {
-            if (f.locked) {
+            if (f.locked && f.port !== ef.port) {
                 for (let rng of availableVlanRanges) {
                     if (f.vlan >= rng.floor && f.vlan <= rng.ceiling) {
                         suggestion = f.vlan;
@@ -131,7 +172,6 @@ export default class VlanSelect extends Component {
                 valText = 'VLAN reserved by another connection.';
 
                 let portVlans = this.props.designStore.vlansLockedOnPort(ef.port);
-                console.log(portVlans);
                 if (portVlans.includes(vlanId)) {
                     valText = 'VLAN being used in this connection (by another fixture on this port).';
                 }

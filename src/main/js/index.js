@@ -16,11 +16,13 @@ import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AboutApp from './apps/about';
 import TimeoutApp from './apps/timeout';
+import ErrorApp from './apps/error';
 
 import StatusApp from './apps/statusApp';
 import MapApp from './apps/mapApp';
 import AccountApp from './apps/accountApp';
 import AdminUsersApp from './apps/usersAdminApp';
+import AdminTagsApp from './apps/adminTagsApp';
 import ConnectionDetails from './apps/detailsApp';
 import Login from './apps/login';
 import Logout from './apps/logout';
@@ -30,12 +32,14 @@ import NavBar from './components/navbar'
 import accountStore from './stores/accountStore';
 import commonStore from './stores/commonStore';
 import controlsStore from './stores/controlsStore';
+import heldStore from './stores/heldStore';
 import mapStore from './stores/mapStore';
 import designStore from './stores/designStore';
 import topologyStore from './stores/topologyStore';
 import connsStore from './stores/connsStore';
 import userStore from './stores/userStore';
 import modalStore from './stores/modalStore';
+import tagStore from './stores/tagStore';
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -77,8 +81,10 @@ const stores = {
     controlsStore,
     mapStore,
     designStore,
+    heldStore,
     topologyStore,
     userStore,
+    tagStore,
     modalStore
 };
 
@@ -105,10 +111,12 @@ ReactDOM.render(
                     <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
                     <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
                     <PrivateRoute exact path="/pages/timeout" component={TimeoutApp}/>
+                    <PrivateRoute exact path="/pages/error" component={ErrorApp}/>
                     <PrivateRoute exact path="/pages/account" component={AccountApp}/>
                     <PrivateRoute exact path="/pages/status" component={StatusApp}/>
                     <PrivateRoute exact path="/pages/map" component={MapApp}/>
                     <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
+                    <AdminRoute exact path="/pages/admin/tags" component={AdminTagsApp}/>
                 </Switch>
             </Container>
         </BrowserRouter>

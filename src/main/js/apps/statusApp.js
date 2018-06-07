@@ -6,6 +6,8 @@ import {
     CardHeader, CardBody, TabPane, TabContent
 } from 'reactstrap';
 
+import { LazyLog, ScrollFollow } from 'react-lazylog';
+
 import classnames from 'classnames';
 
 @inject('connsStore', 'commonStore')
@@ -63,6 +65,15 @@ export default class StatusApp extends Component {
                                         }}
                                     >Topology</NavLink>
                                 </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        className={classnames({active: this.state.activeTab === 'log'})}
+                                        onClick={() => {
+                                            this.toggle('log');
+                                        }}
+                                    >Logs</NavLink>
+                                </NavItem>
+
                             </Nav>
 
                             <div>
@@ -91,6 +102,16 @@ export default class StatusApp extends Component {
                                         <p>Consistent: <b>NO</b></p>
                                         <p>Issues: <b>(+)</b> expand</p>
                                     </TabPane>
+                                    <TabPane tabId='log' style={{ height: 500 }}>
+                                        <ScrollFollow
+                                            startFollowing={true}
+                                            render={({ follow, onScroll }) => (
+                                                <LazyLog url='/api/log' stream selectableLines
+                                                         follow={follow} onScroll={onScroll} />
+                                            )}
+                                        />
+                                    </TabPane>
+
                                 </TabContent>
                             </div>
                         </CardBody>

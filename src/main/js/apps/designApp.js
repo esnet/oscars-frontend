@@ -16,6 +16,7 @@ import ScheduleControls from '../components/design/scheduleControls';
 import ConnectionControls from '../components/design/connectionControls';
 import SelectPortTypeahead from '../components/design/selectPortTypeahead';
 import HoldTimer from '../components/design/holdTimer';
+import HeldList from '../components/design/heldList';
 
 @inject('controlsStore', 'mapStore', 'designStore', 'commonStore', 'modalStore')
 export default class DesignApp extends Component {
@@ -58,6 +59,7 @@ export default class DesignApp extends Component {
                 <Col md={3} sm={3}>
                     <ConnectionControls />
                     <ScheduleControls />
+                    <HeldList/>
                 </Col>
                 <Col md={6} sm={6}>
                     <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>

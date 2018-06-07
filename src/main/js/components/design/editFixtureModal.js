@@ -66,6 +66,7 @@ export default class EditFixtureModal extends Component {
 
         tParams.ingress = ef.bw.ingress.mbps;
         tParams.egress = ef.bw.egress.mbps;
+        tParams.port = ef.port;
 
 
         tParams.vlan = ef.vlan.vlanId;
@@ -132,7 +133,7 @@ export default class EditFixtureModal extends Component {
 
                                 <ConfirmModal body='Are you ready to delete this fixture?'
                                               header='Delete fixture'
-                                              buttonText='Delete'
+                                              uiElement={<Button color='warning'>{'Delete'}</Button>}
                                               onConfirm={() => {
                                                   this.deleteFixture(true)
                                               }}/>

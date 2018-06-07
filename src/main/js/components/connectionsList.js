@@ -1,11 +1,15 @@
 import React, {Component} from 'react';
-import {Card, CardBody, CardHeader, Table, Form, Input, FormGroup, Label} from 'reactstrap';
+import {Card, CardBody, ListGroupItem, ListGroup} from 'reactstrap';
 import Moment from 'moment';
 import {toJS, autorun} from 'mobx';
 import {observer, inject} from 'mobx-react';
 import transformer from '../lib/transform';
-import {withRouter, Link} from 'react-router-dom'
+import {withRouter, Link} from 'react-router-dom';
 
+import BootstrapTable from 'react-bootstrap-table-next';
+import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
+import filterFactory, {textFilter, selectFilter} from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import myClient from '../agents/client';
 
 @inject('controlsStore', 'connsStore', 'mapStore', 'modalStore', 'commonStore')
@@ -13,10 +17,12 @@ import myClient from '../agents/client';
 class ConnectionsList extends Component {
 
     componentWillMount() {
+        /*
         this.props.connsStore.setFilter({
             criteria: ['phase'],
             phase: 'RESERVED'
         });
+        */
 
         this.updateList();
     }
@@ -27,7 +33,7 @@ class ConnectionsList extends Component {
 
     disposeOfUpdateList = autorun(() => {
         this.updateList();
-    }, { delay: 1000 });
+    }, {delay: 1000});
 
     updateList = () => {
         let filter = {};
@@ -59,79 +65,97 @@ class ConnectionsList extends Component {
 
     };
 
-    selectedPhaseChanged = (e) => {
-        let phase = e.target.value;
-        this.props.connsStore.setFilter({
-            criteria: ['phase'],
-            phase: phase
-        });
+    hrefIdFormatter = (cell, row) => {
+        const href = '/pages/details/' + row.connectionId;
+        return <Link to={href}>{row.connectionId}</Link>;
 
+    };
+
+    fixtureFormatter = (cell, row) => {
+        let result = row.fixtures.map((f) => {
+            let key = row.connectionId+':'+f.portUrn + '#' + f.vlan.vlanId;
+            return <ListGroupItem className='m-1 p-1' key={key}><small>{f.portUrn + '#' + f.vlan.vlanId}</small></ListGroupItem>
+        });
+        return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
 
     render() {
         const format = 'Y/MM/DD HH:mm';
+        const phaseOptions = {
+            'RESERVED': 'Reserved',
+            'ARCHIVED': 'Archived'
 
+        };
+        const columns = [
+            {
+                text: 'Connection ID',
+                dataField: 'connectionId',
+                filter: textFilter({delay: 100}),
+                formatter: this.hrefIdFormatter
 
-        let rows = this.props.connsStore.store.conns.map((c) => {
+            },
+            {
+                dataField: 'description',
+                text: 'Description',
+                filter: textFilter({delay: 100})
+            },
+            {
+                dataField: 'phase',
+                text: 'Phase',
+                filter: selectFilter({options: phaseOptions, defaultValue: 'RESERVED'})
+            },
+
+            {
+                dataField: 'username',
+                text: 'User',
+                filter: textFilter({delay: 100})
+            },
+            {
+                dataField: 'fixtureString',
+                text: 'Fixtures',
+                formatter: this.fixtureFormatter,
+                filter: textFilter({delay: 100})
+            },
+        ];
+
+        let rows = [];
+
+        this.props.connsStore.store.conns.map((c) => {
             const beg = Moment(c.archived.schedule.beginning * 1000);
             const end = Moment(c.archived.schedule.ending * 1000);
 
             let beginning = beg.format(format) + ' (' + beg.fromNow() + ')';
             let ending = end.format(format) + ' (' + end.fromNow() + ')';
+            let fixtures = [];
+            let fixtureBits = [];
+            c.archived.cmp.fixtures.map((f) => {
+                fixtures.push(f);
+                const fixtureBit = f.portUrn + '#'+f.vlan.vlanId;
+                fixtureBits.push(fixtureBit);
+            });
+            let fixtureString = fixtureBits.join(' ');
 
-            return (
-                <tr key={c.connectionId}>
-                    <td><Link to={'/pages/details/' + c.connectionId}>{c.connectionId}</Link></td>
-                    <td>
-                        <div>{c.description}</div>
-                        <div>{c.username}</div>
-                    </td>
-                    <td>
-                        {
-                            c.archived.cmp.fixtures.map((f) => {
-                                return <div
-                                    key={c.connectionId+':'+f.portUrn + ':' + f.vlan.vlanId}>{f.portUrn + ':' + f.vlan.vlanId}</div>
-                            })
-                        }
-                    </td>
-                    <td>
-                        <div>{c.phase}</div>
-                        <div>{c.state}</div>
-                    </td>
-                    <td>
-                        <div>Beginning: {beginning}</div>
-                        <div>Ending: {ending}</div>
-                    </td>
-                </tr>);
+            let row = {
+                connectionId: c.connectionId,
+                description: c.description,
+                phase: c.phase,
+                state: c.state,
+                username: c.username,
+                fixtures: fixtures,
+                fixtureString: fixtureString,
+                beginning: beginning,
+                ending: ending
+            };
+            rows.push(row);
         });
-
+        console.log(rows);
 
         return <Card>
             <CardBody>
-                <h3>Filters:</h3>
-                <FormGroup>
-                    <Label>Phase:</Label>
-                    <Input type="select" onChange={this.selectedPhaseChanged}>
-                        <option key='RESERVED' value='RESERVED'>Reserved</option>
-                        <option key='ARCHIVED' value='ARCHIVED'>Archived</option>
+                <BootstrapTable keyField='connectionId' data={rows} columns={columns}
+                                pagination={paginationFactory()}
+                                filter={filterFactory()}/>
 
-                    </Input>
-                </FormGroup>
-                <h3>Connections</h3>
-                <Table striped bordered size='sm' hover>
-                    <thead>
-                    <tr>
-                        <th>Connection Id</th>
-                        <th><div>Description</div><div>Username</div></th>
-                        <th>Fixtures</th>
-                        <th>States</th>
-                        <th>Schedule</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {rows}
-                    </tbody>
-                </Table>
             </CardBody>
 
 

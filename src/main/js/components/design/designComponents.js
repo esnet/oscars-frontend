@@ -5,6 +5,7 @@ import {toJS} from 'mobx';
 import {
     Card, CardHeader, CardBody, CardSubtitle,
     NavLink, ListGroupItem, ListGroup,
+    Button
 } from 'reactstrap';
 import ToggleDisplay from 'react-toggle-display';
 
@@ -131,7 +132,7 @@ export default class DesignComponents extends Component {
                         <hr />
                         <ConfirmModal body='This will clear all components and start over. Are you ready?'
                                       header='Clear components'
-                                      buttonText='Clear'
+                                      uiElement={<Button color='primary'>{'Clear'}</Button>}
                                       onConfirm={this.clear}/>
 
                     </ToggleDisplay>

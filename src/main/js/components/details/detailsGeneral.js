@@ -1,21 +1,21 @@
 import React, {Component} from 'react';
 
 import {observer, inject} from 'mobx-react';
-import {action, toJS} from 'mobx';
 import Moment from 'moment';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import ToggleDisplay from 'react-toggle-display';
+import BootstrapTable from 'react-bootstrap-table-next';
 
 import {
     Card, CardBody, CardHeader,
     Nav, NavLink, NavItem,
+    ListGroup, ListGroupItem,
     TabPane, TabContent,
-    Button, Modal, ModalBody,
-    ModalHeader, ModalFooter
 } from 'reactstrap';
 import classnames from 'classnames';
-import myClient from '../../agents/client';
+
+import DetailsButtons from './detailsButtons';
 import DetailsDrawing from './detailsDrawing';
+import DetailsTags from './detailsTags';
+import HelpPopover from '../helpPopover';
 
 
 @inject('connsStore')
@@ -25,17 +25,12 @@ export default class DetailsGeneral extends Component {
         super(props);
     }
 
-    componentWillUnmount() {
-        clearTimeout(this.refreshTimeout);
-    }
 
     componentWillMount() {
         this.setState({
-            releaseModalOpen: false,
             tab: 'drawing'
         });
 
-        this.refreshControls();
     }
 
     setTab = (tab) => {
@@ -46,169 +41,9 @@ export default class DetailsGeneral extends Component {
         }
     };
 
-    build = () => {
-        const conn = this.props.connsStore.store.current;
-        myClient.submitWithToken('GET', '/protected/pss/build/' + conn.connectionId, '')
-            .then(action((response) => {
-                this.props.connsStore.setControl('general', 'build', {
-                    clicked: true,
-                    display: false,
-                    enabled: false,
-                });
-                this.props.connsStore.setControl('general', 'dismantle', {
-                    clicked: false,
-                    display: false,
-                    enabled: false,
-                });
-            }));
-
-    };
-    dismantle = () => {
-        const conn = this.props.connsStore.store.current;
-        myClient.submitWithToken('GET', '/protected/pss/dismantle/' + conn.connectionId, '')
-            .then(action((response) => {
-                this.props.connsStore.setControl('general', 'dismantle', {
-                    clicked: true,
-                    display: false,
-                    enabled: false,
-                });
-                this.props.connsStore.setControl('general', 'build', {
-                    clicked: false,
-                    display: false,
-                    enabled: false,
-                });
-            }));
-
-
-    };
-
-    auto = () => {
-        let current = this.props.connsStore.store.current;
-        myClient.submitWithToken('POST', '/protected/conn/mode/' + current.connectionId, 'AUTOMATIC')
-            .then(action((response) => {
-                this.props.connsStore.setControl('general', 'auto', {
-                    clicked: true,
-                    display: false,
-                    enabled: false,
-                });
-                this.props.connsStore.setControl('general', 'manual', {
-                    clicked: false,
-                    display: false,
-                    enabled: false,
-                });
-            }));
-
-    };
-
-    manual = () => {
-        let current = this.props.connsStore.store.current;
-        myClient.submitWithToken('POST', '/protected/conn/mode/' + current.connectionId, 'MANUAL')
-            .then(action((response) => {
-                this.props.connsStore.setControl('general', 'manual', {
-                    clicked: true,
-                    display: false,
-                    enabled: false,
-                });
-                this.props.connsStore.setControl('general', 'auto', {
-                    clicked: false,
-                    display: false,
-                    enabled: false,
-                });
-            }));
-    };
-
-    doRelease = () => {
-        let current = this.props.connsStore.store.current;
-        myClient.submitWithToken('POST', '/protected/conn/cancel', current.connectionId)
-            .then(action((response) => {
-                current.phase = response.replace(/"/g, '');
-                this.props.connsStore.setControl('general', 'cancel', {
-                    clicked: true,
-                    display: false,
-                    enabled: false,
-                });
-
-            }));
-
-        this.closeReleaseModal();
-        return false;
-    };
-
-    closeReleaseModal = () => {
-        this.setState({
-            releaseModalOpen: false
-        });
-
-    };
-
-    toggleReleaseModal = () => {
-        this.setState({
-            releaseModalOpen: !this.state.releaseModalOpen
-        });
-    };
-
-    // bleh
-    refreshControls = () => {
-        const conn = this.props.connsStore.store.current;
-        const controls = this.props.connsStore.controls;
-
-        const beg = Moment(conn.archived.schedule.beginning * 1000);
-        const end = Moment(conn.archived.schedule.ending * 1000);
-        let inInterval = false;
-        if (beg.isBefore(new Moment()) && end.isAfter(new Moment())) {
-            inInterval = true
-        }
-
-        const isReserved = (conn.connectionId !== '' && conn.phase === 'RESERVED');
-        if (!controls.general.cancel.clicked) {
-            this.props.connsStore.setControl('general', 'cancel', {
-                clicked: false,
-                display: isReserved,
-                enabled: isReserved,
-            });
-
-        }
-        const canBuild = (inInterval && isReserved && conn.mode === 'MANUAL' && conn.state === 'WAITING');
-        const canDismantle = (inInterval && isReserved && conn.mode === 'MANUAL' && conn.state === 'ACTIVE');
-        const canAuto = isReserved && conn.mode === 'MANUAL';
-        const canManual = isReserved && conn.mode === 'AUTOMATIC';
-
-        if (!controls.general.build.clicked) {
-            this.props.connsStore.setControl('general', 'build', {
-                clicked: false,
-                display: canBuild,
-                enabled: canBuild,
-            });
-        }
-        if (!controls.general.dismantle.clicked) {
-            this.props.connsStore.setControl('general', 'dismantle', {
-                clicked: false,
-                display: canDismantle,
-                enabled: canDismantle,
-            });
-        }
-        if (!controls.general.auto.clicked) {
-            this.props.connsStore.setControl('general', 'auto', {
-                clicked: false,
-                display: canAuto,
-                enabled: canAuto,
-            });
-        }
-        if (!controls.general.manual.clicked) {
-            this.props.connsStore.setControl('general', 'manual', {
-                clicked: false,
-                display: canManual,
-                enabled: canManual,
-            });
-        }
-        this.refreshTimeout = setTimeout(this.refreshControls, 5000); // update per 5 seconds
-
-
-    };
 
     render() {
         const conn = this.props.connsStore.store.current;
-        const controls = this.props.connsStore.controls;
         const format = 'Y/MM/DD HH:mm';
         const beg = Moment(conn.archived.schedule.beginning * 1000);
         const end = Moment(conn.archived.schedule.ending * 1000);
@@ -224,18 +59,6 @@ export default class DetailsGeneral extends Component {
                 'v': conn.username
             },
             {
-                'k': 'Phase',
-                'v': conn.phase
-            },
-            {
-                'k': 'State',
-                'v': conn.state
-            },
-            {
-                'k': 'Mode',
-                'v': conn.mode
-            },
-            {
                 'k': 'Begins',
                 'v': beginning
             },
@@ -245,6 +68,36 @@ export default class DetailsGeneral extends Component {
             },
         ];
 
+        const columns = [{
+            dataField: 'k',
+            text: 'Field',
+            headerTitle: true
+        }, {
+            dataField: 'v',
+            text: 'Value',
+            headerTitle: true
+        }];
+        const phaseTexts = {
+            'RESERVED': 'Reserved',
+            'ARCHIVED': 'Archived',
+            'HELD': 'Held',
+        };
+        const modeTexts = {
+            'MANUAL': 'Manual',
+            'AUTOMATIC': 'Scheduled',
+        };
+        const stateTexts = {
+            'ACTIVE': 'Active',
+            'WAITING': 'Waiting',
+            'FAILED': 'Failed',
+            'FINISHED': 'Finished',
+        };
+
+        let states = <ListGroup>
+            <ListGroupItem>Phase: {phaseTexts[conn.phase]} {this.phaseHelp(conn.phase)}</ListGroupItem>
+            <ListGroupItem>State: {stateTexts[conn.state]} {this.stateHelp(conn.state)}</ListGroupItem>
+            <ListGroupItem>Build mode: {modeTexts[conn.mode]} {this.modeHelp(conn.mode)}</ListGroupItem>
+        </ListGroup>;
 
         return (
             <Card>
@@ -270,54 +123,33 @@ export default class DetailsGeneral extends Component {
                                 Info
                             </NavLink>
                         </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.tab === 'tags'})}
+                                onClick={() => {
+                                    this.setTab('tags');
+                                }}>
+                                Tags
+                            </NavLink>
+                        </NavItem>
+
                     </Nav>
                     <TabContent activeTab={this.state.tab}>
                         <TabPane tabId='info' title='Info'>
 
-                            <BootstrapTable tableHeaderClass={'hidden'} data={info} bordered={false}>
-                                <TableHeaderColumn dataField='k' isKey={true}/>
-                                <TableHeaderColumn dataField='v'/>
-                            </BootstrapTable>
-                            <ToggleDisplay show={controls.general.manual.display}>
-                                <Button color='info' disabled={!controls.general.manual.enabled} onClick={this.manual}
-                                        className='float-left'>Set mode to MANUAL</Button>
-                            </ToggleDisplay>
+                            <BootstrapTable tableHeaderClass={'hidden'}
+                                            keyField='k'
+                                            columns={columns} data={info}
+                                            bordered={false}/>
+                            {states}
+                            <DetailsButtons />
 
-                            <ToggleDisplay show={controls.general.auto.display}>
-                                <Button color='info' disabled={!controls.general.auto.enabled} onClick={this.auto}
-                                        className='float-left'>Set mode to AUTO</Button>
-                            </ToggleDisplay>
-
-                            <ToggleDisplay show={controls.general.build.display}>
-                                <Button color='info' disabled={!controls.general.build.enabled} onClick={this.build}
-                                        className='float-left'>Build</Button>
-                            </ToggleDisplay>
-
-                            <ToggleDisplay show={controls.general.dismantle.display}>
-                                <Button color='info' disabled={!controls.general.dismantle.enabled}
-                                        onClick={this.dismantle}
-                                        className='float-left'>Dismantle</Button>
-                            </ToggleDisplay>
-
-                            <ToggleDisplay show={controls.general.cancel.display}>
-
-                                <Modal isOpen={this.state.releaseModalOpen} fade={false}
-                                       toggle={this.toggleReleaseModal}>
-                                    <ModalHeader toggle={this.toggleReleaseModal}>Release reservation</ModalHeader>
-                                    <ModalBody>
-                                        This will release all resources, and dismantle the reservation if it is
-                                        built. </ModalBody>
-                                    <ModalFooter>
-                                        <Button color='primary' onClick={this.doRelease}>Release</Button>{' '}
-                                        <Button color='secondary' onClick={this.closeReleaseModal}>Never mind</Button>
-                                    </ModalFooter>
-                                </Modal>
-                                <Button color='primary' onClick={this.toggleReleaseModal}>Release</Button>
-
-                            </ToggleDisplay>
                         </TabPane>
                         <TabPane tabId='drawing' title='Drawing'>
                             <DetailsDrawing/>
+                        </TabPane>
+                        <TabPane tabId='tags' title='Tags'>
+                            <DetailsTags/>
                         </TabPane>
                     </TabContent>
 
@@ -325,6 +157,50 @@ export default class DetailsGeneral extends Component {
                 </CardBody>
 
             </Card>);
+
+    }
+
+    phaseHelp(phase) {
+        const header = <span>Phase help</span>;
+        let body = <span>Phases refer to the connection's lifecycle in regards to resource reservation. There
+        are three phases:
+            <ul>
+                <li><b>Held</b>: very short term, before the connection has been committed.</li>
+                <li><b>Reserved</b>: after the connection has been committed and before end time.</li>
+                <li><b>Archived</b>: after end time or after being released.</li>
+            </ul></span>;
+        return <span className='float-right'>
+            <HelpPopover header={header} body={body} placement='right' popoverId='phase-help'/>
+        </span>;
+
+    }
+
+    stateHelp(state) {
+        const header = <span>State help</span>;
+        let body = <span>State refers to the connection's lifecycle in regards to network configuration. The main
+            states are as follows:
+            <ul>
+                <li><b>Waiting</b>: when the connection is still waiting to be built</li>
+                <li><b>Active</b>: when successfully configured and operational,</li>
+                <li><b>Finished</b>: after the connection end time (or after release)</li>
+                <li><b>Failed</b>: when something's wrong.</li>
+            </ul></span>;
+        return <span className='float-right'>
+            <HelpPopover header={header} body={body} placement='right' popoverId='state-help'/>
+        </span>;
+
+    }
+    modeHelp(mode) {
+        const header = <span>Build mode help</span>;
+        let body = <span>Build mode refers to the connection's setting regarding when / how it will
+            configure network devices. There are two modes:
+            <ul>
+                <li><b>Scheduled</b>: OSCARS will build the connection automatically</li>
+                <li><b>Manual</b>: OSCARS will wait for a user command to build </li>
+            </ul></span>;
+        return <span className='float-right'>
+            <HelpPopover header={header} body={body} placement='right' popoverId='state-help'/>
+        </span>;
 
     }
 }

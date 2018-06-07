@@ -9,7 +9,7 @@ import myClient from '../../agents/client';
 import Transformer from '../../lib/transform';
 import {autorun, toJS, action} from 'mobx';
 
-@inject('controlsStore', 'designStore', 'topologyStore')
+@inject('controlsStore', 'designStore', 'topologyStore', 'commonStore')
 @observer
 class HoldTimer extends Component {
 
@@ -146,6 +146,12 @@ class HoldTimer extends Component {
         let delay = 10000;
 
         let conn = this.props.controlsStore.connection;
+        // do not extend if we don't have a connection id
+        if (conn.connectionId == null) {
+            this.extendHoldTimeout = setTimeout(this.extendHold, delay);
+            return;
+        }
+
         // do not extend if user is idle; check again later in case they become un-idle
         if (conn.held.idle) {
 //            console.log('not extending hold for idle');
@@ -163,6 +169,22 @@ class HoldTimer extends Component {
             myClient.submitWithToken('GET', '/protected/extend_hold/' + conn.connectionId)
                 .then(
                     action((response) => {
+                        // negative means we got kicked out or some such
+                        if (response < 0) {
+                            this.props.controlsStore.clearEditConnection();
+                            this.props.controlsStore.clearEditDesign();
+                            this.props.designStore.clear();
+                            this.props.controlsStore.clearSessionStorage();
+                            this.props.designStore.clearSessionStorage();
+                            this.props.commonStore.addAlert({
+                                id: (new Date()).getTime(),
+                                type: 'danger',
+                                headline: 'Extend hold rejected!',
+                                message: 'Could not extend hold; possibly past start time, or another user cleared this'
+                            });
+                            this.props.history.push('/pages/error');
+
+                        }
                         this.props.controlsStore.setParamsForConnection({
                             held: {
                                 until: Moment.unix(response + 100)
@@ -216,18 +238,38 @@ class HoldTimer extends Component {
         myClient.submitWithToken('POST', '/protected/hold', connection)
             .then(
                 action((response) => {
-                    // console.log(response);
+                    let parsed = JSON.parse(response);
+                    if (parsed.validity != null) {
+                        if (parsed.validity.valid  === false) {
+                            console.log('not valid hold');
+                            this.props.controlsStore.clearEditConnection();
+                            this.props.controlsStore.clearEditDesign();
+                            this.props.designStore.clear();
+                            this.props.controlsStore.clearSessionStorage();
+                            this.props.designStore.clearSessionStorage();
+                            this.props.commonStore.addAlert({
+                                id: (new Date()).getTime(),
+                                type: 'danger',
+                                headline: 'Resource hold rejected!',
+                                message: parsed.validity.message
+                            });
+                            this.props.history.push('/pages/error');
+                            return;
+                        }
+                    }
+
                     this.props.controlsStore.setParamsForConnection({
                         held: {
-                            until: Moment.unix(response.heldUntil)
+                            until: Moment.unix(parsed.heldUntil)
                         }
                     });
                     this.props.controlsStore.saveToSessionStorage();
                     this.props.designStore.saveToSessionStorage();
 
+
                     const startSec = conn.schedule.start.at.getTime() / 1000;
                     const endSec = conn.schedule.end.at.getTime() / 1000;
-                    // this.props.topologyStore.loadAvailable(startSec, endSec);
+                    this.props.topologyStore.loadAvailable(startSec, endSec);
                 }));
 
 
