@@ -145,7 +145,7 @@ export default class ConnectionControls extends Component {
                             {help}
                             {' '}
                             <Input type='select' onChange={this.onBuildModeChange}>
-                                <option value='AUTOMATIC'>Auto</option>
+                                <option value='AUTOMATIC'>Scheduled</option>
                                 <option value='MANUAL'>Manual</option>
                             </Input>
                         </FormGroup>

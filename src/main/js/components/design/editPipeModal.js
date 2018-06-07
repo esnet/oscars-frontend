@@ -517,8 +517,8 @@ export default class EditPipeModal extends Component {
                                      onBwValid={this.onBwValid}
         />;
 
-        const help = this.makePipeHelp();
-        const bwHelp = this.makeBwHelp();
+        const help = EditPipeModal.makePipeHelp();
+        const bwHelp = EditPipeModal.makeBwHelp();
 
         let alert = null;
         let bwModeBox = <FormGroup check inline>
@@ -678,7 +678,7 @@ export default class EditPipeModal extends Component {
 
                         <ConfirmModal body='Are you ready to delete this pipe?'
                                       header='Delete pipe'
-                                      buttonText='Delete'
+                                      uiElement={<Button color='warning'>{'Delete'}</Button>}
                                       onConfirm={this.deletePipe}/>
                         {' '}
                         <ToggleDisplay show={!ep.locked}>
@@ -696,7 +696,15 @@ export default class EditPipeModal extends Component {
     }
 
 
-    makePipeHelp() {
+    setEroTab = (tab) => {
+        if (this.state.eroTab !== tab) {
+            this.setState({
+                eroTab : tab
+            });
+        }
+    };
+
+    static makePipeHelp() {
 
 
         const helpHeader = <span>Pipe controls</span>;
@@ -719,15 +727,7 @@ export default class EditPipeModal extends Component {
     }
 
 
-    setEroTab = (tab) => {
-        if (this.state.eroTab !== tab) {
-            this.setState({
-                eroTab : tab
-            });
-        }
-    };
-
-    makeBwHelp() {
+    static makeBwHelp() {
 
         const bwHelpHeader = <span>Pipe controls</span>;
         const bwHelpBody = <span>

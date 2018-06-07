@@ -14,6 +14,7 @@ import classnames from 'classnames';
 
 import DetailsButtons from './detailsButtons';
 import DetailsDrawing from './detailsDrawing';
+import DetailsTags from './detailsTags';
 import HelpPopover from '../helpPopover';
 
 
@@ -76,11 +77,26 @@ export default class DetailsGeneral extends Component {
             text: 'Value',
             headerTitle: true
         }];
+        const phaseTexts = {
+            'RESERVED': 'Reserved',
+            'ARCHIVED': 'Archived',
+            'HELD': 'Held',
+        };
+        const modeTexts = {
+            'MANUAL': 'Manual',
+            'AUTOMATIC': 'Scheduled',
+        };
+        const stateTexts = {
+            'ACTIVE': 'Active',
+            'WAITING': 'Waiting',
+            'FAILED': 'Failed',
+            'FINISHED': 'Finished',
+        };
 
         let states = <ListGroup>
-            <ListGroupItem>Phase: {conn.phase} {this.phaseHelp(conn.phase)}</ListGroupItem>
-            <ListGroupItem>State: {conn.state} {this.stateHelp(conn.state)}</ListGroupItem>
-            <ListGroupItem>Build mode: {conn.mode} {this.modeHelp(conn.mode)}</ListGroupItem>
+            <ListGroupItem>Phase: {phaseTexts[conn.phase]} {this.phaseHelp(conn.phase)}</ListGroupItem>
+            <ListGroupItem>State: {stateTexts[conn.state]} {this.stateHelp(conn.state)}</ListGroupItem>
+            <ListGroupItem>Build mode: {modeTexts[conn.mode]} {this.modeHelp(conn.mode)}</ListGroupItem>
         </ListGroup>;
 
         return (
@@ -107,6 +123,16 @@ export default class DetailsGeneral extends Component {
                                 Info
                             </NavLink>
                         </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.tab === 'tags'})}
+                                onClick={() => {
+                                    this.setTab('tags');
+                                }}>
+                                Tags
+                            </NavLink>
+                        </NavItem>
+
                     </Nav>
                     <TabContent activeTab={this.state.tab}>
                         <TabPane tabId='info' title='Info'>
@@ -122,6 +148,9 @@ export default class DetailsGeneral extends Component {
                         <TabPane tabId='drawing' title='Drawing'>
                             <DetailsDrawing/>
                         </TabPane>
+                        <TabPane tabId='tags' title='Tags'>
+                            <DetailsTags/>
+                        </TabPane>
                     </TabContent>
 
 
@@ -136,9 +165,9 @@ export default class DetailsGeneral extends Component {
         let body = <span>Phases refer to the connection's lifecycle in regards to resource reservation. There
         are three phases:
             <ul>
-                <li><b>HELD</b>: very short term, before the connection has been committed.</li>
-                <li><b>RESERVED</b>: after the connection has been committed and before end time.</li>
-                <li><b>ARCHIVED</b>: after end time or after being released.</li>
+                <li><b>Held</b>: very short term, before the connection has been committed.</li>
+                <li><b>Reserved</b>: after the connection has been committed and before end time.</li>
+                <li><b>Archived</b>: after end time or after being released.</li>
             </ul></span>;
         return <span className='float-right'>
             <HelpPopover header={header} body={body} placement='right' popoverId='phase-help'/>
@@ -151,10 +180,10 @@ export default class DetailsGeneral extends Component {
         let body = <span>State refers to the connection's lifecycle in regards to network configuration. The main
             states are as follows:
             <ul>
-                <li><b>WAITING</b>: when the connection is still waiting to be built</li>
-                <li><b>ACTIVE</b>: when successfully configured and operational,</li>
-                <li><b>FINISHED</b>: after the connection end time (or after release)</li>
-                <li><b>FAILED</b>: when something's wrong.</li>
+                <li><b>Waiting</b>: when the connection is still waiting to be built</li>
+                <li><b>Active</b>: when successfully configured and operational,</li>
+                <li><b>Finished</b>: after the connection end time (or after release)</li>
+                <li><b>Failed</b>: when something's wrong.</li>
             </ul></span>;
         return <span className='float-right'>
             <HelpPopover header={header} body={body} placement='right' popoverId='state-help'/>
@@ -166,8 +195,8 @@ export default class DetailsGeneral extends Component {
         let body = <span>Build mode refers to the connection's setting regarding when / how it will
             configure network devices. There are two modes:
             <ul>
-                <li><b>AUTOMATIC</b>: OSCARS will build the connection automatically</li>
-                <li><b>MANUAL</b>: OSCARS will wait for a user command to build </li>
+                <li><b>Scheduled</b>: OSCARS will build the connection automatically</li>
+                <li><b>Manual</b>: OSCARS will wait for a user command to build </li>
             </ul></span>;
         return <span className='float-right'>
             <HelpPopover header={header} body={body} placement='right' popoverId='state-help'/>

@@ -210,7 +210,7 @@ export default class EditUserForm extends Component {
 
                                         <ConfirmModal body='Are you ready to delete this user?'
                                                       header='Delete user'
-                                                      buttonText='Delete'
+                                                      uiElement={<Button color='primary'>Delete</Button>}
                                                       onConfirm={this.props.submitDelete}/>
                                     </ToggleDisplay>
                                 </div>

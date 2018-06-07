@@ -131,11 +131,11 @@ export default class DetailsButtons extends Component {
                 'show': true,
                 'ok': true
             });
-            let otherMode = 'MANUAL';
+            let buildmodeText = 'Set build mode to manual';
             if (conn.mode === 'MANUAL') {
-                otherMode = 'AUTOMATIC';
+                buildmodeText = 'Set build mode to scheduled';
             }
-            const buildmodeText = 'Set mode to ' + otherMode;
+
             this.props.connsStore.setControl('buildmode', {
                 'text': buildmodeText,
                 'show': true,
@@ -241,7 +241,7 @@ export default class DetailsButtons extends Component {
                 release = <ListGroupItem>
                     <ConfirmModal body='This will release all resources, and dismantle the reservation if it is built.'
                                   header='Release reservation'
-                                  buttonText={releaseText}
+                                  uiElement={<Button color='primary'>{releaseText}</Button>}
                                   onConfirm={this.doRelease}/>
                     {' '}
                     {this.help('release')}

@@ -42,7 +42,9 @@ export default class ConfirmModal extends Component {
     };
 
     render() {
-
+        const cloned = React.cloneElement(this.props.uiElement, {
+            onClick: this.showConfirm
+        });
         return  <span>
             <Modal isOpen={this.state.confirmOpen} fade={false} toggle={this.toggleConfirm}>
                 <ModalHeader toggle={this.toggleConfirm}>{this.props.header}</ModalHeader>
@@ -54,7 +56,7 @@ export default class ConfirmModal extends Component {
                             onClick={this.abort}>{this.props.abortButtonText}</Button>
                 </ModalFooter>
             </Modal>
-            <Button color={this.props.buttonColor}  onClick={this.showConfirm}>{this.props.buttonText} </Button>
+            {cloned}
         </span>;
 
     }
@@ -69,8 +71,7 @@ ConfirmModal.propTypes = {
     abortButtonText: PropTypes.string,
     abortButtonColor: PropTypes.string,
 
-    buttonText: PropTypes.string.isRequired,
-    buttonColor: PropTypes.string,
+    uiElement: PropTypes.element.isRequired,
 
     header: PropTypes.string.isRequired,
     body: PropTypes.string.isRequired,
@@ -83,7 +84,4 @@ ConfirmModal.defaultProps = {
     onAbort: () => {},
     abortButtonText: 'Abort',
     abortButtonColor: 'secondary',
-
-    buttonColor: 'warning',
-
 };

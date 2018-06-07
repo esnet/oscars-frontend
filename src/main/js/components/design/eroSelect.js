@@ -4,9 +4,9 @@ import ToggleDisplay from 'react-toggle-display';
 import {
     ListGroup, ListGroupItem,
     Button,
-    Card, CardBody, CardSubtitle,
+    Card, CardBody,
 
-    InputGroup, InputGroupAddon, InputGroupText
+    InputGroup
 } from 'reactstrap';
 import Select from 'react-select-plus';
 import Octicon from 'react-octicon'

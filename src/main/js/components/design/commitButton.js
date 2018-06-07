@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 
 import {action, toJS} from 'mobx';
 import {inject} from 'mobx-react';
+import {
+    Button
+} from 'reactstrap';
 
 import {withRouter} from 'react-router-dom'
 
@@ -45,8 +48,7 @@ class CommitButton extends Component {
 
             <ConfirmModal body='Are you ready to commit this connection?'
                           header='Commit connection'
-                          buttonText='Commit'
-                          buttonColor='success'
+                          uiElement={<Button color='success'>{'Commit'}</Button>}
                           onConfirm={this.commit}/>
 
         </div>;

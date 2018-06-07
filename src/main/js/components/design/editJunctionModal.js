@@ -201,7 +201,7 @@ export default class EditJunctionModal extends Component {
                             {noPipesText}
                             <ConfirmModal body='Are you ready to delete this junction?'
                                           header='Delete junction'
-                                          buttonText='Delete'
+                                          uiElement={<Button color='warning'>{'Delete'}</Button>}
                                           onConfirm={this.deleteJunction}/>
                         </CardBody>
                     </Card>

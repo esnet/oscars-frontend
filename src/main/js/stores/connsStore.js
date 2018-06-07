@@ -16,6 +16,8 @@ class ConnectionsStore {
 
                 }
             },
+            tags: [],
+            dirty: false
 
         },
         foundCurrent: false,
@@ -75,6 +77,7 @@ class ConnectionsStore {
         phase: 'RESERVED',
         state: 'ACTIVE',
     };
+
 
     @action setCommands(commands) {
         this.store.commands = commands;

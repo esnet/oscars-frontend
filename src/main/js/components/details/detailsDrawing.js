@@ -153,7 +153,7 @@ export default class DetailsDrawing extends Component {
         });
         fixtures.map((f) => {
             // console.log(toJS(f));
-            const label  = f.portUrn.replace(f.junction+':', '');
+            const label  = f.portUrn.replace(f.junction+':', '')+':'+f.vlan.vlanId;
             let fixtureNode = {
                 id: f.portUrn + ':' + f.vlan.vlanId,
                 label: label,
@@ -238,6 +238,7 @@ export default class DetailsDrawing extends Component {
             });
         }
 //        console.log(edges);
+        /*
         let addedEdges = [];
         let addedNodes = [];
         for (let adjcy of this.props.topologyStore.adjacencies) {
@@ -300,6 +301,7 @@ export default class DetailsDrawing extends Component {
                 addedEdges.push(edgeId);
             }
         }
+        */
 
         VisUtils.mergeItems(nodes, this.datasource.nodes);
         this.datasource.edges.clear();
@@ -338,7 +340,6 @@ export default class DetailsDrawing extends Component {
                 </CardHeader>
                 <CardBody>
                     <div id='schematicDrawing'><p>connection map</p></div>
-                    <p>In progress!</p>
                 </CardBody>
             </Card>
 
