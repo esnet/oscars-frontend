@@ -151,6 +151,11 @@ class HoldTimer extends Component {
             this.extendHoldTimeout = setTimeout(this.extendHold, delay);
             return;
         }
+        // a hold attempt has not been made yet
+        if (conn.held.until === '') {
+            this.extendHoldTimeout = setTimeout(this.extendHold, delay);
+            return;
+        }
 
         // do not extend if user is idle; check again later in case they become un-idle
         if (conn.held.idle) {
