@@ -146,8 +146,8 @@ class HoldTimer extends Component {
         let delay = 10000;
 
         let conn = this.props.controlsStore.connection;
-        // do not extend if we don't have a connection id
-        if (conn.connectionId == null) {
+        // do not try to extend if we don't have a connection id
+        if (conn.connectionId == null || conn.connectionId === '') {
             this.extendHoldTimeout = setTimeout(this.extendHold, delay);
             return;
         }
