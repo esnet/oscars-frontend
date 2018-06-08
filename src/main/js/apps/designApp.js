@@ -59,7 +59,6 @@ export default class DesignApp extends Component {
                 <Col md={3} sm={3}>
                     <ConnectionControls />
                     <ScheduleControls />
-                    <HeldList/>
                 </Col>
                 <Col md={6} sm={6}>
                     <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>
