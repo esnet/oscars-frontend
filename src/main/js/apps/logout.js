@@ -9,11 +9,10 @@ export default class Logout extends React.Component {
     componentDidMount() {
         this.props.accountStore.clearAttempt();
         this.props.accountStore.logout();
-        console.log('logging out')
     }
 
     render() {
-        return (<Redirect to='/'/>);
+        return (<Redirect to='/pages/about'/>);
 
     }
 }

@@ -101,22 +101,23 @@ ReactDOM.render(
                     <Col sm={4}>{' '}</Col>
                 </Row>
                 <Switch>
-                    <Route exact path="/" component={WelcomeApp}/>
-                    <Route exact path="/pages/about" component={AboutApp}/>
-                    <Route exact path="/login" component={Login}/>
+                    <Route exact path='/' component={WelcomeApp}/>
+                    <Route exact path='/pages/about' component={AboutApp}/>
+                    <Route exact path='/login' component={Login}/>
 
-                    <Route exact path="/logout" component={Logout}/>
-                    <PrivateRoute exact path="/pages/list" component={ListConnectionsApp}/>
-                    <PrivateRoute path="/pages/details/:connectionId?" component={ConnectionDetails}/>
-                    <PrivateRoute exact path="/pages/selectDesign" component={SelectDesignApp}/>
-                    <PrivateRoute exact path="/pages/newDesign" component={NewDesignApp}/>
-                    <PrivateRoute exact path="/pages/timeout" component={TimeoutApp}/>
-                    <PrivateRoute exact path="/pages/error" component={ErrorApp}/>
-                    <PrivateRoute exact path="/pages/account" component={AccountApp}/>
-                    <PrivateRoute exact path="/pages/status" component={StatusApp}/>
-                    <PrivateRoute exact path="/pages/map" component={MapApp}/>
-                    <AdminRoute exact path="/pages/admin/users" component={AdminUsersApp}/>
-                    <AdminRoute exact path="/pages/admin/tags" component={AdminTagsApp}/>
+                    <Route exact path='/pages/logout' component={Logout}/>
+
+                    <PrivateRoute exact path='/pages/list' component={ListConnectionsApp}/>
+                    <PrivateRoute path='/pages/details/:connectionId?' component={ConnectionDetails}/>
+                    <PrivateRoute exact path='/pages/selectDesign' component={SelectDesignApp}/>
+                    <PrivateRoute exact path='/pages/newDesign' component={NewDesignApp}/>
+                    <PrivateRoute exact path='/pages/timeout' component={TimeoutApp}/>
+                    <PrivateRoute exact path='/pages/error' component={ErrorApp}/>
+                    <PrivateRoute exact path='/pages/account' component={AccountApp}/>
+                    <PrivateRoute exact path='/pages/status' component={StatusApp}/>
+                    <PrivateRoute exact path='/pages/map' component={MapApp}/>
+                    <AdminRoute exact path='/pages/admin/users' component={AdminUsersApp}/>
+                    <AdminRoute exact path='/pages/admin/tags' component={AdminTagsApp}/>
                 </Switch>
             </Container>
         </BrowserRouter>

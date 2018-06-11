@@ -28,7 +28,9 @@ export default class NavBar extends Component {
 
     syncLoggedIn() {
         if (localStorage.getItem('loggedin.username') == null) {
-            this.props.accountStore.logout();
+            if (this.props.accountStore.loggedin.username !== '') {
+                this.props.accountStore.logout();
+            }
         } else {
             this.props.accountStore.setLoggedinAdmin(localStorage.getItem('loggedin.admin'));
             this.props.accountStore.setLoggedinToken(localStorage.getItem('loggedin.token'));
@@ -98,8 +100,7 @@ export default class NavBar extends Component {
                     {admin}
                     <NavLink href='/pages/account'
                              active={this.props.commonStore.nav.active === 'account'}>My Account</NavLink>
-                    <NavLink href='/logout'
-                             active={this.props.commonStore.nav.active === 'logout'}>Logout</NavLink>
+                    <NavLink href='/pages/logout'>Logout</NavLink>
                 </Nav>
             </Navbar>
         )
