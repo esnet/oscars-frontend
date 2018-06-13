@@ -29,6 +29,7 @@ export default class DetailsInfo extends Component {
     componentWillMount() {
         this.setState({
             junctionTab: 'commands',
+            historyId: null,
             ccUrn: {},
             ccType: {}
         });
@@ -162,12 +163,21 @@ export default class DetailsInfo extends Component {
 
 
     };
+    toggleHistoryCollapse = (historyId) => {
+        if (this.state.historyId === historyId) {
+            this.setState({historyId: null});
+        } else {
+            this.setState({historyId: historyId});
+        }
+    };
 
     junctionInfo() {
 
         const selected = this.props.connsStore.store.selected;
         let deviceUrn = selected.data.deviceUrn;
         let cpStatus = <b>Status not loaded yet..</b>;
+        let history = this.props.connsStore.store.history;
+
         if (deviceUrn in this.props.connsStore.store.statuses) {
             let statuses = this.props.connsStore.store.statuses[deviceUrn];
             cpStatus = <div>
@@ -189,7 +199,7 @@ export default class DetailsInfo extends Component {
                                 onClick={() => {
                                     this.setJunctionTab('commands');
                                 }}>
-                                Router commands
+                                Config commands
                             </NavLink>
                         </NavItem>
                         <NavItem>
@@ -199,6 +209,15 @@ export default class DetailsInfo extends Component {
                                     this.setJunctionTab('diagnostics');
                                 }}>
                                 Diagnostics
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.junctionTab === 'history'})}
+                                onClick={() => {
+                                    this.setJunctionTab('history');
+                                }}>
+                                Config History
                             </NavLink>
                         </NavItem>
                     </Nav>
@@ -242,6 +261,31 @@ export default class DetailsInfo extends Component {
                                 </CardBody>
                             </Card>
                         </TabPane>
+                        <TabPane tabId='history' title='Config history'>
+                            {
+                                history.map(h => {
+                                    if (h.deviceUrn === selected.data.deviceUrn) {
+                                        let isOpen = this.state.historyId === h.id;
+
+                                        return <Card key={h.id}>
+                                            <CardHeader className='p-1'
+                                                        onClick={() => this.toggleHistoryCollapse(h.id)}>
+                                                <NavLink href='#'>{h.type} ({h.date})</NavLink>
+                                            </CardHeader>
+                                            <CardBody>
+                                                <Collapse isOpen={isOpen}>
+                                                    <pre>{h.contents}</pre>
+                                                </Collapse>
+                                            </CardBody>
+
+                                        </Card>
+                                    } else {
+                                        return null;
+                                    }
+
+                                })
+                            }
+                        </TabPane>
                     </TabContent>
                 </div>
             </CardBody>
@@ -256,11 +300,11 @@ export default class DetailsInfo extends Component {
         let ero = <ListGroup>
             <ListGroupItem active>ERO</ListGroupItem>
             {
-            d.azERO.map((entry) => {
-                return <ListGroupItem key={entry.urn}>{entry.urn}</ListGroupItem>;
-            })
+                d.azERO.map((entry) => {
+                    return <ListGroupItem key={entry.urn}>{entry.urn}</ListGroupItem>;
+                })
 
-        }</ListGroup>
+            }</ListGroup>
 
 
         const info = [
@@ -300,7 +344,7 @@ export default class DetailsInfo extends Component {
                                 columns={columns}
                                 data={info}
                                 bordered={false}/>
-                <hr />
+                <hr/>
                 {ero}
             </CardBody>
         </Card>

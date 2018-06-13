@@ -89,6 +89,14 @@ export default class DetailsApp extends Component {
                     }
                 })
             );
+        myClient.submitWithToken('GET', '/api/conn/history/' + connectionId)
+            then(action(
+                (response) => {
+                    let history = JSON.parse(response);
+                    this.props.connsStore.setHistory(history);
+
+                }
+            ));
 
     };
 

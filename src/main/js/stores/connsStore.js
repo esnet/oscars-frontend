@@ -24,6 +24,7 @@ class ConnectionsStore {
         selected: {},
         commands: new Map(),
         statuses: new Map(),
+        history: new Map(),
     };
 
     @observable controls = {
@@ -82,6 +83,10 @@ class ConnectionsStore {
     @action setCommands(commands) {
         this.store.commands = commands;
     }
+    @action setHistory(history) {
+        this.store.history = history;
+    }
+
 
     @action setControl(unit, params) {
         this.controls[unit] = params;
