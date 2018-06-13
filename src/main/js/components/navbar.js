@@ -6,7 +6,6 @@ import {
 } from 'reactstrap';
 import {observer, inject} from 'mobx-react';
 
-import {LinkContainer} from 'react-router-bootstrap';
 import {AlertList} from 'react-bs-notifier';
 import {toJS} from 'mobx'
 
@@ -32,7 +31,12 @@ export default class NavBar extends Component {
                 this.props.accountStore.logout();
             }
         } else {
-            this.props.accountStore.setLoggedinAdmin(localStorage.getItem('loggedin.admin'));
+            let admin = localStorage.getItem('loggedin.admin');
+            if (admin === 'true') {
+                this.props.accountStore.setLoggedinAdmin(true );
+            } else {
+                this.props.accountStore.setLoggedinAdmin(false);
+            }
             this.props.accountStore.setLoggedinToken(localStorage.getItem('loggedin.token'));
             this.props.accountStore.setLoggedinUsername(localStorage.getItem('loggedin.username'));
         }

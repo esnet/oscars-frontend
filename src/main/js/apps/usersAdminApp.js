@@ -83,13 +83,14 @@ export default class UsersAdminApp extends Component {
             fullName: 'Joe D. Newuser',
             email: 'email@domain.com',
             institution: 'default',
+            password: '',
             permissions: {
-                isAdmin: false
+                adminAllowed: false
             },
         });
 
         // add a user
-        myClient.submitWithToken('POST', '/admin/users/' + user.username, user)
+        myClient.submitWithToken('POST', '/admin/users/' + user.username, toJS(user))
             .then(
                 (response) => {
                     let parsed = JSON.parse(response);
