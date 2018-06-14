@@ -274,7 +274,7 @@ export default class DetailsInfo extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 <Collapse isOpen={isOpen}>
-                                                    <pre>{h.contents}</pre>
+                                                    <pre>{h.output}</pre>
                                                 </Collapse>
                                             </CardBody>
 
