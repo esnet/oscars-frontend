@@ -66,6 +66,9 @@ class ConnectionsStore {
                 'body': null,
             },
 
+        },
+        overrideState: {
+            'newState': null
         }
     };
 

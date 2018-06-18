@@ -131,8 +131,12 @@ class HoldTimer extends Component {
     idledOut = () => {
         // empty design and controls, push to timeout
 
+        this.props.controlsStore.clearEditConnection();
+        this.props.controlsStore.clearEditDesign();
+        this.props.designStore.clear();
         this.props.controlsStore.clearSessionStorage();
         this.props.designStore.clearSessionStorage();
+
         this.cleanupTasks();
 
 

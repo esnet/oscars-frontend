@@ -30,8 +30,7 @@ export default class DetailsInfo extends Component {
         this.setState({
             junctionTab: 'commands',
             historyId: null,
-            ccUrn: {},
-            ccType: {}
+            commands: {}
         });
         this.refreshStatuses();
     }
@@ -148,18 +147,23 @@ export default class DetailsInfo extends Component {
     };
 
     toggleCommandCollapse = (urn, type) => {
-        let newSt = {ccType: {}, ccUrn: {}};
-        if (this.state.ccType[type]) {
-            newSt.ccType[type] = false;
+        console.log('toggling '+urn+' '+type);
+        console.log(this.state);
+        let newSt = {};
+        if (urn in this.state.commands) {
+            newSt[urn] = {};
+            if (type in this.state.commands[urn]) {
+                newSt[urn][type] = !this.state.commands[urn][type]
+            } else {
+                newSt[urn][type] = true;
+            }
+
         } else {
-            newSt.ccType[type] = true;
+            newSt[urn] = {};
+            newSt[urn][type] = true;
         }
-        if (this.state.ccUrn[urn]) {
-            newSt.ccUrn[urn] = false;
-        } else {
-            newSt.ccUrn[urn] = true;
-        }
-        this.setState(newSt);
+        this.setState({commands: newSt});
+        console.log(this.state);
 
 
     };
@@ -226,7 +230,17 @@ export default class DetailsInfo extends Component {
                             {
                                 this.props.connsStore.store.commands.map(c => {
                                     if (c.deviceUrn === selected.data.deviceUrn) {
-                                        let isOpen = this.state.ccType[c.type] && this.state.ccUrn[c.deviceUrn];
+                                        let isOpen = true;
+                                        if (deviceUrn in this.state.commands) {
+                                            if (c.type in this.state.commands[deviceUrn]) {
+                                                isOpen = this.state.commands[deviceUrn][c.type];
+                                            } else {
+                                                isOpen = false;
+
+                                            }
+                                        } else {
+                                            isOpen = false;
+                                        }
 
                                         return <Card key={c.type}>
                                             <CardHeader className='p-1'
