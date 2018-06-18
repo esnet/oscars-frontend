@@ -28,7 +28,7 @@ export default class DetailsGeneral extends Component {
 
     componentWillMount() {
         this.setState({
-            tab: 'drawing'
+            tab: 'info'
         });
 
     }
@@ -107,15 +107,6 @@ export default class DetailsGeneral extends Component {
                     <Nav tabs>
                         <NavItem>
                             <NavLink
-                                className={classnames({active: this.state.tab === 'drawing'})}
-                                onClick={() => {
-                                    this.setTab('drawing');
-                                }}>
-                                Drawing
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
                                 className={classnames({active: this.state.tab === 'info'})}
                                 onClick={() => {
                                     this.setTab('info');
@@ -130,6 +121,15 @@ export default class DetailsGeneral extends Component {
                                     this.setTab('tags');
                                 }}>
                                 Tags
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.tab === 'drawing'})}
+                                onClick={() => {
+                                    this.setTab('drawing');
+                                }}>
+                                Drawing
                             </NavLink>
                         </NavItem>
 

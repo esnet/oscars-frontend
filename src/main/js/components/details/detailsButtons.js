@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 
 import ConfirmModal from '../confirmModal';
-import {Button, ListGroup, ListGroupItem } from 'reactstrap';
+import {Button, ListGroup, ListGroupItem, Input, Form, FormGroup} from 'reactstrap';
 import myClient from '../../agents/client';
 import Moment from 'moment/moment';
 import {autorun, action, toJS} from 'mobx';
@@ -21,6 +21,7 @@ export default class DetailsButtons extends Component {
     componentWillMount() {
         this.updateControls();
     }
+
     componentWillUnmount() {
         this.controlsUpdateDispose();
     }
@@ -111,6 +112,26 @@ export default class DetailsButtons extends Component {
         this.updateControls();
     });
 
+    overrideState = (e) => {
+        const newState = e.target.value;
+        this.props.connsStore.setControl('overrideState', {
+            'newState': newState
+        });
+
+    };
+
+    doOverrideState = () => {
+        const conn = this.props.connsStore.store.current;
+        const newState = this.props.connsStore.controls.overrideState.newState;
+
+        myClient.submitWithToken('POST', '/protected/conn/state/'+ conn.connectionId, newState)
+            .then(action((response) => {
+                this.props.connsStore.refreshCurrent();
+            }));
+
+        return false;
+    };
+
     updateControls() {
         const conn = this.props.connsStore.store.current;
         if (conn == null || conn.archived == null) {
@@ -180,6 +201,12 @@ export default class DetailsButtons extends Component {
             'text': dismantleText,
             'ok': canDismantle
         });
+        if (conn.state === 'FAILED') {
+            this.props.connsStore.setControl('overrideState', {
+                'newState': 'WAITING'
+            });
+        }
+
         this.setBuildDismantleHelp(canBuild, 'build');
         this.setBuildDismantleHelp(canDismantle, 'dismantle');
 
@@ -188,6 +215,7 @@ export default class DetailsButtons extends Component {
 
     render() {
         const controls = this.props.connsStore.controls;
+        const conn = this.props.connsStore.store.current;
 
         const canChangeBuildMode = controls.buildmode.ok;
         const buildModeChangeText = controls.buildmode.text;
@@ -209,7 +237,7 @@ export default class DetailsButtons extends Component {
         let build = null;
         if (controls.build.show) {
             build = <ListGroupItem><Button color='primary' disabled={!canBuild} onClick={this.build}
-                                  className='float-left'>{buildText}</Button>
+                                           className='float-left'>{buildText}</Button>
                 {' '}
                 {this.help('build')}
             </ListGroupItem>;
@@ -256,7 +284,7 @@ export default class DetailsButtons extends Component {
             <p>The normal controls (Build, Dismantle, Release,etc)
                 are not present.</p>
         </div>;
-        let overallHelp =  <span className='float-right'>
+        let overallHelp = <span className='float-right'>
             <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='details-buttons-help'/>
         </span>;
 
@@ -264,14 +292,36 @@ export default class DetailsButtons extends Component {
             overallHelp = null;
         }
 
+        let recoverSelect = null;
+        let specialControls = null;
+        if (conn.state === 'FAILED') {
+            specialControls = <ListGroupItem active>Special Controls</ListGroupItem>
+            recoverSelect = <ListGroupItem>
+                <Form inline>
+                    <FormGroup>
+                        <Input type='select' onChange={this.overrideState}>
+                            <option value='WAITING'>Change to WAITING</option>
+                            <option value='ACTIVE'>Change to ACTIVE</option>
+                        </Input>
+                        {' '}
+                        <Button className='pull-right' color='warning'
+                                onClick={this.doOverrideState}>Override state</Button>
+                    </FormGroup>
+                </Form>
+            </ListGroupItem>;
+        }
+
 
         return <ListGroup>
-                <ListGroupItem active>Controls {overallHelp}</ListGroupItem>
-                {buildMode}
-                {build}
-                {dismantle}
-                {release}
-            </ListGroup>;
+            <ListGroupItem active>Controls {overallHelp}</ListGroupItem>
+            {buildMode}
+            {build}
+            {dismantle}
+            {release}
+            {specialControls}
+            {recoverSelect}
+
+        </ListGroup>;
     }
 
 
@@ -279,7 +329,7 @@ export default class DetailsButtons extends Component {
         const controls = this.props.connsStore.controls;
         const header = controls.help[key].header;
         const body = controls.help[key].body;
-        const id = 'details-controls-'+key + '-help';
+        const id = 'details-controls-' + key + '-help';
         return <span className='float-right'>
             <HelpPopover header={header} body={body} placement='right' popoverId={id}/>
         </span>;
@@ -320,6 +370,7 @@ export default class DetailsButtons extends Component {
         });
 
     }
+
     setBuildDismantleHelp(canPerform, key) {
 
         const helpHeader = <span>Build mode help</span>;

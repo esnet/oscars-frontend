@@ -29,8 +29,8 @@ export default class DetailsInfo extends Component {
     componentWillMount() {
         this.setState({
             junctionTab: 'commands',
-            ccUrn: {},
-            ccType: {}
+            historyId: null,
+            commands: {}
         });
         this.refreshStatuses();
     }
@@ -147,20 +147,32 @@ export default class DetailsInfo extends Component {
     };
 
     toggleCommandCollapse = (urn, type) => {
-        let newSt = {ccType: {}, ccUrn: {}};
-        if (this.state.ccType[type]) {
-            newSt.ccType[type] = false;
+        console.log('toggling '+urn+' '+type);
+        console.log(this.state);
+        let newSt = {};
+        if (urn in this.state.commands) {
+            newSt[urn] = {};
+            if (type in this.state.commands[urn]) {
+                newSt[urn][type] = !this.state.commands[urn][type]
+            } else {
+                newSt[urn][type] = true;
+            }
+
         } else {
-            newSt.ccType[type] = true;
+            newSt[urn] = {};
+            newSt[urn][type] = true;
         }
-        if (this.state.ccUrn[urn]) {
-            newSt.ccUrn[urn] = false;
-        } else {
-            newSt.ccUrn[urn] = true;
-        }
-        this.setState(newSt);
+        this.setState({commands: newSt});
+        console.log(this.state);
 
 
+    };
+    toggleHistoryCollapse = (historyId) => {
+        if (this.state.historyId === historyId) {
+            this.setState({historyId: null});
+        } else {
+            this.setState({historyId: historyId});
+        }
     };
 
     junctionInfo() {
@@ -168,6 +180,8 @@ export default class DetailsInfo extends Component {
         const selected = this.props.connsStore.store.selected;
         let deviceUrn = selected.data.deviceUrn;
         let cpStatus = <b>Status not loaded yet..</b>;
+        let history = this.props.connsStore.store.history;
+
         if (deviceUrn in this.props.connsStore.store.statuses) {
             let statuses = this.props.connsStore.store.statuses[deviceUrn];
             cpStatus = <div>
@@ -189,7 +203,7 @@ export default class DetailsInfo extends Component {
                                 onClick={() => {
                                     this.setJunctionTab('commands');
                                 }}>
-                                Router commands
+                                Config commands
                             </NavLink>
                         </NavItem>
                         <NavItem>
@@ -201,13 +215,32 @@ export default class DetailsInfo extends Component {
                                 Diagnostics
                             </NavLink>
                         </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({active: this.state.junctionTab === 'history'})}
+                                onClick={() => {
+                                    this.setJunctionTab('history');
+                                }}>
+                                Config History
+                            </NavLink>
+                        </NavItem>
                     </Nav>
                     <TabContent activeTab={this.state.junctionTab}>
                         <TabPane tabId='commands' title='Router commands'>
                             {
                                 this.props.connsStore.store.commands.map(c => {
                                     if (c.deviceUrn === selected.data.deviceUrn) {
-                                        let isOpen = this.state.ccType[c.type] && this.state.ccUrn[c.deviceUrn];
+                                        let isOpen = true;
+                                        if (deviceUrn in this.state.commands) {
+                                            if (c.type in this.state.commands[deviceUrn]) {
+                                                isOpen = this.state.commands[deviceUrn][c.type];
+                                            } else {
+                                                isOpen = false;
+
+                                            }
+                                        } else {
+                                            isOpen = false;
+                                        }
 
                                         return <Card key={c.type}>
                                             <CardHeader className='p-1'
@@ -242,6 +275,31 @@ export default class DetailsInfo extends Component {
                                 </CardBody>
                             </Card>
                         </TabPane>
+                        <TabPane tabId='history' title='Config history'>
+                            {
+                                history.map(h => {
+                                    if (h.deviceUrn === selected.data.deviceUrn) {
+                                        let isOpen = this.state.historyId === h.id;
+
+                                        return <Card key={h.id}>
+                                            <CardHeader className='p-1'
+                                                        onClick={() => this.toggleHistoryCollapse(h.id)}>
+                                                <NavLink href='#'>{h.type} ({h.date})</NavLink>
+                                            </CardHeader>
+                                            <CardBody>
+                                                <Collapse isOpen={isOpen}>
+                                                    <pre>{h.output}</pre>
+                                                </Collapse>
+                                            </CardBody>
+
+                                        </Card>
+                                    } else {
+                                        return null;
+                                    }
+
+                                })
+                            }
+                        </TabPane>
                     </TabContent>
                 </div>
             </CardBody>
@@ -256,11 +314,11 @@ export default class DetailsInfo extends Component {
         let ero = <ListGroup>
             <ListGroupItem active>ERO</ListGroupItem>
             {
-            d.azERO.map((entry) => {
-                return <ListGroupItem key={entry.urn}>{entry.urn}</ListGroupItem>;
-            })
+                d.azERO.map((entry) => {
+                    return <ListGroupItem key={entry.urn}>{entry.urn}</ListGroupItem>;
+                })
 
-        }</ListGroup>
+            }</ListGroup>
 
 
         const info = [
@@ -300,7 +358,7 @@ export default class DetailsInfo extends Component {
                                 columns={columns}
                                 data={info}
                                 bordered={false}/>
-                <hr />
+                <hr/>
                 {ero}
             </CardBody>
         </Card>
