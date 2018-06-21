@@ -275,7 +275,10 @@ export default class EroDrawing extends Component {
                 // console.log('done drawing rest, now for current pipe');
                 let i = 0;
                 let ero = ep.ero;
-                if (ero.acceptable && !ep.locked) {
+                if (ep.locked) {
+                    // it's been drawn already
+
+                } else if (ero.acceptable ) {
                     let hops = ero.hops;
                     // console.log(toJS(hops));
                     while (i < hops.length - 1) {
@@ -320,6 +323,21 @@ export default class EroDrawing extends Component {
 
                         i = i + 3;
                     }
+                } else {
+                    let edge = {
+                        id: ep.id,
+                        from: ep.a,
+                        to: ep.z,
+                        dashes: true,
+                        length: 10,
+                        color: {
+                            color: 'purple'
+                        },
+                        width: 4,
+                        onClick: this.onPipeClicked
+
+                    };
+                    edges.push(edge);
                 }
 
 
