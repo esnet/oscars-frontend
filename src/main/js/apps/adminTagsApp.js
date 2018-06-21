@@ -62,7 +62,8 @@ export default class AdminTagsApp extends Component {
         const edit = this.props.tagStore.editCtg;
         let ctg = {
             id: null,
-            category: edit.category
+            category: edit.category,
+            source: edit.source
         };
         myClient.submitWithToken('POST', '/protected/tag/categories/update', ctg)
             .then(
@@ -74,6 +75,10 @@ export default class AdminTagsApp extends Component {
 
     onCategoryChange = (val) => {
         this.props.tagStore.setEditedCtg(val, null);
+    };
+
+    onSourceChange = (val) => {
+        this.props.tagStore.setEditedSource(val, null);
     };
 
     // key presses
@@ -101,8 +106,12 @@ export default class AdminTagsApp extends Component {
                             <ListGroup>
                                 {
                                     categories.map(c => {
+                                        let source = c.source;
+                                        if (c.source.length > 40) {
+                                            source = c.source.substr(0, 40)+'...';
+                                        }
                                         return <ListGroupItem className='p-1 m-1'
-                                                              key={c.id}>{c.category}
+                                                              key={c.id}>{c.category} <span className='pull-right'>{source}</span>
                                             <ConfirmModal body='This will delete the tag category. It will not delete tags on connections'
                                                           header='Delete category'
                                                           uiElement={ <Octicon name='trashcan' style={{height: '16px', width: '16px'}}/>}
@@ -124,6 +133,15 @@ export default class AdminTagsApp extends Component {
                                            onKeyPress={this.handleKeyPress}
                                            onChange={(e) => this.onCategoryChange(e.target.value)}/>
                                 </FormGroup>
+                                <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
+                                    <Label for='category' hidden>Source: </Label>
+                                    {' '}
+                                    <Input type='text' id='Source'
+                                           placeholder='source'
+                                           onKeyPress={this.handleKeyPress}
+                                           onChange={(e) => this.onSourceChange(e.target.value)}/>
+                                </FormGroup>
+
                                 {' '}
                                 <Button className='float-right'
                                         disabled={!size(edit.category)}

@@ -4,7 +4,6 @@ import {
     CardHeader,
     CardBody,
     Button,
-    Label,
     Input,
     Form,
     InputGroup,
@@ -15,12 +14,12 @@ import {action} from 'mobx';
 import {size} from 'lodash-es';
 
 import Select from 'react-select-plus';
+import Creatable from 'react-select-plus';
 import BootstrapTable from 'react-bootstrap-table-next';
 import Octicon from 'react-octicon'
 
 
 import myClient from '../../agents/client';
-import ConfirmModal from '../confirmModal';
 
 @inject('tagStore', 'connsStore')
 @observer
@@ -45,7 +44,6 @@ export default class DetailsTags extends Component {
                 action((response) => {
                     let parsed = JSON.parse(response);
                     this.props.tagStore.updateCategories(parsed);
-
                 }));
         this.tagUpdateTimeout = setTimeout(this.refreshTagCategories, 20000);
     };
@@ -64,10 +62,37 @@ export default class DetailsTags extends Component {
     };
 
     onCategoryChange = (val) => {
-        console.log('category changed ' + val);
         this.props.tagStore.setEditedTagCtg(val);
 
+        let source = this.props.tagStore.editTag.source;
+        if (source != null && source.startsWith('http')) {
+            this.fetchContentOptions();
+        }
+
     };
+
+    fetchContentOptions = () => {
+        let source = this.props.tagStore.editTag.source;
+        if (!source.startsWith('https://spreadsheets.google.com/feeds/cells/')) {
+            console.log('invalid source; only google sheets for now');
+            this.props.tagStore.setEditedTagContentOptions(['Error!']);
+            return;
+        }
+        myClient.loadJSON({method: 'GET', url: source}).then(
+            action((response) => {
+                let parsed = JSON.parse(response);
+                let entries = parsed['feed']['entry'];
+                let opts = [];
+                entries.map(e => {
+                    opts.push(e['content']['$t']);
+                });
+                this.props.tagStore.setEditedTagContentOptions(opts);
+
+            })
+        );
+
+    };
+
 
     onContentsChange = (val) => {
         this.props.tagStore.setEditedTagContents(val);
@@ -135,6 +160,7 @@ export default class DetailsTags extends Component {
             })
         });
 
+
         const columns = [
             {
                 dataField: 'category',
@@ -153,6 +179,36 @@ export default class DetailsTags extends Component {
 
         ];
         const ctgValue = edit.category;
+        const contentsValue = edit.contents;
+
+        let ctgSource = this.props.tagStore.editTag.source;
+        let contentsInput = <Input type='text' id='contents'
+                                   bsSize='sm'
+                                   style={{width: '160px'}}
+                                   placeholder='Contents'
+                                   onKeyPress={this.handleKeyPress}
+                                   onChange={(e) => this.onContentsChange(e.target.value)}/>;
+        if (ctgSource != null && ctgSource !== '' && ctgSource.startsWith('http')) {
+            let contentsOpts = [];
+            this.props.tagStore.editTag.contentOptions.map(opt => {
+                contentsOpts.push({
+                    'value': opt,
+                    'label': opt
+                })
+            });
+
+            contentsInput = <small>
+                <Select style={{width: '160px'}}
+                        name='select-contents'
+                        placeholder='Choose..'
+                        simpleValue
+                        value={contentsValue}
+                        onBlurResetsInput={false}
+                        onChange={this.onContentsChange}
+                        autosize={false}
+                        options={contentsOpts}/>
+            </small>;
+        }
 
         return (
             <Card>
@@ -175,16 +231,13 @@ export default class DetailsTags extends Component {
                                         autosize={false}
                                         options={categoryOpts}/>
                             </small>
-                            <Input type='text' id='contents'
-                                   bsSize='sm'
-                                   placeholder='Contents'
-                                   onKeyPress={this.handleKeyPress}
-                                   onChange={(e) => this.onContentsChange(e.target.value)}/>
-                        <InputGroupAddon addonType='append'>
-                            <Button className='float-right btn-sm'
-                                    disabled={size(edit.category) === 0 || size(edit.contents) === 0}
-                                    onClick={this.add}>Add</Button>
-                        </InputGroupAddon>
+                            {contentsInput}
+
+                            <InputGroupAddon addonType='append'>
+                                <Button className='float-right btn-sm'
+                                        disabled={size(edit.category) === 0 || size(edit.contents) === 0}
+                                        onClick={this.add}>Add</Button>
+                            </InputGroupAddon>
                         </InputGroup>
                     </Form>
                 </CardBody>

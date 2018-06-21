@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {autorun, toJS, action} from 'mobx';
+import {autorun, toJS, action, trace, spy} from 'mobx';
 import {Card, CardBody, CardHeader} from 'reactstrap';
 import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 
-import transformer from '../../lib/transform';
 import validator from '../../lib/validation'
 import VisUtils from '../../lib/vis'
 import myClient from '../../agents/client';
@@ -19,7 +18,7 @@ require('vis/dist/vis.min.css');
 
 @inject('controlsStore', 'designStore', 'modalStore')
 @observer
-export default class DesignDrawing extends Component {
+export default class EroDrawing extends Component {
     constructor(props) {
         super(props);
 
@@ -33,23 +32,23 @@ export default class DesignDrawing extends Component {
 
 
     onFixtureClicked = (fixture) => {
-        const params = transformer.existingFixtureToEditParams(fixture);
-        this.props.controlsStore.setParamsForEditFixture(params);
-        this.props.modalStore.openModal('editFixture');
     };
 
     onJunctionClicked = (junction) => {
-        this.props.controlsStore.setParamsForEditJunction({junction: junction.id});
-        this.props.modalStore.openModal('editJunction');
     };
 
     onPipeClicked = (pipe) => {
-        const params = transformer.existingPipeToEditParams(pipe);
-        this.props.controlsStore.setParamsForEditPipe(params);
-        this.props.modalStore.openModal('editPipe');
     };
 
     componentDidMount() {
+        /*
+        spy((event) => {
+            if (event.name === 'setParamsForEditPipe') {
+                console.log(event.name)
+                console.log(event.arguments)
+            }
+        });
+        */
         let options = {
             height: '300px',
             interaction: {
@@ -116,13 +115,13 @@ export default class DesignDrawing extends Component {
 
 
     // this automagically updates the map;
-    // TODO: use a reaction and don't clear the whole graph, instead add/remove/update
     disposeOfMapUpdate = autorun(() => {
 
         let {design} = this.props.designStore;
         let junctions = toJS(design.junctions);
         let fixtures = toJS(design.fixtures);
         let pipes = toJS(design.pipes);
+        let ep = toJS(this.props.controlsStore.editPipe);
 
         let nodes = [];
         let edges = [];
@@ -132,13 +131,13 @@ export default class DesignDrawing extends Component {
             .then(action((response) => {
                 let positions = {};
                 let topology = JSON.parse(response);
+
                 topology.nodes.map((n) => {
                     // scale everything down
                     positions[n.id] = {
                         x: 0.3 * n.x,
                         y: 0.3 * n.y
                     }
-
                 });
 
 
@@ -192,7 +191,24 @@ export default class DesignDrawing extends Component {
                     '#00CC00', 'orange', 'cyan', 'brown', 'pink'];
 
                 pipes.map((p, pipe_idx) => {
-                    if (p.locked) {
+                    let drawMode = 'None';
+                    if (p.id === ep.pipeId){
+                        if (ep.locked) {
+                            drawMode = 'full';
+
+                        } else {
+                            drawMode = 'none';
+                        }
+
+                    } else if (p.locked) {
+                        drawMode = 'full';
+                    } else {
+                        drawMode = 'direct';
+                    }
+                    if (drawMode === 'none') {
+                        //console.log('not drawing current pipe in design pipes loop');
+
+                    } else if (drawMode === 'full') {
                         let i = 0;
                         while (i < p.ero.length - 1) {
                             let a = p.ero[i];
@@ -237,7 +253,8 @@ export default class DesignDrawing extends Component {
                         }
 
 
-                    } else {
+                    } else if (drawMode === 'direct') {
+
                         let edge = {
                             id: p.id,
                             from: p.a,
@@ -255,6 +272,57 @@ export default class DesignDrawing extends Component {
                         edges.push(edge);
                     }
                 });
+                // console.log('done drawing rest, now for current pipe');
+                let i = 0;
+                let ero = ep.ero;
+                if (ero.acceptable && !ep.locked) {
+                    let hops = ero.hops;
+                    // console.log(toJS(hops));
+                    while (i < hops.length - 1) {
+                        let a = hops[i];
+                        let b = hops[i + 1];
+                        let y = hops[i + 2];
+                        let z = hops[i + 3];
+
+                        let foundZ = false;
+                        nodes.map((node) => {
+                            if (node.id === z) {
+                                foundZ = true;
+                            }
+                        });
+                        if (!foundZ) {
+                            let zNode = {
+                                id: z,
+                                label: z,
+                                size: 12,
+                                x: positions[z].x,
+                                y: positions[z].y,
+
+                                shape: 'diamond',
+                                onClick: null
+                            };
+                            nodes.push(zNode);
+                        }
+                        let edge = {
+                            id: 'current' + ' : ' + b + ' --- ' + y,
+                            from: a,
+                            color: {
+                                color: 'purple'
+                            },
+                            onClick: null,
+                            dashes: true,
+                            to: z,
+                            length: 3,
+                            width: 4
+                        };
+                        edges.push(edge);
+
+
+                        i = i + 3;
+                    }
+                }
+
+
 
                 topology.nodes.map((n) => {
 
@@ -277,22 +345,13 @@ export default class DesignDrawing extends Component {
     render() {
 
 
-        const helpHeader = <span>Design drawing help</span>;
+        const helpHeader = <span>ERO drawing help</span>;
         const helpBody = <span>
-            <p>This drawing displays the fixtures, junctions and pipes of your design. It starts empty and
-                will auto-update as they are added, deleted, or updated.</p>
-            <p>Fixtures are drawn as small hexagons. Junctions are represented by larger circles. Pipes
-                will be drawn as dashed lines of different colors between junctions when unlocked, and
-                as solid lines when locked. Intermediate devices will be drawn as small rhombuses.</p>
-            <p>Zoom in and out by mouse-wheel, click and drag the background to pan, or click-and-drag
-                a node to reposition it.</p>
-            <p>Click on any component to bring up its edit form. You may also click on the
-                magnifying glass icon to the right to auto-adjust the zoom level to fit everything
-                in the displayed window.</p>
-            <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
+            <p>This drawing displays the ERO for this pipe.</p>
+
         </span>;
 
-        const help = <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='ddHelp'/>
+        const help = <HelpPopover header={helpHeader} body={helpBody} placement='right' popoverId='ddHelp'/>;
 
 
         return (
@@ -310,7 +369,7 @@ export default class DesignDrawing extends Component {
                     </span>
                 </CardHeader>
                 <CardBody>
-                    <div id={this.props.containerId}><p>design drawing</p></div>
+                    <div id={this.props.containerId}><p>ero drawing</p></div>
                 </CardBody>
             </Card>
 
@@ -318,6 +377,6 @@ export default class DesignDrawing extends Component {
     }
 }
 
-DesignDrawing.propTypes = {
+EroDrawing.propTypes = {
     containerId: PropTypes.string.isRequired,
 };

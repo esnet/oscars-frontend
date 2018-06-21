@@ -22,7 +22,7 @@ import myClient from '../../agents/client';
 import ConfirmModal from '../confirmModal';
 import HelpPopover from '../helpPopover';
 import PipeBwInput from './pipeBwInput';
-import DesignDrawing from './designDrawing';
+import EroDrawing from './eroDrawing';
 
 
 const modalName = 'editPipe';
@@ -638,7 +638,7 @@ export default class EditPipeModal extends Component {
                             </ListGroup>
                         </TabPane>
                         <TabPane tabId='drawing' title='Drawing'>
-                            <DesignDrawing containerId={'modalDesignDrawing'} />
+                            <EroDrawing containerId={'eroDrawing'} />
 
                         </TabPane>
                     </TabContent>

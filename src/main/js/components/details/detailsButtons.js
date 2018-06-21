@@ -7,7 +7,7 @@ import {Button, ListGroup, ListGroupItem, Input, Form, FormGroup} from 'reactstr
 import myClient from '../../agents/client';
 import Moment from 'moment/moment';
 import {autorun, action, toJS} from 'mobx';
-
+import {size} from 'lodash-es';
 import HelpPopover from '../helpPopover';
 
 
@@ -120,11 +120,21 @@ export default class DetailsButtons extends Component {
 
     };
 
+    doRegenCommands = () => {
+        const conn = this.props.connsStore.store.current;
+        myClient.submitWithToken('GET', '/protected/pss/regenerate/' + conn.connectionId)
+            .then(action((response) => {
+                this.props.connsStore.refreshCommands();
+            }));
+
+        return false;
+    };
+
     doOverrideState = () => {
         const conn = this.props.connsStore.store.current;
         const newState = this.props.connsStore.controls.overrideState.newState;
 
-        myClient.submitWithToken('POST', '/protected/conn/state/'+ conn.connectionId, newState)
+        myClient.submitWithToken('POST', '/protected/conn/state/' + conn.connectionId, newState)
             .then(action((response) => {
                 this.props.connsStore.refreshCurrent();
             }));
@@ -163,6 +173,22 @@ export default class DetailsButtons extends Component {
                 'ok': true
             });
 
+            if (size(this.props.connsStore.store.commands) === 0) {
+                this.props.connsStore.setControl('regenerate', {
+                    'text': 'Regenerate router configs',
+                    'show': true,
+                    'ok': false
+                });
+
+            } else {
+                this.props.connsStore.setControl('regenerate', {
+                    'text': 'Regenerate router configs',
+                    'show': true,
+                    'ok': true
+                });
+            }
+
+
             this.setReleaseHelp();
             this.setBmHelp();
         } else {
@@ -182,6 +208,12 @@ export default class DetailsButtons extends Component {
                 'show': false,
                 'ok': false
             });
+            this.props.connsStore.setControl('regenerate', {
+                'text': 'Regenerate router configs',
+                'show': false,
+                'ok': false
+            });
+
 
 
         }
@@ -221,7 +253,9 @@ export default class DetailsButtons extends Component {
         const buildModeChangeText = controls.buildmode.text;
 
         let buildMode = null;
+        let showControlsheader = false;
         if (controls.buildmode.show) {
+            showControlsheader = true;
             buildMode = <ListGroupItem>
 
                 <Button color='primary' disabled={!canChangeBuildMode} onClick={this.changeBuildMode}
@@ -236,6 +270,7 @@ export default class DetailsButtons extends Component {
 
         let build = null;
         if (controls.build.show) {
+            showControlsheader = true;
             build = <ListGroupItem><Button color='primary' disabled={!canBuild} onClick={this.build}
                                            className='float-left'>{buildText}</Button>
                 {' '}
@@ -247,6 +282,7 @@ export default class DetailsButtons extends Component {
         const dismantleText = controls.dismantle.text;
         let dismantle = null;
         if (controls.dismantle.show) {
+            showControlsheader = true;
             dismantle = <ListGroupItem>
                 <Button color='primary' disabled={!canDismantle} onClick={this.dismantle}
                         className='float-left'>{dismantleText}</Button>
@@ -260,6 +296,7 @@ export default class DetailsButtons extends Component {
 
         let release = null;
         if (controls.release.show) {
+            showControlsheader = true;
             release = <ListGroupItem>
                 <Button color='info' disabled={true} className='float-left'>{releaseText}</Button>
                 {' '}
@@ -292,10 +329,11 @@ export default class DetailsButtons extends Component {
             overallHelp = null;
         }
 
+        let showSpecialHeader = false;
+
         let recoverSelect = null;
-        let specialControls = null;
         if (conn.state === 'FAILED') {
-            specialControls = <ListGroupItem active>Special Controls</ListGroupItem>
+            showSpecialHeader = true;
             recoverSelect = <ListGroupItem>
                 <Form inline>
                     <FormGroup>
@@ -311,15 +349,38 @@ export default class DetailsButtons extends Component {
             </ListGroupItem>;
         }
 
+        let regenerate = null;
+        if (controls.regenerate.show) {
+            showSpecialHeader = true;
+            regenerate = <ListGroupItem>
+                <Button className='pull-right' color='warning'
+                        disabled={!controls.regenerate.ok}
+                        onClick={this.doRegenCommands}>Regenerate router config</Button>
+            </ListGroupItem>
+
+        }
+
+        let controlsHeader = null;
+        if (showControlsheader) {
+            controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
+        }
+        let specialHeader = null;
+        if (showSpecialHeader) {
+            specialHeader = <ListGroupItem active>Special Controls</ListGroupItem>;
+        }
+
 
         return <ListGroup>
-            <ListGroupItem active>Controls {overallHelp}</ListGroupItem>
+            {controlsHeader}
             {buildMode}
             {build}
             {dismantle}
             {release}
-            {specialControls}
+            {specialHeader}
+            {regenerate}
+
             {recoverSelect}
+
 
         </ListGroup>;
     }

@@ -56,7 +56,9 @@ export default class DetailsInfo extends Component {
                         this.props.connsStore.setStatuses(deviceUrn, status);
                     }));
         }
-        this.refreshTimeout = setTimeout(this.refreshStatuses, 10000); // update per 5 seconds
+        this.props.connsStore.refreshCommands();
+
+        this.refreshTimeout = setTimeout(this.refreshStatuses, 5000); // update per 5 seconds
 
     };
 
@@ -147,8 +149,8 @@ export default class DetailsInfo extends Component {
     };
 
     toggleCommandCollapse = (urn, type) => {
-        console.log('toggling '+urn+' '+type);
-        console.log(this.state);
+//       console.log('toggling '+urn+' '+type);
+//        console.log(this.state);
         let newSt = {};
         if (urn in this.state.commands) {
             newSt[urn] = {};
@@ -163,7 +165,7 @@ export default class DetailsInfo extends Component {
             newSt[urn][type] = true;
         }
         this.setState({commands: newSt});
-        console.log(this.state);
+//        console.log(this.state);
 
 
     };
