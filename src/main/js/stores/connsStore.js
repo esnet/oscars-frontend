@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import {observable, action} from 'mobx';
 import {isArray, mergeWith} from 'lodash-es';
 import transformer from "../lib/transform";
 import myClient from "../agents/client";
@@ -65,7 +65,11 @@ class ConnectionsStore {
                 'header': null,
                 'body': null,
             },
-
+        },
+        regenerate: {
+            ok: false,
+            show: false,
+            text: ''
         },
         overrideState: {
             'newState': null
@@ -86,6 +90,7 @@ class ConnectionsStore {
     @action setCommands(commands) {
         this.store.commands = commands;
     }
+
     @action setHistory(history) {
         this.store.history = history;
     }
@@ -94,6 +99,7 @@ class ConnectionsStore {
     @action setControl(unit, params) {
         this.controls[unit] = params;
     }
+
     @action setControlHelp(unit, params) {
         this.controls.help[unit] = params;
     }
@@ -112,6 +118,7 @@ class ConnectionsStore {
         this.store.current = conn;
         this.store.foundCurrent = true;
     }
+
     @action clearCurrent() {
         this.store.current = {};
         this.store.foundCurrent = false;
@@ -125,6 +132,22 @@ class ConnectionsStore {
         this.store.conns = [];
         this.store.conns = resvs;
     }
+
+    @action refreshCommands() {
+        myClient.submitWithToken('GET', '/protected/pss/commands/' + this.store.current.connectionId)
+            .then(action(
+                (response) => {
+                    let commands = JSON.parse(response);
+                    if (commands.length !== 0) {
+                        this.setCommands(commands);
+                    } else {
+                        this.setCommands({});
+                    }
+                })
+            );
+
+    }
+
     @action refreshCurrent() {
         myClient.submitWithToken('GET', '/api/conn/info/' + this.store.current.connectionId)
             .then(action(

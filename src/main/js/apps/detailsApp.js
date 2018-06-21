@@ -67,13 +67,7 @@ export default class DetailsApp extends Component {
                         })
                         */
 
-                        myClient.submitWithToken('GET', '/protected/pss/commands/'+connectionId)
-                            .then(action(
-                                (response) => {
-                                    let commands = JSON.parse(response);
-                                    this.props.connsStore.setCommands(commands);
-                                })
-                            );
+                        this.props.connsStore.refreshCommands();
 
 
                     } else {

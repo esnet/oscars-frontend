@@ -73,7 +73,7 @@ export default class DetailsTags extends Component {
 
     fetchContentOptions = () => {
         let source = this.props.tagStore.editTag.source;
-        if (!source.startsWith('https://spreadsheets.google.com')) {
+        if (!source.startsWith('https://spreadsheets.google.com/feeds/cells/')) {
             console.log('invalid source; only google sheets for now');
             this.props.tagStore.setEditedTagContentOptions(['Error!']);
             return;
@@ -84,7 +84,7 @@ export default class DetailsTags extends Component {
                 let entries = parsed['feed']['entry'];
                 let opts = [];
                 entries.map(e => {
-                    opts.push(e['title']['$t']);
+                    opts.push(e['content']['$t']);
                 });
                 this.props.tagStore.setEditedTagContentOptions(opts);
 
@@ -184,6 +184,7 @@ export default class DetailsTags extends Component {
         let ctgSource = this.props.tagStore.editTag.source;
         let contentsInput = <Input type='text' id='contents'
                                    bsSize='sm'
+                                   style={{width: '160px'}}
                                    placeholder='Contents'
                                    onKeyPress={this.handleKeyPress}
                                    onChange={(e) => this.onContentsChange(e.target.value)}/>;
@@ -197,7 +198,7 @@ export default class DetailsTags extends Component {
             });
 
             contentsInput = <small>
-                <Select style={{width: '100px'}}
+                <Select style={{width: '160px'}}
                         name='select-contents'
                         placeholder='Choose..'
                         simpleValue
