@@ -107,6 +107,12 @@ export default class AdminTagsApp extends Component {
                                 {
                                     categories.map(c => {
                                         let source = c.source;
+                                        if (c.source === null) {
+                                            c.source = '';
+                                        }
+                                        if (c.category === null || c.category === '') {
+                                            return null;
+                                        }
                                         if (c.source.length > 40) {
                                             source = c.source.substr(0, 40)+'...';
                                         }
