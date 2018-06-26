@@ -37,7 +37,7 @@ export default class ConnectionControls extends Component {
                             description: '',
                             phase: 'HELD',
                             connectionId: response,
-                            mode: 'MANUAL'
+                            mode: 'AUTOMATIC'
                         };
                         this.props.controlsStore.setParamsForConnection(params);
                     }));
