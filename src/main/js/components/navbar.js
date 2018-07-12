@@ -74,7 +74,13 @@ export default class NavBar extends Component {
                 </DropdownMenu>
             </UncontrolledDropdown>
         }
-
+/*
+        // remove these links for now
+        <NavLink href='/pages/map'
+                 active={this.props.commonStore.nav.active === 'map'}>Network Map</NavLink>
+        <NavLink href='/pages/details'
+                 active={this.props.commonStore.nav.active === 'details'}>Details</NavLink>
+ */
         return (
             <Navbar color='faded' light expand='md'>
                 <AlertList
@@ -90,12 +96,8 @@ export default class NavBar extends Component {
 
 
                 <Nav navbar>
-                    <NavLink href='/pages/map'
-                             active={this.props.commonStore.nav.active === 'map'}>Network Map</NavLink>
                     <NavLink href='/pages/list'
                              active={this.props.commonStore.nav.active === 'list'}>List</NavLink>
-                    <NavLink href='/pages/details'
-                             active={this.props.commonStore.nav.active === 'details'}>Details</NavLink>
                     <NavLink href='/pages/newDesign'
                              active={this.props.commonStore.nav.active === 'newDesign'}>New</NavLink>
                     <NavLink href='/pages/status'

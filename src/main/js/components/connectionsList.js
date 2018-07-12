@@ -73,8 +73,8 @@ class ConnectionsList extends Component {
 
     fixtureFormatter = (cell, row) => {
         let result = row.fixtures.map((f) => {
-            let key = row.connectionId+':'+f.portUrn + '#' + f.vlan.vlanId;
-            return <ListGroupItem className='m-1 p-1' key={key}><small>{f.portUrn + '#' + f.vlan.vlanId}</small></ListGroupItem>
+            let key = row.connectionId+':'+f.portUrn + '.' + f.vlan.vlanId;
+            return <ListGroupItem className='m-1 p-1' key={key}><small>{f.portUrn + '.' + f.vlan.vlanId}</small></ListGroupItem>
         });
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
@@ -130,7 +130,7 @@ class ConnectionsList extends Component {
             let fixtureBits = [];
             c.archived.cmp.fixtures.map((f) => {
                 fixtures.push(f);
-                const fixtureBit = f.portUrn + '#'+f.vlan.vlanId;
+                const fixtureBit = f.portUrn + '.'+f.vlan.vlanId;
                 fixtureBits.push(fixtureBit);
             });
             let fixtureString = fixtureBits.join(' ');

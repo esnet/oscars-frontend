@@ -22,6 +22,11 @@ class UserStore {
     };
 
     @action
+    toggleAdmin() {
+        this.editUser.user.permissions.adminAllowed = !this.editUser.user.permissions.adminAllowed;
+    }
+
+    @action
     setParamsForEditUser(params) {
         Object.assign(this.editUser, params);
     }
@@ -30,14 +35,18 @@ class UserStore {
     setParamsForOneUser(params) {
         Object.assign(this.editUser.user, params);
     }
+
     @action setPassword(value) {
         this.editUser.password = value;
     }
+
     @action setPasswordAgain(value) {
         this.editUser.passwordAgain = value;
     }
+
     @action setOldPassword(value) {
         this.editUser.oldPassword = value;
     }
 }
+
 export default new UserStore();
