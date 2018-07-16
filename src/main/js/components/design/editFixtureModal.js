@@ -50,10 +50,6 @@ export default class EditFixtureModal extends Component {
 
         this.props.designStore.deleteFixtureDeep(ef.fixtureId);
 
-        // check if the junction is completely gone; if so, uncolor the map
-        if (!this.props.designStore.junctionExists(device)) {
-            this.props.mapStore.deleteColoredNode(device);
-        }
         if (andCloseModal) {
             this.closeModal();
         }

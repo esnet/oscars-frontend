@@ -39,14 +39,12 @@ export default class AddFixtureModal extends Component {
     addFixture = (device, port) => {
         let params = {
             device: device,
-            port: port.urn,
+            port: port,
         };
         let fixture = this.props.designStore.addFixtureDeep(params);
 
         const editFixtureParams = transformer.newFixtureToEditParams(fixture);
         this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
-        // this.props.mapStore.addColoredNode({id: device, color: 'green'});
-        this.props.mapStore.setZoomOnColored(true);
 
         this.props.modalStore.openModal('editFixture');
     };

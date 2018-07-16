@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {DataSet, Network} from 'vis/dist/vis-network.min.js';
 import {inject, observer} from 'mobx-react';
 import {autorun, toJS, action} from 'mobx';
-import ToggleDisplay from 'react-toggle-display';
 import Octicon from 'react-octicon'
 
 require('vis/dist/vis-network.min.css');
@@ -36,49 +35,8 @@ export default class NetworkMap extends Component {
         this.datasource.nodes.add(toJS(this.props.mapStore.network.nodes));
         this.datasource.edges.add(toJS(this.props.mapStore.network.edges));
 
-        this.props.mapStore.network.nodes.map((entry) => {
-            this.datasource.nodes.update({
-                id: entry.id,
-                shape: 'circle',
-                scaling: {
-                    size: 20
-                },
-                font: {
-                    size: 20,
-                    bold: true,
-                }
-            });
-        });
-
-        this.props.mapStore.network.coloredNodes.map((entry) => {
-            this.datasource.nodes.update({
-                id: entry.id,
-                scaling: {
-                    size: 40
-                },
-                color: {background: entry.color}
-            });
-        });
-
-        this.props.mapStore.network.coloredEdges.map((entry) => {
-            let edgeId = entry.id;
-            if (this.datasource.edges.get(edgeId) === null) {
-                edgeId = entry.id.split(' -- ')[1] + ' -- ' + entry.id.split(' -- ')[0];
-
-            }
-            if (this.datasource.edges.get(edgeId) !== null) {
-                this.datasource.edges.update({
-                    id: edgeId,
-                    width: 8,
-                    color: {color: entry.color}
-                });
-            } else {
-                console.log('could not find edge for ' + entry.id);
-            }
-        });
-
         let options = {
-            height: '330px',
+            height: '400px',
             interaction: {
                 hover: false,
                 navigationButtons: true,
@@ -90,8 +48,12 @@ export default class NetworkMap extends Component {
                 stabilization: true
             },
             nodes: {
+                color: {background: 'white'},
+                size: 50,
                 shape: 'dot',
-                color: {background: 'white'}
+                font: {
+                    size: 18,
+                }
             }
         };
         const mapId = document.getElementById(this.props.mapDivId);
@@ -108,42 +70,30 @@ export default class NetworkMap extends Component {
             this.network.on('dragEnd', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
-                    this.datasource.nodes.update({id: nodeId, fixed: {x: true, y: true}});
+                    this.datasource.nodes.update({
+                        id: nodeId,
+                        fixed: {x: true, y: true},
+                    });
                 }
             });
 
             this.network.on('dragStart', (params) => {
                 if (params.nodes.length > 0) {
                     let nodeId = params.nodes[0];
-                    this.datasource.nodes.update({id: nodeId, fixed: {x: false, y: false}});
+                    this.datasource.nodes.update({
+                        id: nodeId,
+                        fixed: {x: false, y: false},
+
+
+                    });
                 }
             });
-            /*
-            this.network.on('stabilizationIterationsDone', () => {
-
-                if (this.props.mapStore.network.zoomedOnColored) {
-
-                    this.zoomOnColored();
-                    this.props.mapStore.setZoomOnColored(false);
-                }
-            });
-            */
 
         }
 
 
     }, {delay: 500});
 
-
-    zoomOnColored = () => {
-
-        let nodeIds = [];
-        this.props.mapStore.network.coloredNodes.map((entry) => {
-            nodeIds.push(entry.id);
-        });
-
-        this.network.fit({nodes: nodeIds, animation: true});
-    };
 
     componentWillUnmount() {
         this.disposeOfMapUpdate();

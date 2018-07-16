@@ -14,8 +14,6 @@ export default class ListConnectionsApp extends Component {
     }
 
     componentWillMount() {
-        this.props.mapStore.setColoredNodes([]);
-        this.props.mapStore.setColoredEdges([]);
         this.props.commonStore.setActiveNav('list');
     }
 
