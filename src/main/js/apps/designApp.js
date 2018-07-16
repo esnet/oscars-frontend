@@ -32,7 +32,6 @@ export default class DesignApp extends Component {
             && this.props.designStore.restoreFromSessionStorage();
         if (!restore) {
             // if we can't restore (ie. first time we visit OR hold time expired), clear
-            this.props.mapStore.clearColored();
             this.props.controlsStore.clearEditConnection();
             this.props.controlsStore.clearEditDesign();
             this.props.controlsStore.clearSessionStorage();

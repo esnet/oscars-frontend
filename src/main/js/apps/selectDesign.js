@@ -41,16 +41,7 @@ export default class SelectDesign extends Component {
         this.props.controlsStore.setParamsForEditDesign({designId: design.designId, description: design.description});
         let cmp = transformer.fromBackend(design.cmp);
         this.props.designStore.setComponents(cmp);
-        let coloredNodes = [];
-        /*
-        cmp.junctions.map((j) => {
-            coloredNodes.push({
-                id: j.id,
-                color: 'green',
-            });
-        });
-        */
-        this.props.mapStore.setColoredNodes(coloredNodes);
+
     };
 
     toggle() {

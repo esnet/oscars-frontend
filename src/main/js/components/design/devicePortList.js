@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import {
     ListGroup,
     ListGroupItem,
-    Row, Col, Container,
-    Card, CardBody, CardSubtitle,
+    Card, CardBody,
     Button
 } from 'reactstrap';
-
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, {textFilter} from "react-bootstrap-table2-filter";
 
 
 export default class DevicePortList extends Component {
@@ -23,49 +23,93 @@ export default class DevicePortList extends Component {
         return 0;
     };
 
-    render() {
-        let portsNodes = this.props.ports.sort(this.portSort).map((entry, portIdx) => {
-            let port = entry.port;
-            let device = entry.device;
-            let portLabel = port.urn.split(':')[1];
+    portFormatter = (cell, row) => {
+        let port = row.port;
+        let label = row.label;
 
-            let clickHandler = () => {
-                this.props.onAddClicked(device, port);
-            };
+        return <ListGroup className='p-0' key={port}>
+            <small><ListGroupItem className='p-1'> {label}</ListGroupItem></small>
+        </ListGroup>;
 
-            let tags = <ListGroupItem/>;
-            if ('tags' in port) {
-                tags = port.tags.map((tag, idx) => {
-                    return (
-                        <ListGroupItem className='p-0' key={idx}>{tag}</ListGroupItem>
-                    )
-                });
-            }
-            return <ListGroupItem key={port.urn}>
-                <Container>
-                    <Row>
-                        <Col>
-                            {portLabel}
-                            {' '}
-                            <Button color='primary' className='float-right' onClick={clickHandler}>Add</Button>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <small>
-                                <ListGroup className='p-0'>
-                                    {tags}
-                                </ListGroup>
-                            </small>
-                        </Col>
-                    </Row>
-                </Container>
-            </ListGroupItem>;
-
-
+    };
+    tagFormatter = (cell, row) => {
+        return row.tags.map((tag, idx) => {
+            return (
+                <ListGroupItem className='p-0' key={idx}><small>{tag}</small></ListGroupItem>
+            )
         });
 
-        return <ListGroup>{portsNodes}</ListGroup>
+    };
+
+    actionFormatter = (cell, row) => {
+        let clickHandler = () => {
+            this.props.onAddClicked(row.device, row.port);
+        };
+        return <Button color='primary' onClick={clickHandler}>Add</Button>;
+
+    };
+
+    render() {
+        const columns = [
+            {
+                text: 'Port',
+                dataField: 'portText',
+                filter: textFilter({delay: 100}),
+                formatter: this.portFormatter,
+                headerStyle:{ width: '100px', textAlign: 'left' },
+                style:{ textAlign: 'center' }
+            },
+            {
+                text: 'Tags',
+                dataField: 'tagText',
+                filter: textFilter({delay: 100}),
+                formatter: this.tagFormatter
+            },
+            {
+                dataField: 'action',
+                text: 'Add',
+                formatter: this.actionFormatter,
+                headerStyle:{ width: '80px', textAlign: 'center' },
+                style:{ textAlign: 'center' }
+            }
+        ];
+
+        let rows = [];
+        this.props.ports.sort(this.portSort);
+        this.props.ports.map(p => {
+            let portLabel = p.port.urn.split(':')[1];
+            let tags = [];
+            if ('tags' in p.port) {
+                p.port.tags.map(t => {
+                    let tag = t.replace(p.device+'->', '');
+                    tags.push(tag);
+                });
+            }
+
+            let portText = portLabel;
+            let tagText = tags.join(", ");
+
+
+            let row = {
+                port: p.port.urn,
+                portText: portText,
+                tagText: tagText,
+                device: p.device,
+                tags: tags,
+                label: portLabel
+            };
+            rows.push(row);
+        });
+
+        return <Card>
+            <CardBody>
+                <BootstrapTable keyField='port' data={rows} columns={columns}
+                                filter={filterFactory()}/>
+
+            </CardBody>
+
+
+        </Card>
     };
 }
 

@@ -51,7 +51,6 @@ export default class EditJunctionModal extends Component {
 
         this.props.designStore.deleteJunctionDeep(junction);
 
-        this.props.mapStore.deleteColoredNode(junction);
         this.setState({
             confirmOpen: false
         });

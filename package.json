@@ -1,6 +1,6 @@
 {
   "name": "oscars-frontend",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "OSCARS frontend",
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "react-dropdown": "^1.2.0",
     "react-idle-timer": "^2.0.0",
     "react-lazylog": "^3.1.4",
+    "react-nestable": "^1.1.0",
     "react-octicon": "^3.0.1",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.1.1",

@@ -46,6 +46,11 @@ export default class EditUserForm extends Component {
 
     };
 
+    toggleAdmin = () => {
+
+        this.props.userStore.toggleAdmin();
+    };
+
     changePwd = () => {
         this.props.userStore.setParamsForEditUser({changingPwd: true});
     };
@@ -117,6 +122,10 @@ export default class EditUserForm extends Component {
         } else if (editUser.passwordValidationState === 'success') {
             passwordValid = true;
             passwordInvalid = false;
+        }
+        let disableAdminBox = true;
+        if (this.props.adminMode) {
+            disableAdminBox = false;
         }
 
         const helpHeader = <span>User editing</span>;
@@ -193,8 +202,11 @@ export default class EditUserForm extends Component {
                                 {' '}
                                 <FormGroup check inline>
                                     <Label>Is admin?{' '}
-                                    <Input type='checkbox' defaultChecked={editUser.user.permissions.adminAllowed}
-                                              disabled={true} />
+                                    <Input type='checkbox'
+                                           onChange={(e) => this.toggleAdmin()}
+                                           defaultChecked={editUser.user.permissions.adminAllowed}
+                                           disabled={disableAdminBox} />
+
                                     </Label>
                                 </FormGroup>
 
@@ -243,6 +255,7 @@ export default class EditUserForm extends Component {
                                             <Label>Old Password</Label>
                                             {' '}
                                             <Input type='password'
+                                                   invalid={editUser.oldPassword.length == 0}
                                                    innerRef={(ref) => {
                                                        this.oldPasswordRef = ref
                                                    }}

@@ -32,12 +32,22 @@ class TopologyStore {
 
     @observable version = observable.map({});
 
+    @observable report = observable.map({});
+
     @action loadVersion() {
         myClient.loadJSON({method: 'GET', url: '/api/topo/version'})
             .then(action((response) => {
                 this.version = JSON.parse(response);
             }));
     }
+
+    @action loadReport() {
+        myClient.loadJSON({method: 'GET', url: '/api/topo/report'})
+            .then(action((response) => {
+                this.report = JSON.parse(response);
+            }));
+    }
+
 
     @action loadEthernetPorts() {
 

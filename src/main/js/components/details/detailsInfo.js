@@ -280,13 +280,17 @@ export default class DetailsInfo extends Component {
                         <TabPane tabId='history' title='Config history'>
                             {
                                 history.map(h => {
+                                    const format = 'Y/MM/DD HH:mm';
                                     if (h.deviceUrn === selected.data.deviceUrn) {
                                         let isOpen = this.state.historyId === h.id;
+                                        const when = Moment(h.date * 1000);
+
+                                        const humanWhen = when.format(format) + ' (' + when.fromNow() + ')';
 
                                         return <Card key={h.id}>
                                             <CardHeader className='p-1'
                                                         onClick={() => this.toggleHistoryCollapse(h.id)}>
-                                                <NavLink href='#'>{h.type} ({h.date})</NavLink>
+                                                <NavLink href='#'>{h.type} - {humanWhen}</NavLink>
                                             </CardHeader>
                                             <CardBody>
                                                 <Collapse isOpen={isOpen}>
