@@ -16,7 +16,6 @@ require('vis/dist/vis-network.min.css');
 require('vis/dist/vis.min.css');
 
 
-
 @inject('controlsStore', 'designStore', 'modalStore')
 @observer
 export default class DesignDrawing extends Component {
@@ -112,7 +111,6 @@ export default class DesignDrawing extends Component {
     componentWillUnmount() {
         this.disposeOfMapUpdate();
     }
-
 
 
     // this automagically updates the map;
@@ -268,7 +266,6 @@ export default class DesignDrawing extends Component {
                 this.network.fit({animation: false})
 
 
-
             }));
 
 
@@ -300,14 +297,15 @@ export default class DesignDrawing extends Component {
                 <CardHeader className='p-1'>
                     Design drawing
                     <span className='float-right'>
-                        <Octicon name='search' onClick={() => {
-                            this.network.fit({animation: true})
-                        }} />
+                        {help}
+                        <Octicon name='search'
+                                 style={ {cursor: 'pointer'}}
+
+                                 onClick={() => {
+                                     this.network.fit({animation: true})
+                                 }}/>
                     </span>
                     {' '}
-                    <span className='float-right'>
-                        {help}
-                    </span>
                 </CardHeader>
                 <CardBody>
                     <div id={this.props.containerId}><p>design drawing</p></div>

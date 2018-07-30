@@ -69,10 +69,10 @@ export default class DesignComponents extends Component {
                                             this.props.controlsStore.setParamsForEditFixture(params);
                                             this.props.modalStore.openModal('editFixture');
                                         }}>
-                                            <NavLink href='#'>
+                                            <NavLink style={{cursor: 'pointer'}}>
                                                 {validationLabel}
                                                 {' '}
-                                                {label}
+                                                <span style={{color:'#3366ff'}}>{label}</span>
                                             </NavLink>
                                         </ListGroupItem>
 
@@ -85,7 +85,7 @@ export default class DesignComponents extends Component {
                                             this.props.controlsStore.setParamsForEditJunction({junction: device});
                                             this.props.modalStore.openModal('editJunction');
                                         }}>
-                                            <NavLink href='#'>
+                                            <NavLink style={{cursor: 'pointer', color:'#3366ff'}}>
                                                 <strong>
                                                     {device}
                                                 </strong>
@@ -113,7 +113,7 @@ export default class DesignComponents extends Component {
 
                                         this.props.modalStore.openModal('editPipe');
                                     }}>
-                                        <NavLink href='#'>
+                                        <NavLink style={{cursor: 'pointer'}}>
                                             <small>
                                                 {validationLabel}
                                                 {' '}

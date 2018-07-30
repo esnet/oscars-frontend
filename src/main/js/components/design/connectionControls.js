@@ -119,7 +119,9 @@ export default class ConnectionControls extends Component {
                         <Alert color='info'>
                             <strong>Help me!
                                 <span className='float-right'>
-                                        <Octicon name='info' style={{height: '18px', width: '18px'}}
+                                        <Octicon name='info' style={
+                                            {height: '18px', width: '18px', cursor: 'pointer'}
+                                        }
                                                  onClick={() => {
                                                      this.props.modalStore.openModal('designHelp')
                                                  }}

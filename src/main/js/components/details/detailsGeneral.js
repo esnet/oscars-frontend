@@ -106,7 +106,7 @@ export default class DetailsGeneral extends Component {
 
                     <Nav tabs>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.tab === 'info'})}
                                 onClick={() => {
                                     this.setTab('info');
@@ -115,7 +115,7 @@ export default class DetailsGeneral extends Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.tab === 'tags'})}
                                 onClick={() => {
                                     this.setTab('tags');
@@ -124,7 +124,7 @@ export default class DetailsGeneral extends Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.tab === 'drawing'})}
                                 onClick={() => {
                                     this.setTab('drawing');

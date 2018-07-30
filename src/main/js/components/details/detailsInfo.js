@@ -200,7 +200,7 @@ export default class DetailsInfo extends Component {
                 <div>
                     <Nav tabs>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.junctionTab === 'commands'})}
                                 onClick={() => {
                                     this.setJunctionTab('commands');
@@ -209,7 +209,7 @@ export default class DetailsInfo extends Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.junctionTab === 'diagnostics'})}
                                 onClick={() => {
                                     this.setJunctionTab('diagnostics');
@@ -218,7 +218,7 @@ export default class DetailsInfo extends Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({active: this.state.junctionTab === 'history'})}
                                 onClick={() => {
                                     this.setJunctionTab('history');

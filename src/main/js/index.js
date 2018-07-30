@@ -41,6 +41,8 @@ import userStore from './stores/userStore';
 import modalStore from './stores/modalStore';
 import tagStore from './stores/tagStore';
 
+require('../css/styles.css');
+
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
         accountStore.isLoggedIn() ? (

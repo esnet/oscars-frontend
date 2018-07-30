@@ -373,7 +373,7 @@ export default class EditPipeModal extends Component {
         let params = {};
         params[direction] = {
             validationText: text,
-            validationState: error,
+            validationState: 'error',
             acceptable: false,
         };
 
@@ -608,14 +608,14 @@ export default class EditPipeModal extends Component {
                 <Col>
                     <Nav tabs>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({ active: this.state.eroTab === 'drawing' })}
                                 onClick={() => { this.setEroTab('drawing'); }}>
                                 Drawing
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink
+                            <NavLink href='#'
                                 className={classnames({ active: this.state.eroTab === 'ero' })}
                                 onClick={() => { this.setEroTab('ero'); }}>
                                 ERO

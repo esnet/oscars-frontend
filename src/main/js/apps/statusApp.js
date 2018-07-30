@@ -44,6 +44,7 @@ export default class StatusApp extends Component {
                             <Nav tabs>
                                 <NavItem>
                                     <NavLink
+                                        href='#'
                                         className={classnames({active: this.state.activeTab === 'log'})}
                                         onClick={() => {
                                             this.toggle('log');
@@ -53,6 +54,7 @@ export default class StatusApp extends Component {
 
                                 <NavItem>
                                     <NavLink
+                                        href='#'
                                         className={classnames({active: this.state.activeTab === 'topo'})}
                                         onClick={() => {
                                             this.toggle('topo');
