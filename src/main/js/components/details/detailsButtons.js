@@ -162,6 +162,8 @@ export default class DetailsButtons extends Component {
                 'show': true,
                 'ok': true
             });
+
+
             let buildmodeText = 'Set build mode to manual';
             if (conn.mode === 'MANUAL') {
                 buildmodeText = 'Set build mode to scheduled';
@@ -215,7 +217,6 @@ export default class DetailsButtons extends Component {
             });
 
 
-
         }
         const canBuild = (inInterval && isReserved && conn.mode === 'MANUAL' && conn.state === 'WAITING');
         const canDismantle = (inInterval && isReserved && conn.mode === 'MANUAL' && conn.state === 'ACTIVE');
@@ -251,15 +252,32 @@ export default class DetailsButtons extends Component {
 
         const canChangeBuildMode = controls.buildmode.ok;
         const buildModeChangeText = controls.buildmode.text;
+        let confirmChangeText = 'This will set the connection build mode to Manual. This means that it ' +
+            'will not be configured at start time; rather, the user will need to click the Build button to '+
+            'start the router config process. If it is already configured, this will enable the Dismantle ' +
+            'button, allowing you to remove the config from the router without releasing any resources.';
+        if (conn.mode === 'MANUAL') {
+            confirmChangeText = 'This will set the connection build mode to Scheduled. This means that it ' +
+                'will automatically be configured if the current time is past the start time. This will disable ' +
+                'the Build and Dismantle buttons.';
+
+        }
+
 
         let buildMode = null;
         let showControlsheader = false;
         if (controls.buildmode.show) {
             showControlsheader = true;
             buildMode = <ListGroupItem>
+                <ConfirmModal body={confirmChangeText}
+                              header='Change build mode'
+                              uiElement={
+                                  <Button color='primary' disabled={!canChangeBuildMode}
+                                          onClick={this.changeBuildMode}
+                                          className='float-left'>{buildModeChangeText}</Button>
+                              }
+                              onConfirm={this.changeBuildMode}/>
 
-                <Button color='primary' disabled={!canChangeBuildMode} onClick={this.changeBuildMode}
-                        className='float-left'>{buildModeChangeText}</Button>
                 {' '}
                 {this.help('buildmode')}
             </ListGroupItem>
@@ -271,8 +289,15 @@ export default class DetailsButtons extends Component {
         let build = null;
         if (controls.build.show) {
             showControlsheader = true;
-            build = <ListGroupItem><Button color='primary' disabled={!canBuild} onClick={this.build}
-                                           className='float-left'>{buildText}</Button>
+            build = <ListGroupItem>
+                <ConfirmModal body='This will build the connection. OSCARS will send all configuration
+                                    to network devices, allowing traffic to flow.'
+                              header='Dismantle connection'
+                              uiElement={<Button color='primary' disabled={!canBuild}
+                                                 className='float-left'>{buildText}</Button>}
+                              onConfirm={this.build}/>
+
+
                 {' '}
                 {this.help('build')}
             </ListGroupItem>;
@@ -284,8 +309,14 @@ export default class DetailsButtons extends Component {
         if (controls.dismantle.show) {
             showControlsheader = true;
             dismantle = <ListGroupItem>
-                <Button color='primary' disabled={!canDismantle} onClick={this.dismantle}
-                        className='float-left'>{dismantleText}</Button>
+                <ConfirmModal body='This will dismantle the connection. OSCARS will
+                                    remove all configuration from routers, stopping traffic flow.'
+                              header='Dismantle connection'
+                              uiElement={<Button color='primary' disabled={!canDismantle}
+                                                 className='float-left'>{dismantleText}</Button>}
+                              onConfirm={this.dismantle}/>
+
+
                 {' '}
                 {this.help('dismantle')}
             </ListGroupItem>;

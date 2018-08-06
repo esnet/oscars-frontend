@@ -28,7 +28,7 @@ export default class VlanSelect extends Component {
         const ef = this.props.controlsStore.editFixture;
 
         const baseline = this.props.topologyStore.baseline[ef.port];
-        const baselineVlanExpression = baseline.vlanExpression;
+        const baselineVlanExpression = baseline.vlanExpression.replace(new RegExp(':', 'g'),'-');
         const baselineVlanRanges = baseline.vlanRanges;
 
         if (!(ef.port in this.props.topologyStore.available)) {
@@ -70,6 +70,10 @@ export default class VlanSelect extends Component {
         }
 
         let expressionParts = [];
+        availableVlanRanges.sort( (a, b) => {
+            return a.floor - b.floor;
+
+        });
 
         for (let range of availableVlanRanges) {
             if (range.floor === range.ceiling) {

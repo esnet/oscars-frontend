@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
 import Moment from 'moment';
 import BootstrapTable from 'react-bootstrap-table-next';
+import {action, toJS} from 'mobx';
 
 import {
     Card, CardBody, CardHeader,
@@ -44,6 +45,7 @@ export default class DetailsGeneral extends Component {
 
     render() {
         const conn = this.props.connsStore.store.current;
+        //console.log(toJS(conn));
         const format = 'Y/MM/DD HH:mm';
         const beg = Moment(conn.archived.schedule.beginning * 1000);
         const end = Moment(conn.archived.schedule.ending * 1000);
