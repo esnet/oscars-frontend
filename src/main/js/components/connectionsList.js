@@ -148,7 +148,6 @@ class ConnectionsList extends Component {
             };
             rows.push(row);
         });
-        console.log(rows);
 
         return <Card>
             <CardBody>

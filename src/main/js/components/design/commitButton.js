@@ -20,24 +20,34 @@ class CommitButton extends Component {
 
 
     commit = () => {
+        let connId = this.props.controlsStore.connection.connectionId;
 
-        myClient.submitWithToken('POST', '/protected/conn/commit', this.props.controlsStore.connection.connectionId)
-            .then(action((response) => {
-                const phase = response.replace(/"/g, '');
-                this.props.controlsStore.setParamsForConnection({
-                    phase: phase
-                });
-                // TODO: do some checking of response!
+        myClient.submitWithToken('POST', '/protected/conn/commit', connId)
+            .then(
+                action((response) => {
+                    const phase = response.replace(/"/g, '');
+                    this.props.controlsStore.setParamsForConnection({
+                        phase: phase
+                    });
 
-                this.props.controlsStore.clearEditConnection();
-                this.props.controlsStore.clearEditDesign();
-                this.props.designStore.clear();
-                this.props.controlsStore.clearSessionStorage();
-                this.props.designStore.clearSessionStorage();
+                    this.props.controlsStore.clearEditConnection();
+                    this.props.controlsStore.clearEditDesign();
+                    this.props.designStore.clear();
+                    this.props.controlsStore.clearSessionStorage();
+                    this.props.designStore.clearSessionStorage();
 
-                this.props.history.push('/pages/list');
+                    this.props.history.push('/pages/details/' + connId);
 
-            }));
+                }),
+                action((failure) => {
+                    console.log(failure);
+                    this.props.controlsStore.clearEditConnection();
+                    this.props.controlsStore.clearEditDesign();
+                    this.props.designStore.clear();
+                    this.props.controlsStore.clearSessionStorage();
+                    this.props.designStore.clearSessionStorage();
+                })
+            );
 
         return false;
     };

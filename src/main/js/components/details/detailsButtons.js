@@ -28,11 +28,14 @@ export default class DetailsButtons extends Component {
 
     build = () => {
         const conn = this.props.connsStore.store.current;
+        const controls = this.props.connsStore.controls;
         this.props.connsStore.setControl('build', {
             text: 'Working..',
             'ok': false
         });
         this.props.connsStore.setControl('dismantle', {
+            'text': controls.dismantle.text,
+            'show': true,
             'ok': false
         });
         myClient.submitWithToken('GET', '/protected/pss/build/' + conn.connectionId, '')
@@ -43,11 +46,15 @@ export default class DetailsButtons extends Component {
     };
     dismantle = () => {
         const conn = this.props.connsStore.store.current;
+        const controls = this.props.connsStore.controls;
         this.props.connsStore.setControl('build', {
+            'text': controls.build.text,
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('dismantle', {
             text: 'Working..',
+            'show': true,
             'ok': false
         });
         myClient.submitWithToken('GET', '/protected/pss/dismantle/' + conn.connectionId, '')
@@ -59,6 +66,7 @@ export default class DetailsButtons extends Component {
     };
 
     changeBuildMode = () => {
+        const controls = this.props.connsStore.controls;
         let conn = this.props.connsStore.store.current;
         let otherMode = 'MANUAL';
         if (conn.mode === 'MANUAL') {
@@ -66,12 +74,17 @@ export default class DetailsButtons extends Component {
         }
         this.props.connsStore.setControl('buildmode', {
             'text': 'Working...',
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('build', {
+            'text': controls.build.text,
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('dismantle', {
+            'text': controls.dismantle.text,
+            'show': true,
             'ok': false
         });
         myClient.submitWithToken('POST', '/protected/conn/mode/' + conn.connectionId, otherMode)
@@ -85,18 +98,26 @@ export default class DetailsButtons extends Component {
 
 
     doRelease = () => {
+        const controls = this.props.connsStore.controls;
         let current = this.props.connsStore.store.current;
         this.props.connsStore.setControl('release', {
             'text': 'Releasing',
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('buildmode', {
+            'text': controls.buildmode.text,
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('build', {
+            'text': controls.build.text,
+            'show': true,
             'ok': false
         });
         this.props.connsStore.setControl('dismantle', {
+            'text': controls.dismantle.text,
+            'show': true,
             'ok': false
         });
 
@@ -224,13 +245,15 @@ export default class DetailsButtons extends Component {
         let dismantleText = 'Dismantle';
 
         this.props.connsStore.setControl('build', {
-            'show': isReserved && inInterval,
+//            'show': isReserved && inInterval,
+            'show': true,
             'text': buildText,
             'ok': canBuild
         });
 
         this.props.connsStore.setControl('dismantle', {
-            'show': isReserved && inInterval,
+//            'show': isReserved && inInterval,
+            'show': true,
             'text': dismantleText,
             'ok': canDismantle
         });
@@ -253,7 +276,7 @@ export default class DetailsButtons extends Component {
         const canChangeBuildMode = controls.buildmode.ok;
         const buildModeChangeText = controls.buildmode.text;
         let confirmChangeText = 'This will set the connection build mode to Manual. This means that it ' +
-            'will not be configured at start time; rather, the user will need to click the Build button to '+
+            'will not be configured at start time; rather, the user will need to click the Build button to ' +
             'start the router config process. If it is already configured, this will enable the Dismantle ' +
             'button, allowing you to remove the config from the router without releasing any resources.';
         if (conn.mode === 'MANUAL') {
@@ -265,9 +288,7 @@ export default class DetailsButtons extends Component {
 
 
         let buildMode = null;
-        let showControlsheader = false;
         if (controls.buildmode.show) {
-            showControlsheader = true;
             buildMode = <ListGroupItem>
                 <ConfirmModal body={confirmChangeText}
                               header='Change build mode'
@@ -286,48 +307,39 @@ export default class DetailsButtons extends Component {
         const canBuild = controls.build.ok;
         const buildText = controls.build.text;
 
-        let build = null;
-        if (controls.build.show) {
-            showControlsheader = true;
-            build = <ListGroupItem>
-                <ConfirmModal body='This will build the connection. OSCARS will send all configuration
+        let build = <ListGroupItem>
+            <ConfirmModal body='This will build the connection. OSCARS will send all configuration
                                     to network devices, allowing traffic to flow.'
-                              header='Dismantle connection'
-                              uiElement={<Button color='primary' disabled={!canBuild}
-                                                 className='float-left'>{buildText}</Button>}
-                              onConfirm={this.build}/>
+                          header='Dismantle connection'
+                          uiElement={<Button color='primary' disabled={!canBuild}
+                                             className='float-left'>{buildText}</Button>}
+                          onConfirm={this.build}/>
 
 
-                {' '}
-                {this.help('build')}
-            </ListGroupItem>;
-        }
+            {' '}
+            {this.help('build')}
+        </ListGroupItem>;
 
         const canDismantle = controls.dismantle.ok;
         const dismantleText = controls.dismantle.text;
-        let dismantle = null;
-        if (controls.dismantle.show) {
-            showControlsheader = true;
-            dismantle = <ListGroupItem>
-                <ConfirmModal body='This will dismantle the connection. OSCARS will
+        let dismantle = <ListGroupItem>
+            <ConfirmModal body='This will dismantle the connection. OSCARS will
                                     remove all configuration from routers, stopping traffic flow.'
-                              header='Dismantle connection'
-                              uiElement={<Button color='primary' disabled={!canDismantle}
-                                                 className='float-left'>{dismantleText}</Button>}
-                              onConfirm={this.dismantle}/>
+                          header='Dismantle connection'
+                          uiElement={<Button color='primary' disabled={!canDismantle}
+                                             className='float-left'>{dismantleText}</Button>}
+                          onConfirm={this.dismantle}/>
 
 
-                {' '}
-                {this.help('dismantle')}
-            </ListGroupItem>;
-        }
+            {' '}
+            {this.help('dismantle')}
+        </ListGroupItem>;
 
         const canRelease = controls.release.ok;
         const releaseText = controls.release.text;
 
         let release = null;
         if (controls.release.show) {
-            showControlsheader = true;
             release = <ListGroupItem>
                 <Button color='info' disabled={true} className='float-left'>{releaseText}</Button>
                 {' '}
@@ -391,10 +403,7 @@ export default class DetailsButtons extends Component {
 
         }
 
-        let controlsHeader = null;
-        if (showControlsheader) {
-            controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
-        }
+        let controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
         let specialHeader = null;
         if (showSpecialHeader) {
             specialHeader = <ListGroupItem active>Special Controls</ListGroupItem>;
