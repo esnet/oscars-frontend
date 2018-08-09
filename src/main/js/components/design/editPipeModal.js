@@ -70,6 +70,16 @@ export default class EditPipeModal extends Component {
     };
 
     protectClicked = (e) => {
+        let nextValue = false;
+        if (e.target.checked) {
+            nextValue = true;
+        }
+        this.props.controlsStore.setParamsForEditPipe({
+            protect: nextValue
+
+        });
+        let ep = this.props.controlsStore.editPipe;
+        console.log(toJS(ep));
     };
 
     pathUpdateDispose = autorun(() => {
@@ -312,6 +322,7 @@ export default class EditPipeModal extends Component {
         let params = {
             azBw: ep.A_TO_Z.bw,
             zaBw: ep.Z_TO_A.bw,
+            protect: ep.protect,
             mode: ep.ero.mode,
             ero: ep.ero.hops,
         };

@@ -9,6 +9,7 @@ class Transformer {
             port: fixture.port,
             device: fixture.device,
             locked: fixture.locked,
+            strict: fixture.strict,
             vlan: {
                 vlanId: fixture.vlanId,
                 validationState: 'success',
@@ -40,6 +41,7 @@ class Transformer {
             port: fixture.port,
             device: fixture.device,
             locked: false,
+            strict: fixture.strict,
             vlan: {
                 acceptable: true,
                 vlanId: null,
@@ -68,6 +70,7 @@ class Transformer {
             a: pipe.a,
             z: pipe.z,
             locked: pipe.locked,
+            protect: pipe.protect,
 
             A_TO_Z: {
                 bw: pipe.azBw,
@@ -110,6 +113,7 @@ class Transformer {
                     ingress: df.ingressBandwidth,
                     egress: df.egressBandwidth,
                     vlan: df.vlan.vlanId,
+                    strict: df.strict,
                     label: df.portUrn + ':' + df.vlan.vlanId,
                     locked: false,
                 };
@@ -126,6 +130,7 @@ class Transformer {
                     id: dp.a + ' -- ' + dp.z,
                     a: dp.a,
                     z: dp.z,
+                    protect: dp.protect,
                     azBw: dp.azBandwidth,
                     zaBw: dp.zaBandwidth,
                     locked: false,
@@ -157,6 +162,7 @@ class Transformer {
                 let entry = {
                     a: p.a,
                     z: p.z,
+                    protect: p.protect,
                     azMbps: p.azBw,
                     zaMbps: p.zaBw,
                     ero: p.ero
@@ -171,6 +177,7 @@ class Transformer {
                 junction: f.device,
                 inMbps: f.ingress,
                 outMbps: f.egress,
+                strict: f.strict,
                 port: f.port,
                 vlan: f.vlan
             };

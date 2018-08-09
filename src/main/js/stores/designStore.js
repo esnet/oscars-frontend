@@ -11,6 +11,7 @@ class DesignStore {
             label: a label
             vlan: int,
             ingress: int,
+            strict: bool,
             egress: int,
             locked: bool,
     }
@@ -20,6 +21,7 @@ class DesignStore {
            zaBW: int,
            locked: bool,
            ero: [],
+           protect: bool
            mode: str
     }
      */
@@ -146,6 +148,7 @@ class DesignStore {
                     z: lastDevice,
                     azBw: 0,
                     zaBw: 0,
+                    strict: false,
                     locked: false,
                     mode: 'fits',
                     ero: []
@@ -204,6 +207,7 @@ class DesignStore {
             ingress: 0,
             egress: 0,
             locked: false,
+            strict: false
 
         };
 
@@ -233,6 +237,7 @@ class DesignStore {
             if (entry.id === id) {
                 outLabel = entry.port.split(':')[1] + ':' + params.vlan;
                 entry.label = outLabel;
+                entry.strict = params.strict;
 
                 entry.vlan = params.vlan;
                 entry.ingress = params.ingress;
@@ -250,6 +255,7 @@ class DesignStore {
             if (entry.id === id) {
                 outLabel = entry.port.split(':')[1] + ':' + entry.id.split(':')[2];
                 entry.label = outLabel;
+                entry.strict = false;
 
                 entry.vlan = null;
                 entry.ingress = 0;
@@ -343,6 +349,7 @@ class DesignStore {
         pipe.zaBw = 0;
         pipe.locked = false;
         pipe.mode = 'fits';
+        pipe.protect = true;
         pipe.ero = [];
 
 
@@ -358,7 +365,9 @@ class DesignStore {
                 pipe.azBw = params.azBw;
                 pipe.zaBw = params.zaBw;
                 pipe.mode = params.mode;
+                pipe.protect = params.protect;
                 pipe.ero = params.ero;
+                pipe.protect = params.protect;
                 pipe.locked = true;
             }
         });
@@ -371,6 +380,7 @@ class DesignStore {
                 pipe.azBw = 0;
                 pipe.zaBw = 0;
                 pipe.mode = '';
+                pipe.protect = false;
                 pipe.ero = [];
                 pipe.locked = false;
             }

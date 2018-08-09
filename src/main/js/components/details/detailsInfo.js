@@ -100,6 +100,10 @@ export default class DetailsInfo extends Component {
 
     fixtureInfo() {
         const d = this.props.connsStore.store.selected.data;
+        let policingText = 'Soft';
+        if (d.strict) {
+            policingText = 'Strict';
+        }
         const info = [
             {
                 'k': 'Port',
@@ -116,6 +120,10 @@ export default class DetailsInfo extends Component {
             {
                 'k': 'Egress',
                 'v': d.egressBandwidth + ' Mbps'
+            },
+            {
+                'k': 'Policing',
+                'v': policingText
             },
         ];
 
@@ -326,7 +334,10 @@ export default class DetailsInfo extends Component {
 
             }</ListGroup>
 
-
+        let protectTxt = 'No';
+        if (d.protect) {
+            protectTxt = 'Yes';
+        }
         const info = [
             {
                 'k': 'A',
@@ -343,6 +354,10 @@ export default class DetailsInfo extends Component {
             {
                 'k': 'Z-A Bandwidth',
                 'v': d.zaBandwidth + ' Mbps'
+            },
+            {
+                'k': 'Protect path?',
+                'v': protectTxt
             },
         ];
 

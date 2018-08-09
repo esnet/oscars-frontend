@@ -46,7 +46,6 @@ export default class EditFixtureModal extends Component {
     deleteFixture = (andCloseModal) => {
         const ef = this.props.controlsStore.editFixture;
 
-        let device = this.props.designStore.deviceOf(ef.fixtureId);
 
         this.props.designStore.deleteFixtureDeep(ef.fixtureId);
 
@@ -63,6 +62,7 @@ export default class EditFixtureModal extends Component {
         tParams.ingress = ef.bw.ingress.mbps;
         tParams.egress = ef.bw.egress.mbps;
         tParams.port = ef.port;
+        tParams.strict = ef.strict;
 
 
         tParams.vlan = ef.vlan.vlanId;

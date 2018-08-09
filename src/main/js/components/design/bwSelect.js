@@ -112,6 +112,18 @@ export default class BwSelect extends Component {
         this.props.controlsStore.setParamsForEditFixture(params);
     };
 
+    strictCheckboxClicked = (e) => {
+        let nextValue = false;
+        if (e.target.checked) {
+            nextValue = true;
+        }
+        let params = {
+            strict: nextValue
+        };
+        this.props.controlsStore.setParamsForEditFixture(params);
+    };
+
+
     onIngressBwChange = (e) => {
         let inputStr = Validator.cleanBandwidth(e.target.value, this.ingressControl);
 
@@ -402,6 +414,11 @@ export default class BwSelect extends Component {
                                         <Input type='checkbox' defaultChecked={ef.bw.symmetrical}
                                                onChange={this.symmetricalCheckboxClicked}/>
                                         {' '}Symmetrical
+                                    </Label>
+                                    <Label>
+                                        <Input type='checkbox' defaultChecked={ef.strict}
+                                               onChange={this.strictCheckboxClicked}/>
+                                        {' '}Strict Policing
                                     </Label>
                                 </FormGroup>
                             </Col>

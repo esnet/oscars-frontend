@@ -56,6 +56,7 @@ class ControlsStore {
         fixtureId: '',
         label: '',
         port: '',
+        strict: false,
 
         locked: false,
 
