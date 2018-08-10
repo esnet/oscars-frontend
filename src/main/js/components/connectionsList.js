@@ -17,13 +17,6 @@ import myClient from '../agents/client';
 class ConnectionsList extends Component {
 
     componentWillMount() {
-        /*
-        this.props.connsStore.setFilter({
-            criteria: ['phase'],
-            phase: 'RESERVED'
-        });
-        */
-
         this.updateList();
     }
 
@@ -36,10 +29,14 @@ class ConnectionsList extends Component {
     }, {delay: 1000});
 
     updateList = () => {
+        let csFilter = this.props.connsStore.filter;
         let filter = {};
-        this.props.connsStore.filter.criteria.map((c) => {
+        csFilter.criteria.map((c) => {
             filter[c] = this.props.connsStore.filter[c];
         });
+        filter.page = csFilter.page;
+        filter.sizePerPage = csFilter.sizePerPage;
+        filter.phase = csFilter.phase;
 
         myClient.submit('POST', '/api/conn/list', filter)
             .then(
@@ -71,52 +68,119 @@ class ConnectionsList extends Component {
 
     };
 
-    fixtureFormatter = (cell, row) => {
+    portsFormatter = (cell, row) => {
+
+        let added = [];
         let result = row.fixtures.map((f) => {
-            let key = row.connectionId+':'+f.portUrn + '.' + f.vlan.vlanId;
-            return <ListGroupItem className='m-1 p-1' key={key}><small>{f.portUrn + '.' + f.vlan.vlanId}</small></ListGroupItem>
+            let key = row.connectionId + ':' + f.portUrn;
+            if (added.includes(key)) {
+                return null;
+            } else {
+                added.push(key);
+                return <ListGroupItem className='m-1 p-1' key={key}>
+                    <small>{f.portUrn}</small>
+                </ListGroupItem>
+            }
         });
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
 
+
+    vlansFormatter = (cell, row) => {
+        let added = [];
+        let result = row.fixtures.map((f) => {
+            let key = row.connectionId + ':' + f.vlan.vlanId;
+            if (added.includes(key)) {
+                return null;
+            } else {
+                added.push(key);
+                return <ListGroupItem className='m-1 p-1' key={key}>
+                    <small>{f.vlan.vlanId}</small>
+                </ListGroupItem>
+            }
+
+        });
+        return <ListGroup className='m-0 p-0'>{result}</ListGroup>
+    };
+    onTableChange = (type, newState) => {
+        console.log(type);
+        console.log(newState);
+        const cs =  this.props.connsStore;
+        if (type === 'pagination') {
+            cs.setFilter({
+                page: newState.page,
+                sizePerPage: newState.sizePerPage
+            });
+        }
+        if (type === 'filter') {
+            cs.setFilter({
+                phase: newState.filters.phase.filterVal
+            });
+            const fields = ['username', 'connectionId', 'vlans', 'ports', 'description'];
+            let params = {
+                criteria: []
+            };
+            for (let field of fields) {
+                if (newState.filters[field] !== undefined) {
+                    if (field === 'vlans' || field === 'ports') {
+                        params[field] = [newState.filters[field].filterVal];
+                    } else {
+                        params[field] = newState.filters[field].filterVal;
+                    }
+                    params.criteria.push(field);
+                }
+            }
+            console.log(params);
+            cs.setFilter(params);
+        }
+        this.updateList();
+    };
+
+    phaseOptions = {
+        'RESERVED': 'Reserved',
+        'ARCHIVED': 'Archived'
+
+    };
+
+    columns = [
+        {
+            text: 'Connection ID',
+            dataField: 'connectionId',
+            filter: textFilter({delay: 100}),
+            formatter: this.hrefIdFormatter
+
+        },
+        {
+            dataField: 'description',
+            text: 'Description',
+            filter: textFilter({delay: 100})
+        },
+        {
+            dataField: 'phase',
+            text: 'Phase',
+            filter: selectFilter({options: this.phaseOptions, defaultValue: 'RESERVED'})
+        },
+
+        {
+            dataField: 'username',
+            text: 'User',
+            filter: textFilter({delay: 100})
+        },
+        {
+            dataField: 'ports',
+            text: 'Ports',
+            formatter: this.portsFormatter,
+            filter: textFilter({delay: 100})
+        },
+        {
+            dataField: 'vlans',
+            text: 'VLANs',
+            formatter: this.vlansFormatter,
+            filter: textFilter({delay: 100})
+        },
+    ];
     render() {
         const format = 'Y/MM/DD HH:mm';
-        const phaseOptions = {
-            'RESERVED': 'Reserved',
-            'ARCHIVED': 'Archived'
-
-        };
-        const columns = [
-            {
-                text: 'Connection ID',
-                dataField: 'connectionId',
-                filter: textFilter({delay: 100}),
-                formatter: this.hrefIdFormatter
-
-            },
-            {
-                dataField: 'description',
-                text: 'Description',
-                filter: textFilter({delay: 100})
-            },
-            {
-                dataField: 'phase',
-                text: 'Phase',
-                filter: selectFilter({options: phaseOptions, defaultValue: 'RESERVED'})
-            },
-
-            {
-                dataField: 'username',
-                text: 'User',
-                filter: textFilter({delay: 100})
-            },
-            {
-                dataField: 'fixtureString',
-                text: 'Fixtures',
-                formatter: this.fixtureFormatter,
-                filter: textFilter({delay: 100})
-            },
-        ];
 
         let rows = [];
 
@@ -130,7 +194,7 @@ class ConnectionsList extends Component {
             let fixtureBits = [];
             c.archived.cmp.fixtures.map((f) => {
                 fixtures.push(f);
-                const fixtureBit = f.portUrn + '.'+f.vlan.vlanId;
+                const fixtureBit = f.portUrn + '.' + f.vlan.vlanId;
                 fixtureBits.push(fixtureBit);
             });
             let fixtureString = fixtureBits.join(' ');
@@ -148,10 +212,18 @@ class ConnectionsList extends Component {
             };
             rows.push(row);
         });
+        let remote = {
+            filter: true,
+            pagination: true,
+            sort: false,
+            cellEdit: false
+        };
+
 
         return <Card>
             <CardBody>
-                <BootstrapTable keyField='connectionId' data={rows} columns={columns}
+                <BootstrapTable keyField='connectionId' data={rows} columns={this.columns}
+                                remote={remote} onTableChange={ this.onTableChange }
                                 pagination={paginationFactory()}
                                 filter={filterFactory()}/>
 

@@ -80,10 +80,13 @@ class ConnectionsStore {
         criteria: [],
         ports: [],
         vlans: [],
+        connectionId: '',
         username: '',
         description: '',
         phase: 'RESERVED',
         state: 'ACTIVE',
+        sizePerPage: 10,
+        page: 1
     };
 
 
