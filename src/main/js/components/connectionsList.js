@@ -41,7 +41,12 @@ class ConnectionsList extends Component {
         myClient.submit('POST', '/api/conn/list', filter)
             .then(
                 (successResponse) => {
-                    let conns = JSON.parse(successResponse);
+                    let result = JSON.parse(successResponse);
+                    let conns = result.connections;
+                    this.props.connsStore.setFilter({
+                        totalSize: result.totalSize
+                    });
+
                     conns.map((conn) => {
                         transformer.fixSerialization(conn);
                     });
@@ -114,6 +119,7 @@ class ConnectionsList extends Component {
         }
         if (type === 'filter') {
             cs.setFilter({
+                page: 1,
                 phase: newState.filters.phase.filterVal
             });
             const fields = ['username', 'connectionId', 'vlans', 'ports', 'description'];
@@ -180,11 +186,13 @@ class ConnectionsList extends Component {
         },
     ];
     render() {
+        let cs = this.props.connsStore;
         const format = 'Y/MM/DD HH:mm';
 
         let rows = [];
 
-        this.props.connsStore.store.conns.map((c) => {
+
+        cs.store.conns.map((c) => {
             const beg = Moment(c.archived.schedule.beginning * 1000);
             const end = Moment(c.archived.schedule.ending * 1000);
 
@@ -224,7 +232,11 @@ class ConnectionsList extends Component {
             <CardBody>
                 <BootstrapTable keyField='connectionId' data={rows} columns={this.columns}
                                 remote={remote} onTableChange={ this.onTableChange }
-                                pagination={paginationFactory()}
+                                pagination={paginationFactory({
+                                    sizePerPage: cs.filter.sizePerPage,
+                                    page: cs.filter.page,
+                                    totalSize: cs.filter.totalSize,
+                                })}
                                 filter={filterFactory()}/>
 
             </CardBody>
