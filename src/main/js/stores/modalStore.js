@@ -3,16 +3,19 @@ import {observable, action} from 'mobx';
 class ModalStore {
     @observable
     modals = observable.map({
-        'editFixture': false,
-        'editJunction': false,
-        'editPipe': false,
-        'designHelp': false,
-        'addFixture': false,
-        'designErrors': false,
-        'connectionErrors': false,
-        'connection': false,
-        'userAdmin': false,
-    });
+            'editFixture': false,
+            'editJunction': false,
+            'editPipe': false,
+            'designHelp': false,
+            'addFixture': false,
+            'designErrors': false,
+            'connectionErrors': false,
+            'connection': false,
+            'disconnected': false,
+            'userAdmin': false,
+        },
+        { name: 'modalNames' }
+    );
 
 
     @action
@@ -35,4 +38,5 @@ class ModalStore {
 
 
 }
+
 export default new ModalStore();

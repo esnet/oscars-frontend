@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {observer, inject} from 'mobx-react';
-import {Modal, ModalHeader, ModalBody } from 'reactstrap';
+import {Modal, ModalHeader, ModalBody} from 'reactstrap';
 import EditUserForm from './editUserForm';
 import myClient from '../agents/client';
 import {size} from 'lodash-es'
@@ -137,7 +137,7 @@ export default class UserAdminModal extends Component {
         let showModal = this.props.modalStore.modals.get(modalName);
 
         return (
-            <Modal size='lg'fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+            <Modal size='lg' fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
                 <ModalHeader toggle={this.toggle}>Edit user</ModalHeader>
                 <ModalBody>
                     <EditUserForm submitPassword={this.submitPassword}

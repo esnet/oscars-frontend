@@ -7,6 +7,14 @@ class MyXHRClient {
             let xhr = new XMLHttpRequest();
             xhr.overrideMimeType('application/json');
             xhr.open(opts.method, opts.url);
+
+            if ('timeout' in opts) {
+                xhr.timeout = opts.timeout;
+            }
+            xhr.ontimeout = () => {
+                reject({status: 0, statusText: 'Timed out'})
+            };
+
             xhr.onload = function () {
                 if (this.status >= 200 && this.status < 300) {
                     resolve(xhr.response);
@@ -17,12 +25,14 @@ class MyXHRClient {
                     });
                 }
             };
+
             xhr.onerror = function () {
                 reject({
                     status: this.status,
                     statusText: xhr.statusText
                 });
             };
+
             if (opts.headers) {
                 Object.keys(opts.headers).forEach(function (key) {
                     xhr.setRequestHeader(key, opts.headers[key]);
@@ -56,6 +66,7 @@ class MyXHRClient {
 
         return this.loadJSON({method: method, url: url, headers: headers, params: payload});
     }
+
 }
 
 

@@ -17,12 +17,16 @@ class Autologout extends Component {
         this.timeout = setTimeout(() => {
             myClient.submitWithToken('GET', '/protected/ping').then(
                 logged_in => {
-                    this.ping();
                 },
                 logged_out => {
-                    this.props.history.push('/pages/logout');
+                    if (logged_out.status !== 0) {
+                        // status of 0 is a timeout
+                        this.props.history.push('/pages/logout');
+                    }
                 }
             );
+            this.ping();
+
 
         }, 5000);
     }

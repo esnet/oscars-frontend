@@ -3,29 +3,45 @@ import React, {Component} from 'react';
 
 import myClient from '../agents/client';
 import {withRouter} from 'react-router-dom';
+import DisconnectedModal from './disconnected';
+import {inject, observer} from 'mobx-react';
+import {action, autorun, toJS} from 'mobx';
 
+@inject('modalStore')
+@observer
 class Ping extends Component {
     constructor(props) {
         super(props);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.ping();
     }
 
     ping() {
 
         this.timeout = setTimeout(() => {
-            myClient.submitWithToken('GET', '/api/ping').then(
-                connected => {
-                    this.ping();
-                },
-                disconnected => {
-                    this.props.history.push('/pages/disconnected');
-                }
-            );
+            try {
+                myClient.loadJSON({method: 'GET', url: '/api/ping', timeout: 3000}).then(
+                    action((connected) => {
+                        if (this.props.modalStore.modals.get('disconnected')) {
+                            this.props.modalStore.closeModal('disconnected');
+                        }
+                    }),
+                    action((disconnected) => {
+                        // a status of 0 should be a request timeout
+                        if (disconnected.status === 0) {
+                            this.props.modalStore.openModal('disconnected');
+                        }
+                    })
+                );
 
-        }, 500);
+            } catch (e) {
+                console.log('caught an exception');
+            }
+            this.ping();
+
+        }, 5000);
     }
 
 
@@ -34,7 +50,7 @@ class Ping extends Component {
     }
 
     render() {
-        return null;
+        return <DisconnectedModal/>;
     }
 }
 
