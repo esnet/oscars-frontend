@@ -7,9 +7,9 @@ import Octicon from 'react-octicon'
 class Validator {
     label(state) {
         if (!state) {
-            return <Octicon color='orange' name='alert'/>
+            return <Octicon style={{color: 'orange'}} name='alert'/>
         }
-        return <Octicon color='green' name='check'/>
+        return <Octicon style={{color: 'green'}} name='check'/>
 
     }
 

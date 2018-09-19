@@ -15,6 +15,7 @@ import SelectDesignApp from './apps/selectDesign';
 import NewDesignApp from './apps/designApp';
 import WelcomeApp from './apps/welcome';
 import AboutApp from './apps/about';
+import DisconnectedApp from './apps/disconnected';
 import TimeoutApp from './apps/timeout';
 import ErrorApp from './apps/error';
 
@@ -28,6 +29,7 @@ import Login from './apps/login';
 import Logout from './apps/logout';
 
 import NavBar from './components/navbar'
+import Ping from './components/ping'
 
 import accountStore from './stores/accountStore';
 import commonStore from './stores/commonStore';
@@ -96,6 +98,7 @@ ReactDOM.render(
         <Provider {...stores}>
         <BrowserRouter>
             <Container fluid={true}>
+                <Ping />
                 <Row>
                     <NavBar/>
                 </Row>
@@ -118,6 +121,7 @@ ReactDOM.render(
                     <PrivateRoute exact path='/pages/account' component={AccountApp}/>
                     <PrivateRoute exact path='/pages/status' component={StatusApp}/>
                     <PrivateRoute exact path='/pages/map' component={MapApp}/>
+                    <PrivateRoute exact path='/pages/disconnected' component={DisconnectedApp}/>
                     <AdminRoute exact path='/pages/admin/users' component={AdminUsersApp}/>
                     <AdminRoute exact path='/pages/admin/tags' component={AdminTagsApp}/>
                 </Switch>

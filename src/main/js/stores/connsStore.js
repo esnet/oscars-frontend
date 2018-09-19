@@ -28,6 +28,7 @@ class ConnectionsStore {
     };
 
     @observable controls = {
+        show: false,
         buildmode: {
             ok: false,
             show: false,
@@ -97,6 +98,10 @@ class ConnectionsStore {
 
     @action setHistory(history) {
         this.store.history = history;
+    }
+
+    @action showControls(value) {
+        this.controls.show = value;
     }
 
 

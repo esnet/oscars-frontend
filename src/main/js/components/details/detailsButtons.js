@@ -178,6 +178,8 @@ export default class DetailsButtons extends Component {
 
         const isReserved = (conn.connectionId !== '' && conn.phase === 'RESERVED');
         if (isReserved) {
+            this.props.connsStore.showControls(true);
+
             this.props.connsStore.setControl('release', {
                 'text': 'Release',
                 'show': true,
@@ -196,22 +198,24 @@ export default class DetailsButtons extends Component {
                 'ok': true
             });
 
+            let canRegenerate = true;
             if (size(this.props.connsStore.store.commands) === 0) {
-                this.props.connsStore.setControl('regenerate', {
-                    'text': 'Regenerate router configs',
-                    'show': true,
-                    'ok': false
-                });
-
-            } else {
-                this.props.connsStore.setControl('regenerate', {
-                    'text': 'Regenerate router configs',
-                    'show': true,
-                    'ok': true
-                });
+                canRegenerate = false
             }
+            if ('tags' in this.props.connsStore.store.current) {
+                for (let tag of this.props.connsStore.store.current.tags) {
+                    if (tag.category === 'migrated') {
+                        canRegenerate = false;
+                    }
+                }
+            }
+            this.props.connsStore.setControl('regenerate', {
+                'text': 'Regenerate router configs',
+                'show': true,
+                'ok': canRegenerate
+            });
 
-
+            this.setRegenHelp();
             this.setReleaseHelp();
             this.setBmHelp();
         } else {
@@ -245,15 +249,13 @@ export default class DetailsButtons extends Component {
         let dismantleText = 'Dismantle';
 
         this.props.connsStore.setControl('build', {
-//            'show': isReserved && inInterval,
-            'show': true,
+            'show': isReserved && inInterval,
             'text': buildText,
             'ok': canBuild
         });
 
         this.props.connsStore.setControl('dismantle', {
-//            'show': isReserved && inInterval,
-            'show': true,
+            'show': isReserved && inInterval,
             'text': dismantleText,
             'ok': canDismantle
         });
@@ -306,34 +308,39 @@ export default class DetailsButtons extends Component {
 
         const canBuild = controls.build.ok;
         const buildText = controls.build.text;
-
-        let build = <ListGroupItem>
-            <ConfirmModal body='This will build the connection. OSCARS will send all configuration
+        let build = null;
+        if (controls.build.show) {
+            build = <ListGroupItem>
+                <ConfirmModal body='This will build the connection. OSCARS will send all configuration
                                     to network devices, allowing traffic to flow.'
-                          header='Dismantle connection'
-                          uiElement={<Button color='primary' disabled={!canBuild}
-                                             className='float-left'>{buildText}</Button>}
-                          onConfirm={this.build}/>
+                              header='Dismantle connection'
+                              uiElement={<Button color='primary' disabled={!canBuild}
+                                                 className='float-left'>{buildText}</Button>}
+                              onConfirm={this.build}/>
 
 
-            {' '}
-            {this.help('build')}
-        </ListGroupItem>;
+                {' '}
+                {this.help('build')}
+            </ListGroupItem>;
+        }
 
         const canDismantle = controls.dismantle.ok;
         const dismantleText = controls.dismantle.text;
-        let dismantle = <ListGroupItem>
-            <ConfirmModal body='This will dismantle the connection. OSCARS will
+        let dismantle = null;
+        if (controls.dismantle.show) {
+            dismantle = <ListGroupItem>
+                <ConfirmModal body='This will dismantle the connection. OSCARS will
                                     remove all configuration from routers, stopping traffic flow.'
-                          header='Dismantle connection'
-                          uiElement={<Button color='primary' disabled={!canDismantle}
-                                             className='float-left'>{dismantleText}</Button>}
-                          onConfirm={this.dismantle}/>
+                              header='Dismantle connection'
+                              uiElement={<Button color='primary' disabled={!canDismantle}
+                                                 className='float-left'>{dismantleText}</Button>}
+                              onConfirm={this.dismantle}/>
 
 
-            {' '}
-            {this.help('dismantle')}
-        </ListGroupItem>;
+                {' '}
+                {this.help('dismantle')}
+            </ListGroupItem>;
+        }
 
         const canRelease = controls.release.ok;
         const releaseText = controls.release.text;
@@ -393,17 +400,25 @@ export default class DetailsButtons extends Component {
         }
 
         let regenerate = null;
+        let canRegenerate = controls.regenerate.ok;
         if (controls.regenerate.show) {
             showSpecialHeader = true;
             regenerate = <ListGroupItem>
-                <Button className='pull-right' color='warning'
-                        disabled={!controls.regenerate.ok}
-                        onClick={this.doRegenCommands}>Regenerate router config</Button>
+                <ConfirmModal body='This will re-generate all router configs. Do NOT use on migrated reservations!'
+                              header='Regenerate configs'
+                              uiElement={<Button className='pull-right' disabled={!canRegenerate} color='warning'>Regenerate router config</Button>}
+                              onConfirm={this.doRegenCommands}/>
+                {' '}
+                {this.help('regenerate')}
+
             </ListGroupItem>
 
         }
 
-        let controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
+        let controlsHeader = null;
+        if (controls.show) {
+            controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
+        }
         let specialHeader = null;
         if (showSpecialHeader) {
             specialHeader = <ListGroupItem active>Special Controls</ListGroupItem>;
@@ -437,6 +452,23 @@ export default class DetailsButtons extends Component {
 
     }
 
+
+    setRegenHelp() {
+        const helpHeader = <span>Release help</span>;
+        const helpBody = <div>
+            <p>Click this button to regenerate router configurations for this connection. Typically
+                used to pull in changes to router config templates.
+            </p>
+            <p>Use with caution.</p>
+            <p>Should not be used (and is normally deactivated) for migrated connections.</p>
+        </div>;
+
+        this.props.connsStore.setControlHelp('regenerate', {
+            header: helpHeader,
+            body: helpBody
+        });
+
+    }
 
     setReleaseHelp() {
         const helpHeader = <span>Release help</span>;

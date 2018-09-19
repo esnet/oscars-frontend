@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 
 import {
-    Navbar, NavbarBrand, Nav, NavItem, UncontrolledDropdown, DropdownMenu, DropdownToggle,
-    NavLink, DropdownItem
+    Navbar, NavbarBrand, Nav, UncontrolledDropdown, DropdownMenu, DropdownToggle,
+    NavLink
 } from 'reactstrap';
-import {observer, inject} from 'mobx-react';
+import Autologout from './autologout';
 
+import {observer, inject} from 'mobx-react';
 import {AlertList} from 'react-bs-notifier';
 import {toJS} from 'mobx'
 
@@ -83,6 +84,7 @@ export default class NavBar extends Component {
  */
         return (
             <Navbar color='faded' light expand='md'>
+                <Autologout />
                 <AlertList
                     position='top-right'
                     alerts={toJS(this.props.commonStore.alerts)}
