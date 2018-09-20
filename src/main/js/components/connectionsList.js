@@ -89,6 +89,33 @@ class ConnectionsList extends Component {
         });
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
+    descFormatter = (cell, row) => {
+        const desc = row.description;
+
+        let i = 0;
+        let items = [];
+        let key = row.connectionId + ':desc';
+        items.push(<ListGroupItem className='m-1 p-1' key={key}>
+            <small>Description: {desc}</small>
+        </ListGroupItem>);
+
+        if ('tags' in row) {
+            for (let tag of row.tags) {
+                console.log(tag);
+                key = row.connectionId + ':' + i;
+                let item = <ListGroupItem className='m-1 p-1' key={key}>
+                    <small>{tag.category}: {tag.contents}</small>
+                </ListGroupItem>;
+
+                items.push(item);
+
+                i++;
+            }
+        }
+
+        return <ListGroup className='m-0 p-0'>{items}</ListGroup>
+
+    };
 
 
     vlansFormatter = (cell, row) => {
@@ -155,8 +182,9 @@ class ConnectionsList extends Component {
         },
         {
             dataField: 'description',
-            text: 'Description',
-            filter: textFilter({delay: 100})
+            text: 'Description & tags',
+            filter: textFilter({delay: 100}),
+            formatter: this.descFormatter
         },
         {
             dataField: 'phase',
@@ -209,6 +237,7 @@ class ConnectionsList extends Component {
                 description: c.description,
                 phase: c.phase,
                 state: c.state,
+                tags: toJS(c.tags),
                 username: c.username,
                 fixtures: fixtures,
                 fixtureString: fixtureString,
