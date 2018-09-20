@@ -9,11 +9,12 @@ import Moment from 'moment/moment';
 import {autorun, action, toJS} from 'mobx';
 import {size} from 'lodash-es';
 import HelpPopover from '../helpPopover';
+import {withRouter} from 'react-router-dom';
 
 
 @inject('connsStore')
 @observer
-export default class DetailsButtons extends Component {
+class DetailsButtons extends Component {
     constructor(props) {
         super(props);
     }
@@ -121,9 +122,17 @@ export default class DetailsButtons extends Component {
             'ok': false
         });
 
-        myClient.submitWithToken('POST', '/protected/conn/cancel', current.connectionId)
+        myClient.submitWithToken('POST', '/protected/conn/release', current.connectionId)
             .then(action((response) => {
-                this.props.connsStore.refreshCurrent();
+                let result = JSON.parse(response);
+                if (result.what === 'DELETED') {
+                    console.log('redirecting to list');
+                    this.props.history.push('/pages/list');
+
+                } else {
+                    this.props.connsStore.refreshCurrent();
+
+                }
             }));
 
         return false;
@@ -521,3 +530,4 @@ export default class DetailsButtons extends Component {
     }
 
 }
+export default withRouter(DetailsButtons);

@@ -108,8 +108,6 @@ class ConnectionsList extends Component {
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
     onTableChange = (type, newState) => {
-        console.log(type);
-        console.log(newState);
         const cs =  this.props.connsStore;
         if (type === 'pagination') {
             cs.setFilter({
@@ -136,7 +134,6 @@ class ConnectionsList extends Component {
                     params.criteria.push(field);
                 }
             }
-            console.log(params);
             cs.setFilter(params);
         }
         this.updateList();

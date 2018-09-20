@@ -31,10 +31,9 @@ export default class DisconnectedModal extends Component {
         let showModal = this.props.modalStore.modals.get(modalName);
         return (
             <Modal size='lg' fade={false} isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
-                <ModalHeader toggle={this.toggle}>Edit user</ModalHeader>
+                <ModalHeader toggle={this.toggle}>Disconnected</ModalHeader>
                 <ModalBody>
                     <Card>
-                        <CardHeader>Disconnected</CardHeader>
                         <CardBody>
                             <p>You are seeing this page because your browser has been disconnected from OSCARS.</p>
                             <p>This can happen when your browser can not currently reach OSCARS,

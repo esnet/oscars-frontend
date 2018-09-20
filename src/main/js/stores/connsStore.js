@@ -159,13 +159,17 @@ class ConnectionsStore {
 
     @action refreshCurrent() {
         myClient.submitWithToken('GET', '/api/conn/info/' + this.store.current.connectionId)
-            .then(action(
-                (response) => {
+            .then(
+                action((response) => {
                     let conn = JSON.parse(response);
                     transformer.fixSerialization(conn);
                     this.setCurrent(conn);
 
-                }));
+                }),
+                (failure) => {
+                    // do nothing
+                }
+            );
 
 
     }

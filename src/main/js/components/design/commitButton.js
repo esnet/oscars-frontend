@@ -25,7 +25,7 @@ class CommitButton extends Component {
         myClient.submitWithToken('POST', '/protected/conn/commit', connId)
             .then(
                 action((response) => {
-                    const phase = response.replace(/"/g, '');
+                    const phase = response.phase;
                     this.props.controlsStore.setParamsForConnection({
                         phase: phase
                     });

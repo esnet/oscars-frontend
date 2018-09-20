@@ -23,6 +23,7 @@ export default class DetailsApp extends Component {
         this.retrieve(pathConnectionId);
         this.periodicCheck();
     }
+
     componentWillUnmount() {
         clearTimeout(this.timeoutId);
         this.props.connsStore.clearCurrent();
@@ -51,37 +52,42 @@ export default class DetailsApp extends Component {
             return;
         }
         myClient.submitWithToken('GET', '/api/conn/info/' + connectionId)
-            .then(action(
-                (response) => {
-                    if (response !== null && response.length > 0) {
-                        let conn = JSON.parse(response);
-                        transformer.fixSerialization(conn);
-                        this.props.history.push('/pages/details/' + connectionId);
-                        this.props.connsStore.setCurrent(conn);
-                        /*
-                        this.props.commonStore.addAlert({
-                            id: (new Date()).getTime(),
-                            type: 'success',
-                            headline: 'Retrieved connection ' + connectionId,
-                            message: ''
-                        })
-                        */
+            .then(
+                action((response) => {
+                        if (response !== null && response.length > 0) {
+                            let conn = JSON.parse(response);
+                            transformer.fixSerialization(conn);
+                            this.props.history.push('/pages/details/' + connectionId);
+                            this.props.connsStore.setCurrent(conn);
+                            /*
+                            this.props.commonStore.addAlert({
+                                id: (new Date()).getTime(),
+                                type: 'success',
+                                headline: 'Retrieved connection ' + connectionId,
+                                message: ''
+                            })
+                            */
 
-                        this.props.connsStore.refreshCommands();
+                            this.props.connsStore.refreshCommands();
 
 
-                    } else {
-                        this.props.connsStore.clearCurrent();
-                        this.props.history.push('/pages/details');
-                        this.props.commonStore.addAlert({
-                            id: (new Date()).getTime(),
-                            type: 'danger',
-                            headline: 'Could not find connection ' + connectionId,
-                            message: ''
-                        });
+                        } else {
+                            this.props.connsStore.clearCurrent();
+                            this.props.history.push('/pages/details');
+                            this.props.commonStore.addAlert({
+                                id: (new Date()).getTime(),
+                                type: 'danger',
+                                headline: 'Could not find connection ' + connectionId,
+                                message: ''
+                            });
 
+                        }
                     }
-                })
+                ),
+                (failure) => {
+                    this.props.history.push('/pages/list');
+
+                }
             );
         myClient.submitWithToken('GET', '/api/conn/history/' + connectionId)
             .then(action(
