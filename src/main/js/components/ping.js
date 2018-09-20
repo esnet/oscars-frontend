@@ -30,7 +30,7 @@ class Ping extends Component {
                     }),
                     action((disconnected) => {
                         // a status of 0 should be a request timeout
-                        if (disconnected.status === 0) {
+                        if (disconnected.status === 0 || disconnected.status === 504) {
                             this.props.modalStore.openModal('disconnected');
                         }
                     })

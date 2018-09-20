@@ -19,8 +19,8 @@ class Autologout extends Component {
                 logged_in => {
                 },
                 logged_out => {
-                    if (logged_out.status !== 0) {
-                        // status of 0 is a timeout
+                    if (logged_out.status !== 0 && logged_out.status !== 504) {
+                        // status of 0 is a timeout, 504 is gateway timeout
                         this.props.history.push('/pages/logout');
                     }
                 }
