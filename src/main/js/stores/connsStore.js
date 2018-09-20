@@ -27,6 +27,10 @@ class ConnectionsStore {
         history: new Map(),
     };
 
+    @observable drawing = {
+        redraw: true
+    };
+
     @observable controls = {
         show: false,
         buildmode: {
@@ -91,6 +95,10 @@ class ConnectionsStore {
         totalSize: 0,
     };
 
+
+    @action setRedraw(value) {
+        this.drawing.redraw = value;
+    }
 
     @action setCommands(commands) {
         this.store.commands = commands;

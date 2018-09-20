@@ -36,11 +36,18 @@ export default class DetailsGeneral extends Component {
 
     setTab = (tab) => {
         if (this.state.tab !== tab) {
+            if (tab === 'drawing') {
+                this.redraw();
+            }
             this.setState({
                 tab : tab
             });
         }
     };
+
+    redraw() {
+        this.props.connsStore.setRedraw(true);
+    }
 
 
     render() {

@@ -23,6 +23,7 @@ export default class DetailsDrawing extends Component {
     }
 
 
+
     onFixtureClicked = (fixture) => {
         this.props.connsStore.setSelected({
             type: 'fixture',
@@ -42,6 +43,15 @@ export default class DetailsDrawing extends Component {
             type: 'pipe',
             data: pipe,
         });
+    };
+    network = {
+        fit: () => {
+           // console.log('default fit')
+        },
+        stabilize: () => {
+           // console.log('default stab')
+
+        }
     };
 
     componentDidMount() {
@@ -113,7 +123,18 @@ export default class DetailsDrawing extends Component {
 
     componentWillUnmount() {
         this.disposeOfMapUpdate();
+        this.disposeOfRedraw();
     }
+
+    disposeOfRedraw = autorun(() => {
+        if (this.props.connsStore.drawing.redraw === true) {
+            // console.log('redrawing');
+            this.props.connsStore.setRedraw(false);
+            this.network.stabilize(50);
+            this.network.fit({animation: false});
+            // console.log('done redrawing');
+        }
+    });
 
     // this automagically updates the map;
     disposeOfMapUpdate = autorun(() => {
@@ -127,6 +148,7 @@ export default class DetailsDrawing extends Component {
 
         let nodes = [];
         let edges = [];
+        let nodeIds = [];
         let detailsDevices = [];
         if (size(junctions) === 0) {
             return;
@@ -150,6 +172,7 @@ export default class DetailsDrawing extends Component {
 
             detailsDevices.push(j.deviceUrn);
             nodes.push(junctionNode);
+            nodeIds.push(junctionNode.id);
         });
         fixtures.map((f) => {
             // console.log(toJS(f));
@@ -169,6 +192,8 @@ export default class DetailsDrawing extends Component {
 
                 onClick: this.onFixtureClicked
             };
+            nodeIds.push(fixtureNode.id);
+
             nodes.push(fixtureNode);
             let edge = {
                 id: f.portUrn + ':' + f.vlan.vlanId,
@@ -306,11 +331,9 @@ export default class DetailsDrawing extends Component {
         VisUtils.mergeItems(nodes, this.datasource.nodes);
         this.datasource.edges.clear();
         this.datasource.edges.add(edges);
-        this.network.stabilize(1000);
-        this.network.fit({animation: false})
 
 
-    }, {delay: 5000});
+    }, {delay: 500});
 
 
     render() {
