@@ -1,15 +1,18 @@
 import React, {Component} from 'react';
-import {Card, CardBody, ListGroupItem, ListGroup} from 'reactstrap';
+import {Card, CardBody, ListGroupItem, ListGroupItemHeading, ListGroup} from 'reactstrap';
+
 import Moment from 'moment';
 import {toJS, autorun} from 'mobx';
 import {observer, inject} from 'mobx-react';
-import transformer from '../lib/transform';
 import {withRouter, Link} from 'react-router-dom';
+import {size} from 'lodash-es';
 
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import filterFactory, {textFilter, selectFilter} from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+
+import transformer from '../lib/transform';
 import myClient from '../agents/client';
 
 @inject('controlsStore', 'connsStore', 'mapStore', 'modalStore', 'commonStore')
@@ -82,7 +85,7 @@ class ConnectionsList extends Component {
                 return null;
             } else {
                 added.push(key);
-                return <ListGroupItem className='m-1 p-1' key={key}>
+                return <ListGroupItem className='p-1' key={key}>
                     <small>{f.portUrn}</small>
                 </ListGroupItem>
             }
@@ -90,20 +93,23 @@ class ConnectionsList extends Component {
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
     descFormatter = (cell, row) => {
-        const desc = row.description;
 
-        let i = 0;
-        let items = [];
-        let key = row.connectionId + ':desc';
-        items.push(<ListGroupItem className='m-1 p-1' key={key}>
-            <small>Description: {desc}</small>
-        </ListGroupItem>);
 
-        if ('tags' in row) {
+        let tagList = null;
+
+        if ('tags' in row && size(row.tags) > 0) {
+            let i = 0;
+            let items = [];
+
+            let key = row.connectionId + ':header';
+            items.push(<ListGroupItem color='info' className='p-1' key={key}>
+                <small>Tags</small>
+            </ListGroupItem>);
+
             for (let tag of row.tags) {
                 console.log(tag);
                 key = row.connectionId + ':' + i;
-                let item = <ListGroupItem className='m-1 p-1' key={key}>
+                let item = <ListGroupItem className='p-1' key={key}>
                     <small>{tag.category}: {tag.contents}</small>
                 </ListGroupItem>;
 
@@ -111,9 +117,13 @@ class ConnectionsList extends Component {
 
                 i++;
             }
+            tagList = <ListGroup className='m-0 p-0'>{items}</ListGroup>;
         }
 
-        return <ListGroup className='m-0 p-0'>{items}</ListGroup>
+        return <div>
+            {row.description}
+            {tagList}
+        </div>
 
     };
 
@@ -135,7 +145,7 @@ class ConnectionsList extends Component {
         return <ListGroup className='m-0 p-0'>{result}</ListGroup>
     };
     onTableChange = (type, newState) => {
-        const cs =  this.props.connsStore;
+        const cs = this.props.connsStore;
         if (type === 'pagination') {
             cs.setFilter({
                 page: newState.page,
@@ -210,6 +220,7 @@ class ConnectionsList extends Component {
             filter: textFilter({delay: 100})
         },
     ];
+
     render() {
         let cs = this.props.connsStore;
         const format = 'Y/MM/DD HH:mm';
@@ -257,7 +268,7 @@ class ConnectionsList extends Component {
         return <Card>
             <CardBody>
                 <BootstrapTable keyField='connectionId' data={rows} columns={this.columns}
-                                remote={remote} onTableChange={ this.onTableChange }
+                                remote={remote} onTableChange={this.onTableChange}
                                 pagination={paginationFactory({
                                     sizePerPage: cs.filter.sizePerPage,
                                     page: cs.filter.page,

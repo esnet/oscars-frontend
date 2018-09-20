@@ -426,11 +426,11 @@ class DetailsButtons extends Component {
 
         let controlsHeader = null;
         if (controls.show) {
-            controlsHeader = <ListGroupItem active>Controls {overallHelp}</ListGroupItem>;
+            controlsHeader = <ListGroupItem color='info'>Controls {overallHelp}</ListGroupItem>;
         }
         let specialHeader = null;
         if (showSpecialHeader) {
-            specialHeader = <ListGroupItem active>Special Controls</ListGroupItem>;
+            specialHeader = <ListGroupItem color='warning'>Special Controls</ListGroupItem>;
         }
 
 
