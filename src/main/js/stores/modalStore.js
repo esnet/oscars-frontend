@@ -1,22 +1,22 @@
-import {observable, action} from 'mobx';
+import { observable, action } from "mobx";
 
 class ModalStore {
     @observable
-    modals = observable.map({
-            'editFixture': false,
-            'editJunction': false,
-            'editPipe': false,
-            'designHelp': false,
-            'addFixture': false,
-            'designErrors': false,
-            'connectionErrors': false,
-            'connection': false,
-            'disconnected': false,
-            'userAdmin': false,
+    modals = observable.map(
+        {
+            editFixture: false,
+            editJunction: false,
+            editPipe: false,
+            designHelp: false,
+            addFixture: false,
+            designErrors: false,
+            connectionErrors: false,
+            connection: false,
+            disconnected: false,
+            userAdmin: false
         },
-        { name: 'modalNames' }
+        { name: "modalNames" }
     );
-
 
     @action
     openModal(type) {
@@ -35,8 +35,6 @@ class ModalStore {
             this.modals.set(key, false);
         });
     }
-
-
 }
 
 export default new ModalStore();

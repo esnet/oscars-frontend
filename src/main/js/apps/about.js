@@ -1,36 +1,30 @@
-import React, {Component} from 'react';
-import {Row, Col, Card, CardHeader, CardBody} from 'reactstrap';
-import myClient from '../agents/client';
-import {action} from 'mobx';
-import {inject, observer} from 'mobx-react';
+import React, { Component } from "react";
+import { Row, Col, Card, CardHeader, CardBody } from "reactstrap";
+import myClient from "../agents/client";
+import { action } from "mobx";
+import { inject, observer } from "mobx-react";
 
-@inject('commonStore')
+@inject("commonStore")
 @observer
-
-export default class AboutApp extends Component {
+class AboutApp extends Component {
     constructor(props) {
         super(props);
     }
 
-
     componentWillMount() {
-
-        myClient.submit('GET', '/api/version')
-            .then(
-                action((response) => {
-                    this.props.commonStore.setVersion('backend', response);
-                }));
+        myClient.submit("GET", "/api/version").then(
+            action(response => {
+                this.props.commonStore.setVersion("backend", response);
+            })
+        );
     }
-
 
     render() {
         return (
             <Row>
-                <Col md={{size: 10, offset: 1}}>
+                <Col md={{ size: 10, offset: 1 }}>
                     <Card>
-                        <CardHeader>
-                            About OSCARS
-                        </CardHeader>
+                        <CardHeader>About OSCARS</CardHeader>
                         <CardBody>
                             <div>
                                 Frontend version: <u>{this.props.commonStore.version.frontend}</u>
@@ -44,5 +38,6 @@ export default class AboutApp extends Component {
             </Row>
         );
     }
-
 }
+
+export default AboutApp;

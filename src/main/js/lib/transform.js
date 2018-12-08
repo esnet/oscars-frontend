@@ -1,6 +1,3 @@
-import React from 'react';
-
-
 class Transformer {
     existingFixtureToEditParams(fixture) {
         let editParams = {
@@ -12,26 +9,24 @@ class Transformer {
             strict: fixture.strict,
             vlan: {
                 vlanId: fixture.vlanId,
-                validationState: 'success',
-                validationText: '',
+                validationState: "success",
+                validationText: ""
             },
             bw: {
                 ingress: {
                     mbps: fixture.ingress,
-                    validationText: '',
-                    validationState: 'success',
+                    validationText: "",
+                    validationState: "success"
                 },
                 egress: {
                     mbps: fixture.egress,
-                    validationText: '',
-                    validationState: 'success',
-
+                    validationText: "",
+                    validationState: "success"
                 }
             }
         };
 
         return editParams;
-
     }
 
     newFixtureToEditParams(fixture) {
@@ -44,20 +39,20 @@ class Transformer {
             strict: fixture.strict,
             vlan: {
                 acceptable: true,
-                vlanId: null,
+                vlanId: null
             },
             bw: {
                 acceptable: true,
                 symmetrical: true,
                 ingress: {
                     mbps: 0,
-                    validationState: 'success',
-                    validationText: '',
+                    validationState: "success",
+                    validationText: ""
                 },
                 egress: {
                     mbps: 0,
-                    validationState: 'success',
-                    validationText: '',
+                    validationState: "success",
+                    validationText: ""
                 }
             }
         };
@@ -73,7 +68,7 @@ class Transformer {
             protect: pipe.protect,
 
             A_TO_Z: {
-                bw: pipe.azBw,
+                bw: pipe.azBw
             },
             Z_TO_A: {
                 bw: pipe.zaBw
@@ -81,10 +76,9 @@ class Transformer {
             ero: {
                 include: [pipe.a, pipe.z],
                 hops: pipe.ero,
-                mode: 'fits'
+                mode: "fits"
             }
         };
-
     }
 
     fromBackend(cmp) {
@@ -94,40 +88,40 @@ class Transformer {
             pipes: []
         };
 
-        let {junctions, fixtures, pipes} = cmp;
+        let { junctions, fixtures, pipes } = cmp;
 
-        if (typeof junctions !== 'undefined') {
-            junctions.map((dj) => {
+        if (typeof junctions !== "undefined") {
+            junctions.map(dj => {
                 let entry = {
                     id: dj.deviceUrn
                 };
                 result.junctions.push(entry);
             });
         }
-        if (typeof fixtures !== 'undefined') {
-            fixtures.map((df) => {
+        if (typeof fixtures !== "undefined") {
+            fixtures.map(df => {
                 let entry = {
-                    id: df.portUrn + ':' + df.vlan.vlanId,
+                    id: df.portUrn + ":" + df.vlan.vlanId,
                     port: df.portUrn,
                     device: df.junction,
                     ingress: df.ingressBandwidth,
                     egress: df.egressBandwidth,
                     vlan: df.vlan.vlanId,
                     strict: df.strict,
-                    label: df.portUrn + ':' + df.vlan.vlanId,
-                    locked: false,
+                    label: df.portUrn + ":" + df.vlan.vlanId,
+                    locked: false
                 };
                 result.fixtures.push(entry);
             });
         }
-        if (typeof pipes !== 'undefined') {
-            pipes.map((dp) => {
+        if (typeof pipes !== "undefined") {
+            pipes.map(dp => {
                 let ero = [];
-                dp.azERO.map((h) => {
+                dp.azERO.map(h => {
                     ero.push(h.urn);
                 });
                 let entry = {
-                    id: dp.a + ' -- ' + dp.z,
+                    id: dp.a + " -- " + dp.z,
                     a: dp.a,
                     z: dp.z,
                     protect: dp.protect,
@@ -135,7 +129,6 @@ class Transformer {
                     zaBw: dp.zaBandwidth,
                     locked: false,
                     ero: ero
-
                 };
                 result.pipes.push(entry);
             });
@@ -145,20 +138,20 @@ class Transformer {
     }
 
     toBackend(design, scheduleRef = null) {
-        let {junctions, pipes, fixtures} = design;
+        let { junctions, pipes, fixtures } = design;
         let cmp = {
             junctions: [],
             pipes: [],
             fixtures: []
         };
-        junctions.map((j) => {
+        junctions.map(j => {
             let entry = {
-                device: j.id,
+                device: j.id
             };
             cmp.junctions.push(entry);
         });
-        if (typeof pipes !== 'undefined') {
-            pipes.map((p) => {
+        if (typeof pipes !== "undefined") {
+            pipes.map(p => {
                 let entry = {
                     a: p.a,
                     z: p.z,
@@ -172,7 +165,7 @@ class Transformer {
                 }
             });
         }
-        fixtures.map((f) => {
+        fixtures.map(f => {
             let entry = {
                 junction: f.device,
                 inMbps: f.ingress,
@@ -188,56 +181,54 @@ class Transformer {
         return cmp;
     }
 
-
     fixSerialization(conn) {
         let scheds = [];
         let schedMap = {};
 
-        if (typeof conn.reserved !== 'undefined') {
+        if (typeof conn.reserved !== "undefined") {
             scheds.push(conn.reserved.schedule);
             this.collectSchedules(scheds, conn.reserved.cmp);
         }
 
-        if (typeof conn.archived !== 'undefined') {
+        if (typeof conn.archived !== "undefined") {
             scheds.push(conn.archived.schedule);
             this.collectSchedules(scheds, conn.archived.cmp);
-
         }
-        scheds.map((s) => {
-            if (typeof s === 'object') {
+        scheds.map(s => {
+            if (typeof s === "object") {
                 schedMap[s.refId] = s;
             }
         });
-        if (typeof conn.reserved !== 'undefined' && typeof conn.reserved.schedule === 'string') {
+        if (typeof conn.reserved !== "undefined" && typeof conn.reserved.schedule === "string") {
             conn.reserved.schedule = schedMap[conn.reserved.schedule];
             this.materializeComponentScheduleRefs(schedMap, conn.reserved.cmp);
         }
-        if (typeof conn.archived !== 'undefined' && typeof conn.archived.schedule === 'string') {
+        if (typeof conn.archived !== "undefined" && typeof conn.archived.schedule === "string") {
             conn.archived.schedule = schedMap[conn.archived.schedule];
             this.materializeComponentScheduleRefs(schedMap, conn.archived.cmp);
         }
     }
 
     materializeComponentScheduleRefs(schedMap, cmp) {
-        if (typeof cmp.pipes !== 'undefined') {
-            cmp.pipes.map((p) => {
-                if (typeof p.schedule === 'string') {
+        if (typeof cmp.pipes !== "undefined") {
+            cmp.pipes.map(p => {
+                if (typeof p.schedule === "string") {
                     p.schedule = schedMap[p.schedule];
                 }
             });
         } else {
             cmp.pipes = [];
         }
-        cmp.junctions.map((j) => {
-            if (typeof j.schedule === 'string') {
+        cmp.junctions.map(j => {
+            if (typeof j.schedule === "string") {
                 j.schedule = schedMap[j.schedule];
             }
         });
-        cmp.fixtures.map((f) => {
-            if (typeof f.schedule === 'string') {
+        cmp.fixtures.map(f => {
+            if (typeof f.schedule === "string") {
                 f.schedule = schedMap[f.schedule];
             }
-            if (typeof f.vlan.schedule === 'string') {
+            if (typeof f.vlan.schedule === "string") {
                 f.vlan.schedule = schedMap[f.vlan.schedule];
             }
         });
@@ -245,20 +236,19 @@ class Transformer {
 
     collectSchedules(scheds, cmp) {
         // there might not be a pipe there
-        if (typeof cmp.pipes !== 'undefined') {
-            cmp.pipes.map((p) => {
-                scheds.push(p.schedule)
+        if (typeof cmp.pipes !== "undefined") {
+            cmp.pipes.map(p => {
+                scheds.push(p.schedule);
             });
         }
-        cmp.junctions.map((j) => {
-            scheds.push(j.schedule)
+        cmp.junctions.map(j => {
+            scheds.push(j.schedule);
         });
-        cmp.fixtures.map((f) => {
+        cmp.fixtures.map(f => {
             scheds.push(f.schedule);
             scheds.push(f.vlan.schedule);
         });
     }
-
 }
 
 export default new Transformer();

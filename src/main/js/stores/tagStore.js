@@ -1,22 +1,20 @@
-import { observable, action } from 'mobx';
-
+import { observable, action } from "mobx";
 
 class TagStore {
-
     @observable store = {
-        categories: [],
+        categories: []
     };
 
     @observable editTag = {
-        contents: '',
-        category: '',
-        source: '',
+        contents: "",
+        category: "",
+        source: "",
         contentOptions: []
     };
 
     @observable editCtg = {
-        category: '',
-        source: '',
+        category: "",
+        source: "",
         id: null
     };
 
@@ -31,7 +29,7 @@ class TagStore {
         this.store.categories.map(c => {
             if (c.category === category) {
                 this.editTag.category = c.category;
-                this.editTag.source  = c.source;
+                this.editTag.source = c.source;
             }
         });
     }
