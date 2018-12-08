@@ -1,22 +1,14 @@
 {
-  "ecmaFeatures": {
-    "jsx": true,
-    "modules": true
-  },
-  "env": {
-    "browser": true,
-    "node": true
-  },
-  "parser": "babel-eslint",
+  "extends": ["react-app", "prettier", "prettier/react"],
   "rules": {
-    "quotes": [2, "single"],
+    "no-var": 2,
+    "no-unused-vars": 2,
     "strict": [2, "never"],
-    "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,
     "react/jsx-no-undef" : 2,
+    "react/jsx-uses-react": 2,
     "react/react-in-jsx-scope": 2,
-  },
-  "plugins": [
-    "react"
-  ]
+    "import/no-webpack-loader-syntax": "off",
+    "no-useless-constructor": 0
+  }
 }
