@@ -301,7 +301,7 @@ class EditUserForm extends Component {
                                                 <Label>Old Password</Label>{" "}
                                                 <Input
                                                     type="password"
-                                                    invalid={editUser.oldPassword.length == 0}
+                                                    invalid={editUser.oldPassword.length === 0}
                                                     innerRef={ref => {
                                                         this.oldPasswordRef = ref;
                                                     }}

@@ -290,7 +290,7 @@ class EroDrawing extends Component {
                                 nodes.push(zNode);
                             }
                             let edge = {
-                                id: "current" + " : " + b + " --- " + y,
+                                id: "current : " + b + " --- " + y,
                                 from: a,
                                 color: {
                                     color: "purple"

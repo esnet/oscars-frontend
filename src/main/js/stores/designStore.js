@@ -52,6 +52,7 @@ class DesignStore {
         let idMightBeTaken = true;
         while (idMightBeTaken) {
             let idIsTaken = false;
+            // eslint-disable-next-line no-loop-func
             this.design.fixtures.map(e => {
                 if (e.id === id) {
                     idIsTaken = true;
