@@ -1,23 +1,22 @@
-import React, {Component} from 'react';
-import {observer, inject} from 'mobx-react';
-import {action} from 'mobx';
-import {Row, Col} from 'reactstrap';
-import DetailsControls from '../components/details/detailsControls';
-import DetailsComponents from '../components/details/detailsComponents';
-import DetailsInfo from '../components/details/detailsInfo';
-import myClient from '../agents/client';
-import transformer from '../lib/transform';
+import React, { Component } from "react";
+import { observer, inject } from "mobx-react";
+import { action } from "mobx";
+import { Row, Col } from "reactstrap";
+import DetailsControls from "../components/details/detailsControls";
+import DetailsComponents from "../components/details/detailsComponents";
+import DetailsInfo from "../components/details/detailsInfo";
+import myClient from "../agents/client";
+import transformer from "../lib/transform";
 
-@inject('connsStore', 'commonStore')
+@inject("connsStore", "commonStore")
 @observer
-export default class DetailsApp extends Component {
-
+class DetailsApp extends Component {
     constructor(props) {
         super(props);
     }
 
     componentWillMount() {
-        this.props.commonStore.setActiveNav('details');
+        this.props.commonStore.setActiveNav("details");
 
         const pathConnectionId = this.props.match.params.connectionId;
         this.retrieve(pathConnectionId);
@@ -27,7 +26,6 @@ export default class DetailsApp extends Component {
     componentWillUnmount() {
         clearTimeout(this.timeoutId);
         this.props.connsStore.clearCurrent();
-
     }
 
     periodicCheck() {
@@ -37,7 +35,7 @@ export default class DetailsApp extends Component {
         }, 30000);
     }
 
-    load = (connectionId) => {
+    load = connectionId => {
         this.retrieve(connectionId);
     };
 
@@ -46,20 +44,19 @@ export default class DetailsApp extends Component {
         this.retrieve(pathConnectionId);
     };
 
-    retrieve = (connectionId) => {
-        if (typeof connectionId === 'undefined') {
+    retrieve = connectionId => {
+        if (typeof connectionId === "undefined") {
             this.props.connsStore.clearCurrent();
             return;
         }
-        myClient.submitWithToken('GET', '/api/conn/info/' + connectionId)
-            .then(
-                action((response) => {
-                        if (response !== null && response.length > 0) {
-                            let conn = JSON.parse(response);
-                            transformer.fixSerialization(conn);
-                            this.props.history.push('/pages/details/' + connectionId);
-                            this.props.connsStore.setCurrent(conn);
-                            /*
+        myClient.submitWithToken("GET", "/api/conn/info/" + connectionId).then(
+            action(response => {
+                if (response !== null && response.length > 0) {
+                    let conn = JSON.parse(response);
+                    transformer.fixSerialization(conn);
+                    this.props.history.push("/pages/details/" + connectionId);
+                    this.props.connsStore.setCurrent(conn);
+                    /*
                             this.props.commonStore.addAlert({
                                 id: (new Date()).getTime(),
                                 type: 'success',
@@ -68,68 +65,65 @@ export default class DetailsApp extends Component {
                             })
                             */
 
-                            this.props.connsStore.refreshCommands();
-
-
-                        } else {
-                            this.props.connsStore.clearCurrent();
-                            this.props.history.push('/pages/details');
-                            this.props.commonStore.addAlert({
-                                id: (new Date()).getTime(),
-                                type: 'danger',
-                                headline: 'Could not find connection ' + connectionId,
-                                message: ''
-                            });
-
-                        }
-                    }
-                ),
-                (failure) => {
-                    this.props.history.push('/pages/list');
-
+                    this.props.connsStore.refreshCommands();
+                } else {
+                    this.props.connsStore.clearCurrent();
+                    this.props.history.push("/pages/details");
+                    this.props.commonStore.addAlert({
+                        id: new Date().getTime(),
+                        type: "danger",
+                        headline: "Could not find connection " + connectionId,
+                        message: ""
+                    });
                 }
-            );
-        myClient.submitWithToken('GET', '/api/conn/history/' + connectionId)
-            .then(action(
-                (response) => {
-                    let history = JSON.parse(response);
-                    this.props.connsStore.setHistory(history);
-
-                }
-            ));
-
+            }),
+            failure => {
+                this.props.history.push("/pages/list");
+            }
+        );
+        myClient.submitWithToken("GET", "/api/conn/history/" + connectionId).then(
+            action(response => {
+                let history = JSON.parse(response);
+                this.props.connsStore.setHistory(history);
+            })
+        );
     };
-
 
     render() {
         const pathConnectionId = this.props.match.params.connectionId;
 
         const conn = this.props.connsStore.store.current;
 
-        if (typeof pathConnectionId === 'undefined' || pathConnectionId === '') {
+        if (typeof pathConnectionId === "undefined" || pathConnectionId === "") {
             return (
                 <Row>
-                    <Col md={{size: 10, offset: 1}}>
-                        <DetailsControls refresh={this.refresh} load={this.load}/>
+                    <Col md={{ size: 10, offset: 1 }}>
+                        <DetailsControls refresh={this.refresh} load={this.load} />
                     </Col>
                 </Row>
-
-            )
-        } else if (conn === null || typeof conn === 'undefined' || typeof conn.archived === 'undefined') {
+            );
+        } else if (
+            conn === null ||
+            typeof conn === "undefined" ||
+            typeof conn.archived === "undefined"
+        ) {
             return <div>Loading...</div>;
         } else {
-            return <Row>
-                <Col sm={3} md={3} lg={3}>
-                    <DetailsControls refresh={this.refresh} load={this.load}/>
-                </Col>
-                <Col sm={6} md={6} lg={6}>
-                    <DetailsInfo refresh={this.refresh}/>
-                </Col>
-                <Col sm={3} md={3} lg={3}>
-                    <DetailsComponents/>
-                </Col>
-            </Row>
+            return (
+                <Row>
+                    <Col sm={3} md={3} lg={3}>
+                        <DetailsControls refresh={this.refresh} load={this.load} />
+                    </Col>
+                    <Col sm={6} md={6} lg={6}>
+                        <DetailsInfo refresh={this.refresh} />
+                    </Col>
+                    <Col sm={3} md={3} lg={3}>
+                        <DetailsComponents />
+                    </Col>
+                </Row>
+            );
         }
     }
-
 }
+
+export default DetailsApp;

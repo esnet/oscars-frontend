@@ -1,30 +1,25 @@
-import React, {Component} from 'react';
-import {inject, observer} from 'mobx-react';
-import Nestable from 'react-nestable';
-import {
-    Card, CardBody, CardHeader
-} from 'reactstrap';
+import React, { Component } from "react";
+import { inject, observer } from "mobx-react";
+import Nestable from "react-nestable";
+import { Card, CardBody, CardHeader } from "reactstrap";
+import topologyStore from "../../stores/topologyStore";
+import { toJS } from "mobx";
+import Moment from "moment";
 
-import topologyStore from '../../stores/topologyStore';
-import {action, toJS} from 'mobx';
-import Moment from 'moment';
+const format = "Y/MM/DD HH:mm:ss";
 
-
-const format = 'Y/MM/DD HH:mm:ss';
-
-@inject('topologyStore')
+@inject("topologyStore")
 @observer
-export default class TopoStatus extends Component {
+class TopoStatus extends Component {
     constructor(props) {
         super(props);
-
     }
 
     componentWillMount() {
         this.props.topologyStore.loadReport();
     }
 
-    renderItem = ({item, collapseIcon, handler}) => {
+    renderItem = ({ item, collapseIcon, handler }) => {
         return (
             <div>
                 {handler}
@@ -35,22 +30,21 @@ export default class TopoStatus extends Component {
     };
 
     render() {
-
         const report = toJS(this.props.topologyStore.report);
         const when = Moment(report.generated * 1000);
-        const humanWhen = when.format(format) + ' (' + when.fromNow() + ')';
+        const humanWhen = when.format(format) + " (" + when.fromNow() + ")";
 
         let items = [];
 
         let anyIssues = false;
-        let byConnId = {id: 'by connId', text: 'By connectionId', children: []};
-        if ('issuesByConnectionId' in report) {
+        let byConnId = { id: "by connId", text: "By connectionId", children: [] };
+        if ("issuesByConnectionId" in report) {
             for (let [connId, issues] of Object.entries(report.issuesByConnectionId)) {
-                let connEntry = {id: connId, text: connId, children: []};
+                let connEntry = { id: connId, text: connId, children: [] };
                 let i = 0;
                 for (let issue of issues) {
                     anyIssues = true;
-                    let issueEntry = {id: connId + ':' + i, text: issue};
+                    let issueEntry = { id: connId + ":" + i, text: issue };
                     connEntry.children.push(issueEntry);
                     i++;
                 }
@@ -58,14 +52,14 @@ export default class TopoStatus extends Component {
             }
         }
 
-        let byUrn = {id: 'by urn', text: 'By Urn', children: []};
-        if ('issuesByUrn' in report) {
+        let byUrn = { id: "by urn", text: "By Urn", children: [] };
+        if ("issuesByUrn" in report) {
             for (let [urn, issues] of Object.entries(report.issuesByUrn)) {
-                let urnEntry = {id: urn, text: urn, children: []};
+                let urnEntry = { id: urn, text: urn, children: [] };
                 let i = 0;
                 for (let issue of issues) {
                     anyIssues = true;
-                    let issueEntry = {id: urn + ':' + i, text: issue};
+                    let issueEntry = { id: urn + ":" + i, text: issue };
                     urnEntry.children.push(issueEntry);
                     i++;
                 }
@@ -77,23 +71,16 @@ export default class TopoStatus extends Component {
         if (anyIssues) {
             items.push(byConnId);
             items.push(byUrn);
-            issuesView = <Nestable
-                collapsed={true}
-                items={items}
-                renderItem={this.renderItem}
-            />;
+            issuesView = <Nestable collapsed={true} items={items} renderItem={this.renderItem} />;
         }
 
+        return (
+            <Card>
+                <CardHeader className="p-1">Topology report ({humanWhen})</CardHeader>
+                <CardBody>{issuesView}</CardBody>
+            </Card>
+        );
+    }
+}
 
-        return <Card>
-            <CardHeader className='p-1'>
-                Topology report ({humanWhen})
-            </CardHeader>
-            <CardBody>
-                {issuesView}
-            </CardBody>
-
-        </Card>;
-    };
-
-};
+export default TopoStatus;

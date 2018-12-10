@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from "react";
 import {
     Card,
     CardHeader,
@@ -8,26 +8,22 @@ import {
     Form,
     InputGroup,
     InputGroupAddon
-} from 'reactstrap';
-import {observer, inject} from 'mobx-react';
-import {action} from 'mobx';
-import {size} from 'lodash-es';
+} from "reactstrap";
+import { observer, inject } from "mobx-react";
+import { action } from "mobx";
+import { size } from "lodash-es";
 
-import Select from 'react-select-plus';
-import Creatable from 'react-select-plus';
-import BootstrapTable from 'react-bootstrap-table-next';
-import Octicon from 'react-octicon'
+import Select from "react-select-plus";
+import BootstrapTable from "react-bootstrap-table-next";
+import Octicon from "react-octicon";
 
+import myClient from "../../agents/client";
 
-import myClient from '../../agents/client';
-
-@inject('tagStore', 'connsStore')
+@inject("tagStore", "connsStore")
 @observer
-export default class DetailsTags extends Component {
-
+class DetailsTags extends Component {
     constructor(props) {
         super(props);
-
     }
 
     componentWillMount() {
@@ -39,12 +35,12 @@ export default class DetailsTags extends Component {
     }
 
     refreshTagCategories = () => {
-        myClient.submitWithToken('GET', '/protected/tag/categories')
-            .then(
-                action((response) => {
-                    let parsed = JSON.parse(response);
-                    this.props.tagStore.updateCategories(parsed);
-                }));
+        myClient.submitWithToken("GET", "/protected/tag/categories").then(
+            action(response => {
+                let parsed = JSON.parse(response);
+                this.props.tagStore.updateCategories(parsed);
+            })
+        );
         this.tagUpdateTimeout = setTimeout(this.refreshTagCategories, 20000);
     };
 
@@ -52,60 +48,54 @@ export default class DetailsTags extends Component {
         this.props.connsStore.refreshCurrent();
     };
 
-
     // key presses
-    handleKeyPress = (e) => {
+    handleKeyPress = e => {
         const edit = this.props.tagStore.editTag;
-        if (e.key === 'Enter' && size(edit.category) > 0 && size(edit.contents)) {
+        if (e.key === "Enter" && size(edit.category) > 0 && size(edit.contents)) {
             this.add();
         }
     };
 
-    onCategoryChange = (val) => {
+    onCategoryChange = val => {
         this.props.tagStore.setEditedTagCtg(val);
 
         let source = this.props.tagStore.editTag.source;
-        if (source != null && source.startsWith('http')) {
+        if (source != null && source.startsWith("http")) {
             this.fetchContentOptions();
         }
-
     };
 
     fetchContentOptions = () => {
         let source = this.props.tagStore.editTag.source;
-        if (!source.startsWith('https://spreadsheets.google.com/feeds/cells/')) {
-            console.log('invalid source; only google sheets for now');
-            this.props.tagStore.setEditedTagContentOptions(['Error!']);
+        if (!source.startsWith("https://spreadsheets.google.com/feeds/cells/")) {
+            console.log("invalid source; only google sheets for now");
+            this.props.tagStore.setEditedTagContentOptions(["Error!"]);
             return;
         }
-        myClient.loadJSON({method: 'GET', url: source}).then(
-            action((response) => {
+        myClient.loadJSON({ method: "GET", url: source }).then(
+            action(response => {
                 let parsed = JSON.parse(response);
-                let entries = parsed['feed']['entry'];
+                let entries = parsed["feed"]["entry"];
                 let opts = [];
                 entries.map(e => {
-                    opts.push(e['content']['$t']);
+                    opts.push(e["content"]["$t"]);
                 });
                 this.props.tagStore.setEditedTagContentOptions(opts);
-
             })
         );
-
     };
 
-
-    onContentsChange = (val) => {
+    onContentsChange = val => {
         this.props.tagStore.setEditedTagContents(val);
     };
 
-    delete = (id) => {
+    delete = id => {
         const connId = this.props.connsStore.store.current.connectionId;
-        myClient.submitWithToken('GET', '/protected/tag/delete/' + connId + '/' + id)
-            .then(
-                action(() => {
-                    this.refreshTags();
-                }));
-
+        myClient.submitWithToken("GET", "/protected/tag/delete/" + connId + "/" + id).then(
+            action(() => {
+                this.refreshTags();
+            })
+        );
     };
 
     add = () => {
@@ -117,19 +107,22 @@ export default class DetailsTags extends Component {
             contents: edit.contents
         };
 
-        myClient.submitWithToken('POST', '/protected/tag/add/' + connId, tag)
-            .then(
-                action(() => {
-                    this.refreshTags();
-                }));
-
+        myClient.submitWithToken("POST", "/protected/tag/add/" + connId, tag).then(
+            action(() => {
+                this.refreshTags();
+            })
+        );
     };
 
     idFormatter = (cell, row) => {
-        return <Octicon name='trashcan'
-                        onClick={() => this.delete(row.id)}
-                        className='float-right'
-                        style={{height: '16px', width: '16px'}}/>
+        return (
+            <Octicon
+                name="trashcan"
+                onClick={() => this.delete(row.id)}
+                className="float-right"
+                style={{ height: "16px", width: "16px" }}
+            />
+        );
         /* we don't need confirmations
         return <ConfirmModal
             body='This will delete the tag.'
@@ -149,101 +142,119 @@ export default class DetailsTags extends Component {
                     id: t.id,
                     contents: t.contents,
                     category: t.category
-                })
-            })
+                });
+            });
         }
         let categoryOpts = [];
         this.props.tagStore.store.categories.map(c => {
             categoryOpts.push({
-                'value': c.category,
-                'label': c.category,
-            })
+                value: c.category,
+                label: c.category
+            });
         });
-
 
         const columns = [
             {
-                dataField: 'category',
-                text: 'Category',
+                dataField: "category",
+                text: "Category"
             },
             {
-                dataField: 'contents',
-                text: 'Contents',
+                dataField: "contents",
+                text: "Contents"
             },
             {
-                dataField: 'id',
-                text: '?',
+                dataField: "id",
+                text: "?",
                 formatter: this.idFormatter,
-                headerStyle: {width: '40px', textAlign: 'center'}
-            },
-
+                headerStyle: { width: "40px", textAlign: "center" }
+            }
         ];
         const ctgValue = edit.category;
         const contentsValue = edit.contents;
 
         let ctgSource = this.props.tagStore.editTag.source;
-        let contentsInput = <Input type='text' id='contents'
-                                   bsSize='sm'
-                                   style={{width: '160px'}}
-                                   placeholder='Contents'
-                                   onKeyPress={this.handleKeyPress}
-                                   onChange={(e) => this.onContentsChange(e.target.value)}/>;
-        if (ctgSource != null && ctgSource !== '' && ctgSource.startsWith('http')) {
+        let contentsInput = (
+            <Input
+                type="text"
+                id="contents"
+                bsSize="sm"
+                style={{ width: "160px" }}
+                placeholder="Contents"
+                onKeyPress={this.handleKeyPress}
+                onChange={e => this.onContentsChange(e.target.value)}
+            />
+        );
+        if (ctgSource != null && ctgSource !== "" && ctgSource.startsWith("http")) {
             let contentsOpts = [];
             this.props.tagStore.editTag.contentOptions.map(opt => {
                 contentsOpts.push({
-                    'value': opt,
-                    'label': opt
-                })
+                    value: opt,
+                    label: opt
+                });
             });
 
-            contentsInput = <small>
-                <Select style={{width: '160px'}}
-                        name='select-contents'
-                        placeholder='Choose..'
+            contentsInput = (
+                <small>
+                    <Select
+                        style={{ width: "160px" }}
+                        name="select-contents"
+                        placeholder="Choose.."
                         simpleValue
                         value={contentsValue}
                         onBlurResetsInput={false}
                         onChange={this.onContentsChange}
                         autosize={false}
-                        options={contentsOpts}/>
-            </small>;
+                        options={contentsOpts}
+                    />
+                </small>
+            );
         }
 
         return (
             <Card>
                 <CardHeader>Tags</CardHeader>
                 <CardBody>
-                    <BootstrapTable condensed keyField='id' data={tags} columns={columns}/>
+                    <BootstrapTable condensed keyField="id" data={tags} columns={columns} />
 
-                    <Form inline onSubmit={(e) => {
-                        e.preventDefault()
-                    }}>
-                        <InputGroup className='mb-2 mr-sm-2 mb-sm-0'>
+                    <Form
+                        inline
+                        onSubmit={e => {
+                            e.preventDefault();
+                        }}
+                    >
+                        <InputGroup className="mb-2 mr-sm-2 mb-sm-0">
                             <small>
-                                <Select style={{width: '100px'}}
-                                        name='select-category'
-                                        placeholder='Category'
-                                        simpleValue
-                                        onBlurResetsInput={false}
-                                        onChange={this.onCategoryChange}
-                                        value={ctgValue}
-                                        autosize={false}
-                                        options={categoryOpts}/>
+                                <Select
+                                    style={{ width: "100px" }}
+                                    name="select-category"
+                                    placeholder="Category"
+                                    simpleValue
+                                    onBlurResetsInput={false}
+                                    onChange={this.onCategoryChange}
+                                    value={ctgValue}
+                                    autosize={false}
+                                    options={categoryOpts}
+                                />
                             </small>
                             {contentsInput}
 
-                            <InputGroupAddon addonType='append'>
-                                <Button className='float-right btn-sm'
-                                        disabled={size(edit.category) === 0 || size(edit.contents) === 0}
-                                        onClick={this.add}>Add</Button>
+                            <InputGroupAddon addonType="append">
+                                <Button
+                                    className="float-right btn-sm"
+                                    disabled={
+                                        size(edit.category) === 0 || size(edit.contents) === 0
+                                    }
+                                    onClick={this.add}
+                                >
+                                    Add
+                                </Button>
                             </InputGroupAddon>
                         </InputGroup>
                     </Form>
                 </CardBody>
-
             </Card>
         );
     }
-
 }
+
+export default DetailsTags;

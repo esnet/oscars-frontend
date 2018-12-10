@@ -1,23 +1,21 @@
-import {observable, action} from 'mobx';
-
+import { observable, action } from "mobx";
 
 class UserStore {
-
     @observable
     editUser = {
         allUsers: [],
         user: {
             permissions: {
-                adminAllowed: false,
+                adminAllowed: false
             }
         },
-        password: '',
-        passwordAgain: '',
-        oldPassword: '',
+        password: "",
+        passwordAgain: "",
+        oldPassword: "",
         passwordOk: false,
-        passwordValidationState: 'error',
-        passwordHelpText: 'Password too short',
-        status: '',
+        passwordValidationState: "error",
+        passwordHelpText: "Password too short",
+        status: "",
         changingPwd: false
     };
 

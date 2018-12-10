@@ -1,61 +1,58 @@
-import {observable, action, toJS} from 'mobx';
-
-import {merge, isArray, mergeWith} from 'lodash-es';
-import Moment from 'moment';
+import Moment from "moment";
+import { observable, action } from "mobx";
+import { merge, isArray, mergeWith } from "lodash-es";
 
 class ControlsStore {
-
     @observable connection = {
-        connectionId: '',
-        description: '',
-        phase: '',
-        mode: 'AUTOMATIC',
+        connectionId: "",
+        description: "",
+        phase: "",
+        mode: "AUTOMATIC",
         schedule: {
             locked: false,
             acceptable: false,
-            adviceText: '',
+            adviceText: "",
             start: {
-                at: '',
+                at: "",
                 secsAfterNow: -1,
-                choice: '',
+                choice: "",
                 parsed: false,
-                readable: '',
-                validationState: 'success',
-                validationText: '',
+                readable: "",
+                validationState: "success",
+                validationText: ""
             },
             end: {
-                at: '',
-                choice: '',
+                at: "",
+                choice: "",
                 parsed: false,
-                readable: '',
-                validationState: 'success',
-                validationText: '',
+                readable: "",
+                validationState: "success",
+                validationText: ""
             }
         },
         held: {
-            until: '',
-            remaining: '',
+            until: "",
+            remaining: "",
             idle: false,
             cmp: {}
         },
         validation: {
             errors: [],
-            acceptable: false,
+            acceptable: false
         }
     };
 
     @observable
     editJunction = {
-        junction: '',
-        showAddPipeButton: '',
-        otherJunction: '',
+        junction: "",
+        showAddPipeButton: "",
+        otherJunction: ""
     };
 
-
     @observable editFixture = {
-        fixtureId: '',
-        label: '',
-        port: '',
+        fixtureId: "",
+        label: "",
+        port: "",
         strict: false,
 
         locked: false,
@@ -63,63 +60,60 @@ class ControlsStore {
         vlan: {
             vlanId: null,
             acceptable: false,
-            adviceText: '',
+            adviceText: "",
 
-            validationState: 'success',
-            validationText: '',
+            validationState: "success",
+            validationText: "",
 
             available: {
-                suggestion: '',
-                expression: '',
-                ranges: [],
+                suggestion: "",
+                expression: "",
+                ranges: []
             },
             baseline: {
-                expression: '',
-                ranges: [],
-            },
+                expression: "",
+                ranges: []
+            }
         },
         bw: {
-
             acceptable: false,
-            adviceText: '',
+            adviceText: "",
 
             baseline: {
                 ingress: 0,
-                egress: 0,
+                egress: 0
             },
             available: {
                 ingress: 0,
-                egress: 0,
+                egress: 0
             },
             symmetrical: true,
             qos: {
-                excess: 'scavenger'
+                excess: "scavenger"
             },
 
             ingress: {
                 mbps: 0,
                 acceptable: false,
-                validationText: '',
-                validationState: 'error',
+                validationText: "",
+                validationState: "error"
             },
             egress: {
                 mbps: 0,
                 acceptable: false,
-                validationText: '',
-                validationState: 'error',
-            },
-
-
+                validationText: "",
+                validationState: "error"
+            }
         }
     };
 
     @observable
     editPipe = {
-        a: '',
-        z: '',
-        pipeId: '',
+        a: "",
+        z: "",
+        pipeId: "",
         locked: false,
-        bwMode: 'auto',
+        bwMode: "auto",
 
         protect: true,
 
@@ -128,11 +122,11 @@ class ControlsStore {
             fixturesIngress: 0,
             fixturesEgress: 0,
             qos: {
-                excess: 'scavenger'
+                excess: "scavenger"
             },
             acceptable: false,
-            validationText: '',
-            validationState: 'error',
+            validationText: "",
+            validationState: "error",
             available: 0,
             baseline: 0,
             widest: 0
@@ -143,24 +137,23 @@ class ControlsStore {
             fixturesIngress: 0,
             fixturesEgress: 0,
             qos: {
-                excess: 'scavenger'
+                excess: "scavenger"
             },
             acceptable: false,
-            validationText: '',
-            validationState: 'error',
+            validationText: "",
+            validationState: "error",
             available: 0,
             baseline: 0,
             widest: 0
         },
 
-
         ero: {
-            message: '',
+            message: "",
             acceptable: false,
-            validationText: '',
-            validationState: 'error',
+            validationText: "",
+            validationState: "error",
             hops: [],
-            mode: 'shortest',
+            mode: "shortest",
             include: [],
             exclude: []
         },
@@ -177,7 +170,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
+                azAvailable: 0
             },
             manual: {
                 acceptable: false,
@@ -185,7 +178,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
+                azAvailable: 0
             },
 
             shortest: {
@@ -194,7 +187,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
+                azAvailable: 0
             },
 
             leastHops: {
@@ -203,7 +196,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
+                azAvailable: 0
             },
 
             widestSum: {
@@ -212,8 +205,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
-
+                azAvailable: 0
             },
             widestAZ: {
                 acceptable: false,
@@ -221,8 +213,7 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
-
+                azAvailable: 0
             },
             widestZA: {
                 acceptable: false,
@@ -230,23 +221,19 @@ class ControlsStore {
                 azBaseline: 0,
                 zaBaseline: 0,
                 zaAvailable: 0,
-                azAvailable: 0,
-            },
-        },
+                azAvailable: 0
+            }
+        }
     };
-
 
     customizer = (objValue, srcValue) => {
         if (isArray(srcValue)) {
             return srcValue;
         }
-    }
-
-
+    };
 
     @action
     setParamsForEditPipe(params) {
-
         mergeWith(this.editPipe, params, this.customizer);
     }
 
@@ -265,23 +252,17 @@ class ControlsStore {
         mergeWith(this.connection, params, this.customizer);
     }
 
-
-
-
-
     @action
     clearEditConnection() {
-        this.connection.connectionId = '';
-        this.connection.description = '';
+        this.connection.connectionId = "";
+        this.connection.description = "";
     }
-
-
 
     // adding a fixture by selecting a device (through the map)
 
     @observable
     addFixture = {
-        device: ''
+        device: ""
     };
 
     @action
@@ -289,15 +270,13 @@ class ControlsStore {
         merge(this.addFixture, params);
     }
 
-
-
     // Design editing
 
     @observable editDesign = {
         disabledSaveButton: true,
-        designId: '',
-        description: '',
-        allDesigns: [],
+        designId: "",
+        description: "",
+        allDesigns: []
     };
 
     @action setParamsForEditDesign(params) {
@@ -305,20 +284,20 @@ class ControlsStore {
     }
 
     @action clearEditDesign() {
-        this.editDesign.designId = '';
-        this.editDesign.description = '';
+        this.editDesign.designId = "";
+        this.editDesign.description = "";
         this.editDesign.disabledSaveButton = true;
     }
 
     @action saveToSessionStorage() {
-        sessionStorage.setItem('controlsStore.connection', JSON.stringify(this.connection));
+        sessionStorage.setItem("controlsStore.connection", JSON.stringify(this.connection));
     }
     @action clearSessionStorage() {
-        sessionStorage.removeItem('controlsStore.connection');
+        sessionStorage.removeItem("controlsStore.connection");
     }
 
     @action restoreFromSessionStorage() {
-        const maybeSaved = sessionStorage.getItem('controlsStore.connection');
+        const maybeSaved = sessionStorage.getItem("controlsStore.connection");
         if (maybeSaved == null) {
             return false;
         }
@@ -332,12 +311,7 @@ class ControlsStore {
         this.connection = parsed;
 
         return true;
-
-
     }
-
-
-
 }
 
 export default new ControlsStore();

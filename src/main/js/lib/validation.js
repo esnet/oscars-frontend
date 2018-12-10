@@ -1,32 +1,28 @@
-import React from 'react';
-
-import {Graph, alg} from 'graphlib';
-import Octicon from 'react-octicon'
-
+import React from "react";
+import Octicon from "react-octicon";
+import { Graph, alg } from "graphlib";
 
 class Validator {
     label(state) {
         if (!state) {
-            return <Octicon style={{color: 'orange'}} name='alert'/>
+            return <Octicon style={{ color: "orange" }} name="alert" />;
         }
-        return <Octicon style={{color: 'green'}} name='check'/>
-
+        return <Octicon style={{ color: "green" }} name="check" />;
     }
 
     mapNodeColor(state) {
         if (!state) {
-            return 'orange';
+            return "orange";
         }
-        return 'lightblue';
+        return "lightblue";
     }
 
     mapEdgeColor(state) {
         if (!state) {
-            return 'orange';
+            return "orange";
         }
         return null;
     }
-
 
     fixtureState(fixture) {
         if (!fixture.locked) {
@@ -34,7 +30,6 @@ class Validator {
         }
         return true;
     }
-
 
     pipeState(pipe) {
         if (!pipe.locked) {
@@ -62,57 +57,53 @@ class Validator {
     validateDesign(cmp) {
         let result = {
             ok: true,
-            errors: [],
+            errors: []
         };
 
         const junctions = cmp.junctions;
         const pipes = cmp.pipes;
         const fixtures = cmp.fixtures;
 
-        if (typeof junctions === 'undefined') {
-            console.log('undefined junctions ');
+        if (typeof junctions === "undefined") {
+            console.log("undefined junctions ");
             result.ok = false;
-            result.errors.push('Internal error - undefined junctions');
-
+            result.errors.push("Internal error - undefined junctions");
         } else if (junctions.length < 1) {
             result.ok = false;
-            result.errors.push('Not enough junctions - at least 1 required. Add more fixtures.');
+            result.errors.push("Not enough junctions - at least 1 required. Add more fixtures.");
         }
 
-        if (typeof fixtures === 'undefined') {
+        if (typeof fixtures === "undefined") {
             result.ok = false;
-            result.errors.push('Internal error - undefined fixtures');
-
+            result.errors.push("Internal error - undefined fixtures");
         } else if (fixtures.length < 2) {
             result.ok = false;
-            result.errors.push('Not enough fixtures - at least 2 required. Add more fixtures.');
+            result.errors.push("Not enough fixtures - at least 2 required. Add more fixtures.");
         } else {
             for (let f of fixtures) {
                 if (!f.locked) {
                     result.ok = false;
-                    result.errors.push('Fixture ' + f.label + ': not locked.');
+                    result.errors.push("Fixture " + f.label + ": not locked.");
                 }
             }
         }
-        if (typeof pipes !== 'undefined') {
+        if (typeof pipes !== "undefined") {
             for (let p of pipes) {
                 if (!p.locked) {
                     result.ok = false;
-                    result.errors.push('Pipe ' + p.id + ': not locked. ');
+                    result.errors.push("Pipe " + p.id + ": not locked. ");
                 }
             }
         } else {
             result.ok = false;
-            result.errors.push('Internal error - undefined pipes');
+            result.errors.push("Internal error - undefined pipes");
         }
         if (!this.connectedGraph(cmp)) {
             result.ok = false;
-            result.errors.push('Disjoint connection graph.');
-
+            result.errors.push("Disjoint connection graph.");
         }
 
         return result;
-
     }
 
     connectedGraph(cmp) {
@@ -128,8 +119,7 @@ class Validator {
             g.setNode(j.id, j.id);
         });
         pipes.map(p => {
-            g.setEdge(p.a, p.z, p.a + ' - ' + p.z);
-
+            g.setEdge(p.a, p.z, p.a + " - " + p.z);
         });
         const connected = alg.components(g);
         if (connected.length === 1) {
@@ -143,47 +133,46 @@ class Validator {
 
         const connection = params.connection;
 
-        if (connection.description === '') {
+        if (connection.description === "") {
             result.ok = false;
-            result.errors.push('Description not set.');
+            result.errors.push("Description not set.");
         }
-        if (connection.connectionId === '') {
+        if (connection.connectionId === "") {
             result.ok = false;
-            result.errors.push('Connection id missing!');
+            result.errors.push("Connection id missing!");
         }
-        if (connection.mode === 'MANUAL' || connection.mode === 'AUTOMATIC') {
+        if (connection.mode === "MANUAL" || connection.mode === "AUTOMATIC") {
             // ok
         } else {
             result.ok = false;
-            result.errors.push('Mode is invalid ' + connection.mode);
+            result.errors.push("Mode is invalid " + connection.mode);
         }
 
         if (!connection.schedule.locked) {
             result.ok = false;
-            result.errors.push('Schedule not locked.');
+            result.errors.push("Schedule not locked.");
         }
 
         const now = Date.now();
         if (connection.schedule.start.at < now || connection.schedule.end.at < now) {
             result.ok = false;
-            result.errors.push('Start or end time set in the past!');
+            result.errors.push("Start or end time set in the past!");
         }
         if (connection.schedule.start.at > connection.schedule.end.at) {
             result.ok = false;
-            result.errors.push('End time set before start time.');
+            result.errors.push("End time set before start time.");
         }
         return result;
     }
 
     descriptionControl(val) {
-        if (val === '') {
-            return 'error';
+        if (val === "") {
+            return "error";
         }
-        return 'success';
+        return "success";
     }
 
     cleanBandwidth(inputStr, control) {
-
         let cleanedUp = false;
         let ws_re = /\s+/;
         let ws_idx = inputStr.search(ws_re);
@@ -191,11 +180,11 @@ class Validator {
         let g_idx = inputStr.search(g_re);
 
         if (ws_idx >= 0) {
-            inputStr = inputStr.replace(ws_re, '');
+            inputStr = inputStr.replace(ws_re, "");
             cleanedUp = true;
         }
         if (g_idx >= 0) {
-            inputStr = inputStr.replace(g_re, '000');
+            inputStr = inputStr.replace(g_re, "000");
             cleanedUp = true;
         }
 
@@ -203,9 +192,7 @@ class Validator {
             control.value = inputStr;
         }
         return inputStr;
-
     }
-
 }
 
 export default new Validator();

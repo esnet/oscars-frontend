@@ -1,35 +1,33 @@
-import React, {Component} from 'react';
-import {Row, Col} from 'reactstrap';
-import {inject} from 'mobx-react';
+import React, { Component } from "react";
+import { Row, Col } from "reactstrap";
+import { inject } from "mobx-react";
 
+import NetworkMap from "../components/networkMap";
+import AddFixtureModal from "../components/design/addFixtureModal";
+import EditFixtureModal from "../components/design/editFixtureModal";
+import EditJunctionModal from "../components/design/editJunctionModal";
+import EditPipeModal from "../components/design/editPipeModal";
+import DesignHelpModal from "../components/design/designHelpModal";
+import ConnectionErrorsModal from "../components/design/connectionErrorsModal";
+import DesignDrawing from "../components/design/designDrawing";
+import DesignComponents from "../components/design/designComponents";
+import ScheduleControls from "../components/design/scheduleControls";
+import ConnectionControls from "../components/design/connectionControls";
+import SelectPortTypeahead from "../components/design/selectPortTypeahead";
+import HoldTimer from "../components/design/holdTimer";
 
-import NetworkMap from '../components/networkMap';
-import AddFixtureModal from '../components/design/addFixtureModal';
-import EditFixtureModal from '../components/design/editFixtureModal';
-import EditJunctionModal from '../components/design/editJunctionModal';
-import EditPipeModal from '../components/design/editPipeModal';
-import DesignHelpModal from '../components/design/designHelpModal'
-import ConnectionErrorsModal from '../components/design/connectionErrorsModal';
-import DesignDrawing from '../components/design/designDrawing';
-import DesignComponents from '../components/design/designComponents';
-import ScheduleControls from '../components/design/scheduleControls';
-import ConnectionControls from '../components/design/connectionControls';
-import SelectPortTypeahead from '../components/design/selectPortTypeahead';
-import HoldTimer from '../components/design/holdTimer';
-import HeldList from '../components/design/heldList';
-
-@inject('controlsStore', 'mapStore', 'designStore', 'commonStore', 'modalStore')
-export default class DesignApp extends Component {
-
+@inject("controlsStore", "mapStore", "designStore", "commonStore", "modalStore")
+class DesignApp extends Component {
     constructor(props) {
         super(props);
     }
 
     componentWillMount() {
-        this.props.commonStore.setActiveNav('design');
+        this.props.commonStore.setActiveNav("design");
 
-        let restore = this.props.controlsStore.restoreFromSessionStorage()
-            && this.props.designStore.restoreFromSessionStorage();
+        let restore =
+            this.props.controlsStore.restoreFromSessionStorage() &&
+            this.props.designStore.restoreFromSessionStorage();
         if (!restore) {
             // if we can't restore (ie. first time we visit OR hold time expired), clear
             this.props.controlsStore.clearEditConnection();
@@ -46,10 +44,9 @@ export default class DesignApp extends Component {
         this.props.designStore.saveToSessionStorage();
     }
 
-
-    selectDevice = (device) => {
-        this.props.controlsStore.setParamsForAddFixture({device: device});
-        this.props.modalStore.openModal('addFixture');
+    selectDevice = device => {
+        this.props.controlsStore.setParamsForAddFixture({ device: device });
+        this.props.modalStore.openModal("addFixture");
     };
 
     render() {
@@ -60,12 +57,12 @@ export default class DesignApp extends Component {
                     <ScheduleControls />
                 </Col>
                 <Col md={6} sm={6}>
-                    <NetworkMap mapDivId={'mapDiv'} selectDevice={this.selectDevice}/>
-                    <DesignDrawing containerId={'mainDesignDrawing'}/>
+                    <NetworkMap mapDivId={"mapDiv"} selectDevice={this.selectDevice} />
+                    <DesignDrawing containerId={"mainDesignDrawing"} />
                 </Col>
                 <Col md={3} sm={3}>
-                    <HoldTimer/>
-                    <SelectPortTypeahead/>
+                    <HoldTimer />
+                    <SelectPortTypeahead />
                     <DesignComponents />
                 </Col>
                 <AddFixtureModal />
@@ -74,9 +71,9 @@ export default class DesignApp extends Component {
                 <EditPipeModal />
                 <ConnectionErrorsModal />
                 <DesignHelpModal />
-
             </Row>
         );
     }
-
 }
+
+export default DesignApp;

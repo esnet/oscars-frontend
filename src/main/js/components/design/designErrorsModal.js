@@ -1,16 +1,12 @@
-import React, {Component} from 'react';
-import {observer, inject} from 'mobx-react';
-import {
-    Modal, ModalBody, ModalHeader,
-    Card, CardBody,
-    ListGroup,
-} from 'reactstrap';
+import React, { Component } from "react";
+import { observer, inject } from "mobx-react";
+import { Modal, ModalBody, ModalHeader, Card, CardBody, ListGroup } from "reactstrap";
 
-const modalName = 'designErrors';
+const modalName = "designErrors";
 
-@inject('designStore', 'modalStore')
+@inject("designStore", "modalStore")
 @observer
-export default class DesignErrorsModal extends Component {
+class DesignErrorsModal extends Component {
     constructor(props) {
         super(props);
     }
@@ -23,7 +19,6 @@ export default class DesignErrorsModal extends Component {
             this.props.modalStore.closeModal(modalName);
         } else {
             this.props.modalStore.openModal(modalName);
-
         }
     };
 
@@ -34,7 +29,13 @@ export default class DesignErrorsModal extends Component {
         }
 
         return (
-            <Modal fade={false} size='lg' isOpen={showModal} toggle={this.toggle} onExit={this.closeModal}>
+            <Modal
+                fade={false}
+                size="lg"
+                isOpen={showModal}
+                toggle={this.toggle}
+                onExit={this.closeModal}
+            >
                 <ModalHeader toggle={this.toggle}>Design errors</ModalHeader>
                 <ModalBody>
                     <Card>
@@ -44,7 +45,8 @@ export default class DesignErrorsModal extends Component {
                     </Card>
                 </ModalBody>
             </Modal>
-
         );
     }
 }
+
+export default DesignErrorsModal;

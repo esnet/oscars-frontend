@@ -5,28 +5,26 @@ export default class VisUtils {
         let nodes = [];
 
         if (triplets === 0) {
-            edges.push(ero[0] + ' -- ' + ero[1]);
-
+            edges.push(ero[0] + " -- " + ero[1]);
         } else {
             for (let i = 0; i < triplets; i++) {
                 let offset = 3 * i;
                 nodes.push(ero[offset + 2]);
-                edges.push(ero[offset] + ' -- ' + ero[offset + 1]);
+                edges.push(ero[offset] + " -- " + ero[offset + 1]);
             }
         }
         return {
             edges: edges,
             nodes: nodes
-        }
+        };
     }
 
     static mergeItems(incoming, datasource) {
-
         let itemsToRemove = [];
         let itemsToAdd = [];
         let itemsToUpdate = [];
 
-        datasource.getIds().map( d_id => {
+        datasource.getIds().map(d_id => {
             let found = false;
             incoming.map(item => {
                 if (d_id === item.id) {
@@ -39,9 +37,9 @@ export default class VisUtils {
             }
         });
 
-        incoming.map( (item) => {
+        incoming.map(item => {
             let found = false;
-            datasource.getIds().map( d_id => {
+            datasource.getIds().map(d_id => {
                 if (d_id === item.id) {
                     found = true;
                 }
@@ -53,8 +51,5 @@ export default class VisUtils {
         datasource.remove(itemsToRemove);
         datasource.add(itemsToAdd);
         datasource.update(itemsToUpdate);
-
     }
 }
-
-

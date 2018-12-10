@@ -1,18 +1,16 @@
-import React, {Component} from 'react';
-import {observer, inject} from 'mobx-react';
-import DevicePortList from './devicePortList';
-import {
-    Modal, ModalBody, ModalHeader
-} from 'reactstrap';
-import HelpPopover from '../helpPopover';
+import React, { Component } from "react";
+import { observer, inject } from "mobx-react";
+import DevicePortList from "./devicePortList";
+import { Modal, ModalBody, ModalHeader } from "reactstrap";
+import HelpPopover from "../helpPopover";
 
-import transformer from '../../lib/transform';
+import transformer from "../../lib/transform";
 
-const modalName = 'addFixture';
+const modalName = "addFixture";
 
-@inject('topologyStore', 'controlsStore', 'designStore', 'mapStore', 'modalStore')
+@inject("topologyStore", "controlsStore", "designStore", "mapStore", "modalStore")
 @observer
-export default class AddFixtureModal extends Component {
+class AddFixtureModal extends Component {
     constructor(props) {
         super(props);
     }
@@ -32,21 +30,20 @@ export default class AddFixtureModal extends Component {
             this.props.modalStore.closeModal(modalName);
         } else {
             this.props.modalStore.openModal(modalName);
-
         }
     };
 
     addFixture = (device, port) => {
         let params = {
             device: device,
-            port: port,
+            port: port
         };
         let fixture = this.props.designStore.addFixtureDeep(params);
 
         const editFixtureParams = transformer.newFixtureToEditParams(fixture);
         this.props.controlsStore.setParamsForEditFixture(editFixtureParams);
 
-        this.props.modalStore.openModal('editFixture');
+        this.props.modalStore.openModal("editFixture");
     };
 
     render() {
@@ -54,39 +51,54 @@ export default class AddFixtureModal extends Component {
         const devicePorts = this.props.topologyStore.ethPortsByDevice;
 
         let ports = [];
-        if (typeof device !== 'undefined' && device !== '' && device !== null) {
-            devicePorts.get(device).map((port) => {
-                    ports.push({
-                        'port': port,
-                        'device': device
-                    })
-                }
-            );
+        if (typeof device !== "undefined" && device !== "" && device !== null) {
+            devicePorts.get(device).map(port => {
+                ports.push({
+                    port: port,
+                    device: device
+                });
+            });
         }
 
         const helpHeader = <span>Add a fixture</span>;
-        const helpBody = <span>
-            <p>Here you can see all the physical ports that you
-                can use for fixtures on the selected device .</p>
-            <p>You can click on the port name to view further details.</p>
-            <p>Click on the plus sign next to a port to close this form, add a
-                fixture on that port, and start editing it.</p>
-        </span>;
+        const helpBody = (
+            <span>
+                <p>
+                    Here you can see all the physical ports that you can use for fixtures on the
+                    selected device .
+                </p>
+                <p>You can click on the port name to view further details.</p>
+                <p>
+                    Click on the plus sign next to a port to close this form, add a fixture on that
+                    port, and start editing it.
+                </p>
+            </span>
+        );
 
-        const help = <span className='float-right'>
-            <HelpPopover header={helpHeader} body={helpBody} placement='bottom' popoverId='addFixHelp'/>
-        </span>;
-
+        const help = (
+            <span className="float-right">
+                <HelpPopover
+                    header={helpHeader}
+                    body={helpBody}
+                    placement="bottom"
+                    popoverId="addFixHelp"
+                />
+            </span>
+        );
 
         let showModal = this.props.modalStore.modals.get(modalName);
 
         return (
             <Modal isOpen={showModal} toggle={this.toggle} fade={false} onExit={this.closeModal}>
-                <ModalHeader toggle={this.toggle}>{device}{' '} {help} </ModalHeader>
+                <ModalHeader toggle={this.toggle}>
+                    {device} {help}{" "}
+                </ModalHeader>
                 <ModalBody>
-                    <DevicePortList ports={ports} onAddClicked={this.addFixture}/>
+                    <DevicePortList ports={ports} onAddClicked={this.addFixture} />
                 </ModalBody>
             </Modal>
         );
     }
 }
+
+export default AddFixtureModal;

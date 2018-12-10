@@ -1,10 +1,10 @@
-import {observable, action} from 'mobx';
-import {isArray, mergeWith} from 'lodash-es';
-import transformer from "../lib/transform";
+import { observable, action } from "mobx";
+import { isArray, mergeWith } from "lodash-es";
+
 import myClient from "../agents/client";
+import transformer from "../lib/transform";
 
 class ConnectionsStore {
-
     @observable store = {
         conns: [],
         current: {
@@ -13,18 +13,16 @@ class ConnectionsStore {
                 schedule: {
                     beginning: null,
                     ending: null
-
                 }
             },
             tags: [],
             dirty: false
-
         },
         foundCurrent: false,
         selected: {},
         commands: new Map(),
         statuses: new Map(),
-        history: new Map(),
+        history: new Map()
     };
 
     @observable drawing = {
@@ -36,48 +34,48 @@ class ConnectionsStore {
         buildmode: {
             ok: false,
             show: false,
-            text: ''
+            text: ""
         },
         build: {
             ok: false,
             show: false,
-            text: ''
+            text: ""
         },
         dismantle: {
             ok: false,
             show: false,
-            text: ''
+            text: ""
         },
         release: {
             ok: false,
             show: false,
-            text: ''
+            text: ""
         },
         help: {
             build: {
-                'header': null,
-                'body': null,
+                header: null,
+                body: null
             },
             buildMode: {
-                'header': null,
-                'body': null,
+                header: null,
+                body: null
             },
             release: {
-                'header': null,
-                'body': null,
+                header: null,
+                body: null
             },
             dismantle: {
-                'header': null,
-                'body': null,
-            },
+                header: null,
+                body: null
+            }
         },
         regenerate: {
             ok: false,
             show: false,
-            text: ''
+            text: ""
         },
         overrideState: {
-            'newState': null
+            newState: null
         }
     };
 
@@ -85,16 +83,15 @@ class ConnectionsStore {
         criteria: [],
         ports: [],
         vlans: [],
-        connectionId: '',
-        username: '',
-        description: '',
-        phase: 'RESERVED',
-        state: 'ACTIVE',
+        connectionId: "",
+        username: "",
+        description: "",
+        phase: "RESERVED",
+        state: "ACTIVE",
         sizePerPage: 5,
         page: 1,
-        totalSize: 0,
+        totalSize: 0
     };
-
 
     @action setRedraw(value) {
         this.drawing.redraw = value;
@@ -112,7 +109,6 @@ class ConnectionsStore {
         this.controls.show = value;
     }
 
-
     @action setControl(unit, params) {
         this.controls[unit] = params;
     }
@@ -121,11 +117,9 @@ class ConnectionsStore {
         this.controls.help[unit] = params;
     }
 
-
     @action setStatuses(device, statuses) {
         this.store.statuses[device] = statuses;
     }
-
 
     @action setFilter(params) {
         mergeWith(this.filter, params, this.customizer);
@@ -151,9 +145,10 @@ class ConnectionsStore {
     }
 
     @action refreshCommands() {
-        myClient.submitWithToken('GET', '/protected/pss/commands/' + this.store.current.connectionId)
-            .then(action(
-                (response) => {
+        myClient
+            .submitWithToken("GET", "/protected/pss/commands/" + this.store.current.connectionId)
+            .then(
+                action(response => {
                     let commands = JSON.parse(response);
                     if (commands.length !== 0) {
                         this.setCommands(commands);
@@ -162,24 +157,19 @@ class ConnectionsStore {
                     }
                 })
             );
-
     }
 
     @action refreshCurrent() {
-        myClient.submitWithToken('GET', '/api/conn/info/' + this.store.current.connectionId)
-            .then(
-                action((response) => {
-                    let conn = JSON.parse(response);
-                    transformer.fixSerialization(conn);
-                    this.setCurrent(conn);
-
-                }),
-                (failure) => {
-                    // do nothing
-                }
-            );
-
-
+        myClient.submitWithToken("GET", "/api/conn/info/" + this.store.current.connectionId).then(
+            action(response => {
+                let conn = JSON.parse(response);
+                transformer.fixSerialization(conn);
+                this.setCurrent(conn);
+            }),
+            failure => {
+                // do nothing
+            }
+        );
     }
 
     findConnection(connectionId) {
@@ -190,13 +180,11 @@ class ConnectionsStore {
         }
     }
 
-
     customizer = (objValue, srcValue) => {
         if (isArray(srcValue)) {
             return srcValue;
         }
-    }
-
+    };
 }
 
 export default new ConnectionsStore();

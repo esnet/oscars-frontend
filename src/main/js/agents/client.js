@@ -1,21 +1,20 @@
-import accountStore from '../stores/accountStore';
+import accountStore from "../stores/accountStore";
 
 class MyXHRClient {
-
     loadJSON(opts) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function(resolve, reject) {
             let xhr = new XMLHttpRequest();
-            xhr.overrideMimeType('application/json');
+            xhr.overrideMimeType("application/json");
             xhr.open(opts.method, opts.url);
 
-            if ('timeout' in opts) {
+            if ("timeout" in opts) {
                 xhr.timeout = opts.timeout;
             }
             xhr.ontimeout = () => {
-                reject({status: 0, statusText: 'Timed out'})
+                reject({ status: 0, statusText: "Timed out" });
             };
 
-            xhr.onload = function () {
+            xhr.onload = function() {
                 if (this.status >= 200 && this.status < 300) {
                     resolve(xhr.response);
                 } else {
@@ -26,7 +25,7 @@ class MyXHRClient {
                 }
             };
 
-            xhr.onerror = function () {
+            xhr.onerror = function() {
                 reject({
                     status: this.status,
                     statusText: xhr.statusText
@@ -34,15 +33,15 @@ class MyXHRClient {
             };
 
             if (opts.headers) {
-                Object.keys(opts.headers).forEach(function (key) {
+                Object.keys(opts.headers).forEach(function(key) {
                     xhr.setRequestHeader(key, opts.headers[key]);
                 });
             }
-            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
-            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+            xhr.setRequestHeader("Accept", "application/json");
             let params = opts.params;
             if (params) {
-                if (typeof params === 'object') {
+                if (typeof params === "object") {
                     params = JSON.stringify(params);
                 }
                 xhr.send(params);
@@ -53,21 +52,17 @@ class MyXHRClient {
     }
 
     submit(method, url, payload) {
-
         let headers = {};
 
-        return this.loadJSON({method: method, url: url, headers: headers, params: payload});
+        return this.loadJSON({ method: method, url: url, headers: headers, params: payload });
     }
 
     submitWithToken(method, url, payload) {
         let token = accountStore.loggedin.token;
-        let headers = {'Authentication': token};
+        let headers = { Authentication: token };
 
-
-        return this.loadJSON({method: method, url: url, headers: headers, params: payload});
+        return this.loadJSON({ method: method, url: url, headers: headers, params: payload });
     }
-
 }
-
 
 export default new MyXHRClient();

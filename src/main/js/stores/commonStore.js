@@ -1,15 +1,13 @@
-import { observable, action } from 'mobx';
-
+import { observable, action } from "mobx";
 
 class CommonStore {
-
     @observable nav = {
-        active: '',
+        active: ""
     };
 
     @observable version = {
         frontend: __VERSION__,
-        backend: 'unknown'
+        backend: "unknown"
     };
 
     @observable alerts = [];
@@ -22,7 +20,6 @@ class CommonStore {
         this.version[key] = val;
     }
 
-
     @action removeAlert(alert) {
         let idxToRemove = -1;
         this.alerts.map((entry, index) => {
@@ -33,12 +30,9 @@ class CommonStore {
         if (idxToRemove > -1) {
             this.alerts.splice(idxToRemove, 1);
         }
-
     }
     @action addAlert(alert) {
         this.alerts.push(alert);
-
     }
-
 }
 export default new CommonStore();

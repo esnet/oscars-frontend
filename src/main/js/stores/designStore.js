@@ -1,7 +1,6 @@
-import {observable, action} from 'mobx';
+import { observable, action } from "mobx";
 
 class DesignStore {
-
     /*
     junction: { id: Device URN }
     fixture: {
@@ -26,18 +25,16 @@ class DesignStore {
     }
      */
 
-
     @observable design = {
         junctions: [],
         fixtures: [],
         pipes: [],
-        errors: [],
+        errors: []
     };
-
 
     findFixture(id) {
         let result = null;
-        this.design.fixtures.map((f) => {
+        this.design.fixtures.map(f => {
             if (f.id === id) {
                 result = f;
             }
@@ -50,12 +47,13 @@ class DesignStore {
     }
 
     makeFixtureId(port) {
-        let suffix = 'a';
-        let id = port + ':' + suffix;
+        let suffix = "a";
+        let id = port + ":" + suffix;
         let idMightBeTaken = true;
         while (idMightBeTaken) {
             let idIsTaken = false;
-            this.design.fixtures.map((e) => {
+            // eslint-disable-next-line no-loop-func
+            this.design.fixtures.map(e => {
                 if (e.id === id) {
                     idIsTaken = true;
                 }
@@ -64,15 +62,15 @@ class DesignStore {
                 idMightBeTaken = false;
             } else {
                 suffix = DesignStore.nextChar(suffix);
-                id = port + ':' + suffix;
+                id = port + ":" + suffix;
             }
         }
-        return {id: id, suffix: suffix};
+        return { id: id, suffix: suffix };
     }
 
     fixturesOf(junctionId) {
         let fixturesOf = [];
-        this.design.fixtures.map((entry) => {
+        this.design.fixtures.map(entry => {
             if (entry.device === junctionId) {
                 fixturesOf.push(entry.id);
             }
@@ -82,7 +80,7 @@ class DesignStore {
 
     vlansLockedOnPort(portUrn) {
         let vlans = [];
-        this.design.fixtures.map((f) => {
+        this.design.fixtures.map(f => {
             if (f.port === portUrn && f.locked) {
                 vlans.push(f.vlan);
             }
@@ -90,11 +88,10 @@ class DesignStore {
         return vlans;
     }
 
-
     bwLockedOnPort(portUrn) {
         let ingress = 0;
         let egress = 0;
-        this.design.fixtures.map((f) => {
+        this.design.fixtures.map(f => {
             if (f.port === portUrn && f.locked) {
                 ingress += f.ingress;
                 egress += f.egress;
@@ -103,9 +100,7 @@ class DesignStore {
         return {
             ingress: ingress,
             egress: egress
-        }
-
-
+        };
     }
     deviceOf(fixtureId) {
         if (this.findFixture(fixtureId) == null) {
@@ -119,7 +114,6 @@ class DesignStore {
         this.design.junctions = cmp.junctions;
         this.design.fixtures = cmp.fixtures;
         this.design.pipes = cmp.pipes;
-
     }
 
     @action
@@ -150,7 +144,7 @@ class DesignStore {
                     zaBw: 0,
                     strict: false,
                     locked: false,
-                    mode: 'fits',
+                    mode: "fits",
                     ero: []
                 };
                 this.addPipe(pipe);
@@ -172,7 +166,7 @@ class DesignStore {
         if (this.fixturesOf(device).length === 0) {
             let connectedPipes = this.pipesConnectedTo(device);
             this.deleteJunction(device);
-            connectedPipes.map((pipe) => {
+            connectedPipes.map(pipe => {
                 this.deletePipe(pipe.id);
             });
         }
@@ -180,24 +174,23 @@ class DesignStore {
 
     @action
     deleteJunctionDeep(device) {
-        this.fixturesOf(device).map((fixtureId) => {
+        this.fixturesOf(device).map(fixtureId => {
             this.deleteFixture(fixtureId);
         });
 
         let connectedPipes = this.pipesConnectedTo(device);
-        connectedPipes.map((pipe) => {
+        connectedPipes.map(pipe => {
             this.deletePipe(pipe.id);
         });
 
         this.deleteJunction(device);
     }
 
-
     @action
     addFixture(params) {
         let idResult = this.makeFixtureId(params.port);
 
-        let label = params.port.split(':')[1] + ':' + idResult.suffix;
+        let label = params.port.split(":")[1] + ":" + idResult.suffix;
         let entry = {
             id: idResult.id,
             port: params.port,
@@ -208,9 +201,7 @@ class DesignStore {
             egress: 0,
             locked: false,
             strict: false
-
         };
-
 
         this.design.fixtures.push(entry);
         return entry;
@@ -220,11 +211,11 @@ class DesignStore {
     lockFixture(id, params) {
         let outLabel = null;
         let error = false;
-        this.design.fixtures.map((entry) => {
+        this.design.fixtures.map(entry => {
             if (entry.id !== id) {
                 if (entry.port === params.port) {
                     if (entry.vlan === params.vlan) {
-                        console.log('ERROR; duplicate VLAN detected when locking');
+                        console.log("ERROR; duplicate VLAN detected when locking");
                         error = true;
                     }
                 }
@@ -233,9 +224,9 @@ class DesignStore {
         if (error) {
             return;
         }
-        this.design.fixtures.map((entry) => {
+        this.design.fixtures.map(entry => {
             if (entry.id === id) {
-                outLabel = entry.port.split(':')[1] + ':' + params.vlan;
+                outLabel = entry.port.split(":")[1] + ":" + params.vlan;
                 entry.label = outLabel;
                 entry.strict = params.strict;
 
@@ -251,9 +242,9 @@ class DesignStore {
     @action
     unlockFixture(id) {
         let outLabel = null;
-        this.design.fixtures.map((entry) => {
+        this.design.fixtures.map(entry => {
             if (entry.id === id) {
-                outLabel = entry.port.split(':')[1] + ':' + entry.id.split(':')[2];
+                outLabel = entry.port.split(":")[1] + ":" + entry.id.split(":")[2];
                 entry.label = outLabel;
                 entry.strict = false;
 
@@ -279,20 +270,19 @@ class DesignStore {
         }
     }
 
-
     lastDeviceExcept(device) {
         let lastDeviceAdded = null;
-        this.design.junctions.map((j) => {
+        this.design.junctions.map(j => {
             if (j.id !== device) {
                 lastDeviceAdded = j.id;
             }
         });
-        return lastDeviceAdded
+        return lastDeviceAdded;
     }
 
     junctionExists(device) {
         let junctionExists = false;
-        this.design.junctions.map((j) => {
+        this.design.junctions.map(j => {
             if (j.id === device) {
                 junctionExists = true;
             }
@@ -303,7 +293,7 @@ class DesignStore {
     @action
     addJunction(device) {
         this.design.junctions.push({
-            'id': device,
+            id: device
         });
     }
 
@@ -320,7 +310,7 @@ class DesignStore {
 
     pipesConnectedTo(junctionId) {
         let connected = [];
-        this.design.pipes.map((entry) => {
+        this.design.pipes.map(entry => {
             if (entry.a === junctionId || entry.z === junctionId) {
                 connected.push(entry);
             }
@@ -329,12 +319,12 @@ class DesignStore {
     }
 
     makePipeId(pipe) {
-        return pipe.a + ' ' + pipe.z;
+        return pipe.a + " " + pipe.z;
     }
 
     findPipe(id) {
         let result = null;
-        this.design.pipes.map((f) => {
+        this.design.pipes.map(f => {
             if (f.id === id) {
                 result = f;
             }
@@ -348,11 +338,9 @@ class DesignStore {
         pipe.azBw = 0;
         pipe.zaBw = 0;
         pipe.locked = false;
-        pipe.mode = 'fits';
+        pipe.mode = "fits";
         pipe.protect = true;
         pipe.ero = [];
-
-
 
         this.design.pipes.push(pipe);
         return pipe.id;
@@ -360,7 +348,7 @@ class DesignStore {
 
     @action
     lockPipe(id, params) {
-        this.design.pipes.map((pipe) => {
+        this.design.pipes.map(pipe => {
             if (pipe.id === id) {
                 pipe.azBw = params.azBw;
                 pipe.zaBw = params.zaBw;
@@ -375,11 +363,11 @@ class DesignStore {
 
     @action
     unlockPipe(id) {
-        this.design.pipes.map((pipe) => {
+        this.design.pipes.map(pipe => {
             if (pipe.id === id) {
                 pipe.azBw = 0;
                 pipe.zaBw = 0;
-                pipe.mode = '';
+                pipe.mode = "";
                 pipe.protect = false;
                 pipe.ero = [];
                 pipe.locked = false;
@@ -389,10 +377,10 @@ class DesignStore {
 
     @action
     unlockAll() {
-        this.design.pipes.map((p) => {
+        this.design.pipes.map(p => {
             this.unlockPipe(p.id);
         });
-        this.design.fixtures.map((f) => {
+        this.design.fixtures.map(f => {
             this.unlockFixture(f.id);
         });
     }
@@ -411,24 +399,21 @@ class DesignStore {
     }
 
     @action saveToSessionStorage() {
-        sessionStorage.setItem('designStore.design', JSON.stringify(this.design));
+        sessionStorage.setItem("designStore.design", JSON.stringify(this.design));
     }
     @action clearSessionStorage() {
-        sessionStorage.removeItem('designStore.design');
+        sessionStorage.removeItem("designStore.design");
     }
 
     @action restoreFromSessionStorage() {
-        const maybeSaved = sessionStorage.getItem('designStore.design');
+        const maybeSaved = sessionStorage.getItem("designStore.design");
         if (maybeSaved == null) {
             return false;
         }
         this.design = JSON.parse(maybeSaved);
 
         return true;
-
-
     }
-
 }
 
 export default new DesignStore();
