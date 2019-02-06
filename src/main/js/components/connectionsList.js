@@ -181,7 +181,8 @@ class ConnectionsList extends Component {
 
     phaseOptions = {
         RESERVED: "Reserved",
-        ARCHIVED: "Archived"
+        ARCHIVED: "Archived",
+        ANY: "Any"
     };
 
     columns = [
@@ -200,7 +201,7 @@ class ConnectionsList extends Component {
         {
             dataField: "phase",
             text: "Phase",
-            filter: selectFilter({ options: this.phaseOptions, defaultValue: "RESERVED" })
+            filter: selectFilter({ options: this.phaseOptions, defaultValue: "ANY" })
         },
 
         {
