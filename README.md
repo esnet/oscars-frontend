@@ -32,16 +32,21 @@ A frontend for OSCARS 1.0
 - The version number is important; it should be the same in all of these files:
   - `package.json` 
   - `pom.xml`
-  - `main/resources/frontend/index.html`
+  - `src/main/resources/frontend/index.html`
+  
+- In order for the backend to reflect the new changes on the frontend, we need to do the following
+  - Bump the version number in the frontend in all the files mentioned above
+  - Run a `mvn package deploy` on the frontend (do this ONLY when everything is tested and working as expected)
+    - If you're in development mode, you can skip the deploy mode for now. Just do a `mvn install` locally
+  - Bump the version dependency on the backend (`oscars-newtech`) in the top level `pom.xml`
 
 ### IntelliJ IDEA settings 
 
 - Plugins
-  - Install NodeJS plugin, restart IDEA
-  - Preferences -> Languages & Frameworks -> Node.js and NPM: Enable
-- Preferences -> Languages & Frameworks -> Javascript
-  - Set project language to React JSX
-- Preferences -> Languages & Frameworks -> Javascript -> Libraries
-  - Download
-  - select 'jasmine', Download and install, Apply
- 
+  - Install NodeJS plugin, restart IDEA  
+- Preferences -> Languages & Frameworks
+  - Node.js and NPM: Enable
+  - Javascript: Set project language to React JSX
+  - Javascript -> Libraries
+    - Download
+    - Select 'jasmine', Download and install, Apply

@@ -181,7 +181,8 @@ class ConnectionsList extends Component {
 
     phaseOptions = {
         RESERVED: "Reserved",
-        ARCHIVED: "Archived"
+        ARCHIVED: "Archived",
+        ANY: "Any"
     };
 
     columns = [
