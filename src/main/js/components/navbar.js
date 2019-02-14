@@ -83,6 +83,24 @@ class NavBar extends Component {
                 </UncontrolledDropdown>
             );
         }
+
+        let help = (
+            <UncontrolledDropdown>
+                <DropdownToggle nav caret>
+                    Help
+                </DropdownToggle>
+                <DropdownMenu>
+                    <NavLink
+                        href="//github.com/esnet/oscars-newtech/issues/new"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Report an issue
+                    </NavLink>
+                </DropdownMenu>
+            </UncontrolledDropdown>
+        );
+
         /*
         // remove these links for now
         <NavLink href='/pages/map'
@@ -123,7 +141,6 @@ class NavBar extends Component {
                     >
                         Status
                     </NavLink>
-
                     {admin}
                     <NavLink
                         href="/pages/account"
@@ -131,6 +148,7 @@ class NavBar extends Component {
                     >
                         My Account
                     </NavLink>
+                    {help}
                     <NavLink href="/pages/logout">Logout</NavLink>
                 </Nav>
             </Navbar>
