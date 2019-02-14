@@ -30,6 +30,7 @@ class AdminTagsApp extends Component {
     componentWillMount() {
         this.refreshTagCategories();
     }
+
     componentWillUnmount() {
         clearTimeout(this.tagUpdateTimeout);
     }

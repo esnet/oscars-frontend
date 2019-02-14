@@ -21,6 +21,7 @@ class TagStore {
     @action setEditedTagContents(contents) {
         this.editTag.contents = contents;
     }
+
     @action setEditedTagContentOptions(contentOptions) {
         this.editTag.contentOptions = contentOptions;
     }
@@ -38,6 +39,7 @@ class TagStore {
         this.editCtg.category = ctg;
         this.editCtg.id = id;
     }
+
     @action setEditedSource(src, id) {
         this.editCtg.source = src;
         this.editCtg.id = id;

@@ -102,6 +102,7 @@ class DesignStore {
             egress: egress
         };
     }
+
     deviceOf(fixtureId) {
         if (this.findFixture(fixtureId) == null) {
             return null;
@@ -401,6 +402,7 @@ class DesignStore {
     @action saveToSessionStorage() {
         sessionStorage.setItem("designStore.design", JSON.stringify(this.design));
     }
+
     @action clearSessionStorage() {
         sessionStorage.removeItem("designStore.design");
     }

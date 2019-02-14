@@ -31,6 +31,7 @@ class CommonStore {
             this.alerts.splice(idxToRemove, 1);
         }
     }
+
     @action addAlert(alert) {
         this.alerts.push(alert);
     }

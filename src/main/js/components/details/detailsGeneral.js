@@ -238,6 +238,7 @@ class DetailsGeneral extends Component {
             </span>
         );
     }
+
     modeHelp(mode) {
         const header = <span>Build mode help</span>;
         let body = (

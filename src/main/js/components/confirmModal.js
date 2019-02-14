@@ -6,6 +6,7 @@ export default class ConfirmModal extends Component {
     constructor(props) {
         super(props);
     }
+
     componentWillMount() {
         this.hideConfirm();
     }
@@ -32,6 +33,7 @@ export default class ConfirmModal extends Component {
         this.hideConfirm();
         this.props.onConfirm();
     };
+
     abort = () => {
         this.hideConfirm();
         this.props.onAbort();

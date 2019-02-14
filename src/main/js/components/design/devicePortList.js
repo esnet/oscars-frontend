@@ -27,6 +27,7 @@ export default class DevicePortList extends Component {
             </ListGroup>
         );
     };
+
     tagFormatter = (cell, row) => {
         return row.tags.map((tag, idx) => {
             return (

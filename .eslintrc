@@ -10,6 +10,7 @@
     "react/react-in-jsx-scope": 2,
     "import/no-webpack-loader-syntax": "off",
     "no-useless-constructor": 0,
-    "array-callback-return": 0
+    "array-callback-return": 0,
+    "lines-between-class-members": ["error", "always"]
   }
 }

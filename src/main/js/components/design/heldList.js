@@ -39,6 +39,7 @@ class HeldList extends Component {
         );
         this.heldListUpdateTimeout = setTimeout(this.updateList, 5000); // we will update every second
     };
+
     render() {
         const current = this.props.heldStore.held.current;
         const conn = this.props.controlsStore.connection;

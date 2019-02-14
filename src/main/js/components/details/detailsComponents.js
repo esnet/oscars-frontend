@@ -40,6 +40,7 @@ class DetailsComponents extends Component {
             data: pipe
         });
     };
+
     onConnectionClicked = () => {
         this.props.connsStore.setSelected({
             type: "connection",

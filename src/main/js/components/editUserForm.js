@@ -65,6 +65,7 @@ class EditUserForm extends Component {
     onPwdAgainChange = val => {
         this.props.userStore.setPasswordAgain(val);
     };
+
     onOldPwdChange = val => {
         this.props.userStore.setOldPassword(val);
     };

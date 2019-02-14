@@ -41,6 +41,7 @@ class DetailsDrawing extends Component {
             data: pipe
         });
     };
+
     network = {
         fit: () => {
             // console.log('default fit')

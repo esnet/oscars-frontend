@@ -90,6 +90,7 @@ class ConnectionsList extends Component {
         });
         return <ListGroup className="m-0 p-0">{result}</ListGroup>;
     };
+
     descFormatter = (cell, row) => {
         let tagList = null;
 
@@ -147,6 +148,7 @@ class ConnectionsList extends Component {
         });
         return <ListGroup className="m-0 p-0">{result}</ListGroup>;
     };
+
     onTableChange = (type, newState) => {
         const cs = this.props.connsStore;
         if (type === "pagination") {
@@ -258,6 +260,7 @@ class ConnectionsList extends Component {
             };
             rows.push(row);
         });
+
         let remote = {
             filter: true,
             pagination: true,

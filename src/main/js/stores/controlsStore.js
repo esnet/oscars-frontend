@@ -292,6 +292,7 @@ class ControlsStore {
     @action saveToSessionStorage() {
         sessionStorage.setItem("controlsStore.connection", JSON.stringify(this.connection));
     }
+
     @action clearSessionStorage() {
         sessionStorage.removeItem("controlsStore.connection");
     }

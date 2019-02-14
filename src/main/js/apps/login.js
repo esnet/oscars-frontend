@@ -21,9 +21,11 @@ class Login extends React.Component {
     handleChangeUsername = e => {
         this.props.accountStore.setAttemptUsername(e.target.value);
     };
+
     handleChangePassword = e => {
         this.props.accountStore.setAttemptPassword(e.target.value);
     };
+
     handleKeyPress = e => {
         if (e.key === "Enter") {
             this.handleLogin();

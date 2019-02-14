@@ -181,6 +181,7 @@ class DetailsInfo extends Component {
         this.setState({ commands: newSt });
         //        console.log(this.state);
     };
+
     toggleHistoryCollapse = historyId => {
         if (this.state.historyId === historyId) {
             this.setState({ historyId: null });

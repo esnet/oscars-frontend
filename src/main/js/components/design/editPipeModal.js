@@ -341,6 +341,7 @@ class EditPipeModal extends Component {
         this.props.controlsStore.setParamsForEditPipe({ locked: true });
         this.closeModal();
     };
+
     unlockPipe = () => {
         const ep = this.props.controlsStore.editPipe;
         this.props.controlsStore.setParamsForEditPipe({
@@ -399,6 +400,7 @@ class EditPipeModal extends Component {
 
         this.props.controlsStore.setParamsForEditPipe(params);
     };
+
     onBwValid = (direction, mbps) => {
         let params = {};
         let ep = this.props.controlsStore.editPipe;
@@ -412,6 +414,7 @@ class EditPipeModal extends Component {
         };
         this.props.controlsStore.setParamsForEditPipe(params);
     };
+
     setBwCtlRef = (direction, ref) => {
         this.bwCtlRefs[direction] = ref;
     };

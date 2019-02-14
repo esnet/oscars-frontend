@@ -44,6 +44,7 @@ class DetailsButtons extends Component {
             })
         );
     };
+
     dismantle = () => {
         const conn = this.props.connsStore.store.current;
         const controls = this.props.connsStore.controls;

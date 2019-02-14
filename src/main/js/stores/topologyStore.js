@@ -111,7 +111,9 @@ class TopologyStore {
      */
 
     @observable baseline = observable.map({});
+
     @observable available = observable.map({});
+
     @observable adjacencies = observable.array([]);
 
     @action loadAdjacencies() {
