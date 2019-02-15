@@ -26,7 +26,8 @@ class ConnectionControls extends Component {
                         description: "",
                         phase: "HELD",
                         connectionId: response,
-                        mode: "AUTOMATIC"
+                        mode: "AUTOMATIC",
+                        connection_mtu: 9000
                     };
                     this.props.controlsStore.setParamsForConnection(params);
                 })
@@ -74,11 +75,19 @@ class ConnectionControls extends Component {
         this.props.controlsStore.setParamsForConnection(params);
     };
 
+    onMTUChange = e => {
+        const params = {
+            connection_mtu: parseInt(e.target.value, 10)
+        };
+        console.log("params are ", params);
+        this.props.controlsStore.setParamsForConnection(params);
+    };
+
     render() {
         const conn = this.props.controlsStore.connection;
 
-        const helpHeader = <span>Build mode help</span>;
-        const helpBody = (
+        const buildHelpHeader = <span>Build mode help</span>;
+        const buildHelpBody = (
             <span>
                 <p>
                     Auto: The connection will be configured on network devices ("built") on schedule
@@ -97,13 +106,35 @@ class ConnectionControls extends Component {
             </span>
         );
 
-        const help = (
+        const buildHelp = (
             <span className="float-right">
                 <HelpPopover
-                    header={helpHeader}
-                    body={helpBody}
+                    header={buildHelpHeader}
+                    body={buildHelpBody}
                     placement="right"
                     popoverId="buildHelp"
+                />
+            </span>
+        );
+
+        const mtuHelpHeader = <span>Connection MTU help</span>;
+        const mtudHelpBody = (
+            <span>
+                <p>MTU is the desired data size that the frame will carry.</p>
+                <p>
+                    The default value is 9000, without the overhead. The other option available is
+                    1500.
+                </p>
+            </span>
+        );
+
+        const mtuHelp = (
+            <span className="float-right">
+                <HelpPopover
+                    header={mtuHelpHeader}
+                    body={mtudHelpBody}
+                    placement="right"
+                    popoverId="mtuHelp"
                 />
             </span>
         );
@@ -120,13 +151,19 @@ class ConnectionControls extends Component {
                             <strong>
                                 Help me!
                                 <span className="float-right">
-                                    <Octicon
-                                        name="info"
-                                        style={{ height: "18px", width: "18px", cursor: "pointer" }}
-                                        onClick={() => {
-                                            this.props.modalStore.openModal("designHelp");
-                                        }}
-                                    />
+                                    <span>
+                                        <Octicon
+                                            name="info"
+                                            style={{
+                                                height: "18px",
+                                                width: "18px",
+                                                cursor: "pointer"
+                                            }}
+                                            onClick={() => {
+                                                this.props.modalStore.openModal("designHelp");
+                                            }}
+                                        />
+                                    </span>
                                 </span>
                             </strong>
                             <div>
@@ -146,13 +183,20 @@ class ConnectionControls extends Component {
                         </FormGroup>
                         <FormGroup>
                             <Label>Build Mode:</Label>
-                            {help}{" "}
+                            {buildHelp}{" "}
                             <Input type="select" onChange={this.onBuildModeChange}>
                                 <option value="AUTOMATIC">Scheduled</option>
                                 <option value="MANUAL">Manual</option>
                             </Input>
                         </FormGroup>
-
+                        <FormGroup>
+                            <Label>Connection MTU:</Label>
+                            {mtuHelp}{" "}
+                            <Input type="select" onChange={this.onMTUChange}>
+                                <option value="9000">9000</option>
+                                <option value="1500">1500</option>
+                            </Input>
+                        </FormGroup>
                         <FormGroup className="float-right">
                             <ToggleDisplay show={!conn.validation.acceptable}>
                                 <Button
