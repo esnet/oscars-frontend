@@ -122,8 +122,8 @@ class ConnectionControls extends Component {
             <span>
                 <p>MTU is the desired data size that the frame will carry.</p>
                 <p>
-                    The default value is 9000, without the overhead. The other option available is
-                    1500.
+                    The default value is 9000, without the overhead. The user can provide a value
+                    between 1500 and 9000 (inclusive).
                 </p>
             </span>
         );
@@ -216,6 +216,7 @@ class ConnectionControls extends Component {
                                     Display errors
                                 </Button>{" "}
                             </ToggleDisplay>
+
                             {/*
                             <ToggleDisplay show={conn.phase === 'RESERVED' && conn.schedule.start.at > new Date()}>
                                 <UncommitButton/>{' '}
