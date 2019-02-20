@@ -218,6 +218,7 @@ class HoldTimer extends Component {
             // TODO: handle tags
             let connection = {
                 connectionId: conn.connectionId,
+                connection_mtu: conn.connection_mtu,
                 mode: conn.mode,
                 description: conn.description,
                 username: "",
@@ -230,7 +231,6 @@ class HoldTimer extends Component {
                 junctions: cmp.junctions,
                 fixtures: cmp.fixtures
             };
-            // console.log(connection);
 
             myClient.submitWithToken("POST", "/protected/hold", connection).then(
                 action(response => {
