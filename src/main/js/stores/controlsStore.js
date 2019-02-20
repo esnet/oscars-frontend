@@ -8,7 +8,7 @@ class ControlsStore {
         description: "",
         phase: "",
         mode: "AUTOMATIC",
-        connection_mtu: 9000,
+        connection_mtu: 0,
         schedule: {
             locked: false,
             acceptable: false,
@@ -250,6 +250,7 @@ class ControlsStore {
 
     @action
     setParamsForConnection(params) {
+        // console.log("setParamsForConnection ", params);
         mergeWith(this.connection, params, this.customizer);
     }
 
