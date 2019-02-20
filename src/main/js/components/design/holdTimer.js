@@ -215,8 +215,6 @@ class HoldTimer extends Component {
 
             let cmp = Transformer.toBackend(this.props.designStore.design);
 
-            console.log("hold timer ", conn.connection_mtu);
-
             // TODO: handle tags
             let connection = {
                 connectionId: conn.connectionId,
@@ -233,11 +231,9 @@ class HoldTimer extends Component {
                 junctions: cmp.junctions,
                 fixtures: cmp.fixtures
             };
-            // console.log(connection);
 
             myClient.submitWithToken("POST", "/protected/hold", connection).then(
                 action(response => {
-                    console.log("submit with token");
                     let parsed = JSON.parse(response);
                     if (parsed.validity != null) {
                         if (parsed.validity.valid === false) {

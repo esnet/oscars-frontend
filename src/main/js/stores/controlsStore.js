@@ -250,7 +250,6 @@ class ControlsStore {
 
     @action
     setParamsForConnection(params) {
-        // console.log("setParamsForConnection ", params);
         mergeWith(this.connection, params, this.customizer);
     }
 

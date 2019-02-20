@@ -79,7 +79,6 @@ class ConnectionControls extends Component {
         const params = {
             connection_mtu: parseInt(e.target.value, 10)
         };
-        console.log("params are ", params);
         this.props.controlsStore.setParamsForConnection(params);
     };
 

@@ -137,6 +137,7 @@ class Validator {
             result.ok = false;
             result.errors.push("Description not set.");
         }
+
         if (connection.connection_mtu === "") {
             result.ok = false;
             result.errors.push("MTU not set.");
@@ -152,6 +153,7 @@ class Validator {
             result.ok = false;
             result.errors.push("Connection id missing!");
         }
+
         if (connection.mode === "MANUAL" || connection.mode === "AUTOMATIC") {
             // ok
         } else {
@@ -169,6 +171,7 @@ class Validator {
             result.ok = false;
             result.errors.push("Start or end time set in the past!");
         }
+
         if (connection.schedule.start.at > connection.schedule.end.at) {
             result.ok = false;
             result.errors.push("End time set before start time.");
