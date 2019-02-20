@@ -1,5 +1,11 @@
 # OSCARS Frontend Release Notes
 
+## v1.0.21
+
+> Feb 22, 2019
+
+- Add feature to allow service MTU override [#146](https://github.com/esnet/oscars-newtech/issues/146)
+
 ## v1.0.20
 
 > Feb 7, 2019
