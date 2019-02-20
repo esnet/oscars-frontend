@@ -4,7 +4,7 @@
 
 > Feb 22, 2019
 
-- Add feature to allow service MTU override [#146](https://github.com/esnet/oscars-newtech/issues/146)
+- Add feature to allow service MTU override [#258](https://github.com/esnet/oscars-newtech/issues/258)
 
 ## v1.0.20
 
