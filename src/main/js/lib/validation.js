@@ -137,6 +137,17 @@ class Validator {
             result.ok = false;
             result.errors.push("Description not set.");
         }
+        if (connection.connection_mtu === "") {
+            result.ok = false;
+            result.errors.push("MTU not set.");
+        } else if (connection.connection_mtu < 1500) {
+            result.ok = false;
+            result.errors.push("MTU too small");
+        } else if (connection.connection_mtu > 9000) {
+            result.ok = false;
+            result.errors.push("MTU too large");
+        }
+
         if (connection.connectionId === "") {
             result.ok = false;
             result.errors.push("Connection id missing!");
@@ -170,6 +181,13 @@ class Validator {
             return "error";
         }
         return "success";
+    }
+
+    mtuControl(val) {
+        if (val >= 1500 && val <= 9000) {
+            return "success";
+        }
+        return "error";
     }
 
     cleanBandwidth(inputStr, control) {

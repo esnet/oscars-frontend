@@ -8,7 +8,7 @@ class ControlsStore {
         description: "",
         phase: "",
         mode: "AUTOMATIC",
-        connection_mtu: 0,
+        connection_mtu: 9000,
         schedule: {
             locked: false,
             acceptable: false,

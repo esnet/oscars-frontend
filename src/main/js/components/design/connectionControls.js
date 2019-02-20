@@ -177,6 +177,9 @@ class ConnectionControls extends Component {
                                 type="text"
                                 placeholder="Type a description"
                                 valid={validator.descriptionControl(conn.description) === "success"}
+                                invalid={
+                                    validator.descriptionControl(conn.description) !== "success"
+                                }
                                 defaultValue={conn.description}
                                 onChange={this.onDescriptionChange}
                             />
@@ -192,10 +195,14 @@ class ConnectionControls extends Component {
                         <FormGroup>
                             <Label>Connection MTU:</Label>
                             {mtuHelp}{" "}
-                            <Input type="select" onChange={this.onMTUChange}>
-                                <option value="9000">9000</option>
-                                <option value="1500">1500</option>
-                            </Input>
+                            <Input
+                                type="text"
+                                placeholder="Desired data MTU size"
+                                valid={validator.mtuControl(conn.connection_mtu) === "success"}
+                                invalid={validator.mtuControl(conn.connection_mtu) !== "success"}
+                                defaultValue={conn.connection_mtu}
+                                onChange={this.onMTUChange}
+                            />
                         </FormGroup>
                         <FormGroup className="float-right">
                             <ToggleDisplay show={!conn.validation.acceptable}>
