@@ -39,6 +39,7 @@ A frontend for OSCARS 1.0
   - Run a `mvn package deploy` on the frontend (do this ONLY when everything is tested and working as expected)
     - If you're in development mode, you can skip the deploy mode for now. Just do a `mvn install` locally
   - Bump the version dependency on the backend (`oscars-newtech`) in the top level `pom.xml`
+  - Then, in the backend, run `mvn clean install` from the top level directory
 
 ### IntelliJ IDEA settings 
 
