@@ -45,32 +45,32 @@ class DesignHelpModal extends Component {
                 toggle={this.toggle}
                 onExit={this.closeModal}
             >
-                <ModalHeader toggle={this.toggle}>OSCARS help</ModalHeader>
+                <ModalHeader toggle={this.toggle}>OSCARS Quick Guide</ModalHeader>
                 <ModalBody>
                     <Card>
                         <CardBody>
-                            <h3>Quick guide</h3>
+                            <h3>Steps to follow</h3>
                             <ListGroup>
                                 <ListGroupItem>
-                                    Set a description for your connection,
+                                    1. Set a description for your connection
                                 </ListGroupItem>
                                 <ListGroupItem>
-                                    Unlock, change, then re-lock the schedule,
+                                    2. Unlock, change, then re-lock the schedule
                                 </ListGroupItem>
                                 <ListGroupItem>
-                                    Add a fixture, decide its VLAN and bandwidth and lock it,
+                                    3. Add a fixture, decide its VLAN and bandwidth and lock it
                                 </ListGroupItem>
                                 <ListGroupItem>
-                                    Add at least one more fixture, and lock it
+                                    4. Add at least one more fixture, and lock it
                                 </ListGroupItem>
-                                <ListGroupItem>Keep adding fixtures as needed.</ListGroupItem>
+                                <ListGroupItem>5. Keep adding fixtures as needed</ListGroupItem>
                                 <ListGroupItem>
-                                    Verify pipe topology; click on junction to add more pipes
+                                    6. Verify pipe topology. Click on the junction to add more pipes
                                 </ListGroupItem>
                                 <ListGroupItem>
-                                    Click on each pipe, set parameters, and lock,
+                                    7. Click on each pipe, set parameters, and lock
                                 </ListGroupItem>
-                                <ListGroupItem>Finally, click "Commit"</ListGroupItem>
+                                <ListGroupItem>8. Finally, click "Commit"</ListGroupItem>
                             </ListGroup>
                         </CardBody>
                     </Card>

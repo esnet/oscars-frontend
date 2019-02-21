@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { DataSet, Network } from "vis/dist/vis-network.min.js";
 import { inject, observer } from "mobx-react";
 import { autorun, toJS, action } from "mobx";
-import Octicon from "react-octicon";
 
 import { Card, CardHeader, CardBody } from "reactstrap";
 import PropTypes from "prop-types";
@@ -145,16 +144,7 @@ class NetworkMap extends Component {
             <Card>
                 <CardHeader className="p-1">
                     Network Map
-                    <span className="float-right">
-                        {" "}
-                        <Octicon
-                            name="search"
-                            onClick={() => {
-                                this.network.fit({ animation: true });
-                            }}
-                        />{" "}
-                        {help}
-                    </span>
+                    <span className="float-right"> {help}</span>
                 </CardHeader>
                 <CardBody>
                     <div id={this.props.mapDivId}>

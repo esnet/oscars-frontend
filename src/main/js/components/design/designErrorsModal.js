@@ -14,6 +14,7 @@ class DesignErrorsModal extends Component {
     closeModal = () => {
         this.props.modalStore.closeModal(modalName);
     };
+
     toggle = () => {
         if (this.props.modalStore.modals.get(modalName)) {
             this.props.modalStore.closeModal(modalName);

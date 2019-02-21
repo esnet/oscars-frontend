@@ -278,11 +278,7 @@ class DesignDrawing extends Component {
                     Zoom in and out by mouse-wheel, click and drag the background to pan, or
                     click-and-drag a node to reposition it.
                 </p>
-                <p>
-                    Click on any component to bring up its edit form. You may also click on the
-                    magnifying glass icon to the right to auto-adjust the zoom level to fit
-                    everything in the displayed window.
-                </p>
+                <p>Click on any component to bring up its edit form.</p>
                 <p>Left click and hold to pan, use mouse wheel to zoom in / out. </p>
             </span>
         );
@@ -295,16 +291,7 @@ class DesignDrawing extends Component {
             <Card>
                 <CardHeader className="p-1">
                     Design drawing
-                    <span className="float-right">
-                        {help}
-                        <Octicon
-                            name="search"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => {
-                                this.network.fit({ animation: true });
-                            }}
-                        />
-                    </span>{" "}
+                    <span className="float-right">{help}</span>{" "}
                 </CardHeader>
                 <CardBody>
                     <div id={this.props.containerId}>

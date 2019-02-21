@@ -54,15 +54,18 @@ class DesignApp extends Component {
             <Row>
                 <Col md={3} sm={3}>
                     <ConnectionControls />
+                    <br />
                     <ScheduleControls />
                 </Col>
                 <Col md={6} sm={6}>
                     <NetworkMap mapDivId={"mapDiv"} selectDevice={this.selectDevice} />
+                    <br />
                     <DesignDrawing containerId={"mainDesignDrawing"} />
                 </Col>
                 <Col md={3} sm={3}>
                     <HoldTimer />
                     <SelectPortTypeahead />
+                    <br />
                     <DesignComponents />
                 </Col>
                 <AddFixtureModal />
